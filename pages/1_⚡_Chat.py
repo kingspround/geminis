@@ -98,8 +98,3 @@ if prompt := st.chat_input():
             re = getAnswer(prompt,lambda x:writeReply(p,x))
             print(re)
             st.session_state.messages.append({"role": "assistant", "content": re})
-        print("_"*80)
-        ret+=chunk.text
-        feedback(ret)
-    
-    return ret
