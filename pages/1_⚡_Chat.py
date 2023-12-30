@@ -89,31 +89,21 @@ def getAnswer(prompt,feedback):
         ret+=chunk.text
         feedback(ret)
     
-    return ret
+    # 保存对话记录
+    create_dialogue_file(f"dialogue_{len(st.session_state.messages)}", st.session_state.messages)
 
+    if prompt := st.chat_input():
+    # 创建一个新的对话文件
+    create_dialogue_file(f"dialogue_{len(st.session_state.messages)}", st.session_state.messages)
 
-
-
-if "messages" not in st.session_state:
-    st.session_state.messages = []
-
-    
-for message in st.session_state.messages:
-    with st.chat_message(message["role"]):
-        st.markdown(message["content"])
-        
-def writeReply(cont,msg):
-    cont.write(msg)
-    
-if prompt := st.chat_input():
-    st.chat_message("user").write(prompt)
+    # 将新消息添加到对话列表中
     st.session_state.messages.append({"role": "user", "content": prompt})
-    with st.chat_message("assistant"):
-            p=st.empty()
-            re = getAnswer(prompt,lambda x:writeReply(p,x))
-            print(re)
-            st.session_state.messages.append({"role": "assistant", "content": re})
 
-# 增加重置上一个输出的按钮
-if len(st.session_state.messages) > 0:
-    st.button("重置上一个输出", on_click=lambda: st.session_state.messages.pop(-1))
+    # 生成回复
+    with st.chat_message("assistant"):
+        p=st.empty()
+        re = getAnswer(prompt,lambda x:writeReply(p,x))
+        print(re)
+        st.session_state.messages.append({"role": "assistant", "content": re})
+
+    return ret
