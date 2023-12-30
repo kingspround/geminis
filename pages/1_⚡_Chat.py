@@ -53,20 +53,19 @@ model = genai.GenerativeModel(model_name="gemini-pro",generation_config=generati
 # LLM
 
 
-def getAnswer(prompt,feedback):
-    his_messages=[]
-    #his_messages.append(SystemMessage(content=f'''你是一个全能的仆人。会全力的满足主人的愿望。'''))
-    messages=[]
-    message=None
+def getAnswer(prompt, feedback):
+    his_messages = []
+    # his_messages.append(SystemMessage(content=f'''你是一个全能的仆人。会全力的满足主人的愿望。'''))
+    messages = []
+    message = None
     for msg in st.session_state.messages[-20:]:
-        if msg["role"]=="user":
-            #message=[msg["content"],None]
-            his_messages.append({ "role": "user","parts": msg["content"]})
+        if msg["role"] == "user":
+            # message=[msg["content"],None]
+            his_messages.append({"role": "user", "parts": msg["content"]})
         elif msg is not None and msg["content"] is not None:
-            #message[1]=msg["content"]
-            his_messages.append({ "role": "model", "parts":msg["content"]})
-       
-    print(his_messages)  
+            # message[1]=msg["content"]
+            his_messages.append({"role": "model", "parts": msg["content"]})
+            print(his_messages)
     try:
         response = model.generate_content(contents=his_messages, stream=True)
     except Exception as e:
@@ -79,39 +78,29 @@ def getAnswer(prompt,feedback):
         re = getAnswer(st.session_state.messages[-1]["content"], feedback)
         st.session_state.messages.append({"role": "assistant", "content": re})
         return
-
-    ret=""
-    for chunk in response:
-        print(chunk.text)
-        print("_"*80)
-        ret+=chunk.text
-        feedback(ret)
-    
+    ret = ""
+    # 使用 replace() 函数将连续的空格替换为一个空格
+    ret = " ".join(response.text.split())
+    feedback(ret)
     return ret
+    if "messages" not in st.session_state:
+        st.session_state.messages = []
+    for message in st.session_state.messages:
+        with st.chat_message(message["role"]):
+            st.markdown(message["content"])
 
+    def writeReply(cont, msg):
+        cont.write(msg)
 
-
-
-if "messages" not in st.session_state:
-    st.session_state.messages = []
-
-    
-for message in st.session_state.messages:
-    with st.chat_message(message["role"]):
-        st.markdown(message["content"])
-        
-def writeReply(cont,msg):
-    cont.write(msg)
-    
-if prompt := st.chat_input():
-    st.chat_message("user").write(prompt)
-    st.session_state.messages.append({"role": "user", "content": prompt})
+    if prompt := st.chat_input():
+        st.chat_message("user").write(prompt)
+        st.session_state.messages.append({"role": "user", "content": prompt})
     with st.chat_message("assistant"):
-            p=st.empty()
-            re = getAnswer(prompt,lambda x:writeReply(p,x))
-            print(re)
-            st.session_state.messages.append({"role": "assistant", "content": re})
+        p = st.empty()
+        re = getAnswer(prompt, lambda x: writeReply(p, x))
+        print(re)
+        st.session_state.messages.append({"role": "assistant", "content": re})
 
-# 增加重置上一个输出的按钮
-if len(st.session_state.messages) > 0:
-    st.button("重置上一个输出", on_click=lambda: st.session_state.messages.pop(-1))
+    # 增加重置上一个输出的按钮
+    if len(st.session_state.messages) > 0:
+        st.button("重置上一个输出", on_click=lambda: st.session_state.messages.pop(-1))
