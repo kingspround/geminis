@@ -72,8 +72,14 @@ def getAnswer(prompt,feedback):
     try:
         response = model.generate_content(contents=his_messages, stream=True)
     except Exception as e:
-        st.session_state.messages = []
+        # 只重置上一个输出，而不是所有的输出
+        if len(st.session_state.messages) > 0:
+            st.session_state.messages.pop(-1)
+        # 显示错误消息
         st.error(f"抱歉，我遇到了一个错误：{e}")
+        # 让 AI 继续话题重新输出上一个输出
+        re = getAnswer(st.session_state.messages[-1]["content"], feedback)
+        st.session_state.messages.append({"role": "assistant", "content": re})
         return
 
     ret=""
@@ -106,6 +112,11 @@ if prompt := st.chat_input():
             p=st.empty()
             re = getAnswer(prompt,lambda x:writeReply(p,x))
             print(re)
+            st.session_state.messages.append({"role": "assistant", "content": re})
+
+# 增加重置上一个输出的按钮
+if len(st.session_state.messages) > 0:
+    st.button("重置上一个输出", on_click=lambda: st.session_state.messages.pop(-1))
             st.session_state.messages.append({"role": "assistant", "content": re})
 
 # 增加重置上一个输出的按钮
