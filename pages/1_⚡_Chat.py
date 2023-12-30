@@ -55,7 +55,7 @@ model = genai.GenerativeModel(model_name="gemini-pro",generation_config=generati
 
 
 
-def def getAnswer(prompt,feedback):
+def getAnswer(prompt,feedback):
     his_messages=[]
     #his_messages.append(SystemMessage(content=f'''你是一个全能的仆人。会全力的满足主人的愿望。'''))
     messages=[]
