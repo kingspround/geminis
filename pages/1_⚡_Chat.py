@@ -101,3 +101,6 @@ if prompt := st.chat_input():
             re = getAnswer(prompt,lambda x:writeReply(p,x))
             print(re)
             st.session_state.messages.append({"role": "assistant", "content": re})
+
+# 增加重置上一个输出的按钮
+st.button("重置上一个输出", on_click=lambda: st.session_state.messages.pop())
