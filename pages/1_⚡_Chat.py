@@ -13,14 +13,16 @@ import streamlit as st
 genai.configure(api_key="st.session_state.key")
 
 key = st.text_input("Your key", type="password")    
-if key:
-    st.session_state.key = key
-    
+st.session_state.key = st.session_state.get(key, None)
+
+st.session_state.key = st.session_state.get(key, None)
 if not st.session_state.key: 
     st.info("Please add your key to continue.")
     st.stop()
 
-model = GenerativeModel(model_name="gemini-pro", key="st.session_state.key")
+model = GenerativeModel(model_name="gemini-pro", key=st.session_state.get(key, None))
+
+# Your code to generate content using model
 
 # Set up the model
 generation_config = {
