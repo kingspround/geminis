@@ -102,9 +102,6 @@ def writeReply(cont,msg):
     cont.write(msg)
     
 if prompt := st.chat_input():
-    # 创建一个新的对话文件
-    create_dialogue_file(f"dialogue_{len(st.session_state.messages)}", st.session_state.messages)
-
     # 将新消息添加到对话列表中
     st.session_state.messages.append({"role": "user", "content": prompt})
 
@@ -114,6 +111,11 @@ if prompt := st.chat_input():
         re = getAnswer(prompt,lambda x:writeReply(p,x))
         print(re)
         st.session_state.messages.append({"role": "assistant", "content": re})
+
+# 增加创建一个新对话文件的按钮
+if st.button("创建新对话文件"):
+    # 创建一个新的对话文件
+    create_dialogue_file(f"dialogue_{len(st.session_state.messages)}", st.session_state.messages)
 
 # 增加重置上一个输出的按钮
 if len(st.session_state.messages) > 0:
