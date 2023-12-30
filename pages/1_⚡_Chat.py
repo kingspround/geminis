@@ -16,7 +16,7 @@ if not st.session_state.key:
     st.info("Please add your key to continue.")
     st.stop()
     
-genai.configure(api_key=AIzaSyCDoTOEe1CAMKCz4GhnCe66l5Y6pSMsIu8)
+genai.configure(api_key="AIzaSyCDoTOEe1CAMKCz4GhnCe66l5Y6pSMsIu8")
 
 # Set up the model
 generation_config = {
