@@ -1,5 +1,6 @@
 # First
 import google.generativeai as genai
+from google.generativeai import GenerativeModel
 import streamlit as st
 from dotenv import load_dotenv  
 import os
@@ -9,14 +10,17 @@ from io import BytesIO
 from io import StringIO
 import streamlit as st
 
-if "key" not in st.session_state:
-    st.session_state.key = NONE
+genai.configure(api_key="st.session_state.key")
+
+key = st.text_input("Your key", type="password")    
+if key:
+    st.session_state.key = key
     
-if not st.session_state.key:
+if not st.session_state.key: 
     st.info("Please add your key to continue.")
     st.stop()
-    
-genai.configure(api_key="AIzaSyCDoTOEe1CAMKCz4GhnCe66l5Y6pSMsIu8")
+
+model = GenerativeModel(model_name="gemini-pro", key="AIzaSyCDoTOEe1CAMKCz4GhnCe66l5Y6pSMsIu8")
 
 # Set up the model
 generation_config = {
