@@ -53,25 +53,29 @@ model = genai.GenerativeModel(model_name="gemini-pro",generation_config=generati
 # LLM
 
 
-
-
 def getAnswer(prompt,feedback):
     his_messages=[]
+    #his_messages.append(SystemMessage(content=f'''你是一个全能的仆人。会全力的满足主人的愿望。'''))
     messages=[]
     message=None
     for msg in st.session_state.messages[-20:]:
         if msg["role"]=="user":
+            #message=[msg["content"],None]
             his_messages.append({ "role": "user","parts": msg["content"]})
         elif msg is not None and msg["content"] is not None:
+            #message[1]=msg["content"]
             his_messages.append({ "role": "model", "parts":msg["content"]})
        
     print(his_messages)  
     try:
         response = model.generate_content(contents=his_messages, stream=True)
     except Exception as e:
+        # 只重置上一个输出，而不是所有的输出
         if len(st.session_state.messages) > 0:
             st.session_state.messages.pop(-1)
+        # 显示错误消息
         st.error(f"抱歉，我遇到了一个错误：{e}")
+        # 让 AI 继续话题重新输出上一个输出
         re = getAnswer(st.session_state.messages[-1]["content"], feedback)
         st.session_state.messages.append({"role": "assistant", "content": re})
         return
@@ -85,10 +89,8 @@ def getAnswer(prompt,feedback):
     
     return ret
 
-def create_dialogue_file(filename, dialogue):
-    with open(f"pages/{filename}.py", "w") as f:
-        f.write(f"def get_dialogue():\n")
-        f.write(f"    return {dialogue}\n")
+
+
 
 if "messages" not in st.session_state:
     st.session_state.messages = []
@@ -102,20 +104,13 @@ def writeReply(cont,msg):
     cont.write(msg)
     
 if prompt := st.chat_input():
-    # 将新消息添加到对话列表中
+    st.chat_message("user").write(prompt)
     st.session_state.messages.append({"role": "user", "content": prompt})
-
-    # 生成回复
     with st.chat_message("assistant"):
-        p=st.empty()
-        re = getAnswer(prompt,lambda x:writeReply(p,x))
-        print(re)
-        st.session_state.messages.append({"role": "assistant", "content": re})
-
-# 增加创建一个新对话文件的按钮
-if st.button("创建新对话文件"):
-    # 创建一个新的对话文件
-    create_dialogue_file(f"dialogue_{len(st.session_state.messages)}", st.session_state.messages)
+            p=st.empty()
+            re = getAnswer(prompt,lambda x:writeReply(p,x))
+            print(re)
+            st.session_state.messages.append({"role": "assistant", "content": re})
 
 # 增加重置上一个输出的按钮
 if len(st.session_state.messages) > 0:
