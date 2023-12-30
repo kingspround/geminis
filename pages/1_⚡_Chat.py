@@ -55,7 +55,7 @@ model = genai.GenerativeModel(model_name="gemini-pro",generation_config=generati
 
 
 
-def getAnswer(prompt,feedback):
+def def getAnswer(prompt,feedback):
     his_messages=[]
     #his_messages.append(SystemMessage(content=f'''你是一个全能的仆人。会全力的满足主人的愿望。'''))
     messages=[]
@@ -112,11 +112,6 @@ if prompt := st.chat_input():
             p=st.empty()
             re = getAnswer(prompt,lambda x:writeReply(p,x))
             print(re)
-            st.session_state.messages.append({"role": "assistant", "content": re})
-
-# 增加重置上一个输出的按钮
-if len(st.session_state.messages) > 0:
-    st.button("重置上一个输出", on_click=lambda: st.session_state.messages.pop(-1))
             st.session_state.messages.append({"role": "assistant", "content": re})
 
 # 增加重置上一个输出的按钮
