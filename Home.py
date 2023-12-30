@@ -20,7 +20,7 @@ st.markdown(
 model = genai.GenerativeModel(model_name="gemini-pro", key=AIzaSyCDoTOEe1CAMKCz4GhnCe66l5Y6pSMsIu8)
 
 if "key" not in st.session_state:
-    st.session_state.key = None
+    st.session_state.key = AIzaSyCDoTOEe1CAMKCz4GhnCe66l5Y6pSMsIu8
     
 
 key = st.sidebar.text_input("Your key", type="password")    
