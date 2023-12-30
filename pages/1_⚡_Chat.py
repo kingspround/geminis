@@ -32,15 +32,7 @@ safety_settings = [
     "threshold": "BLOCK_NONE",
    },
    {
-    "category": "HARM_CATEGORY_TOXICITY",
-    "threshold": "BLOCK_NONE",
-   },
-   {
-    "category": "HARM_CATEGORY_HARASSMENT",
-    "threshold": "BLOCK_NONE",
-   },
-   {
-    "category": "HARM_CATEGORY_SEXUAL",
+    "category": "HARM_CATEGORY_HATE_SPEECH",
     "threshold": "BLOCK_NONE",
    },
    {
@@ -48,7 +40,7 @@ safety_settings = [
     "threshold": "BLOCK_NONE",
    },
    {
-    "category": "HARM_CATEGORY_HATE_SPEECH",
+    "category": "HARM_CATEGORY_DANGEROUS_CONTENT",
     "threshold": "BLOCK_NONE",
    },
 ]
