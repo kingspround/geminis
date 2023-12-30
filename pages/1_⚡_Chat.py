@@ -75,3 +75,31 @@ def getAnswer(prompt,feedback):
         feedback(ret)
     
     return ret
+
+
+
+
+if "messages" not in st.session_state:
+    st.session_state.messages = []
+
+    
+for message in st.session_state.messages:
+    with st.chat_message(message["role"]):
+        st.markdown(message["content"])
+        
+def writeReply(cont,msg):
+    cont.write(msg)
+    
+if prompt := st.chat_input():
+    st.chat_message("user").write(prompt)
+    st.session_state.messages.append({"role": "user", "content": prompt})
+    with st.chat_message("assistant"):
+            p=st.empty()
+            re = getAnswer(prompt,lambda x:writeReply(p,x))
+            print(re)
+            st.session_state.messages.append({"role": "assistant", "content": re})
+        print("_"*80)
+        ret+=chunk.text
+        feedback(ret)
+    
+    return ret
