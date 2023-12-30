@@ -69,7 +69,13 @@ def getAnswer(prompt,feedback):
             his_messages.append({ "role": "model", "parts":msg["content"]})
        
     print(his_messages)  
-    response = model.generate_content(contents=his_messages, stream=True)
+    try:
+        response = model.generate_content(contents=his_messages, stream=True)
+    except Exception as e:
+        st.session_state.messages = []
+        st.error(f"抱歉，我遇到了一个错误：{e}")
+        return
+
     ret=""
     for chunk in response:
         print(chunk.text)
