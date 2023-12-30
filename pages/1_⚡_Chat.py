@@ -41,7 +41,7 @@ safety_settings = [
   },
   {
     "category": "HARM_CATEGORY_DANGEROUS_CONTENT",
-    "threshold": "BLOCK_MEDIUM_AND_ABOVE""
+    "threshold": "BLOCK_MEDIUM_AND_ABOVE"
   }
 ]
 
