@@ -8,8 +8,9 @@ import numpy as np
 from io import BytesIO
 from io import StringIO
 import streamlit as st
-
-model = genai.GenerativeModel(model_name="gemini-pro", key="AIzaSyCDoTOEe1CAMKCz4GhnCe66l5Y6pSMsIu8")
+from google.ai.generativelanguage_v1beta.services.generative_service.client import GenerativeServiceClient
+client = GenerativeServiceClient(key="AIzaSyCDoTOEe1CAMKCz4GhnCe66l5Y6pSMsIu8")
+model = genai.GenerativeModel(model_name="gemini-pro", client=client)
 
 if "key" not in st.session_state:
     st.session_state.key = NONE
