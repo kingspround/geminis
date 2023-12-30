@@ -20,7 +20,7 @@ if not st.session_state.key:
     st.info("Please add your key to continue.")
     st.stop()
 
-model = GenerativeModel(model_name="gemini-pro", key="AIzaSyCDoTOEe1CAMKCz4GhnCe66l5Y6pSMsIu8")
+model = GenerativeModel(model_name="gemini-pro", key="st.session_state.key")
 
 # Set up the model
 generation_config = {
