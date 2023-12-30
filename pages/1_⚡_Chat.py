@@ -9,8 +9,10 @@ from io import BytesIO
 from io import StringIO
 import streamlit as st
 
+model = genai.GenerativeModel(model_name="gemini-pro", key=AIzaSyCDoTOEe1CAMKCz4GhnCe66l5Y6pSMsIu8)
+
 if "key" not in st.session_state:
-    st.session_state.key = AIzaSyCDoTOEe1CAMKCz4GhnCe66l5Y6pSMsIu8
+    st.session_state.key = NONE
     
 if not st.session_state.key:
     st.info("Please add your key to continue.")
