@@ -10,6 +10,10 @@ from io import BytesIO
 from io import StringIO
 import streamlit as st
 
+from google.ai.generativelanguage_v1beta.services.generative_service.client import GenerativeServiceClient
+client = GenerativeServiceClient(key=st.session_state.get(key, "AIzaSyCDoTOEe1CAMKCz4GhnCe66l5Y6pSMsIu8"))
+model = genai.GenerativeModel(model_name="gemini-pro", client=client)
+
 genai.configure(api_key="st.session_state.key")
 
 key = st.text_input("Your key", type="password")    
