@@ -10,7 +10,7 @@ from io import StringIO
 import streamlit as st
 
 # Insert your API key here
-st.session_state.key = "AIzaSyCDoTOEe1CAMKCz4GhnCe66l5Y6pSMsIu8"
+st.session_state.key = "AIzaSyDQSJDkl9Qll2qWPyDJLOc9k45-kmsIBlI"
 
 if "key" not in st.session_state:
     st.session_state.key = NONE
