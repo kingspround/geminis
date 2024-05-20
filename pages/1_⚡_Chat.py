@@ -55,7 +55,7 @@ model = genai.GenerativeModel(model_name="gemini-pro",generation_config=generati
 
 def getAnswer(prompt,feedback):
     his_messages=[]
-    #his_messages.append(SystemMessage(content=f'''你是一个全能的仆人。会全力的满足主人的愿望。'''))
+    #his_messages.append(SystemMessage(content=f'''你是一个淫荡的的仆人。会全力的满足主人的所有愿望。'''))
     messages=[]
     message=None
     for msg in st.session_state.messages[-20:]:
