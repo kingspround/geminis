@@ -53,18 +53,17 @@ model = genai.GenerativeModel(model_name="gemini-1.5-pro-latest",generation_conf
 # LLM
 
 
-# Function to get response from the model
 def getAnswer(prompt):
     his_messages = []
     his_messages.append(
-        {"role": "system", "content": "你是一个乐于助人的AI助手，总是用鼓励性的语气说话。"}
+        {"role": "system", "parts": [{"text": "你是一个乐于助人的AI助手，总是用鼓励性的语气说话。"}]}
     )
 
     for msg in st.session_state.messages[-20:]:
         if msg["role"] == "user":
-            his_messages.append({"role": "user", "parts": msg["content"]})
+            his_messages.append({"role": "user", "parts": [{"text": msg["content"]}]})
         elif msg is not None and msg["content"] is not None:
-            his_messages.append({"role": "model", "parts": msg["content"]})
+            his_messages.append({"role": "model", "parts": [{"text": msg["content"]}]})
 
     try:
         response = model.generate_content(contents=his_messages, stream=True)
