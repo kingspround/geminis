@@ -75,7 +75,7 @@ def getAnswer(prompt):
         return full_response  # 返回完整的回复
     except Exception as e:
         st.error(f"An error occurred: {e}")
-        return ""
+        return""
 
 if prompt := st.chat_input("Enter your message:"):
     st.session_state.messages.append({"role": "user", "content": prompt})
