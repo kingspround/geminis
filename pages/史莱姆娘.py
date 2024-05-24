@@ -67,7 +67,7 @@ def getAnswer(prompt, feedback):
     elif msg is not None and msg["content"] is not None:
       his_messages.append({"role": "model", "parts": msg["content"]})
        
-    print(his_messages)  
+
     try:
         response = model.generate_content(contents=his_messages, stream=True)
     except Exception as e:
