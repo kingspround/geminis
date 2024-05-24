@@ -71,11 +71,19 @@ def getAnswer(prompt):
         full_response = ""
         for chunk in response:
             full_response += chunk.text
-            yield chunk.text  
+            yield chunk.text
         return full_response  # 返回完整的回复
     except Exception as e:
         st.error(f"An error occurred: {e}")
         return ""  # 在发生错误时返回空字符串
+
+
+if "messages" not in st.session_state:
+    st.session_state.messages = []
+
+for message in st.session_state.messages:
+    with st.chat_message(message["role"]):
+        st.markdown(message["content"])
 
 if prompt := st.chat_input("Enter your message:"):
     st.session_state.messages.append({"role": "user", "content": prompt})
@@ -83,55 +91,12 @@ if prompt := st.chat_input("Enter your message:"):
         st.markdown(prompt)
     with st.chat_message("assistant"):
         message_placeholder = st.empty()
-        full_response = ""  # 初始化 full_response
-        for chunk in getAnswer(prompt):
+        full_response = ""
+        for chunk in getAnswer(prompt):  # 正确调用 getAnswer
             full_response += chunk
             message_placeholder.markdown(full_response + "▌")
         message_placeholder.markdown(full_response)
     st.session_state.messages.append({"role": "assistant", "content": full_response})
-       
-    try:
-        response = model.generate_content(contents=his_messages, stream=True)
-    except Exception as e:
-        # 只重置上一个输出，而不是所有的输出
-        if len(st.session_state.messages) > 0:
-            st.session_state.messages.pop(-1)
-        # 显示错误消息
-        st.error(f"抱歉，我遇到了一个错误：{e}")
-        # 让 AI 继续话题重新输出上一个输出
-        re = getAnswer(st.session_state.messages[-1]["content"], feedback)
-        st.session_state.messages.append({"role": "assistant", "content": re})
-        return
-
-    ret=""
-    for chunk in response:
-        print(chunk.text)
-        print("_"*80)
-        ret+=chunk.text
-        feedback(ret)
-    
-    return ret
-
-
-if "messages" not in st.session_state:
-    st.session_state.messages = []
-
-    
-for message in st.session_state.messages:
-    with st.chat_message(message["role"]):
-        st.markdown(message["content"])
-        
-def writeReply(cont,msg):
-    cont.write(msg)
-    
-if prompt := st.chat_input():
-    st.chat_message("user").write(prompt)
-    st.session_state.messages.append({"role": "user", "content": prompt})
-    with st.chat_message("assistant"):
-            p=st.empty()
-            re = getAnswer(prompt,lambda x:writeReply(p,x))
-            print(re)
-            st.session_state.messages.append({"role": "assistant", "content": re})
 
 # 增加重置上一个输出的按钮
 if len(st.session_state.messages) > 0:
