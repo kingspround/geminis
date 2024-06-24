@@ -91,24 +91,21 @@ if "messages" not in st.session_state:
 
 # 显示历史记录
 for i, message in enumerate(st.session_state.messages):
-    with st.chat_message(message["role"]):
-        st.markdown(message["content"])
+    # 判断是否为最后两段对话
+    if i >= len(st.session_state.messages) - 2:
+        # 使用 st.text_area 来显示可编辑文本
+        new_content = st.text_area(f"编辑 {message['role']}:", message["content"], key=f"edit_{i}")
+        st.session_state.messages[i]["content"] = new_content
+    else:
+        # 使用 st.markdown 来显示不可编辑文本
+        with st.chat_message(message["role"]):
+            st.markdown(message["content"])
 
-        # 在最后两个对话中添加编辑按钮
-        if i >= len(st.session_state.messages) - 2:
-            if st.button("编辑", key=f"edit_{i}"):
-                # 弹出窗口用于编辑
-                new_content = st.text_area(f"编辑 {message['role']}:", message["content"])
-                if st.button("保存", key=f"save_{i}"):
-                    st.session_state.messages[i]["content"] = new_content
-                    # 保存更改到文件
-                    with open(filename, "wb") as f:
-                        pickle.dump(st.session_state.messages, f)
-                    st.success(f"已保存更改！")
-
-                    # 只更新页面中的历史记录
-                    with st.chat_message(message["role"]):
-                        st.markdown(new_content)
+# 保存历史记录到文件
+if st.session_state.messages != st.session_state.messages_old:
+    with open(filename, "wb") as f:
+        pickle.dump(st.session_state.messages, f)
+    st.session_state.messages_old = st.session_state.messages
 
 if prompt := st.chat_input("Enter your message:"):
     st.session_state.messages.append({"role": "user", "content": prompt})
@@ -122,10 +119,6 @@ if prompt := st.chat_input("Enter your message:"):
             message_placeholder.markdown(full_response + "▌")
         message_placeholder.markdown(full_response)
     st.session_state.messages.append({"role": "assistant", "content": full_response})
-
-    # 保存历史记录到文件
-    with open(filename, "wb") as f:
-        pickle.dump(st.session_state.messages, f)
 
 # 增加重置上一个输出的按钮
 if len(st.session_state.messages) > 0:
