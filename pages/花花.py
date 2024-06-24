@@ -183,6 +183,7 @@ st.markdown(
     <style>
     .stButton button {
         text-align: left;
+        margin-right: 10px; /* 调整按钮之间的右间距 */
     }
     </style>
     """,
