@@ -173,29 +173,6 @@ with col3:
             st.success(f"成功清除 {filename} 的历史记录！")
         except FileNotFoundError:
             st.warning(f"{filename} 不存在。")
-# 使用 Streamlit 的 columns 布局来将按钮放在同一行
-col1, col2, col3 = st.columns(3)
-with col1:
-    if len(st.session_state.messages) > 0:
-        st.button("重置上一个输出", on_click=lambda: st.session_state.messages.pop(-1))
-with col2:
-    if st.button("读取历史记录"):
-        try:
-            with open(log_file, "rb") as f:
-                messages = pickle.load(f)
-                for message in messages:
-                    with st.chat_message(message["role"]):
-                        st.markdown(message["content"])
-        except FileNotFoundError:
-            st.warning(f"{filename} 不存在。")
-with col3:
-    if st.button("清除历史记录"):
-        st.session_state.messages = []
-        try:
-            os.remove(log_file)  # 删除文件
-            st.success(f"成功清除 {filename} 的历史记录！")
-        except FileNotFoundError:
-            st.warning(f"{filename} 不存在。")
 
 # 使用 st.markdown 添加 CSS 代码
 st.markdown(
