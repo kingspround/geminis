@@ -101,8 +101,7 @@ def save_edit(index, new_content):
     with open(filename, "wb") as f:
         pickle.dump(st.session_state.messages, f)
 
-# 只显示最后两条对话
-for i, message in enumerate(st.session_state.messages[-2:]): 
+for i, message in enumerate(st.session_state.messages):
     with st.chat_message(message["role"]):
         if st.session_state.editing_index == i:
             new_content = st.text_area(
