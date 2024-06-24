@@ -80,11 +80,19 @@ def getAnswer(prompt):
 
 # 获取文件名，并生成对应的文件名
 filename = "史莱姆娘" + ".pkl"  # 这里假设文件名就是 "史莱姆娘"
+log_dir = "log"  # 日志文件夹名称
+
+# 创建日志文件夹
+if not os.path.exists(log_dir):
+    os.makedirs(log_dir)
+
+# 获取完整路径
+log_file = os.path.join(log_dir, filename)
 
 if "messages" not in st.session_state:
     # 从文件加载历史记录
     try:
-        with open(filename, "rb") as f:
+        with open(log_file, "rb") as f:
             st.session_state.messages = pickle.load(f)
     except FileNotFoundError:
         st.session_state.messages = []
@@ -92,8 +100,8 @@ if "messages" not in st.session_state:
 # 显示历史记录
 for i, message in enumerate(st.session_state.messages):
     with st.chat_message(message["role"]):
-        # 使用 st.write 显示对话内容
-        st.write(message["content"], key=f"message_{i}")
+        # 使用 st.markdown 显示对话内容
+        st.markdown(message["content"], key=f"message_{i}")
 
         # 在最后两个对话中添加编辑按钮
         if i >= len(st.session_state.messages) - 2:
@@ -115,7 +123,7 @@ if st.session_state.get("editing"):
         if st.button("保存", key=f"save_{i}"):
             st.session_state.messages[i]["content"] = new_content
             # 保存更改到文件
-            with open(filename, "wb") as f:
+            with open(log_file, "wb") as f:
                 pickle.dump(st.session_state.messages, f)
             st.success(f"已保存更改！")
             st.session_state.editing = False  # 结束编辑状态
@@ -136,7 +144,7 @@ if prompt := st.chat_input("Enter your message:"):
     st.session_state.messages.append({"role": "assistant", "content": full_response})
 
     # 保存历史记录到文件
-    with open(filename, "wb") as f:
+    with open(log_file, "wb") as f:
         pickle.dump(st.session_state.messages, f)
 
 # 增加重置上一个输出的按钮
@@ -147,7 +155,18 @@ if len(st.session_state.messages) > 0:
 if st.button("清除历史记录"):
     st.session_state.messages = []
     try:
-        os.remove(filename)  # 删除文件
+        os.remove(log_file)  # 删除文件
         st.success(f"成功清除 {filename} 的历史记录！")
+    except FileNotFoundError:
+        st.warning(f"{filename} 不存在。")
+
+# 读取历史记录按钮
+if st.button("读取历史记录"):
+    try:
+        with open(log_file, "rb") as f:
+            messages = pickle.load(f)
+            for message in messages:
+                with st.chat_message(message["role"]):
+                    st.markdown(message["content"])
     except FileNotFoundError:
         st.warning(f"{filename} 不存在。")
