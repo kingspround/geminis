@@ -105,7 +105,10 @@ for i, message in enumerate(st.session_state.messages):
                     with open(filename, "wb") as f:
                         pickle.dump(st.session_state.messages, f)
                     st.success(f"已保存更改！")
-                    st.experimental_rerun()  # 重新运行页面
+
+                    # 只更新页面中的历史记录
+                    with st.chat_message(message["role"]):
+                        st.markdown(new_content)
 
 if prompt := st.chat_input("Enter your message:"):
     st.session_state.messages.append({"role": "user", "content": prompt})
