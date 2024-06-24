@@ -154,7 +154,7 @@ if prompt := st.chat_input("Enter your message:"):
     st.experimental_rerun() 
 
 # 使用 Streamlit 的 columns 布局来将按钮放在同一行
-col1, col2, col3 = st.columns(3)
+col1, col2, col3 = st.columns(3, spacing=0)  # 设置列间距为 0
 with col1:
     if len(st.session_state.messages) > 0:
         st.button("重置上一个输出", on_click=lambda: st.session_state.messages.pop(-1))
@@ -183,7 +183,6 @@ st.markdown(
     <style>
     .stButton button {
         text-align: left;
-        margin-right: 10px; /* 调整按钮之间的右间距 */
     }
     </style>
     """,
