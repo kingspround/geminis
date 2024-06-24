@@ -174,37 +174,28 @@ with st.container():
         unsafe_allow_html=True,
     )
 
-    # 使用一个新的容器来包含按钮
-    with st.container() as button_container:
-        st.markdown(
-            """
-            <style>
-            .button-container {
-                display: flex;
-                justify-content: flex-start; /* 按钮向左对齐 */
-            }
-            .button-container > button {
-                margin-right: 5px; /* 调整按钮之间的右间距 */
-            }
-            </style>
-            """,
-            unsafe_allow_html=True,
-        )
-        if len(st.session_state.messages) > 0:
-            st.button("重置上一个输出", on_click=lambda: st.session_state.messages.pop(-1))
-        if st.button("读取历史记录"):
-            try:
-                with open(log_file, "rb") as f:
-                    messages = pickle.load(f)
-                    for message in messages:
-                        with st.chat_message(message["role"]):
-                            st.markdown(message["content"])
-            except FileNotFoundError:
-                st.warning(f"{filename} 不存在。")
-        if st.button("清除历史记录"):
-            st.session_state.messages = []
-            try:
-                os.remove(log_file)  # 删除文件
-                st.success(f"成功清除 {filename} 的历史记录！")
-            except FileNotFoundError:
-                st.warning(f"{filename} 不存在。")
+    # 使用 st.container 来包含按钮
+    with st.container():
+        # 使用 st.columns(3) 布局三个按钮
+        col1, col2, col3 = st.columns([1,1,1])  # 设置每一列宽度
+        with col1:
+            if len(st.session_state.messages) > 0:
+                st.button("重置上一个输出", on_click=lambda: st.session_state.messages.pop(-1))
+        with col2:
+            if st.button("读取历史记录"):
+                try:
+                    with open(log_file, "rb") as f:
+                        messages = pickle.load(f)
+                        for message in messages:
+                            with st.chat_message(message["role"]):
+                                st.markdown(message["content"])
+                except FileNotFoundError:
+                    st.warning(f"{filename} 不存在。")
+        with col3:
+            if st.button("清除历史记录"):
+                st.session_state.messages = []
+                try:
+                    os.remove(log_file)  # 删除文件
+                    st.success(f"成功清除 {filename} 的历史记录！")
+                except FileNotFoundError:
+                    st.warning(f"{filename} 不存在。")
