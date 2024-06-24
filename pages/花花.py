@@ -150,6 +150,9 @@ if prompt := st.chat_input("Enter your message:"):
     with open(log_file, "wb") as f:
         pickle.dump(st.session_state.messages, f)
 
+    # 重新运行页面，使 CSS 样式生效
+    st.experimental_rerun() 
+
 # 使用 Streamlit 的 columns 布局来将按钮放在同一行
 col1, col2, col3 = st.columns(3)
 with col1:
