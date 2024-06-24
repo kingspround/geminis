@@ -89,32 +89,23 @@ if "messages" not in st.session_state:
     except FileNotFoundError:
         st.session_state.messages = []
 
-# 用于跟踪当前编辑的消息索引
-st.session_state.editing_index = None
-
-def edit_message(index):
-    st.session_state.editing_index = index
-
-def save_edit(index, new_content):
-    st.session_state.messages[index]["content"] = new_content
-    st.session_state.editing_index = None
-    with open(filename, "wb") as f:
-        pickle.dump(st.session_state.messages, f)
-
+# 显示历史记录
 for i, message in enumerate(st.session_state.messages):
     with st.chat_message(message["role"]):
-        if st.session_state.editing_index == i:
-            new_content = st.text_area(
-                label="编辑消息",
-                value=message["content"],
-                key=f"edit_{i}",
-            )
-            st.button("保存", on_click=lambda: save_edit(i, new_content))
-            st.button("取消", on_click=lambda: setattr(st.session_state, "editing_index", None))
-        else:
-            st.markdown(message["content"])
-            st.button("编辑", on_click=lambda: edit_message(i))
+        st.markdown(message["content"])
 
+        # 在最后两个对话中添加编辑按钮
+        if i >= len(st.session_state.messages) - 2:
+            if st.button("编辑", key=f"edit_{i}"):
+                # 弹出窗口用于编辑
+                new_content = st.text_area(f"编辑 {message['role']}:", message["content"])
+                if st.button("保存", key=f"save_{i}"):
+                    st.session_state.messages[i]["content"] = new_content
+                    # 保存更改到文件
+                    with open(filename, "wb") as f:
+                        pickle.dump(st.session_state.messages, f)
+                    st.success(f"已保存更改！")
+                    st.experimental_rerun()  # 重新运行页面
 
 if prompt := st.chat_input("Enter your message:"):
     st.session_state.messages.append({"role": "user", "content": prompt})
