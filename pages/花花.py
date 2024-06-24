@@ -92,21 +92,13 @@ if "messages" not in st.session_state:
 # 显示历史记录
 for i, message in enumerate(st.session_state.messages):
     with st.chat_message(message["role"]):
-        st.markdown(message["content"], key=f"message_{i}")  # 添加 key
-
-        # 在最后两个对话中添加编辑按钮
-        if i >= len(st.session_state.messages) - 2:
-            if st.button("编辑", key=f"edit_{i}"):
-                # 弹出窗口用于编辑
-                new_content = st.text_area(f"编辑 {message['role']}:", message["content"])
-                if st.button("保存", key=f"save_{i}"):
-                    st.session_state.messages[i]["content"] = new_content
-                    # 保存更改到文件
-                    with open(filename, "wb") as f:
-                        pickle.dump(st.session_state.messages, f)
-                    st.success(f"已保存更改！")
-                    # 更新对话内容
-                    st.markdown(new_content, key=f"message_{i}") 
+        # 使用 st.text_area 显示对话内容
+        new_content = st.text_area(f"{message['role']}:", message["content"], key=f"message_{i}")
+        # 在失去焦点时保存更改
+        if new_content != message["content"]:
+            st.session_state.messages[i]["content"] = new_content
+            with open(filename, "wb") as f:
+                pickle.dump(st.session_state.messages, f)
 
 if prompt := st.chat_input("Enter your message:"):
     st.session_state.messages.append({"role": "user", "content": prompt})
