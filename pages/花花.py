@@ -92,13 +92,35 @@ if "messages" not in st.session_state:
 # 显示历史记录
 for i, message in enumerate(st.session_state.messages):
     with st.chat_message(message["role"]):
-        # 使用 st.text_area 显示对话内容
-        new_content = st.text_area(f"{message['role']}:", message["content"], key=f"message_{i}")
-        # 在失去焦点时保存更改
-        if new_content != message["content"]:
+        # 使用 st.markdown 显示对话内容
+        st.markdown(message["content"], key=f"message_{i}")
+
+        # 在最后两个对话中添加编辑按钮
+        if i >= len(st.session_state.messages) - 2:
+            if st.button("编辑", key=f"edit_{i}"):
+                # 更改为可编辑文本
+                st.session_state.editable_index = i  # 记录可编辑的索引
+                st.session_state.editing = True  # 表示正在编辑
+
+if st.session_state.get("editing"):
+    # 如果正在编辑，显示编辑框和保存/取消按钮
+    i = st.session_state.editable_index
+    message = st.session_state.messages[i]
+
+    with st.chat_message(message["role"]):
+        new_content = st.text_area(
+            f"{message['role']}:", message["content"], key=f"message_edit_{i}"
+        )
+
+        if st.button("保存", key=f"save_{i}"):
             st.session_state.messages[i]["content"] = new_content
+            # 保存更改到文件
             with open(filename, "wb") as f:
                 pickle.dump(st.session_state.messages, f)
+            st.success(f"已保存更改！")
+            st.session_state.editing = False  # 结束编辑状态
+        if st.button("取消", key=f"cancel_{i}"):
+            st.session_state.editing = False  # 结束编辑状态
 
 if prompt := st.chat_input("Enter your message:"):
     st.session_state.messages.append({"role": "user", "content": prompt})
