@@ -92,8 +92,8 @@ if "messages" not in st.session_state:
 # 显示历史记录
 for i, message in enumerate(st.session_state.messages):
     with st.chat_message(message["role"]):
-        # 使用 st.markdown 显示对话内容
-        st.markdown(message["content"], key=f"message_{i}")
+        # 使用 st.write 显示对话内容
+        st.write(message["content"], key=f"message_{i}")
 
         # 在最后两个对话中添加编辑按钮
         if i >= len(st.session_state.messages) - 2:
