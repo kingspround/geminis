@@ -155,30 +155,43 @@ if prompt := st.chat_input("Enter your message:"):
 
 # 使用 st.container 创建一个新的容器
 with st.container():
-    # 使用 st.empty 创建一个占位符，以便使用 Flexbox 控制按钮
+    # 使用 st.empty 创建一个占位符
     st.empty()
+
     # 使用 Flexbox 控制按钮之间的间距
     st.markdown(
         """
         <style>
-        .stButton {
+        .button-container {
             display: flex;
-            justify-content: space-between; /* 按钮之间的间距为平均分配 */
+            justify-content: flex-start; /* 按钮向左对齐 */
         }
-        .stButton button {
-            margin-right: 5px;
+        .button-container > button {
+            margin-right: 5px; /* 调整按钮之间的右间距 */
         }
         </style>
         """,
         unsafe_allow_html=True,
     )
 
-    # 使用 st.columns(3) 布局三个按钮
-    col1, col2, col3 = st.columns(3)
-    with col1:
+    # 使用一个新的容器来包含按钮
+    with st.container() as button_container:
+        st.markdown(
+            """
+            <style>
+            .button-container {
+                display: flex;
+                justify-content: flex-start; /* 按钮向左对齐 */
+            }
+            .button-container > button {
+                margin-right: 5px; /* 调整按钮之间的右间距 */
+            }
+            </style>
+            """,
+            unsafe_allow_html=True,
+        )
         if len(st.session_state.messages) > 0:
             st.button("重置上一个输出", on_click=lambda: st.session_state.messages.pop(-1))
-    with col2:
         if st.button("读取历史记录"):
             try:
                 with open(log_file, "rb") as f:
@@ -188,7 +201,6 @@ with st.container():
                             st.markdown(message["content"])
             except FileNotFoundError:
                 st.warning(f"{filename} 不存在。")
-    with col3:
         if st.button("清除历史记录"):
             st.session_state.messages = []
             try:
