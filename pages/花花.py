@@ -92,7 +92,7 @@ if "messages" not in st.session_state:
 # 显示历史记录
 for i, message in enumerate(st.session_state.messages):
     with st.chat_message(message["role"]):
-        st.markdown(message["content"])
+        st.markdown(message["content"], key=f"message_{i}")  # 添加 key
 
         # 在最后两个对话中添加编辑按钮
         if i >= len(st.session_state.messages) - 2:
@@ -105,7 +105,8 @@ for i, message in enumerate(st.session_state.messages):
                     with open(filename, "wb") as f:
                         pickle.dump(st.session_state.messages, f)
                     st.success(f"已保存更改！")
-                    st.experimental_rerun()  # 重新运行页面
+                    # 更新对话内容
+                    st.markdown(new_content, key=f"message_{i}") 
 
 if prompt := st.chat_input("Enter your message:"):
     st.session_state.messages.append({"role": "user", "content": prompt})
