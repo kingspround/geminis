@@ -94,12 +94,18 @@ if "messages" not in st.session_state:
     # 从文件加载历史记录
     try:
         with open(log_file, "r", encoding="utf-8") as f:  # 使用 "r" 模式读取
-            st.session_state.messages = [
-                {"role": line.split(":")[0].strip(), "content": line.split(":")[1].strip()}
-                for line in f.readlines()
-            ]
+            st.session_state.messages = []
+            for line in f.readlines():
+                parts = line.split(":")
+                if len(parts) >= 2:  # 检查列表长度
+                    st.session_state.messages.append(
+                        {"role": parts[0].strip(), "content": parts[1].strip()}
+                    )
+                else:
+                    st.warning(f"无法解析行：{line}")  # 打印无法解析的行的信息
     except FileNotFoundError:
         st.session_state.messages = []
+
 
 # 显示历史记录
 for i, message in enumerate(st.session_state.messages):
