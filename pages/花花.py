@@ -4,7 +4,6 @@ import streamlit as st
 from dotenv import load_dotenv  
 import os
 import pickle
-import shutil
 
 # Insert your API key here
 st.session_state.key = "AIzaSyDPFZ7gRba9mhKTqbXA_Y7fhAxS8IEu0bY"
@@ -147,12 +146,7 @@ if prompt := st.chat_input("Enter your message:"):
     with open(log_file, "wb") as f:
         pickle.dump(st.session_state.messages, f)
 
-    # 将 "史莱姆娘.pkl" 文件复制到 logs 根目录
-    try:
-        shutil.copyfile(log_file, os.path.join("logs", filename))
-        st.success(f"已保存聊天记录到 logs 文件夹！")
-    except Exception as e:
-        st.error(f"保存聊天记录失败：{e}")
+    st.success(f"已保存聊天记录到 logs 文件夹！")
 
     # 使用 st.experimental_rerun() 实时更新聊天界面
     st.experimental_rerun()
@@ -189,11 +183,4 @@ def save_chat_history(log_file):
     # 保存聊天记录到文件
     with open(log_file, "wb") as f:
         pickle.dump(st.session_state.messages, f)
-
-    # 将 "史莱姆娘.pkl" 文件复制到 logs 根目录
-    try:
-        # 将目标路径改为 logs 文件夹的父目录
-        shutil.copyfile(log_file, os.path.join(os.path.dirname(log_file), filename)) 
-        st.success(f"已保存聊天记录到 logs 文件夹！")
-    except Exception as e:
-        st.error(f"保存聊天记录失败：{e}")
+    st.success(f"已保存聊天记录到 logs 文件夹！")
