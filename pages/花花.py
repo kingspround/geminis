@@ -165,8 +165,7 @@ st.sidebar.download_button(
 st.sidebar.button("读取历史记录", on_click=lambda: load_history(log_file))
 st.sidebar.button("清除历史记录", on_click=lambda: clear_history(log_file))
 
-# 使用 st.file_uploader 创建拖放文件框
-# 恢复读取本地文件按钮
+# 添加读取本地文件的按钮
 if st.sidebar.button("读取本地文件"):
     st.session_state.file_upload_mode = True  # 设置文件上传模式
 
@@ -176,9 +175,11 @@ if st.session_state.get("file_upload_mode"):
         try:
             # 读取文件内容
             st.session_state.messages = pickle.load(uploaded_file)
+            # 立即显示聊天记录
             for message in st.session_state.messages:
                 with st.chat_message(message["role"]):
                     st.markdown(message["content"])
+            st.session_state.file_upload_mode = False  # 关闭文件上传模式
         except Exception as e:
             st.error(f"读取本地文件失败：{e}")
     else:
