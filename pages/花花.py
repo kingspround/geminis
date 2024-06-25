@@ -180,7 +180,7 @@ if uploaded_file is not None:
 def load_history(log_file):
     try:
         with open(log_file, "rb") as f:  # 使用 "rb" 模式读取
-            st.session_state.messages = pickle.load(f)
+            st.session_state.messages = pickle.load(f)  # 这里只加载一次
             for message in st.session_state.messages:
                 with st.chat_message(message["role"]):
                     st.markdown(message["content"])
