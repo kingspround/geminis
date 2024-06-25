@@ -90,6 +90,7 @@ if not os.path.exists(log_file):
     with open(log_file, "wb") as f:
         pass  # 创建空文件
 
+# 加载历史记录（只执行一次）
 if "messages" not in st.session_state:
     # 从文件加载历史记录
     try:
@@ -98,7 +99,7 @@ if "messages" not in st.session_state:
     except FileNotFoundError:
         st.session_state.messages = []
 
-# 显示历史记录
+# 显示历史记录（只执行一次）
 for i, message in enumerate(st.session_state.messages):
     with st.chat_message(message["role"]):
         # 使用 st.write 显示对话内容
@@ -164,15 +165,15 @@ st.sidebar.download_button(
 st.sidebar.button("读取历史记录", on_click=lambda: load_history(log_file))
 st.sidebar.button("清除历史记录", on_click=lambda: clear_history(log_file))
 
-# 使用 st.file_uploader 创建拖放文件框
-uploaded_file = st.sidebar.file_uploader("读取本地文件", type=["pkl"])
-if uploaded_file is not None:
+# 添加读取本地文件的按钮
+if st.button("读取本地文件"):
     try:
-        # 读取文件内容
-        st.session_state.messages = pickle.load(uploaded_file)
-        for message in st.session_state.messages:
-            with st.chat_message(message["role"]):
-                st.markdown(message["content"])
+        # 尝试读取指定路径的文件
+        with open(log_file, "rb") as f:  # 使用 "rb" 模式读取
+            st.session_state.messages = pickle.load(f)
+            for message in st.session_state.messages:
+                with st.chat_message(message["role"]):
+                    st.markdown(message["content"])
     except Exception as e:
         st.error(f"读取本地文件失败：{e}")
 
@@ -180,8 +181,8 @@ if uploaded_file is not None:
 def load_history(log_file):
     try:
         with open(log_file, "rb") as f:  # 使用 "rb" 模式读取
-            st.session_state.messages = pickle.load(f)  # 这里只加载一次
-            for message in st.session_state.messages:
+            messages = pickle.load(f)
+            for message in messages:
                 with st.chat_message(message["role"]):
                     st.markdown(message["content"])
     except FileNotFoundError:
