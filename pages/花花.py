@@ -9,6 +9,10 @@ from io import BytesIO
 from io import StringIO
 import streamlit as st
 import pickle
+import streamlit as st
+import os
+import pickle
+import requests
 
 # Insert your API key here
 st.session_state.key = "AIzaSyDPFZ7gRba9mhKTqbXA_Y7fhAxS8IEu0bY"
@@ -180,17 +184,30 @@ def clear_history(log_file):
 
 # 定义保存聊天记录到 GitHub 仓库的函数
 def save_to_github(log_file, messages):
-    # 获取 GitHub 仓库的根目录
-    repo_root = os.path.join(os.path.dirname(__file__), "..")
-    
-    # 构建完整路径
-    github_log_file = os.path.join(repo_root, "logs", log_file)
-    
-    # 保存历史记录到文件
-    with open(github_log_file, "wb") as f:
-        pickle.dump(messages, f)
+    # 获取 GitHub 仓库的 API 地址
+    repo_url = "https://api.github.com/repos/kingspround/geminis/contents/logs/"
 
-    st.success(f"成功将聊天记录保存到 GitHub 仓库中的 {log_file} 文件！")
+    # 将聊天记录序列化为 JSON 字符串
+    data = pickle.dumps(messages)
+    encoded_data = data.encode('base64').decode('utf-8')
+
+    # 创建提交请求
+    headers = {
+        "Authorization": f"token {YOUR_GITHUB_ACCESS_TOKEN}",
+        "Content-Type": "application/json"
+    }
+    payload = {
+        "message": "Update chat log",
+        "content": encoded_data,
+        "path": log_file
+    }
+    response = requests.put(repo_url + log_file, headers=headers, json=payload)
+
+    # 检查响应
+    if response.status_code == 200:
+        st.success(f"成功将聊天记录保存到 GitHub 仓库中的 {log_file} 文件！")
+    else:
+        st.error(f"保存聊天记录到 GitHub 仓库失败：{response.text}")
 
 # 添加保存到 GitHub 的按钮
 st.sidebar.button("保存到 GitHub", on_click=lambda: save_to_github(filename, st.session_state.messages))
