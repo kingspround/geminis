@@ -11,6 +11,13 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'  # 替换为你的 Python 版本
+      - name: Install streamlit-experimental-artifacts
+        run: |
+          pip install git+https://github.com/streamlit/streamlit-experimental-artifacts.git
       - name: Download Chat History
         uses: actions/download-artifact@v3
         with:
