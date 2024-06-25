@@ -194,7 +194,6 @@ def save_to_github(log_file, github_token, repo_name, filename):
     # 获取文件内容
     with open(log_file, "rb") as f:
         file_content = f.read()
-        file_content = file_content.decode("utf-8")  # 解码为 utf-8
 
     # 上传文件到 GitHub
     url = f"https://api.github.com/repos/{repo_name}/contents/{filename}"
@@ -205,7 +204,7 @@ def save_to_github(log_file, github_token, repo_name, filename):
     }
     data = {
         "message": "Save Chat History",
-        "content": file_content,
+        "content": file_content,  # 使用二进制数据，避免解码
         "branch": "main",  # 指定分支
     }
     response = requests.put(url, headers=headers, json=data)
