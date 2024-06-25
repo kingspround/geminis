@@ -150,6 +150,10 @@ if prompt := st.chat_input("Enter your message:"):
         message_placeholder.markdown(full_response)
     st.session_state.messages.append({"role": "assistant", "content": full_response})
 
+    # 保存聊天记录到文件
+    with open(log_file, "wb") as f:
+        pickle.dump(st.session_state.messages, f)
+
     # 使用 st.experimental_rerun() 实时更新聊天界面
     st.experimental_rerun()
 
