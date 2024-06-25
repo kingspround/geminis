@@ -1,4 +1,3 @@
-# First
 import google.generativeai as genai
 import streamlit as st
 from dotenv import load_dotenv  
@@ -8,7 +7,6 @@ import numpy as np
 from io import BytesIO
 from io import StringIO
 import streamlit as st
-import os
 import pickle
 import requests
 import json
@@ -180,6 +178,12 @@ def clear_history(log_file):
         st.success(f"成功清除 {filename} 的历史记录！")
     except FileNotFoundError:
         st.warning(f"{filename} 不存在。")
+
+# 读取环境变量
+YOUR_GITHUB_ACCESS_TOKEN = os.getenv("YOUR_GITHUB_ACCESS_TOKEN")
+if not YOUR_GITHUB_ACCESS_TOKEN:
+    st.error("请设置环境变量 YOUR_GITHUB_ACCESS_TOKEN")
+    st.stop()
 
 # 定义保存聊天记录到 GitHub 仓库的函数
 def save_to_github(log_file, messages):
