@@ -204,10 +204,10 @@ def save_to_github(log_file, github_token, repo_name, filename):
     }
     data = {
         "message": "Save Chat History",
-        "content": file_content,  # 使用二进制数据，避免解码
+        "content": file_content,  # 使用二进制数据
         "branch": "main",  # 指定分支
     }
-    response = requests.put(url, headers=headers, json=data)
+    response = requests.put(url, headers=headers, data=data)  # 使用 data 参数
 
     if response.status_code == 201:
         st.success(f"聊天记录已保存到 GitHub 仓库！")
