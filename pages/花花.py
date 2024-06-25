@@ -93,6 +93,14 @@ def create_logs_folder():
 
 create_logs_folder()
 
+# 将 logs 文件夹添加到 Git 仓库
+# try:
+#     os.system("git add logs")
+#     os.system('git commit -m "Add logs folder"')
+#     os.system('git push origin main')
+# except Exception as e:
+#     st.error(f"无法将 logs 文件夹添加到 Git 仓库：{e}")
+
 if "messages" not in st.session_state:
     # 从文件加载历史记录
     try:
