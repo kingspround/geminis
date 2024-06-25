@@ -167,29 +167,55 @@ st.sidebar.button("清除历史记录", on_click=lambda: clear_history(log_file)
 
 # 添加读取本地文件的按钮
 if st.sidebar.button("读取本地文件"):
-    # 将文件上传框的代码放在按钮点击事件内
-    uploaded_file = st.sidebar.file_uploader("选择文件", type=["pkl"])
-    if uploaded_file is not None:
-        try:
-            # 读取文件内容
-            st.session_state.messages = pickle.load(uploaded_file)
-            # 立即显示聊天记录
-            for i, message in enumerate(st.session_state.messages):
-                with st.chat_message(message["role"]):
-                    st.write(message["content"], key=f"message_{i}")
-                    if i >= len(st.session_state.messages) - 2:
-                        # 在最后两个对话中添加编辑按钮
-                        if st.button("编辑", key=f"edit_{i}"):
-                            # 更改为可编辑文本
-                            st.session_state.editable_index = i  # 记录可编辑的索引
-                            st.session_state.editing = True  # 表示正在编辑
-            # 添加关闭按钮
-            if st.sidebar.button("关闭", key="close_upload"):
-                st.session_state.file_upload_mode = False
-        except Exception as e:
-            st.error(f"读取本地文件失败：{e}")
+    st.session_state.show_file_upload = True  # 设置文件上传模式
 
+if st.session_state.get("show_file_upload"):
+    # 使用 st.container 创建一个新的容器
+    with st.container():
+        # 使用 st.empty 创建一个占位符
+        st.empty()
 
+        # 使用 Flexbox 控制按钮之间的间距
+        st.markdown(
+            """
+            <style>
+            .button-container {
+                display: flex;
+                justify-content: flex-start; /* 按钮向左对齐 */
+            }
+            .button-container > button {
+                margin-right: 5px; /* 调整按钮之间的右间距 */
+            }
+            </style>
+            """,
+            unsafe_allow_html=True,
+        )
+
+        # 使用 st.container 来包含按钮
+        with st.container():
+            # 使用 st.columns(3) 布局三个按钮
+            col1, col2 = st.columns([1,1])  # 设置每一列宽度
+            with col1:
+                uploaded_file = st.file_uploader("选择文件", type=["pkl"])
+                if uploaded_file is not None:
+                    try:
+                        # 读取文件内容
+                        st.session_state.messages = pickle.load(uploaded_file)
+                        # 立即显示聊天记录
+                        for i, message in enumerate(st.session_state.messages):
+                            with st.chat_message(message["role"]):
+                                st.write(message["content"], key=f"message_{i}")
+                                if i >= len(st.session_state.messages) - 2:
+                                    # 在最后两个对话中添加编辑按钮
+                                    if st.button("编辑", key=f"edit_{i}"):
+                                        # 更改为可编辑文本
+                                        st.session_state.editable_index = i  # 记录可编辑的索引
+                                        st.session_state.editing = True  # 表示正在编辑
+                    except Exception as e:
+                        st.error(f"读取本地文件失败：{e}")
+            with col2:
+                if st.button("关闭", key="close_upload"):
+                    st.session_state.show_file_upload = False
 
 def load_history(log_file):
     try:
