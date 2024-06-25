@@ -12,10 +12,9 @@ import requests
 
 # Insert your API key here
 st.session_state.key = "AIzaSyDPFZ7gRba9mhKTqbXA_Y7fhAxS8IEu0bY"
-st.session_state.key = os.environ.get("GEMINI_API_KEY")  # 从环境变量获取 API Key
 
 if "key" not in st.session_state:
-    st.session_state.key = none
+    st.session_state.key = NONE
     
 if not st.session_state.key:
     st.info("Please add your key to continue.")
