@@ -180,7 +180,7 @@ def clear_history(log_file):
         st.warning(f"{filename} 不存在。")
 
 # 读取环境变量
-YOUR_GITHUB_ACCESS_TOKEN = "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"
+YOUR_GITHUB_ACCESS_TOKEN = os.getenv("YOUR_GITHUB_ACCESS_TOKEN")
 if not YOUR_GITHUB_ACCESS_TOKEN:
     st.error("请设置环境变量 YOUR_GITHUB_ACCESS_TOKEN")
     st.stop()
@@ -195,7 +195,7 @@ def save_to_github(log_file, messages):
 
     # 创建提交请求
     headers = {
-        "Authorization": f"token {YOUR_GITHUB_ACCESS_TOKEN}",
+        "Authorization": f"token 【标记】",
         "Content-Type": "application/json"
     }
     payload = {
