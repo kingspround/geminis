@@ -151,28 +151,14 @@ if prompt := st.chat_input("Enter your message:"):
     with open(log_file, "wb") as f:  # 使用 "wb" 模式写入
         pickle.dump(st.session_state.messages, f)
 
-    # 重新运行页面，使 CSS 样式生效
-    st.experimental_rerun() 
-
 # 使用 st.sidebar 放置按钮
 st.sidebar.title("操作")
 if len(st.session_state.messages) > 0:
     st.sidebar.button("重置上一个输出", on_click=lambda: st.session_state.messages.pop(-1))
-st.sidebar.button("下载聊天记录", on_click=lambda: save_history(log_file))
+st.sidebar.button("下载聊天记录", on_click=lambda: download_history(log_file))
 st.sidebar.button("读取历史记录", on_click=lambda: load_history(log_file))
 st.sidebar.button("清除历史记录", on_click=lambda: clear_history(log_file))
-
-# 添加读取本地文件的按钮
-if st.button("读取本地文件"):
-    try:
-        # 尝试读取指定路径的文件
-        with open(log_file, "rb") as f:  # 使用 "rb" 模式读取
-            st.session_state.messages = pickle.load(f)
-            for message in st.session_state.messages:
-                with st.chat_message(message["role"]):
-                    st.markdown(message["content"])
-    except Exception as e:
-        st.error(f"读取本地文件失败：{e}")
+st.sidebar.button("读取本地文件", on_click=lambda: read_local_file(log_file))
 
 def load_history(log_file):
     try:
@@ -197,10 +183,23 @@ def save_history(log_file):
     with open(log_file, "wb") as f:  # 使用 "wb" 模式写入
         pickle.dump(st.session_state.messages, f)
     st.success(f"已手动保存聊天记录！")
-    # 修正缩进
+
+def download_history(log_file):
+    # 使用 st.download_button 下载文件
     st.download_button(
         label="下载聊天记录",
         data=open(log_file, "rb").read(),  # 读取文件内容
         file_name=filename,  # 设置下载文件名
         mime="application/octet-stream",  # 设置 MIME 类型
     )
+
+def read_local_file(log_file):
+    try:
+        # 尝试读取指定路径的文件
+        with open(log_file, "rb") as f:  # 使用 "rb" 模式读取
+            st.session_state.messages = pickle.load(f)
+            for message in st.session_state.messages:
+                with st.chat_message(message["role"]):
+                    st.markdown(message["content"])
+    except Exception as e:
+        st.error(f"读取本地文件失败：{e}")
