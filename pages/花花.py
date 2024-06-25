@@ -82,11 +82,19 @@ def getAnswer(prompt):
 # 获取当前 Python 文件名
 filename = os.path.splitext(os.path.basename(__file__))[0] + ".pkl"  # 使用 .pkl 扩展名
 
+# 获取完整路径
+log_file = os.path.join(os.path.dirname(__file__), filename)  # 使用 os.path.dirname 获取当前目录
+
+# 检查文件是否存在，如果不存在就创建空文件
+if not os.path.exists(log_file):
+    with open(log_file, "wb") as f:
+        pass  # 创建空文件
+
 # 加载历史记录（只执行一次）
 if "messages" not in st.session_state:
     # 从文件加载历史记录
     try:
-        with open(filename, "rb") as f:  # 使用 "rb" 模式读取
+        with open(log_file, "rb") as f:  # 使用 "rb" 模式读取
             st.session_state.messages = pickle.load(f)
     except FileNotFoundError:
         st.session_state.messages = []
@@ -119,7 +127,7 @@ if st.session_state.get("editing"):
             if st.button("保存", key=f"save_{i}"):
                 st.session_state.messages[i]["content"] = new_content
                 # 保存更改到文件
-                with open(filename, "wb") as f:  # 使用 "wb" 模式写入
+                with open(log_file, "wb") as f:  # 使用 "wb" 模式写入
                     pickle.dump(st.session_state.messages, f)
                 st.success(f"已保存更改！")
                 st.session_state.editing = False  # 结束编辑状态
@@ -141,7 +149,7 @@ if prompt := st.chat_input("Enter your message:"):
     st.session_state.messages.append({"role": "assistant", "content": full_response})
 
     # 保存历史记录到文件
-    with open(filename, "wb") as f:  # 使用 "wb" 模式写入
+    with open(log_file, "wb") as f:  # 使用 "wb" 模式写入
         pickle.dump(st.session_state.messages, f)
 
 # 使用 st.sidebar 放置按钮
@@ -150,16 +158,16 @@ if len(st.session_state.messages) > 0:
     st.sidebar.button("重置上一个输出", on_click=lambda: st.session_state.messages.pop(-1))
 st.sidebar.download_button(
     label="下载聊天记录",  # 使用 st.sidebar.download_button 直接下载
-    data=open(filename, "rb").read(),  # 读取文件内容
+    data=open(log_file, "rb").read(),  # 读取文件内容
     file_name=filename,  # 设置下载文件名
     mime="application/octet-stream",  # 设置 MIME 类型
 )
-st.sidebar.button("读取历史记录", on_click=lambda: load_history(filename))
-st.sidebar.button("清除历史记录", on_click=lambda: clear_history(filename))
+st.sidebar.button("读取历史记录", on_click=lambda: load_history(log_file))
+st.sidebar.button("清除历史记录", on_click=lambda: clear_history(log_file))
 
 # 添加读取本地文件的按钮
 if st.sidebar.button("读取本地文件"):
-    uploaded_file = st.sidebar.file_uploader("选择文件", type=["pkl"])
+    uploaded_file = st.sidebar.file_uploader("选择文件", type=["pkl"], key='file_uploader')
     if uploaded_file is not None:
         try:
             # 读取文件内容
@@ -172,7 +180,6 @@ if st.sidebar.button("读取本地文件"):
                     st.markdown(message["content"])
         except Exception as e:
             st.error(f"读取本地文件失败：{e}")
-
 
 def load_history(log_file):
     try:
