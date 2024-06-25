@@ -1,0 +1,29 @@
+name: Upload Chat History
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  upload-file:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Download Chat History
+        uses: actions/download-artifact@v3
+        with:
+          name: chat-history
+      - name: Upload Chat History to logs Folder
+        uses: actions/upload-artifact@v3
+        with:
+          name: chat-history
+          path: chat-history.pkl  # Make sure this matches the downloaded file name
+      - name: Commit and Push to logs Folder
+        run: |
+          git config --global user.email "your_email@example.com"
+          git config --global user.name "your_github_username"
+          git add logs/chat-history.pkl
+          git commit -m "Uploaded chat history"
+          git push
