@@ -184,6 +184,7 @@ if st.session_state.get("file_upload_mode"):
                 st.session_state.file_upload_mode = False
         except Exception as e:
             st.error(f"读取本地文件失败：{e}")
+    # 修正代码逻辑：如果用户没有选择文件，也需要隐藏文件上传框
     else:
         st.session_state.file_upload_mode = False  # 关闭文件上传模式
 
