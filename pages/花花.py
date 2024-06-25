@@ -79,8 +79,9 @@ def getAnswer(prompt):
 
 
 # 获取文件名，并生成对应的文件名
-filename = "史莱姆娘" + ".pkl"  # 这里假设文件名就是 "史莱姆娘"
-log_dir = "log"  # 日志文件夹名称
+# 获取当前 Python 文件名
+filename = os.path.splitext(os.path.basename(__file__))[0] + ".txt"
+log_dir = "D:\\今宵别梦\\bot\\历史记录"  # 日志文件夹路径
 
 # 创建日志文件夹
 if not os.path.exists(log_dir):
@@ -92,8 +93,11 @@ log_file = os.path.join(log_dir, filename)
 if "messages" not in st.session_state:
     # 从文件加载历史记录
     try:
-        with open(log_file, "rb") as f:
-            st.session_state.messages = pickle.load(f)
+        with open(log_file, "r", encoding="utf-8") as f:  # 使用 "r" 模式读取
+            st.session_state.messages = [
+                {"role": line.split(":")[0].strip(), "content": line.split(":")[1].strip()}
+                for line in f.readlines()
+            ]
     except FileNotFoundError:
         st.session_state.messages = []
 
@@ -125,8 +129,9 @@ if st.session_state.get("editing"):
             if st.button("保存", key=f"save_{i}"):
                 st.session_state.messages[i]["content"] = new_content
                 # 保存更改到文件
-                with open(log_file, "wb") as f:
-                    pickle.dump(st.session_state.messages, f)
+                with open(log_file, "w", encoding="utf-8") as f:  # 使用 "w" 模式写入
+                    for msg in st.session_state.messages:
+                        f.write(f"{msg['role']}: {msg['content']}\n")
                 st.success(f"已保存更改！")
                 st.session_state.editing = False  # 结束编辑状态
         with col2:
@@ -147,33 +152,59 @@ if prompt := st.chat_input("Enter your message:"):
     st.session_state.messages.append({"role": "assistant", "content": full_response})
 
     # 保存历史记录到文件
-    with open(log_file, "wb") as f:
-        pickle.dump(st.session_state.messages, f)
+    with open(log_file, "w", encoding="utf-8") as f:  # 使用 "w" 模式写入
+        for msg in st.session_state.messages:
+            f.write(f"{msg['role']}: {msg['content']}\n")
 
     # 重新运行页面，使 CSS 样式生效
     st.experimental_rerun() 
 
-# 使用 st.sidebar 放置按钮
-st.sidebar.title("操作")
-if len(st.session_state.messages) > 0:
-    st.sidebar.button("重置上一个输出", on_click=lambda: st.session_state.messages.pop(-1))
-st.sidebar.button("读取历史记录", on_click=lambda: load_history(log_file))
-st.sidebar.button("清除历史记录", on_click=lambda: clear_history(log_file))
+# 使用 st.container 创建一个新的容器
+with st.container():
+    # 使用 st.empty 创建一个占位符
+    st.empty()
 
-def load_history(log_file):
-    try:
-        with open(log_file, "rb") as f:
-            messages = pickle.load(f)
-            for message in messages:
-                with st.chat_message(message["role"]):
-                    st.markdown(message["content"])
-    except FileNotFoundError:
-        st.warning(f"{filename} 不存在。")
+    # 使用 Flexbox 控制按钮之间的间距
+    st.markdown(
+        """
+        <style>
+        .button-container {
+            display: flex;
+            justify-content: flex-start; /* 按钮向左对齐 */
+        }
+        .button-container > button {
+            margin-right: 5px; /* 调整按钮之间的右间距 */
+        }
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
 
-def clear_history(log_file):
-    st.session_state.messages = []
-    try:
-        os.remove(log_file)  # 删除文件
-        st.success(f"成功清除 {filename} 的历史记录！")
-    except FileNotFoundError:
-        st.warning(f"{filename} 不存在。")
+    # 使用 st.container 来包含按钮
+    with st.container():
+        # 使用 st.columns(3) 布局三个按钮
+        col1, col2, col3 = st.columns([1,1,1])  # 设置每一列宽度
+        with col1:
+            if len(st.session_state.messages) > 0:
+                st.button("重置上一个输出", on_click=lambda: st.session_state.messages.pop(-1))
+        with col2:
+            if st.button("读取历史记录"):
+                try:
+                    with open(log_file, "r", encoding="utf-8") as f:  # 使用 "r" 模式读取
+                        messages = [
+                            {"role": line.split(":")[0].strip(), "content": line.split(":")[1].strip()}
+                            for line in f.readlines()
+                        ]
+                        for message in messages:
+                            with st.chat_message(message["role"]):
+                                st.markdown(message["content"])
+                except FileNotFoundError:
+                    st.warning(f"{filename} 不存在。")
+        with col3:
+            if st.button("清除历史记录"):
+                st.session_state.messages = []
+                try:
+                    os.remove(log_file)  # 删除文件
+                    st.success(f"成功清除 {filename} 的历史记录！")
+                except FileNotFoundError:
+                    st.warning(f"{filename} 不存在。")
