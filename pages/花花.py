@@ -3,12 +3,8 @@ import google.generativeai as genai
 import streamlit as st
 from dotenv import load_dotenv  
 import os
-from PIL import Image
-import numpy as np
-from io import BytesIO
-from io import StringIO
-import streamlit as st
 import pickle
+import shutil
 
 # Insert your API key here
 st.session_state.key = "AIzaSyDPFZ7gRba9mhKTqbXA_Y7fhAxS8IEu0bY"
@@ -87,9 +83,6 @@ log_file = os.path.join("logs", filename)  # 完整路径
 def create_logs_folder():
     if not os.path.exists("logs"):
         os.makedirs("logs")
-    # 创建空文件
-    with open(log_file, "w") as f:
-        pass
 
 create_logs_folder()
 
@@ -129,7 +122,8 @@ if st.session_state.get("editing"):
             if st.button("保存", key=f"save_{i}"):
                 st.session_state.messages[i]["content"] = new_content
                 # 保存更改到文件
-                save_chat_history()
+                with open(log_file, "wb") as f:
+                    pickle.dump(st.session_state.messages, f)
                 st.success(f"已保存更改！")
                 st.session_state.editing = False  # 结束编辑状态
         with col2:
@@ -150,25 +144,25 @@ if prompt := st.chat_input("Enter your message:"):
     st.session_state.messages.append({"role": "assistant", "content": full_response})
 
     # 保存聊天记录到文件
-    save_chat_history()
+    with open(log_file, "wb") as f:
+        pickle.dump(st.session_state.messages, f)
+
+    # 将 "史莱姆娘.pkl" 文件复制到 logs 根目录
+    try:
+        shutil.copyfile(log_file, os.path.join("logs", filename))
+        st.success(f"已保存聊天记录到 logs 文件夹！")
+    except Exception as e:
+        st.error(f"保存聊天记录失败：{e}")
+
+    # 使用 st.experimental_rerun() 实时更新聊天界面
+    st.experimental_rerun()
 
 # 使用 st.sidebar 放置按钮
 st.sidebar.title("操作")
 if len(st.session_state.messages) > 0:
-    st.sidebar.button("重置上一个输出", on_click=reset_last_output)
+    st.sidebar.button("重置上一个输出", on_click=lambda: st.session_state.messages.pop(-1))
 st.sidebar.button("读取历史记录", on_click=lambda: load_history(log_file))
 st.sidebar.button("清除历史记录", on_click=lambda: clear_history(log_file))
-
-def save_chat_history():
-    with open(log_file, "wb") as f:
-        pickle.dump(st.session_state.messages, f)
-
-def reset_last_output():
-    if len(st.session_state.messages) >= 2:
-        st.session_state.messages.pop(-2)  # 删除上一个输出
-        st.session_state.messages.pop(-1)  # 删除上一个输入
-        save_chat_history()
-        st.experimental_rerun()
 
 def load_history(log_file):
     try:
