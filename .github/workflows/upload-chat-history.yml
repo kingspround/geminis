@@ -16,10 +16,9 @@ jobs:
         with:
           name: chat-history
       - name: Upload Chat History to logs Folder
-        uses: actions/upload-artifact@v3
-        with:
-          name: chat-history
-          path: chat-history.pkl  # Make sure this matches the downloaded file name
+        run: |
+          mkdir -p logs
+          mv chat-history.pkl logs/
       - name: Commit and Push to logs Folder
         run: |
           git config --global user.email "your_email@example.com"
