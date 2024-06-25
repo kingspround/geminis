@@ -177,7 +177,11 @@ def sync_to_github():
         # 将数据写入本地文件
         with open("log/chat_history.pkl", "wb") as f:
             f.write(data)
+        # 切换到 pages 目录
+        os.chdir("pages")
         # 使用 git-ftp 同步到 GitHub
         subprocess.run(["git", "add", "log/chat_history.pkl"])
         subprocess.run(["git", "commit", "-m", "Update chat history"])
         subprocess.run(["git-ftp", "push"])
+        # 切换回原目录
+        os.chdir("..")
