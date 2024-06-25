@@ -98,6 +98,10 @@ if "messages" not in st.session_state:
             st.session_state.messages = pickle.load(f)
     except FileNotFoundError:
         st.session_state.messages = []
+    except EOFError:
+        st.warning(f"读取历史记录失败：文件可能损坏。")
+        st.session_state.messages = []  # 清空 messages
+        # 可以考虑在这里添加代码，提示用户重新创建文件或重新加载数据
 
 # 显示历史记录（只执行一次）
 for i, message in enumerate(st.session_state.messages):
@@ -204,6 +208,7 @@ if st.session_state.get("file_upload_mode"):
 
         except Exception as e:
             st.error(f"读取本地文件失败：{e}")
+
 
 def load_history(log_file):
     try:
