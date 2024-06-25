@@ -1,7 +1,7 @@
-# 导入必要的库
+# First
 import google.generativeai as genai
 import streamlit as st
-from dotenv import load_dotenv
+from dotenv import load_dotenv  
 import os
 from PIL import Image
 import numpy as np
@@ -9,54 +9,57 @@ from io import BytesIO
 from io import StringIO
 import streamlit as st
 import pickle
-from datetime import datetime  # 导入datetime模块用于生成时间戳
 
-# 导入你的 API 密钥
+# Insert your API key here
 st.session_state.key = "AIzaSyDPFZ7gRba9mhKTqbXA_Y7fhAxS8IEu0bY"
+
 if "key" not in st.session_state:
     st.session_state.key = None
+    
 if not st.session_state.key:
-    st.info("请添加你的 API 密钥以继续。")
+    st.info("Please add your key to continue.")
     st.stop()
-
-# 配置 API 密钥
+    
 genai.configure(api_key=st.session_state.key)
 
-# 设置模型参数
+# Set up the model
 generation_config = {
-    "temperature": 1,
-    "top_p": 0,
-    "top_k": 0,
-    "max_output_tokens": 10000,
+  "temperature": 1,
+  "top_p": 0,
+  "top_k": 0,
+  "max_output_tokens": 10000,
 }
-safety_settings = [
-    {
-        "category": "HARM_CATEGORY_HARASSMENT",
-        "threshold": "BLOCK_NONE",
-    },
-    {
-        "category": "HARM_CATEGORY_HATE_SPEECH",
-        "threshold": "BLOCK_NONE",
-    },
-    {
-        "category": "HARM_CATEGORY_SEXUALLY_EXPLICIT",
-        "threshold": "BLOCK_NONE",
-    },
-    {
-        "category": "HARM_CATEGORY_DANGEROUS_CONTENT",
-        "threshold": "BLOCK_NONE",
-    },
-]
-# 初始化模型
-model = genai.GenerativeModel(model_name="gemini-1.5-pro-latest", generation_config=generation_config, safety_settings=safety_settings)
 
-# 定义获取模型回复的函数
+safety_settings = [
+   {
+    "category": "HARM_CATEGORY_HARASSMENT",
+    "threshold": "BLOCK_NONE",
+   },
+   {
+    "category": "HARM_CATEGORY_HATE_SPEECH",
+    "threshold": "BLOCK_NONE",
+   },
+   {
+    "category": "HARM_CATEGORY_SEXUALLY_EXPLICIT",
+    "threshold": "BLOCK_NONE",
+   },
+   {
+    "category": "HARM_CATEGORY_DANGEROUS_CONTENT",
+    "threshold": "BLOCK_NONE",
+   },
+]
+
+model = genai.GenerativeModel(model_name="gemini-1.5-pro-latest",generation_config=generation_config,safety_settings=safety_settings)
+
+# LLM
+
+
 def getAnswer(prompt):
     his_messages = []
     his_messages.append(
         {"role": "model", "parts": [{"text": ""}]}
     )
-    # 获取最近 20 条聊天记录
+
     for msg in st.session_state.messages[-20:]:
         if msg["role"] == "user":
             his_messages.append({"role": "user", "parts": [{"text": msg["content"]}]})
@@ -64,7 +67,6 @@ def getAnswer(prompt):
             his_messages.append({"role": "model", "parts": [{"text": msg["content"]}]})
 
     try:
-        # 使用模型生成回复
         response = model.generate_content(contents=his_messages, stream=True)
         full_response = ""
         for chunk in response:
@@ -72,49 +74,106 @@ def getAnswer(prompt):
             yield chunk.text
         return full_response  # 返回完整的回复
     except Exception as e:
-        st.error(f"发生错误：{e}")
+        st.error(f"An error occurred: {e}")
         return ""  # 在发生错误时返回空字符串
 
-# Streamlit 界面
+
+# 获取文件名，并生成对应的文件名
+filename = "史莱姆娘" + ".pkl"  # 这里假设文件名就是 "史莱姆娘"
+log_dir = "log"  # 日志文件夹名称
+
+# 创建日志文件夹
+if not os.path.exists(log_dir):
+    os.makedirs(log_dir)
+
+# 获取完整路径
+log_file = os.path.join(log_dir, filename)
+
 if "messages" not in st.session_state:
+    # 从文件加载历史记录
+    try:
+        with open(log_file, "rb") as f:
+            st.session_state.messages = pickle.load(f)
+    except FileNotFoundError:
+        st.session_state.messages = []
+
+# 显示历史记录
+for i, message in enumerate(st.session_state.messages):
+    with st.chat_message(message["role"]):
+        # 使用 st.write 显示对话内容
+        st.write(message["content"], key=f"message_{i}")
+
+        # 在最后两个对话中添加编辑按钮
+        if i >= len(st.session_state.messages) - 2:
+            if st.button("编辑", key=f"edit_{i}"):
+                # 更改为可编辑文本
+                st.session_state.editable_index = i  # 记录可编辑的索引
+                st.session_state.editing = True  # 表示正在编辑
+
+if st.session_state.get("editing"):
+    # 如果正在编辑，显示编辑框和保存/取消按钮
+    i = st.session_state.editable_index
+    message = st.session_state.messages[i]
+
+    with st.chat_message(message["role"]):
+        new_content = st.text_area(
+            f"{message['role']}:", message["content"], key=f"message_edit_{i}"
+        )
+
+        col1, col2 = st.columns(2)  # 创建两列布局
+        with col1:
+            if st.button("保存", key=f"save_{i}"):
+                st.session_state.messages[i]["content"] = new_content
+                # 保存更改到文件
+                with open(log_file, "wb") as f:
+                    pickle.dump(st.session_state.messages, f)
+                st.success(f"已保存更改！")
+                st.session_state.editing = False  # 结束编辑状态
+        with col2:
+            if st.button("取消", key=f"cancel_{i}"):
+                st.session_state.editing = False  # 结束编辑状态
+
+if prompt := st.chat_input("Enter your message:"):
+    st.session_state.messages.append({"role": "user", "content": prompt})
+    with st.chat_message("user"):
+        st.markdown(prompt)
+    with st.chat_message("assistant"):
+        message_placeholder = st.empty()
+        full_response = ""
+        for chunk in getAnswer(prompt):  # 正确调用 getAnswer
+            full_response += chunk
+            message_placeholder.markdown(full_response + "▌")
+        message_placeholder.markdown(full_response)
+    st.session_state.messages.append({"role": "assistant", "content": full_response})
+
+    # 保存历史记录到文件
+    with open(log_file, "wb") as f:
+        pickle.dump(st.session_state.messages, f)
+
+    # 重新运行页面，使 CSS 样式生效
+    st.experimental_rerun() 
+
+# 使用 st.sidebar 放置按钮
+st.sidebar.title("操作")
+if len(st.session_state.messages) > 0:
+    st.sidebar.button("重置上一个输出", on_click=lambda: st.session_state.messages.pop(-1))
+st.sidebar.button("读取历史记录", on_click=lambda: load_history(log_file))
+st.sidebar.button("清除历史记录", on_click=lambda: clear_history(log_file))
+
+def load_history(log_file):
+    try:
+        with open(log_file, "rb") as f:
+            messages = pickle.load(f)
+            for message in messages:
+                with st.chat_message(message["role"]):
+                    st.markdown(message["content"])
+    except FileNotFoundError:
+        st.warning(f"{filename} 不存在。")
+
+def clear_history(log_file):
     st.session_state.messages = []
-
-st.title("Gemini 聊天")
-
-# 用户输入框
-user_input = st.text_input("在这里输入你的消息：")
-
-# 发送按钮
-if st.button("发送"):
-    if user_input:
-        # 将用户消息添加到聊天记录中
-        st.session_state.messages.append({"role": "user", "content": user_input})
-        st.session_state.messages.append({"role": "model", "content": ""})
-        # 显示用户消息
-        with st.chat_message("user"):
-            st.markdown(user_input)
-        # 显示模型回复
-        with st.chat_message("model"):
-            for chunk in getAnswer(user_input):
-                st.markdown(chunk)
-
-# 保存聊天记录按钮
-if st.button("保存聊天记录"):
-    # 获取当前的聊天记录
-    chat_history = st.session_state.messages
-
-    # 创建 logs 目录，如果不存在
-    logs_dir = os.path.join(os.path.dirname(__file__), 'logs')
-    os.makedirs(logs_dir, exist_ok=True)
-
-    # 生成一个唯一的文件名
-    filename = f"chat_log_{datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.txt"
-    filepath = os.path.join(logs_dir, filename)
-
-    # 将聊天记录保存到文件中
-    with open(filepath, 'w') as f:
-        for message in chat_history:
-            f.write(f"{message['role']}: {message['content']}\n")
-
-    # 显示保存成功提示
-    st.success(f"聊天记录已保存到 {filepath}")
+    try:
+        os.remove(log_file)  # 删除文件
+        st.success(f"成功清除 {filename} 的历史记录！")
+    except FileNotFoundError:
+        st.warning(f"{filename} 不存在。")
