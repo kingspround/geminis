@@ -179,7 +179,9 @@ if st.session_state.get("file_upload_mode"):
             for message in st.session_state.messages:
                 with st.chat_message(message["role"]):
                     st.markdown(message["content"])
-            st.session_state.file_upload_mode = False  # 关闭文件上传模式
+            # 添加关闭按钮
+            if st.sidebar.button("关闭", key="close_upload"):
+                st.session_state.file_upload_mode = False
         except Exception as e:
             st.error(f"读取本地文件失败：{e}")
     else:
