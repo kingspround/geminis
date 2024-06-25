@@ -215,12 +215,9 @@ def save_history(log_file):
         for msg in st.session_state.messages:
             f.write(f"{msg['role']}: {msg['content']}\n")
     st.success(f"已手动保存聊天记录！")
+    # 修正缩进
     st.download_button(
         label="下载聊天记录",
-        data=open(log_file, "rb").read(),  # 读取文件内容
-        file_name=filename,  # 设置下载文件名
-        mime="text/plain",  # 设置 MIME 类型
-    )
         data=open(log_file, "rb").read(),  # 读取文件内容
         file_name=filename,  # 设置下载文件名
         mime="text/plain",  # 设置 MIME 类型
