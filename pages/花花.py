@@ -151,6 +151,11 @@ if prompt := st.chat_input("Enter your message:"):
         message_placeholder.markdown(full_response)
     st.session_state.messages.append({"role": "assistant", "content": full_response})
 
+    # 保存历史记录到文件
+    with open(log_file, "w", encoding="utf-8") as f:  # 使用 "w" 模式写入
+        for msg in st.session_state.messages:
+            f.write(f"{msg['role']}: {msg['content']}\n")
+
     # 重新运行页面，使 CSS 样式生效
     st.experimental_rerun() 
 
@@ -183,18 +188,18 @@ with st.container():
             if len(st.session_state.messages) > 0:
                 st.button("重置上一个输出", on_click=lambda: st.session_state.messages.pop(-1))
         with col2:
-        if st.button("读取历史记录"):
-            try:
-                with open(log_file, "r", encoding="utf-8") as f:  # 使用 "r" 模式读取
-                    messages = [
-                        {"role": line.split(":")[0].strip(), "content": line.split(":")[1].strip()}
-                        for line in f.readlines()
-                    ]
-                    for message in messages:
-                        with st.chat_message(message["role"]):
-                            st.markdown(message["content"])
-            except FileNotFoundError:  # 修正缩进
-                st.warning(f"{filename} 不存在。")
+            if st.button("读取历史记录"):
+                try:
+                    with open(log_file, "r", encoding="utf-8") as f:  # 使用 "r" 模式读取
+                        messages = [
+                            {"role": line.split(":")[0].strip(), "content": line.split(":")[1].strip()}
+                            for line in f.readlines()
+                        ]
+                        for message in messages:
+                            with st.chat_message(message["role"]):
+                                st.markdown(message["content"])
+                except FileNotFoundError:
+                    st.warning(f"{filename} 不存在。")
         with col3:
             if st.button("清除历史记录"):
                 st.session_state.messages = []
@@ -211,5 +216,3 @@ with st.container():
             for msg in st.session_state.messages:
                 f.write(f"{msg['role']}: {msg['content']}\n")
         st.success(f"已手动保存聊天记录！")
-                except FileNotFoundError:
-                    st.warning(f"{filename} 不存在。")
