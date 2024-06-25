@@ -171,35 +171,35 @@ if st.sidebar.button("读取本地文件"):
 
 if st.session_state.get("file_upload_mode"):
     uploaded_file = st.sidebar.file_uploader("选择文件", type=["pkl"])
-    if uploaded_file is not None and st.session_state.file_upload_mode:  # 添加判断条件
-        try:
-            # 读取文件内容
-            loaded_messages = pickle.load(uploaded_file)
+    if "file_loaded" not in st.session_state or not st.session_state.file_loaded:
+        if uploaded_file is not None:
+            try:
+                # 读取文件内容
+                loaded_messages = pickle.load(uploaded_file)
 
-            # 合并到 st.session_state.messages 中
-            st.session_state.messages.extend(loaded_messages)
+                # 合并到 st.session_state.messages 中
+                st.session_state.messages.extend(loaded_messages)
 
-            # 显示聊天记录和编辑按钮
-            for i, message in enumerate(st.session_state.messages):
-                with st.chat_message(message["role"]):
-                    st.write(message["content"], key=f"message_{i}")
-                    if i >= len(st.session_state.messages) - 2:  # 在最后两条消息中添加编辑按钮
-                        if st.button("编辑", key=f"edit_{i}"):
-                            st.session_state.editable_index = i
-                            st.session_state.editing = True
+                # 显示聊天记录和编辑按钮
+                for i, message in enumerate(st.session_state.messages):
+                    with st.chat_message(message["role"]):
+                        st.write(message["content"], key=f"message_{i}")
+                        if i >= len(st.session_state.messages) - 2:  # 在最后两条消息中添加编辑按钮
+                            if st.button("编辑", key=f"edit_{i}"):
+                                st.session_state.editable_index = i
+                                st.session_state.editing = True
 
-            # 添加关闭按钮
-            if st.sidebar.button("关闭", key="close_upload"):
-                st.session_state.file_upload_mode = False
-                uploaded_file = None  # 重置上传文件
+                # 添加关闭按钮
+                if st.sidebar.button("关闭", key="close_upload"):
+                    st.session_state.file_upload_mode = False
+                    st.session_state.file_loaded = False  # 重置 file_loaded
 
-            # 保存合并后的历史记录到文件
-            with open(log_file, "wb") as f:
-                pickle.dump(st.session_state.messages, f)
+                # 保存合并后的历史记录到文件
+                with open(log_file, "wb") as f:
+                    pickle.dump(st.session_state.messages, f)
 
-        except Exception as e:
-            st.error(f"读取本地文件失败：{e}")
-
+            except Exception as e:
+                st.error(f"读取本地文件失败：{e}")
 
 def load_history(log_file):
     try:
