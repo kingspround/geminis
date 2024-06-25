@@ -167,7 +167,7 @@ st.sidebar.button("清除历史记录", on_click=lambda: clear_history(log_file)
 
 # 添加读取本地文件的按钮
 if st.sidebar.button("读取本地文件"):
-    st.session_state.file_upload_mode = True
+    st.session_state.file_upload_mode = True  # 设置文件上传模式
 
 if st.session_state.get("file_upload_mode"):
     uploaded_file = st.sidebar.file_uploader("选择文件", type=["pkl"])
@@ -184,7 +184,9 @@ if st.session_state.get("file_upload_mode"):
                 st.session_state.file_upload_mode = False
         except Exception as e:
             st.error(f"读取本地文件失败：{e}")
-
+    # 修正代码逻辑：如果用户没有选择文件，也需要隐藏文件上传框
+    else:
+        st.session_state.file_upload_mode = False  # 关闭文件上传模式
 
 def load_history(log_file):
     try:
@@ -204,7 +206,5 @@ def clear_history(log_file):
     try:
         os.remove(log_file)  # 删除文件
         st.success(f"成功清除 {filename} 的历史记录！")
-    except FileNotFoundError:
-        st.warning(f"{filename} 不存在。")
     except FileNotFoundError:
         st.warning(f"{filename} 不存在。")
