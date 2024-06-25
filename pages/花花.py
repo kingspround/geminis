@@ -1,4 +1,3 @@
-# First
 import google.generativeai as genai
 import streamlit as st
 from dotenv import load_dotenv  
@@ -80,7 +79,7 @@ def getAnswer(prompt):
 
 # 获取文件名，并生成对应的文件名
 filename = "史莱姆娘" + ".pkl"  # 这里假设文件名就是 "史莱姆娘"
-log_dir = "log"  # 日志文件夹名称
+log_dir = "logs"  # 日志文件夹名称
 
 # 创建日志文件夹
 if not os.path.exists(log_dir):
@@ -160,6 +159,9 @@ if len(st.session_state.messages) > 0:
 st.sidebar.button("读取历史记录", on_click=lambda: load_history(log_file))
 st.sidebar.button("清除历史记录", on_click=lambda: clear_history(log_file))
 
+# 添加保存按钮
+st.sidebar.button("保存聊天记录", on_click=lambda: save_chat_history(log_file))
+
 def load_history(log_file):
     try:
         with open(log_file, "rb") as f:
@@ -177,3 +179,9 @@ def clear_history(log_file):
         st.success(f"成功清除 {filename} 的历史记录！")
     except FileNotFoundError:
         st.warning(f"{filename} 不存在。")
+
+def save_chat_history(log_file):
+    # 保存当前的聊天记录到文件
+    with open(log_file, "wb") as f:
+        pickle.dump(st.session_state.messages, f)
+    st.success("聊天记录已保存到 logs 文件夹！")
