@@ -180,7 +180,7 @@ def clear_history(log_file):
         st.warning(f"{filename} 不存在。")
 
 # 读取环境变量
-YOUR_GITHUB_ACCESS_TOKEN = "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"
+YOUR_GITHUB_ACCESS_TOKEN = "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"
 if not YOUR_GITHUB_ACCESS_TOKEN:
     st.error("请设置环境变量 YOUR_GITHUB_ACCESS_TOKEN")
     st.stop()
