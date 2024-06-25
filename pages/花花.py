@@ -191,6 +191,7 @@ if st.session_state.get("file_upload_mode"):
             # 添加关闭按钮
             if st.sidebar.button("关闭", key="close_upload"):
                 st.session_state.file_upload_mode = False
+                uploaded_file = None  # 重置上传文件
 
             # 保存合并后的历史记录到文件
             with open(log_file, "wb") as f:
