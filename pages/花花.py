@@ -10,7 +10,6 @@ from io import StringIO
 import streamlit as st
 import pickle
 import datetime
-from streamlit_experimental_artifacts import upload_artifact
 
 # Insert your API key here
 st.session_state.key = "AIzaSyDPFZ7gRba9mhKTqbXA_Y7fhAxS8IEu0bY"
@@ -147,7 +146,7 @@ def save_and_upload_chat_history(messages):
         f.write(data)
 
     # 上传工件
-    upload_artifact("chat-history", filename)
+    st.experimental_upload_artifact("chat-history", filename)
     st.success(f"已保存聊天记录到文件: {filename}")
 
 if prompt := st.chat_input("Enter your message:"):
