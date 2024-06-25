@@ -11,7 +11,8 @@ import pickle
 import requests
 
 # Insert your API key here
-st.session_state.key = "AIzaSyDPFZ7gRba9mhKTqbXA_Y7fhAxS8IEu0bY"
+# st.session_state.key = "AIzaSyDPFZ7gRba9mhKTqbXA_Y7fhAxS8IEu0bY"
+st.session_state.key = os.environ.get("GEMINI_API_KEY")  # 从环境变量获取 API Key
 
 if "key" not in st.session_state:
     st.session_state.key = None
@@ -184,7 +185,7 @@ def clear_history(log_file):
 def save_chat_history(log_file):
     # 获取你的 GitHub API Token 和仓库名称
     # github_token = os.environ.get("GITHUB_TOKEN")  # 从环境变量获取
-    github_token = st.secrets["GITHUB_TOKEN"]  # 从 Streamlit secrets 获取
+    github_token = "your_github_token"  # 从环境变量获取
     repo_name = "kingspround/geminis"  # 替换成你的 GitHub 仓库名称
     filename = "logs/史莱姆娘.pkl"  # 确保文件名和路径与你GitHub仓库一致
 
