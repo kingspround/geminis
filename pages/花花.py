@@ -80,7 +80,7 @@ def getAnswer(prompt):
 
 # 获取文件名，并生成对应的文件名
 filename = "史莱姆娘" + ".pkl"  # 这里假设文件名就是 "史莱姆娘"
-log_file = os.path.join("logs", filename)  # 完整路径
+log_file = os.path.join("../logs", filename)  # 相对路径
 
 if "messages" not in st.session_state:
     # 从文件加载历史记录
