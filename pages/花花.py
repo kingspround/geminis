@@ -177,3 +177,20 @@ def clear_history(log_file):
         st.success(f"成功清除 {filename} 的历史记录！")
     except FileNotFoundError:
         st.warning(f"{filename} 不存在。")
+
+# 定义保存聊天记录到 GitHub 仓库的函数
+def save_to_github(log_file, messages):
+    # 获取 GitHub 仓库的根目录
+    repo_root = os.path.join(os.path.dirname(__file__), "..")
+    
+    # 构建完整路径
+    github_log_file = os.path.join(repo_root, "logs", log_file)
+    
+    # 保存历史记录到文件
+    with open(github_log_file, "wb") as f:
+        pickle.dump(messages, f)
+
+    st.success(f"成功将聊天记录保存到 GitHub 仓库中的 {log_file} 文件！")
+
+# 添加保存到 GitHub 的按钮
+st.sidebar.button("保存到 GitHub", on_click=lambda: save_to_github(filename, st.session_state.messages))
