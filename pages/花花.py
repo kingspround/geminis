@@ -82,6 +82,14 @@ def getAnswer(prompt):
 filename = "史莱姆娘" + ".pkl"  # 这里假设文件名就是 "史莱姆娘"
 log_file = os.path.join("logs", filename)  # 完整路径
 
+# 使用 st.experimental_singleton 来确保 logs 文件夹拥有写入权限
+@st.experimental_singleton
+def create_logs_folder():
+    if not os.path.exists("logs"):
+        os.makedirs("logs")
+
+create_logs_folder()
+
 if "messages" not in st.session_state:
     # 从文件加载历史记录
     try:
@@ -139,8 +147,12 @@ if prompt := st.chat_input("Enter your message:"):
         message_placeholder.markdown(full_response)
     st.session_state.messages.append({"role": "assistant", "content": full_response})
 
-    # 使用 st.experimental_rerun() 实时更新聊天界面
-    st.experimental_rerun()
+    # 保存历史记录到文件
+    with open(log_file, "wb") as f:
+        pickle.dump(st.session_state.messages, f)
+
+    # 重新运行页面，使 CSS 样式生效
+    st.experimental_rerun() 
 
 # 使用 st.sidebar 放置按钮
 st.sidebar.title("操作")
