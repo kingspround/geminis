@@ -181,20 +181,19 @@ if st.button("读取本地文件"):
     except Exception as e:
         st.error(f"读取本地文件失败：{e}")
 
-
 def load_history(log_file):
     try:
         with open(log_file, "r", encoding="utf-8") as f:  # 使用 "r" 模式读取
-            st.session_state.messages = []
+            messages = []
             for line in f.readlines():
                 parts = line.split(":")
                 if len(parts) >= 2:  # 检查列表长度
-                    st.session_state.messages.append(
+                    messages.append(
                         {"role": parts[0].strip(), "content": parts[1].strip()}
                     )
                 else:
                     st.warning(f"无法解析行：{line}")  # 打印无法解析的行的信息
-            for message in st.session_state.messages:
+            for message in messages:
                 with st.chat_message(message["role"]):
                     st.markdown(message["content"])
     except FileNotFoundError:
