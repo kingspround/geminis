@@ -1,10 +1,14 @@
+# First
 import google.generativeai as genai
 import streamlit as st
 from dotenv import load_dotenv  
 import os
+from PIL import Image
+import numpy as np
+from io import BytesIO
+from io import StringIO
+import streamlit as st
 import pickle
-import shutil
-import tempfile
 
 # Insert your API key here
 st.session_state.key = "AIzaSyDPFZ7gRba9mhKTqbXA_Y7fhAxS8IEu0bY"
@@ -76,15 +80,14 @@ def getAnswer(prompt):
 
 # 获取文件名，并生成对应的文件名
 filename = "史莱姆娘" + ".pkl"  # 这里假设文件名就是 "史莱姆娘"
-log_file = os.path.join("logs", filename)  # 完整路径
+log_dir = "log"  # 日志文件夹名称
 
-# 使用 st.experimental_singleton 来确保 logs 文件夹拥有写入权限
-@st.experimental_singleton
-def create_logs_folder():
-    if not os.path.exists("logs"):
-        os.makedirs("logs")
+# 创建日志文件夹
+if not os.path.exists(log_dir):
+    os.makedirs(log_dir)
 
-create_logs_folder()
+# 获取完整路径
+log_file = os.path.join(log_dir, filename)
 
 if "messages" not in st.session_state:
     # 从文件加载历史记录
@@ -143,8 +146,12 @@ if prompt := st.chat_input("Enter your message:"):
         message_placeholder.markdown(full_response)
     st.session_state.messages.append({"role": "assistant", "content": full_response})
 
-    # 使用 st.experimental_rerun() 实时更新聊天界面
-    st.experimental_rerun()
+    # 保存历史记录到文件
+    with open(log_file, "wb") as f:
+        pickle.dump(st.session_state.messages, f)
+
+    # 重新运行页面，使 CSS 样式生效
+    st.experimental_rerun() 
 
 # 使用 st.sidebar 放置按钮
 st.sidebar.title("操作")
@@ -152,9 +159,6 @@ if len(st.session_state.messages) > 0:
     st.sidebar.button("重置上一个输出", on_click=lambda: st.session_state.messages.pop(-1))
 st.sidebar.button("读取历史记录", on_click=lambda: load_history(log_file))
 st.sidebar.button("清除历史记录", on_click=lambda: clear_history(log_file))
-# 添加手动保存按钮
-st.sidebar.button("手动保存", on_click=lambda: save_chat_history())
-
 
 def load_history(log_file):
     try:
@@ -173,20 +177,3 @@ def clear_history(log_file):
         st.success(f"成功清除 {filename} 的历史记录！")
     except FileNotFoundError:
         st.warning(f"{filename} 不存在。")
-
-def save_chat_history():
-    # 创建临时文件
-    with tempfile.NamedTemporaryFile(mode='wb', delete=False) as tmp_file:
-        # 保存聊天记录到临时文件
-        pickle.dump(st.session_state.messages, tmp_file)
-        tmp_file_path = tmp_file.name
-
-    # 复制临时文件到 logs 文件夹
-    try:
-        shutil.copyfile(tmp_file_path, log_file)
-        st.success(f"已保存聊天记录到 logs 文件夹！")
-    except Exception as e:
-        st.error(f"保存聊天记录失败：{e}")
-
-    # 删除临时文件
-    os.remove(tmp_file_path)
