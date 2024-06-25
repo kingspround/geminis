@@ -171,7 +171,7 @@ if st.sidebar.button("读取本地文件"):
 
 if st.session_state.get("file_upload_mode"):
     uploaded_file = st.sidebar.file_uploader("选择文件", type=["pkl"])
-    if uploaded_file is not None:
+    if uploaded_file is not None and st.session_state.file_upload_mode:  # 添加判断条件
         try:
             # 读取文件内容
             loaded_messages = pickle.load(uploaded_file)
