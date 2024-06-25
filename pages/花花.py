@@ -1,3 +1,4 @@
+# First
 import google.generativeai as genai
 import streamlit as st
 from dotenv import load_dotenv  
@@ -179,12 +180,6 @@ def clear_history(log_file):
     except FileNotFoundError:
         st.warning(f"{filename} 不存在。")
 
-# 读取环境变量
-YOUR_GITHUB_ACCESS_TOKEN = os.getenv("YOUR_GITHUB_ACCESS_TOKEN")
-if not YOUR_GITHUB_ACCESS_TOKEN:
-    st.error("请设置环境变量 YOUR_GITHUB_ACCESS_TOKEN")
-    st.stop()
-
 # 定义保存聊天记录到 GitHub 仓库的函数
 def save_to_github(log_file, messages):
     # 获取 GitHub 仓库的 API 地址
@@ -195,7 +190,7 @@ def save_to_github(log_file, messages):
 
     # 创建提交请求
     headers = {
-        "Authorization": f"token "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"",
+        "Authorization": f"token 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",
         "Content-Type": "application/json"
     }
     payload = {
