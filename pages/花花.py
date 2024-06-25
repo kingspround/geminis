@@ -77,13 +77,6 @@ def getAnswer(prompt):
         st.error(f"An error occurred: {e}")
         return ""  # 在发生错误时返回空字符串
 
-# 创建 logs 文件夹（使用 st.experimental_singleton）
-@st.experimental_singleton
-def create_logs_folder():
-    if not os.path.exists("logs"):
-        os.makedirs("logs")
-
-create_logs_folder()
 
 # 获取文件名，并生成对应的文件名
 filename = "史莱姆娘" + ".pkl"  # 这里假设文件名就是 "史莱姆娘"
@@ -130,53 +123,4 @@ if st.session_state.get("editing"):
                 # 保存更改到文件
                 with open(log_file, "wb") as f:
                     pickle.dump(st.session_state.messages, f)
-                st.success(f"已保存更改！")
-                st.session_state.editing = False  # 结束编辑状态
-        with col2:
-            if st.button("取消", key=f"cancel_{i}"):
-                st.session_state.editing = False  # 结束编辑状态
-
-if prompt := st.chat_input("Enter your message:"):
-    st.session_state.messages.append({"role": "user", "content": prompt})
-    with st.chat_message("user"):
-        st.markdown(prompt)
-    with st.chat_message("assistant"):
-        message_placeholder = st.empty()
-        full_response = ""
-        for chunk in getAnswer(prompt):  # 正确调用 getAnswer
-            full_response += chunk
-            message_placeholder.markdown(full_response + "▌")
-        message_placeholder.markdown(full_response)
-    st.session_state.messages.append({"role": "assistant", "content": full_response})
-
-    # 保存历史记录到文件
-    with open(log_file, "wb") as f:
-        pickle.dump(st.session_state.messages, f)
-
-    # 重新运行页面，使 CSS 样式生效
-    st.experimental_rerun() 
-
-# 使用 st.sidebar 放置按钮
-st.sidebar.title("操作")
-if len(st.session_state.messages) > 0:
-    st.sidebar.button("重置上一个输出", on_click=lambda: st.session_state.messages.pop(-1))
-st.sidebar.button("读取历史记录", on_click=lambda: load_history(log_file))
-st.sidebar.button("清除历史记录", on_click=lambda: clear_history(log_file))
-
-def load_history(log_file):
-    try:
-        with open(log_file, "rb") as f:
-            messages = pickle.load(f)
-            for message in messages:
-                with st.chat_message(message["role"]):
-                    st.markdown(message["content"])
-    except FileNotFoundError:
-        st.warning(f"{filename} 不存在。")
-
-def clear_history(log_file):
-    st.session_state.messages = []
-    try:
-        os.remove(log_file)  # 删除文件
-        st.success(f"成功清除 {filename} 的历史记录！")
-    except FileNotFoundError:
-        st.warning(f"{filename} 不存在。")
+                st
