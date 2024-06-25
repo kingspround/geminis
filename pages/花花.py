@@ -194,7 +194,8 @@ if st.session_state.get("file_upload_mode"):
             # 添加关闭按钮
             if st.sidebar.button("关闭", key="close_upload"):
                 st.session_state.file_upload_mode = False
-                
+                st.session_state.file_loaded = False  # 将 file_loaded 设置为 False
+
             # 保存合并后的历史记录到文件
             with open(log_file, "wb") as f:
                 pickle.dump(st.session_state.messages, f)
