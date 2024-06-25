@@ -1,9 +1,10 @@
-# First
 import google.generativeai as genai
 import streamlit as st
 from dotenv import load_dotenv  
 import os
 import pickle
+import shutil
+import tempfile
 
 # Insert your API key here
 st.session_state.key = "AIzaSyDPFZ7gRba9mhKTqbXA_Y7fhAxS8IEu0bY"
@@ -174,7 +175,18 @@ def clear_history(log_file):
         st.warning(f"{filename} 不存在。")
 
 def save_chat_history():
-    # 保存聊天记录到文件
-    with open(log_file, "wb") as f:
-        pickle.dump(st.session_state.messages, f)
-    st.success(f"已保存聊天记录到 logs 文件夹！")
+    # 创建临时文件
+    with tempfile.NamedTemporaryFile(mode='wb', delete=False) as tmp_file:
+        # 保存聊天记录到临时文件
+        pickle.dump(st.session_state.messages, tmp_file)
+        tmp_file_path = tmp_file.name
+
+    # 复制临时文件到 logs 文件夹
+    try:
+        shutil.copyfile(tmp_file_path, log_file)
+        st.success(f"已保存聊天记录到 logs 文件夹！")
+    except Exception as e:
+        st.error(f"保存聊天记录失败：{e}")
+
+    # 删除临时文件
+    os.remove(tmp_file_path)
