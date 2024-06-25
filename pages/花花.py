@@ -8,11 +8,10 @@ import numpy as np
 from io import BytesIO
 from io import StringIO
 import streamlit as st
-import pickle
-import streamlit as st
 import os
 import pickle
 import requests
+import json
 
 # Insert your API key here
 st.session_state.key = "AIzaSyDPFZ7gRba9mhKTqbXA_Y7fhAxS8IEu0bY"
@@ -187,9 +186,8 @@ def save_to_github(log_file, messages):
     # 获取 GitHub 仓库的 API 地址
     repo_url = "https://api.github.com/repos/kingspround/geminis/contents/logs/"
 
-    # 将聊天记录序列化为 JSON 字符串
-    data = pickle.dumps(messages)
-    encoded_data = data.encode('base64').decode('utf-8')
+    # 使用 json.dumps 将聊天记录转换为 JSON 字符串
+    data = json.dumps(messages)
 
     # 创建提交请求
     headers = {
@@ -198,13 +196,13 @@ def save_to_github(log_file, messages):
     }
     payload = {
         "message": "Update chat log",
-        "content": encoded_data,
+        "content": data,
         "path": log_file
     }
-    response = requests.put(repo_url + log_file, headers=headers, json=payload)
+    response = requests.post(repo_url + log_file, headers=headers, json=payload)
 
     # 检查响应
-    if response.status_code == 200:
+    if response.status_code == 201:  # 检查 POST 请求成功
         st.success(f"成功将聊天记录保存到 GitHub 仓库中的 {log_file} 文件！")
     else:
         st.error(f"保存聊天记录到 GitHub 仓库失败：{response.text}")
