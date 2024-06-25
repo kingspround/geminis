@@ -85,15 +85,18 @@ filename = os.path.splitext(os.path.basename(__file__))[0] + ".pkl"  # 使用 .p
 # 获取完整路径
 log_file = os.path.join(os.path.dirname(__file__), filename)  # 使用 os.path.dirname 获取当前目录
 
-# 检查文件是否存在，如果存在则加载历史记录
-if os.path.exists(log_file):
+# 检查文件是否存在，如果不存在就创建空文件
+if not os.path.exists(log_file):
+    with open(log_file, "wb") as f:
+        pass  # 创建空文件
+
+if "messages" not in st.session_state:
+    # 从文件加载历史记录
     try:
         with open(log_file, "rb") as f:  # 使用 "rb" 模式读取
             st.session_state.messages = pickle.load(f)
     except FileNotFoundError:
         st.session_state.messages = []
-else:
-    st.session_state.messages = []  # 创建空列表
 
 # 显示历史记录
 for i, message in enumerate(st.session_state.messages):
