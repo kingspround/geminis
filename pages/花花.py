@@ -164,17 +164,18 @@ st.sidebar.download_button(
 st.sidebar.button("读取历史记录", on_click=lambda: load_history(log_file))
 st.sidebar.button("清除历史记录", on_click=lambda: clear_history(log_file))
 
-# 使用 st.file_uploader 创建拖放文件框
-uploaded_file = st.sidebar.file_uploader("读取本地文件", type=["pkl"])
-if uploaded_file is not None:
-    try:
-        # 读取文件内容
-        st.session_state.messages = pickle.load(uploaded_file)
-        for message in st.session_state.messages:
-            with st.chat_message(message["role"]):
-                st.markdown(message["content"])
-    except Exception as e:
-        st.error(f"读取本地文件失败：{e}")
+# 添加读取本地文件的按钮
+if st.sidebar.button("读取本地文件"):
+    uploaded_file = st.sidebar.file_uploader("选择文件", type=["pkl"])
+    if uploaded_file is not None:
+        try:
+            # 读取文件内容
+            st.session_state.messages = pickle.load(uploaded_file)
+            for message in st.session_state.messages:
+                with st.chat_message(message["role"]):
+                    st.markdown(message["content"])
+        except Exception as e:
+            st.error(f"读取本地文件失败：{e}")
 
 def load_history(log_file):
     try:
