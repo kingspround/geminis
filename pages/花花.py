@@ -192,7 +192,8 @@ def save_chat_history(log_file):
 
     # 将 "史莱姆娘.pkl" 文件复制到 logs 根目录
     try:
-        shutil.copyfile(log_file, os.path.join("logs", filename))
+        # 将目标路径改为 "logs/史莱姆娘.pkl"
+        shutil.copyfile(log_file, "logs/史莱姆娘.pkl")  
         st.success(f"已保存聊天记录到 logs 文件夹！")
     except Exception as e:
         st.error(f"保存聊天记录失败：{e}")
