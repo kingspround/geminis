@@ -195,7 +195,7 @@ def save_to_github(log_file, messages):
 
     # 创建提交请求
     headers = {
-        "Authorization": f"token 【标记】",
+        "Authorization": f"token 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",
         "Content-Type": "application/json"
     }
     payload = {
