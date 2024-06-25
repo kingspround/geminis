@@ -85,10 +85,8 @@ log_file = os.path.join("logs", filename)  # 完整路径
 if "messages" not in st.session_state:
     # 从文件加载历史记录
     try:
-        with open(log_file, "r", encoding="utf-8") as f:  # 以读取模式打开文件
-            st.session_state.messages = [
-                json.loads(line) for line in f.readlines()  # 读取每行并解析为 JSON 对象
-            ]
+        with open(log_file, "rb") as f:
+            st.session_state.messages = pickle.load(f)
     except FileNotFoundError:
         st.session_state.messages = []
 
@@ -120,9 +118,8 @@ if st.session_state.get("editing"):
             if st.button("保存", key=f"save_{i}"):
                 st.session_state.messages[i]["content"] = new_content
                 # 保存更改到文件
-                with open(log_file, "w", encoding="utf-8") as f:  # 以写入模式打开文件
-                    for msg in st.session_state.messages:
-                        f.write(json.dumps(msg) + "\n")  # 写入 JSON 对象，并换行
+                with open(log_file, "wb") as f:
+                    pickle.dump(st.session_state.messages, f)
                 st.success(f"已保存更改！")
                 st.session_state.editing = False  # 结束编辑状态
         with col2:
@@ -142,12 +139,8 @@ if prompt := st.chat_input("Enter your message:"):
         message_placeholder.markdown(full_response)
     st.session_state.messages.append({"role": "assistant", "content": full_response})
 
-    # 保存历史记录到文件
-    with open(log_file, "a", encoding="utf-8") as f:  # 以追加模式打开文件
-        f.write(json.dumps(st.session_state.messages[-1]) + "\n")  # 追加 JSON 对象，并换行
-
-    # 重新运行页面，使 CSS 样式生效
-    st.experimental_rerun() 
+    # 使用 st.experimental_rerun() 实时更新聊天界面
+    st.experimental_rerun()
 
 # 使用 st.sidebar 放置按钮
 st.sidebar.title("操作")
@@ -158,10 +151,8 @@ st.sidebar.button("清除历史记录", on_click=lambda: clear_history(log_file)
 
 def load_history(log_file):
     try:
-        with open(log_file, "r", encoding="utf-8") as f:
-            messages = [
-                json.loads(line) for line in f.readlines()  # 读取每行并解析为 JSON 对象
-            ]
+        with open(log_file, "rb") as f:
+            messages = pickle.load(f)
             for message in messages:
                 with st.chat_message(message["role"]):
                     st.markdown(message["content"])
