@@ -156,8 +156,11 @@ if prompt := st.chat_input("Enter your message:"):
         message_placeholder.markdown(full_response)
     st.session_state.messages.append({"role": "assistant", "content": full_response})
 
-    # 重新运行页面，使 CSS 样式生效
-    st.experimental_rerun() 
+    # 保存历史记录到文件
+    with open(log_file, "w", encoding="utf-8") as f:  # 使用 "w" 模式写入
+        for msg in st.session_state.messages:
+            f.write(f"{msg['role']}: {msg['content']}\n")
+
 
 # 使用 st.sidebar 放置按钮
 st.sidebar.title("操作")
@@ -185,16 +188,16 @@ if st.button("读取本地文件"):
 def load_history(log_file):
     try:
         with open(log_file, "r", encoding="utf-8") as f:  # 使用 "r" 模式读取
-            st.session_state.messages = []
+            messages = []
             for line in f.readlines():
                 parts = line.split(":")
                 if len(parts) >= 2:  # 检查列表长度
-                    st.session_state.messages.append(
+                    messages.append(
                         {"role": parts[0].strip(), "content": parts[1].strip()}
                     )
                 else:
                     st.warning(f"无法解析行：{line}")  # 打印无法解析的行的信息
-            for message in st.session_state.messages:
+            for message in messages:
                 with st.chat_message(message["role"]):
                     st.markdown(message["content"])
     except FileNotFoundError:
