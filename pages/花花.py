@@ -132,6 +132,9 @@ if st.session_state.get("editing"):
             if st.button("取消", key=f"cancel_{i}"):
                 st.session_state.editing = False  # 结束编辑状态
 
+# 在程序初始化阶段创建文件上传器
+with st.sidebar.file_uploader("Upload chat_history.pkl", type=["pkl"]):
+    st.session_state.uploaded_file = st.session_state.uploaded_file
 
 # Use code with caution.
 if prompt := st.chat_input("Enter your message:"):
@@ -162,8 +165,8 @@ def save_chat_history_to_streamlit():
     # 使用 Streamlit 文件存储功能保存聊天记录到 Streamlit 存储
     with open("log/chat_history.pkl", "wb") as f:
         pickle.dump(st.session_state.messages, f)
-    with st.file_uploader("Upload chat_history.pkl", type=["pkl"]):
-        st.session_state.uploaded_file = st.session_state.uploaded_file
+    # 将本地文件上传到 Streamlit 存储
+    st.session_state.uploaded_file = open("log/chat_history.pkl", "rb")
 
 def sync_to_github():
     # 使用 Streamlit 文件存储功能获取 chat_history.pkl 文件内容
