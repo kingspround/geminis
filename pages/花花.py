@@ -238,3 +238,5 @@ def clear_history(log_file):
         st.success(f"成功清除 {filename} 的历史记录！")
     except FileNotFoundError:
         st.warning(f"{filename} 不存在。")
+    except FileNotFoundError:
+        st.warning(f"{filename} 不存在。")
