@@ -183,8 +183,8 @@ def clear_history(log_file):
 
 def save_chat_history(log_file):
     # 获取你的 GitHub API Token 和仓库名称
-    # github_token = os.environ.get("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")  # 从环境变量获取
-    github_token = st.text_input("请输入 GitHub API Token", type="password")  # 使用 text_input 获取 Token
+    # github_token = os.environ.get("GITHUB_TOKEN")  # 从环境变量获取
+    github_token = "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"  # 使用 text_input 获取 Token
     repo_name = "kingspround/geminis"  # 替换成你的 GitHub 仓库名称
     filename = "logs/史莱姆娘.pkl"  # 确保文件名和路径与你GitHub仓库一致
 
