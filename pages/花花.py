@@ -164,6 +164,7 @@ st.sidebar.title("操作")
 if len(st.session_state.messages) > 0:
     st.sidebar.button("重置上一个输出", on_click=lambda: st.session_state.messages.pop(-1))
 st.sidebar.button("下载聊天记录", on_click=lambda: save_history(log_file))
+st.sidebar.button("读取历史记录", on_click=lambda: load_history(log_file))
 st.sidebar.button("清除历史记录", on_click=lambda: clear_history(log_file))
 
 # 添加读取本地文件的按钮
@@ -184,16 +185,16 @@ if st.button("读取本地文件"):
 def load_history(log_file):
     try:
         with open(log_file, "r", encoding="utf-8") as f:  # 使用 "r" 模式读取
-            messages = []
+            st.session_state.messages = []
             for line in f.readlines():
                 parts = line.split(":")
                 if len(parts) >= 2:  # 检查列表长度
-                    messages.append(
+                    st.session_state.messages.append(
                         {"role": parts[0].strip(), "content": parts[1].strip()}
                     )
                 else:
                     st.warning(f"无法解析行：{line}")  # 打印无法解析的行的信息
-            for message in messages:
+            for message in st.session_state.messages:
                 with st.chat_message(message["role"]):
                     st.markdown(message["content"])
     except FileNotFoundError:
