@@ -163,9 +163,25 @@ if prompt := st.chat_input("Enter your message:"):
 st.sidebar.title("操作")
 if len(st.session_state.messages) > 0:
     st.sidebar.button("重置上一个输出", on_click=lambda: st.session_state.messages.pop(-1))
-st.sidebar.button("读取历史记录", on_click=lambda: load_history(log_file))
+st.sidebar.button("下载聊天记录", on_click=lambda: save_history(log_file))
 st.sidebar.button("清除历史记录", on_click=lambda: clear_history(log_file))
-st.sidebar.button("手动保存", on_click=lambda: save_history(log_file))
+
+# 添加读取本地文件的按钮
+if st.button("读取本地文件"):
+    try:
+        uploaded_file = st.file_uploader("选择文件", type=["txt"])
+        if uploaded_file is not None:
+            # 读取文件内容
+            contents = uploaded_file.read().decode("utf-8")
+            messages = [
+                {"role": line.split(":")[0].strip(), "content": line.split(":")[1].strip()}
+                for line in contents.splitlines() if ":" in line
+            ]
+            for message in messages:
+                with st.chat_message(message["role"]):
+                    st.markdown(message["content"])
+    except Exception as e:
+        st.error(f"读取本地文件失败：{e}")
 
 def load_history(log_file):
     try:
@@ -201,6 +217,10 @@ def save_history(log_file):
     st.success(f"已手动保存聊天记录！")
     st.download_button(
         label="下载聊天记录",
+        data=open(log_file, "rb").read(),  # 读取文件内容
+        file_name=filename,  # 设置下载文件名
+        mime="text/plain",  # 设置 MIME 类型
+    )
         data=open(log_file, "rb").read(),  # 读取文件内容
         file_name=filename,  # 设置下载文件名
         mime="text/plain",  # 设置 MIME 类型
