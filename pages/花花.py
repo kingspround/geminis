@@ -9,8 +9,8 @@ from io import BytesIO
 from io import StringIO
 import streamlit as st
 import pickle
-import requests
-import json
+import datetime
+from streamlit_experimental_artifacts import upload_artifact
 
 # Insert your API key here
 st.session_state.key = "AIzaSyDPFZ7gRba9mhKTqbXA_Y7fhAxS8IEu0bY"
@@ -54,8 +54,6 @@ safety_settings = [
 model = genai.GenerativeModel(model_name="gemini-1.5-pro-latest",generation_config=generation_config,safety_settings=safety_settings)
 
 # LLM
-
-
 def getAnswer(prompt):
     his_messages = []
     his_messages.append(
@@ -135,6 +133,23 @@ if st.session_state.get("editing"):
             if st.button("取消", key=f"cancel_{i}"):
                 st.session_state.editing = False  # 结束编辑状态
 
+# 保存聊天记录并上传到 GitHub
+def save_and_upload_chat_history(messages):
+    # 获取当前日期和时间，用于文件名
+    timestamp = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+    filename = f"chat_history_{timestamp}.pkl"
+
+    # 将聊天记录序列化为二进制数据
+    data = pickle.dumps(messages)
+
+    # 保存到文件
+    with open(filename, "wb") as f:
+        f.write(data)
+
+    # 上传工件
+    upload_artifact("chat-history", filename)
+    st.success(f"已保存聊天记录到文件: {filename}")
+
 if prompt := st.chat_input("Enter your message:"):
     st.session_state.messages.append({"role": "user", "content": prompt})
     with st.chat_message("user"):
@@ -162,6 +177,10 @@ if len(st.session_state.messages) > 0:
 st.sidebar.button("读取历史记录", on_click=lambda: load_history(log_file))
 st.sidebar.button("清除历史记录", on_click=lambda: clear_history(log_file))
 
+# 保存聊天记录按钮
+if st.button("保存聊天记录"):
+    save_and_upload_chat_history(st.session_state.messages)
+
 def load_history(log_file):
     try:
         with open(log_file, "rb") as f:
@@ -179,32 +198,3 @@ def clear_history(log_file):
         st.success(f"成功清除 {filename} 的历史记录！")
     except FileNotFoundError:
         st.warning(f"{filename} 不存在。")
-
-# 定义保存聊天记录到 GitHub 仓库的函数
-def save_to_github(log_file, messages):
-    # 获取 GitHub 仓库的 API 地址
-    repo_url = "https://api.github.com/repos/kingspround/geminis/contents/logs/"
-
-    # 使用 json.dumps 将聊天记录转换为 JSON 字符串
-    data = json.dumps(messages)
-
-    # 创建提交请求
-    headers = {
-        "Authorization": f"token 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",
-        "Content-Type": "application/json"
-    }
-    payload = {
-        "message": "Update chat log",
-        "content": data,
-        "path": log_file
-    }
-    response = requests.post(repo_url + log_file, headers=headers, json=payload)
-
-    # 检查响应
-    if response.status_code == 201:  # 检查 POST 请求成功
-        st.success(f"成功将聊天记录保存到 GitHub 仓库中的 {log_file} 文件！")
-    else:
-        st.error(f"保存聊天记录到 GitHub 仓库失败：{response.text}")
-
-# 添加保存到 GitHub 的按钮
-st.sidebar.button("保存到 GitHub", on_click=lambda: save_to_github(filename, st.session_state.messages))
