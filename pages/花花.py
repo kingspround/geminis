@@ -77,14 +77,17 @@ def getAnswer(prompt):
         st.error(f"An error occurred: {e}")
         return ""  # 在发生错误时返回空字符串
 
+# 创建 logs 文件夹（使用 st.experimental_singleton）
+@st.experimental_singleton
+def create_logs_folder():
+    if not os.path.exists("logs"):
+        os.makedirs("logs")
+
+create_logs_folder()
 
 # 获取文件名，并生成对应的文件名
 filename = "史莱姆娘" + ".pkl"  # 这里假设文件名就是 "史莱姆娘"
 log_dir = "log"  # 日志文件夹名称
-
-# 检测 logs 文件夹是否存在，如果不存在则创建
-if not os.path.exists(log_dir):
-    os.makedirs(log_dir)
 
 # 获取完整路径
 log_file = os.path.join(log_dir, filename)
