@@ -78,6 +78,14 @@ def getAnswer(prompt):
         return ""  # 在发生错误时返回空字符串
 
 
+@st.experimental_singleton
+def create_logs_folder():
+    if not os.path.exists("logs"):
+        os.makedirs("logs")
+
+# 调用该函数，确保 logs 文件夹创建
+create_logs_folder()
+
 # 获取文件名，并生成对应的文件名
 filename = "史莱姆娘" + ".pkl"  # 这里假设文件名就是 "史莱姆娘"
 log_file = os.path.join("logs", filename)  # 完整路径
