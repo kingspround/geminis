@@ -1,7 +1,7 @@
 # First
 import google.generativeai as genai
 import streamlit as st
-from dotenv import load_dotenv
+from dotenv import load_dotenv  
 import os
 from PIL import Image
 import numpy as np
@@ -9,56 +9,57 @@ from io import BytesIO
 from io import StringIO
 import streamlit as st
 import pickle
-import subprocess
-import base64
 
 # Insert your API key here
 st.session_state.key = "AIzaSyDPFZ7gRba9mhKTqbXA_Y7fhAxS8IEu0bY"
+
 if "key" not in st.session_state:
     st.session_state.key = None
+    
 if not st.session_state.key:
     st.info("Please add your key to continue.")
     st.stop()
-
+    
 genai.configure(api_key=st.session_state.key)
 
 # Set up the model
 generation_config = {
-    "temperature": 1,
-    "top_p": 0,
-    "top_k": 0,
-    "max_output_tokens": 10000,
+  "temperature": 1,
+  "top_p": 0,
+  "top_k": 0,
+  "max_output_tokens": 10000,
 }
 
 safety_settings = [
-    {
-        "category": "HARM_CATEGORY_HARASSMENT",
-        "threshold": "BLOCK_NONE",
-    },
-    {
-        "category": "HARM_CATEGORY_HATE_SPEECH",
-        "threshold": "BLOCK_NONE",
-    },
-    {
-        "category": "HARM_CATEGORY_SEXUALLY_EXPLICIT",
-        "threshold": "BLOCK_NONE",
-    },
-    {
-        "category": "HARM_CATEGORY_DANGEROUS_CONTENT",
-        "threshold": "BLOCK_NONE",
-    },
+   {
+    "category": "HARM_CATEGORY_HARASSMENT",
+    "threshold": "BLOCK_NONE",
+   },
+   {
+    "category": "HARM_CATEGORY_HATE_SPEECH",
+    "threshold": "BLOCK_NONE",
+   },
+   {
+    "category": "HARM_CATEGORY_SEXUALLY_EXPLICIT",
+    "threshold": "BLOCK_NONE",
+   },
+   {
+    "category": "HARM_CATEGORY_DANGEROUS_CONTENT",
+    "threshold": "BLOCK_NONE",
+   },
 ]
 
-model = genai.GenerativeModel(
-    model_name="gemini-1.5-pro-latest",
-    generation_config=generation_config,
-    safety_settings=safety_settings,
-)
+model = genai.GenerativeModel(model_name="gemini-1.5-pro-latest",generation_config=generation_config,safety_settings=safety_settings)
 
 # LLM
+
+
 def getAnswer(prompt):
     his_messages = []
-    his_messages.append({"role": "model", "parts": [{"text": ""}]})
+    his_messages.append(
+        {"role": "model", "parts": [{"text": ""}]}
+    )
+
     for msg in st.session_state.messages[-20:]:
         if msg["role"] == "user":
             his_messages.append({"role": "user", "parts": [{"text": msg["content"]}]})
@@ -77,7 +78,6 @@ def getAnswer(prompt):
         return ""  # 在发生错误时返回空字符串
 
 
-# Use code with caution.
 # 获取文件名，并生成对应的文件名
 filename = "史莱姆娘" + ".pkl"  # 这里假设文件名就是 "史莱姆娘"
 log_dir = "log"  # 日志文件夹名称
@@ -102,6 +102,7 @@ for i, message in enumerate(st.session_state.messages):
     with st.chat_message(message["role"]):
         # 使用 st.write 显示对话内容
         st.write(message["content"], key=f"message_{i}")
+
         # 在最后两个对话中添加编辑按钮
         if i >= len(st.session_state.messages) - 2:
             if st.button("编辑", key=f"edit_{i}"):
@@ -109,11 +110,11 @@ for i, message in enumerate(st.session_state.messages):
                 st.session_state.editable_index = i  # 记录可编辑的索引
                 st.session_state.editing = True  # 表示正在编辑
 
-# Use code with caution.
 if st.session_state.get("editing"):
     # 如果正在编辑，显示编辑框和保存/取消按钮
     i = st.session_state.editable_index
     message = st.session_state.messages[i]
+
     with st.chat_message(message["role"]):
         new_content = st.text_area(
             f"{message['role']}:", message["content"], key=f"message_edit_{i}"
@@ -132,11 +133,6 @@ if st.session_state.get("editing"):
             if st.button("取消", key=f"cancel_{i}"):
                 st.session_state.editing = False  # 结束编辑状态
 
-# 在程序初始化阶段创建文件上传器
-with st.sidebar.file_uploader("Upload chat_history.pkl", type=["pkl"]):
-    st.session_state.uploaded_file = st.session_state.uploaded_file
-
-# Use code with caution.
 if prompt := st.chat_input("Enter your message:"):
     st.session_state.messages.append({"role": "user", "content": prompt})
     with st.chat_message("user"):
@@ -148,43 +144,58 @@ if prompt := st.chat_input("Enter your message:"):
             full_response += chunk
             message_placeholder.markdown(full_response + "▌")
         message_placeholder.markdown(full_response)
-        st.session_state.messages.append({"role": "assistant", "content": full_response})
+    st.session_state.messages.append({"role": "assistant", "content": full_response})
 
-        # 保存聊天记录到 Streamlit 文件存储
-        save_chat_history_to_streamlit()
-
-        # 同步到 GitHub
-        sync_to_github()
-
-        # 重新运行页面，使 CSS 样式生效
-        st.experimental_rerun()
-
-# ... other code ...
-
-def save_chat_history_to_streamlit():
-    # 使用 Streamlit 文件存储功能保存聊天记录到 Streamlit 存储
-    with open("log/chat_history.pkl", "wb") as f:
+    # 保存历史记录到文件
+    with open(log_file, "wb") as f:
         pickle.dump(st.session_state.messages, f)
-    # 将本地文件上传到 Streamlit 存储
-    st.session_state.uploaded_file = open("log/chat_history.pkl", "rb")
 
-def sync_to_github():
-    # 使用 Streamlit 文件存储功能获取 chat_history.pkl 文件内容
-    with st.file_uploader("Upload chat_history.pkl", type=["pkl"]):
-        uploaded_file = st.session_state.uploaded_file
-    
-    if uploaded_file:
-        # 读取文件内容
-        with uploaded_file as f:
-            data = f.read()
-        # 将数据写入本地文件
-        with open("log/chat_history.pkl", "wb") as f:
-            f.write(data)
-        # 切换到 pages 目录
-        os.chdir("pages")
-        # 使用 git-ftp 同步到 GitHub
-        subprocess.run(["git", "add", "log/chat_history.pkl"])
-        subprocess.run(["git", "commit", "-m", "Update chat history"])
-        subprocess.run(["git-ftp", "push"])
-        # 切换回原目录
-        os.chdir("..")
+    # 重新运行页面，使 CSS 样式生效
+    st.experimental_rerun() 
+
+# 使用 st.container 创建一个新的容器
+with st.container():
+    # 使用 st.empty 创建一个占位符
+    st.empty()
+
+    # 使用 Flexbox 控制按钮之间的间距
+    st.markdown(
+        """
+        <style>
+        .button-container {
+            display: flex;
+            justify-content: flex-start; /* 按钮向左对齐 */
+        }
+        .button-container > button {
+            margin-right: 5px; /* 调整按钮之间的右间距 */
+        }
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    # 使用 st.container 来包含按钮
+    with st.container():
+        # 使用 st.columns(3) 布局三个按钮
+        col1, col2, col3 = st.columns([1,1,1])  # 设置每一列宽度
+        with col1:
+            if len(st.session_state.messages) > 0:
+                st.button("重置上一个输出", on_click=lambda: st.session_state.messages.pop(-1))
+        with col2:
+            if st.button("读取历史记录"):
+                try:
+                    with open(log_file, "rb") as f:
+                        messages = pickle.load(f)
+                        for message in messages:
+                            with st.chat_message(message["role"]):
+                                st.markdown(message["content"])
+                except FileNotFoundError:
+                    st.warning(f"{filename} 不存在。")
+        with col3:
+            if st.button("清除历史记录"):
+                st.session_state.messages = []
+                try:
+                    os.remove(log_file)  # 删除文件
+                    st.success(f"成功清除 {filename} 的历史记录！")
+                except FileNotFoundError:
+                    st.warning(f"{filename} 不存在。")
