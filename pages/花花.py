@@ -82,7 +82,7 @@ def getAnswer(prompt):
 filename = "史莱姆娘" + ".pkl"  # 这里假设文件名就是 "史莱姆娘"
 log_dir = "log"  # 日志文件夹名称
 
-# 创建日志文件夹
+# 检测 logs 文件夹是否存在，如果不存在则创建
 if not os.path.exists(log_dir):
     os.makedirs(log_dir)
 
