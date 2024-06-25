@@ -80,7 +80,7 @@ def getAnswer(prompt):
 
 # 获取文件名，并生成对应的文件名
 filename = "史莱姆娘" + ".pkl"  # 这里假设文件名就是 "史莱姆娘"
-log_dir = "log"  # 日志文件夹名称
+log_dir = "logs"  # 日志文件夹名称
 
 # 获取完整路径
 log_file = os.path.join(log_dir, filename)
@@ -96,8 +96,8 @@ if "messages" not in st.session_state:
 # 显示历史记录
 for i, message in enumerate(st.session_state.messages):
     with st.chat_message(message["role"]):
-        # 显示对话内容
-        st.markdown(message["content"], key=f"message_{i}")  # 使用 st.markdown 显示对话内容
+        # 使用 st.write 显示对话内容
+        st.write(message["content"], key=f"message_{i}")
 
         # 在最后两个对话中添加编辑按钮
         if i >= len(st.session_state.messages) - 2:
@@ -112,7 +112,6 @@ if st.session_state.get("editing"):
     message = st.session_state.messages[i]
 
     with st.chat_message(message["role"]):
-        # 显示可编辑的对话内容
         new_content = st.text_area(
             f"{message['role']}:", message["content"], key=f"message_edit_{i}"
         )
