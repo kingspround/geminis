@@ -164,7 +164,7 @@ def save_chat_history_to_streamlit():
         pickle.dump(st.session_state.messages, f)
     with st.file_uploader("Upload chat_history.pkl", type=["pkl"]):
         st.session_state.uploaded_file = st.session_state.uploaded_file
-    
+
 def sync_to_github():
     # 使用 Streamlit 文件存储功能获取 chat_history.pkl 文件内容
     with st.file_uploader("Upload chat_history.pkl", type=["pkl"]):
