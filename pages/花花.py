@@ -80,7 +80,7 @@ def getAnswer(prompt):
 
 # 获取文件名，并生成对应的文件名
 # 获取当前 Python 文件名
-filename = os.path.splitext(os.path.basename(__file__))[0] + ".txt"
+filename = os.path.splitext(os.path.basename(__file__))[0] + ".pkl"  # 使用 .pkl 扩展名
 log_dir = "D:\\今宵别梦\\bot\\历史记录"  # 日志文件夹路径
 
 # 创建日志文件夹
@@ -93,16 +93,8 @@ log_file = os.path.join(log_dir, filename)
 if "messages" not in st.session_state:
     # 从文件加载历史记录
     try:
-        with open(log_file, "r", encoding="utf-8") as f:  # 使用 "r" 模式读取
-            st.session_state.messages = []
-            for line in f.readlines():
-                parts = line.split(":")
-                if len(parts) >= 2:  # 检查列表长度
-                    st.session_state.messages.append(
-                        {"role": parts[0].strip(), "content": parts[1].strip()}
-                    )
-                else:
-                    st.warning(f"无法解析行：{line}")  # 打印无法解析的行的信息
+        with open(log_file, "rb") as f:  # 使用 "rb" 模式读取
+            st.session_state.messages = pickle.load(f)
     except FileNotFoundError:
         st.session_state.messages = []
 
@@ -134,9 +126,8 @@ if st.session_state.get("editing"):
             if st.button("保存", key=f"save_{i}"):
                 st.session_state.messages[i]["content"] = new_content
                 # 保存更改到文件
-                with open(log_file, "w", encoding="utf-8") as f:  # 使用 "w" 模式写入
-                    for msg in st.session_state.messages:
-                        f.write(f"{msg['role']}: {msg['content']}\n")
+                with open(log_file, "wb") as f:  # 使用 "wb" 模式写入
+                    pickle.dump(st.session_state.messages, f)
                 st.success(f"已保存更改！")
                 st.session_state.editing = False  # 结束编辑状态
         with col2:
@@ -157,10 +148,11 @@ if prompt := st.chat_input("Enter your message:"):
     st.session_state.messages.append({"role": "assistant", "content": full_response})
 
     # 保存历史记录到文件
-    with open(log_file, "w", encoding="utf-8") as f:  # 使用 "w" 模式写入
-        for msg in st.session_state.messages:
-            f.write(f"{msg['role']}: {msg['content']}\n")
+    with open(log_file, "wb") as f:  # 使用 "wb" 模式写入
+        pickle.dump(st.session_state.messages, f)
 
+    # 重新运行页面，使 CSS 样式生效
+    st.experimental_rerun() 
 
 # 使用 st.sidebar 放置按钮
 st.sidebar.title("操作")
@@ -174,12 +166,9 @@ st.sidebar.button("清除历史记录", on_click=lambda: clear_history(log_file)
 if st.button("读取本地文件"):
     try:
         # 尝试读取指定路径的文件
-        with open(log_file, "r", encoding="utf-8") as f:
-            messages = [
-                {"role": line.split(":")[0].strip(), "content": line.split(":")[1].strip()}
-                for line in f.readlines() if ":" in line
-            ]
-            for message in messages:
+        with open(log_file, "rb") as f:  # 使用 "rb" 模式读取
+            st.session_state.messages = pickle.load(f)
+            for message in st.session_state.messages:
                 with st.chat_message(message["role"]):
                     st.markdown(message["content"])
     except Exception as e:
@@ -187,17 +176,9 @@ if st.button("读取本地文件"):
 
 def load_history(log_file):
     try:
-        with open(log_file, "r", encoding="utf-8") as f:  # 使用 "r" 模式读取
-            messages = []
-            for line in f.readlines():
-                parts = line.split(":")
-                if len(parts) >= 2:  # 检查列表长度
-                    messages.append(
-                        {"role": parts[0].strip(), "content": parts[1].strip()}
-                    )
-                else:
-                    st.warning(f"无法解析行：{line}")  # 打印无法解析的行的信息
-            for message in messages:
+        with open(log_file, "rb") as f:  # 使用 "rb" 模式读取
+            st.session_state.messages = pickle.load(f)
+            for message in st.session_state.messages:
                 with st.chat_message(message["role"]):
                     st.markdown(message["content"])
     except FileNotFoundError:
@@ -213,14 +194,13 @@ def clear_history(log_file):
 
 def save_history(log_file):
     # 保存历史记录到文件
-    with open(log_file, "w", encoding="utf-8") as f:  # 使用 "w" 模式写入
-        for msg in st.session_state.messages:
-            f.write(f"{msg['role']}: {msg['content']}\n")
+    with open(log_file, "wb") as f:  # 使用 "wb" 模式写入
+        pickle.dump(st.session_state.messages, f)
     st.success(f"已手动保存聊天记录！")
     # 修正缩进
     st.download_button(
         label="下载聊天记录",
         data=open(log_file, "rb").read(),  # 读取文件内容
         file_name=filename,  # 设置下载文件名
-        mime="text/plain",  # 设置 MIME 类型
+        mime="application/octet-stream",  # 设置 MIME 类型
     )
