@@ -163,6 +163,9 @@ if len(st.session_state.messages) > 0:
     st.sidebar.button("重置上一个输出", on_click=lambda: st.session_state.messages.pop(-1))
 st.sidebar.button("读取历史记录", on_click=lambda: load_history(log_file))
 st.sidebar.button("清除历史记录", on_click=lambda: clear_history(log_file))
+# 添加手动保存按钮
+st.sidebar.button("手动保存", on_click=lambda: save_chat_history(log_file))
+
 
 def load_history(log_file):
     try:
@@ -181,3 +184,15 @@ def clear_history(log_file):
         st.success(f"成功清除 {filename} 的历史记录！")
     except FileNotFoundError:
         st.warning(f"{filename} 不存在。")
+
+def save_chat_history(log_file):
+    # 保存聊天记录到文件
+    with open(log_file, "wb") as f:
+        pickle.dump(st.session_state.messages, f)
+
+    # 将 "史莱姆娘.pkl" 文件复制到 logs 根目录
+    try:
+        shutil.copyfile(log_file, os.path.join("logs", filename))
+        st.success(f"已保存聊天记录到 logs 文件夹！")
+    except Exception as e:
+        st.error(f"保存聊天记录失败：{e}")
