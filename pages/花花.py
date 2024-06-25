@@ -94,18 +94,12 @@ if "messages" not in st.session_state:
     # 从文件加载历史记录
     try:
         with open(log_file, "r", encoding="utf-8") as f:  # 使用 "r" 模式读取
-            st.session_state.messages = []
-            for line in f.readlines():
-                parts = line.split(":")
-                if len(parts) >= 2:  # 检查列表长度
-                    st.session_state.messages.append(
-                        {"role": parts[0].strip(), "content": parts[1].strip()}
-                    )
-                else:
-                    st.warning(f"无法解析行：{line}")  # 打印无法解析的行的信息
+            st.session_state.messages = [
+                {"role": line.split(":")[0].strip(), "content": line.split(":")[1].strip()}
+                for line in f.readlines()
+            ]
     except FileNotFoundError:
         st.session_state.messages = []
-
 
 # 显示历史记录
 for i, message in enumerate(st.session_state.messages):
@@ -160,38 +154,63 @@ if prompt := st.chat_input("Enter your message:"):
     # 重新运行页面，使 CSS 样式生效
     st.experimental_rerun() 
 
-# 使用 st.sidebar 放置按钮
-st.sidebar.title("操作")
-if len(st.session_state.messages) > 0:
-    st.sidebar.button("重置上一个输出", on_click=lambda: st.session_state.messages.pop(-1))
-st.sidebar.button("读取历史记录", on_click=lambda: load_history(log_file))
-st.sidebar.button("清除历史记录", on_click=lambda: clear_history(log_file))
-st.sidebar.button("手动保存", on_click=lambda: save_history(log_file))
+# 使用 st.container 创建一个新的容器
+with st.container():
+    # 使用 st.empty 创建一个占位符
+    st.empty()
 
-def load_history(log_file):
-    try:
-        with open(log_file, "r", encoding="utf-8") as f:  # 使用 "r" 模式读取
-            messages = [
-                {"role": line.split(":")[0].strip(), "content": line.split(":")[1].strip()}
-                for line in f.readlines()
-            ]
-            for message in messages:
-                with st.chat_message(message["role"]):
-                    st.markdown(message["content"])
-    except FileNotFoundError:
-        st.warning(f"{filename} 不存在。")
+    # 使用 Flexbox 控制按钮之间的间距
+    st.markdown(
+        """
+        <style>
+        .button-container {
+            display: flex;
+            justify-content: flex-start; /* 按钮向左对齐 */
+        }
+        .button-container > button {
+            margin-right: 5px; /* 调整按钮之间的右间距 */
+        }
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
 
-def clear_history(log_file):
-    st.session_state.messages = []
-    try:
-        os.remove(log_file)  # 删除文件
-        st.success(f"成功清除 {filename} 的历史记录！")
-    except FileNotFoundError:
-        st.warning(f"{filename} 不存在。")
+    # 使用 st.container 来包含按钮
+    with st.container():
+        # 使用 st.columns(3) 布局三个按钮
+        col1, col2, col3 = st.columns([1,1,1])  # 设置每一列宽度
+        with col1:
+            if len(st.session_state.messages) > 0:
+                st.button("重置上一个输出", on_click=lambda: st.session_state.messages.pop(-1))
+        with col2:
+            if st.button("读取历史记录"):
+                try:
+                    with open(log_file, "r", encoding="utf-8") as f:  # 使用 "r" 模式读取
+                        messages = [
+                            {"role": line.split(":")[0].strip(), "content": line.split(":")[1].strip()}
+                            for line in f.readlines()
+                        ]
+                        for message in messages:
+                            with st.chat_message(message["role"]):
+                                st.markdown(message["content"])
+                except FileNotFoundError:
+                    st.warning(f"{filename} 不存在。")
+        with col3:
+            if st.button("清除历史记录"):
+                st.session_state.messages = []
+                try:
+                    os.remove(log_file)  # 删除文件
+                    st.success(f"成功清除 {filename} 的历史记录！")
+                except FileNotFoundError:
+                    st.warning(f"{filename} 不存在。")
 
-def save_history(log_file):
-    # 保存历史记录到文件
+    # 手动保存按钮
     with open(log_file, "w", encoding="utf-8") as f:  # 使用 "w" 模式写入
         for msg in st.session_state.messages:
             f.write(f"{msg['role']}: {msg['content']}\n")
-    st.success(f"已手动保存聊天记录！")
+    st.download_button(
+        label="手动保存",
+        data=open(log_file, "rb").read(),  # 读取文件内容
+        file_name=filename,  # 设置下载文件名
+        mime="text/plain",  # 设置 MIME 类型
+    )
