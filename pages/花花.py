@@ -169,19 +169,18 @@ st.sidebar.button("清除历史记录", on_click=lambda: clear_history(log_file)
 # 添加读取本地文件的按钮
 if st.button("读取本地文件"):
     try:
-        uploaded_file = st.file_uploader("选择文件", type=["txt"])
-        if uploaded_file is not None:
-            # 读取文件内容
-            contents = uploaded_file.read().decode("utf-8")
+        # 尝试读取指定路径的文件
+        with open(log_file, "r", encoding="utf-8") as f:
             messages = [
                 {"role": line.split(":")[0].strip(), "content": line.split(":")[1].strip()}
-                for line in contents.splitlines() if ":" in line
+                for line in f.readlines() if ":" in line
             ]
             for message in messages:
                 with st.chat_message(message["role"]):
                     st.markdown(message["content"])
     except Exception as e:
         st.error(f"读取本地文件失败：{e}")
+
 
 def load_history(log_file):
     try:
