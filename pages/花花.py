@@ -180,6 +180,7 @@ if st.button("读取本地文件"):
 
 def load_history(log_file):
     try:
+        # 重新打开文件
         with open(log_file, "rb") as f:  # 使用 "rb" 模式读取
             messages = pickle.load(f)
             for message in messages:
@@ -187,6 +188,8 @@ def load_history(log_file):
                     st.markdown(message["content"])
     except FileNotFoundError:
         st.warning(f"{filename} 不存在。")
+    except EOFError:  # 处理 EOFError
+        st.warning(f"读取历史记录失败：文件可能损坏。")
 
 def clear_history(log_file):
     st.session_state.messages = []
