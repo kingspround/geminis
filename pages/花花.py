@@ -142,12 +142,6 @@ if prompt := st.chat_input("Enter your message:"):
         message_placeholder.markdown(full_response)
     st.session_state.messages.append({"role": "assistant", "content": full_response})
 
-    # 保存聊天记录到文件
-    with open(log_file, "wb") as f:
-        pickle.dump(st.session_state.messages, f)
-
-    st.success(f"已保存聊天记录到 logs 文件夹！")
-
     # 使用 st.experimental_rerun() 实时更新聊天界面
     st.experimental_rerun()
 
@@ -158,7 +152,7 @@ if len(st.session_state.messages) > 0:
 st.sidebar.button("读取历史记录", on_click=lambda: load_history(log_file))
 st.sidebar.button("清除历史记录", on_click=lambda: clear_history(log_file))
 # 添加手动保存按钮
-st.sidebar.button("手动保存", on_click=lambda: save_chat_history(log_file))
+st.sidebar.button("手动保存", on_click=lambda: save_chat_history())
 
 
 def load_history(log_file):
@@ -179,7 +173,7 @@ def clear_history(log_file):
     except FileNotFoundError:
         st.warning(f"{filename} 不存在。")
 
-def save_chat_history(log_file):
+def save_chat_history():
     # 保存聊天记录到文件
     with open(log_file, "wb") as f:
         pickle.dump(st.session_state.messages, f)
