@@ -173,11 +173,16 @@ st.sidebar.button("清除历史记录", on_click=lambda: clear_history(log_file)
 if st.sidebar.button("读取本地文件"):
     st.session_state.file_upload_mode = True
 
+# 检查容器是否存在，如果存在则删除
+if "file_upload_container" in st.session_state:
+    st.session_state.file_upload_container.empty()
+    del st.session_state.file_upload_container
+
 # 创建容器
-file_upload_container = st.container()
+st.session_state.file_upload_container = st.container()
 
 if st.session_state.get("file_upload_mode"):
-    with file_upload_container:  # 在容器中创建文件输入框
+    with st.session_state.file_upload_container:  # 在容器中创建文件输入框
         uploaded_file = st.file_uploader("选择文件", type=["pkl"])
         if "file_loaded" not in st.session_state:  # 如果 file_loaded 不存在
             st.session_state.file_loaded = False
@@ -203,7 +208,8 @@ if st.session_state.get("file_upload_mode"):
                 if st.sidebar.button("关闭", key="close_upload"):
                     st.session_state.file_upload_mode = False
                     st.session_state.file_loaded = False  # 将 file_loaded 设置为 False
-                    file_upload_container.empty()  # 隐藏容器
+                    st.session_state.file_upload_container.empty()  # 隐藏容器
+                    del st.session_state.file_upload_container  # 删除容器
 
                 # 保存合并后的历史记录到文件
                 with open(log_file, "wb") as f:
@@ -236,7 +242,5 @@ def clear_history(log_file):
     try:
         os.remove(log_file)  # 删除文件
         st.success(f"成功清除 {filename} 的历史记录！")
-    except FileNotFoundError:
-        st.warning(f"{filename} 不存在。")
     except FileNotFoundError:
         st.warning(f"{filename} 不存在。")
