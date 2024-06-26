@@ -8,12 +8,13 @@ import numpy as np
 from io import BytesIO
 from io import StringIO
 import streamlit as st
+import pickle
 
 # Insert your API key here
 st.session_state.key = "AIzaSyDPFZ7gRba9mhKTqbXA_Y7fhAxS8IEu0bY"
 
 if "key" not in st.session_state:
-    st.session_state.key = NONE
+    st.session_state.key = None
     
 if not st.session_state.key:
     st.info("Please add your key to continue.")
@@ -426,6 +427,7 @@ def getAnswer(prompt):
 】"""}]}
    )
 
+
     for msg in st.session_state.messages[-20:]:
         if msg["role"] == "user":
             his_messages.append({"role": "user", "parts": [{"text": msg["content"]}]})
@@ -444,12 +446,66 @@ def getAnswer(prompt):
         return ""  # 在发生错误时返回空字符串
 
 
-if "messages" not in st.session_state:
-    st.session_state.messages = []
+# 获取文件名，并生成对应的文件名
+# 获取当前 Python 文件名
+filename = os.path.splitext(os.path.basename(__file__))[0] + ".pkl"  # 使用 .pkl 扩展名
 
-for message in st.session_state.messages:
+# 获取完整路径
+log_file = os.path.join(os.path.dirname(__file__), filename)  # 使用 os.path.dirname 获取当前目录
+
+# 检查文件是否存在，如果不存在就创建空文件
+if not os.path.exists(log_file):
+    with open(log_file, "wb") as f:
+        pass  # 创建空文件
+
+# 加载历史记录（只执行一次）
+if "messages" not in st.session_state:
+    # 从文件加载历史记录
+    try:
+        with open(log_file, "rb") as f:  # 使用 "rb" 模式读取
+            st.session_state.messages = pickle.load(f)
+    except FileNotFoundError:
+        st.session_state.messages = []
+    except EOFError:
+        st.warning(f"读取历史记录失败：文件可能损坏。")
+        st.session_state.messages = []  # 清空 messages
+        # 可以考虑在这里添加代码，提示用户重新创建文件或重新加载数据
+
+# 显示历史记录（只执行一次）
+for i, message in enumerate(st.session_state.messages):
     with st.chat_message(message["role"]):
-        st.markdown(message["content"])
+        # 使用 st.write 显示对话内容
+        st.write(message["content"], key=f"message_{i}")
+
+        # 在最后两个对话中添加编辑按钮
+        if i >= len(st.session_state.messages) - 2:
+            if st.button("编辑", key=f"edit_{i}"):
+                # 更改为可编辑文本
+                st.session_state.editable_index = i  # 记录可编辑的索引
+                st.session_state.editing = True  # 表示正在编辑
+
+if st.session_state.get("editing"):
+    # 如果正在编辑，显示编辑框和保存/取消按钮
+    i = st.session_state.editable_index
+    message = st.session_state.messages[i]
+
+    with st.chat_message(message["role"]):
+        new_content = st.text_area(
+            f"{message['role']}:", message["content"], key=f"message_edit_{i}"
+        )
+
+        col1, col2 = st.columns(2)  # 创建两列布局
+        with col1:
+            if st.button("保存", key=f"save_{i}"):
+                st.session_state.messages[i]["content"] = new_content
+                # 保存更改到文件
+                with open(log_file, "wb") as f:  # 使用 "wb" 模式写入
+                    pickle.dump(st.session_state.messages, f)
+                st.success(f"已保存更改！")
+                st.session_state.editing = False  # 结束编辑状态
+        with col2:
+            if st.button("取消", key=f"cancel_{i}"):
+                st.session_state.editing = False  # 结束编辑状态
 
 if prompt := st.chat_input("Enter your message:"):
     st.session_state.messages.append({"role": "user", "content": prompt})
@@ -464,6 +520,85 @@ if prompt := st.chat_input("Enter your message:"):
         message_placeholder.markdown(full_response)
     st.session_state.messages.append({"role": "assistant", "content": full_response})
 
-# 增加重置上一个输出的按钮
+    # 保存历史记录到文件
+    with open(log_file, "wb") as f:  # 使用 "wb" 模式写入
+        pickle.dump(st.session_state.messages, f)
+
+# 使用 st.sidebar 放置按钮
+st.sidebar.title("操作")
 if len(st.session_state.messages) > 0:
-    st.button("重置上一个输出", on_click=lambda: st.session_state.messages.pop(-1))
+    st.sidebar.button("重置上一个输出", on_click=lambda: st.session_state.messages.pop(-1))
+st.sidebar.download_button(
+    label="下载聊天记录",  # 使用 st.sidebar.download_button 直接下载
+    data=open(log_file, "rb").read(),  # 读取文件内容
+    file_name=filename,  # 设置下载文件名
+    mime="application/octet-stream",  # 设置 MIME 类型
+)
+st.sidebar.button("读取历史记录", on_click=lambda: load_history(log_file))
+st.sidebar.button("清除历史记录", on_click=lambda: clear_history(log_file))
+
+# 添加读取本地文件的按钮
+if st.sidebar.button("读取本地文件"):
+    st.session_state.file_upload_mode = True
+
+if st.session_state.get("file_upload_mode"):
+    uploaded_file = st.sidebar.file_uploader("选择文件", type=["pkl"])
+    if "file_loaded" not in st.session_state:  # 如果 file_loaded 不存在
+        st.session_state.file_loaded = False
+
+    if uploaded_file is not None and not st.session_state.file_loaded:  # 只有当 file_loaded 为 False 时才读取文件
+        try:
+            # 读取文件内容
+            loaded_messages = pickle.load(uploaded_file)
+
+            # 合并到 st.session_state.messages 中
+            st.session_state.messages.extend(loaded_messages)
+
+            # 显示聊天记录和编辑按钮
+            for i, message in enumerate(st.session_state.messages):
+                with st.chat_message(message["role"]):
+                    st.write(message["content"], key=f"message_{i}")
+                    if i >= len(st.session_state.messages) - 2:  # 在最后两条消息中添加编辑按钮
+                        if st.button("编辑", key=f"edit_{i}"):
+                            st.session_state.editable_index = i
+                            st.session_state.editing = True
+
+            # 添加关闭按钮
+            if st.sidebar.button("关闭", key="close_upload"):
+                st.session_state.file_upload_mode = False
+                st.session_state.file_loaded = False  # 将 file_loaded 设置为 False
+
+            # 保存合并后的历史记录到文件
+            with open(log_file, "wb") as f:
+                pickle.dump(st.session_state.messages, f)
+
+            st.session_state.file_loaded = True  # 将 file_loaded 设置为 True
+
+        except Exception as e:
+            st.error(f"读取本地文件失败：{e}")
+
+
+def load_history(log_file):
+    try:
+        # 重新打开文件
+        with open(log_file, "rb") as f:  # 使用 "rb" 模式读取
+            messages = pickle.load(f)
+            for message in messages:
+                with st.chat_message(message["role"]):
+                    st.markdown(message["content"])
+
+            # 重新运行应用程序，确保聊天记录加载后不会丢失
+            st.experimental_rerun()  
+
+    except FileNotFoundError:
+        st.warning(f"{filename} 不存在。")
+    except EOFError:  # 处理 EOFError
+        st.warning(f"读取历史记录失败：文件可能损坏。")
+
+def clear_history(log_file):
+    st.session_state.messages = []
+    try:
+        os.remove(log_file)  # 删除文件
+        st.success(f"成功清除 {filename} 的历史记录！")
+    except FileNotFoundError:
+        st.warning(f"{filename} 不存在。")
