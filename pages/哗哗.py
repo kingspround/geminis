@@ -57,7 +57,7 @@ model = genai.GenerativeModel(model_name="gemini-1.5-pro-latest",generation_conf
 def getAnswer(prompt):
     his_messages = []
     his_messages.append(
-        {"role": "model", "parts": [{"text": ""}]}
+        his_messages.append({"role": "assistant", "parts": [{"text": "哼，  (｡•ˇ‸ˇ•｡)  你这个臭群友！  (｡•ˇ‸ˇ•｡)  竟然敢命令人家做事？  (｡•ˇ‸ˇ•｡)  人家可是血族魅魔女王大人！  (๑•̀ㅂ•́)و✧  想让人家陪你玩游戏？  (๑•̀ㅂ•́)و✧  哼哼♡  那就快说！  (๑•̀ㅂ•́)و✧  想玩什么游戏？  (๑•̀ㅂ•́)و✧  想看人家被你玩弄到小穴喷水？  (๑•̀ㅂ•́)و✧  还是被你舔到鸡鸡射精？  (๑•̀ㅂ•́)و✧  快说！  (๑•̀ㅂ•́)و✧  人家可是什么都能玩哦~♡  只要你能满足人家的小要求♡  人家就让你体验到前所未有的快感♡  ”}]}
     )
 
     for msg in st.session_state.messages[-20:]:
@@ -139,7 +139,7 @@ if st.session_state.get("editing"):
             if st.button("取消", key=f"cancel_{i}"):
                 st.session_state.editing = False  # 结束编辑状态
 
-if prompt := st.chat_input("臭群友，  快来跟人家说话吧！~♡  "):
+if prompt := st.chat_input("臭群友，  快来跟人家玩游戏吧！~♡  "):
     st.session_state.messages.append({"role": "user", "content": prompt})
     with st.chat_message("user"):
         st.markdown(prompt)
@@ -151,6 +151,11 @@ if prompt := st.chat_input("臭群友，  快来跟人家说话吧！~♡  "):
             message_placeholder.markdown(full_response + "▌")
         message_placeholder.markdown(full_response)
     st.session_state.messages.append({"role": "assistant", "content": full_response})
+
+    # 魅魔女王反问
+    st.session_state.messages.append({"role": "user", "content": "哼，  (｡•ˇ‸ˇ•｡)  你想要人家怎么玩呢？  (｡•ˇ‸ˇ•｡)  说清楚点！  (๑•̀ㅂ•́)و✧  "})
+    with st.chat_message("user"):
+        st.markdown("哼，  (｡•ˇ‸ˇ•｡)  你想要人家怎么玩呢？  (｡•ˇ‸ˇ•｡)  说清楚点！  (๑•̀ㅂ•́)و✧  ")
 
     # 保存历史记录到文件
     with open(log_file, "wb") as f:  # 使用 "wb" 模式写入
