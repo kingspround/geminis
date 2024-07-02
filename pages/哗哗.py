@@ -111,7 +111,7 @@ for i, message in enumerate(st.session_state.messages):
 
         # 在最后两个对话中添加编辑按钮
         if i >= len(st.session_state.messages) - 2:
-            if st.button("编辑", key=f"edit_{i}"):
+            if st.button("编辑♡", key=f"edit_{i}"):
                 # 更改为可编辑文本
                 st.session_state.editable_index = i  # 记录可编辑的索引
                 st.session_state.editing = True  # 表示正在编辑
@@ -166,11 +166,11 @@ st.sidebar.download_button(
     file_name=filename,  # 设置下载文件名
     mime="application/octet-stream",  # 设置 MIME 类型
 )
-st.sidebar.button("读取历史记录", on_click=lambda: load_history(log_file))
-st.sidebar.button("清除历史记录", on_click=lambda: clear_history(log_file))
+st.sidebar.button("读取历史记录♡", on_click=lambda: load_history(log_file))
+st.sidebar.button("清除历史记录♡", on_click=lambda: clear_history(log_file))
 
 # 添加读取本地文件的按钮
-if st.sidebar.button("读取本地文件"):
+if st.sidebar.button("读取本地文件♡"):
     st.session_state.file_upload_mode = True
 
 if st.session_state.get("file_upload_mode"):
@@ -191,7 +191,7 @@ if st.session_state.get("file_upload_mode"):
                 with st.chat_message(message["role"]):
                     st.write(message["content"], key=f"message_{i}")
                     if i >= len(st.session_state.messages) - 2:  # 在最后两条消息中添加编辑按钮
-                        if st.button("编辑", key=f"edit_{i}"):
+                        if st.button("编辑♡", key=f"edit_{i}"):
                             st.session_state.editable_index = i
                             st.session_state.editing = True
 
