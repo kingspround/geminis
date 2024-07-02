@@ -56,9 +56,9 @@ model = genai.GenerativeModel(model_name="gemini-1.5-pro-latest",generation_conf
 
 def getAnswer(prompt):
     his_messages = []
-    # 初始化 his_messages，parts 字段为空列表
+    # 初始化 his_messages，parts 字段包含一个空文本
     his_messages.append(
-        {"role": "model", "parts": []}
+        {"role": "model", "parts": [{"text": ""}]}
     )
 
     for msg in st.session_state.messages[-20:]:
@@ -82,7 +82,6 @@ def getAnswer(prompt):
     except Exception as e:
         st.error(f"An error occurred: {e}")
         return ""  # 在发生错误时返回空字符串
-
 # 获取文件名，并生成对应的文件名
 # 获取当前 Python 文件名
 filename = os.path.splitext(os.path.basename(__file__))[0] + ".pkl"  # 使用 .pkl 扩展名
