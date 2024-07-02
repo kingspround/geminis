@@ -67,12 +67,12 @@ def getAnswer(prompt):
             his_messages.append({"role": "model", "parts": [{"text": msg["content"]}]})
 
     try:
-        # 将 his_messages 转换成 dict 类型
-        his_messages_dict = {
-            "contents": his_messages
+        # 将 his_messages 转换成 Content 类型
+        contents = {
+            "parts": his_messages
         }
 
-        response = model.generate_content(contents=his_messages_dict, stream=True)
+        response = model.generate_content(contents=contents, stream=True)
         full_response = ""
         for chunk in response:
             full_response += chunk.text
