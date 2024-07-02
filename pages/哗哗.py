@@ -57,9 +57,8 @@ model = genai.GenerativeModel(model_name="gemini-1.5-pro-latest",generation_conf
 def getAnswer(prompt):
     his_messages = []
     his_messages.append(
-        his_messages.append(
-    {"role": "assistant", "parts": [{"text": """哼，  (｡•ˇ‸ˇ•｡)  你这个臭群友！  (｡•ˇ‸ˇ•｡)  竟然敢命令人家做事？  (｡•ˇ‸ˇ•｡)  人家可是血族魅魔女王大人！  (๑•̀ㅂ•́)و✧  想让人家陪你玩游戏？  (๑•̀ㅂ•́)و✧  哼哼♡  那就快说！  (๑•̀ㅂ•́)و✧  想玩什么游戏？  (๑•̀ㅂ•́)و✧  想看人家被你玩弄到小穴喷水？  (๑•̀ㅂ•́)و✧  还是被你舔到鸡鸡射精？  (๑•̀ㅂ•́)و✧  快说！  (๑•̀ㅂ•́)و✧  人家可是什么都能玩哦~♡  只要你能满足人家的小要求♡  人家就让你体验到前所未有的快感♡  """}]})
-)
+        {"role": "model", "parts": [{"text": ""}]}
+    )
 
     for msg in st.session_state.messages[-20:]:
         if msg["role"] == "user":
@@ -68,7 +67,12 @@ def getAnswer(prompt):
             his_messages.append({"role": "model", "parts": [{"text": msg["content"]}]})
 
     try:
-        response = model.generate_content(contents=his_messages, stream=True)
+        # 将 his_messages 转换成 dict 类型
+        his_messages_dict = {
+            "contents": his_messages
+        }
+
+        response = model.generate_content(contents=his_messages_dict, stream=True)
         full_response = ""
         for chunk in response:
             full_response += chunk.text
@@ -77,7 +81,6 @@ def getAnswer(prompt):
     except Exception as e:
         st.error(f"An error occurred: {e}")
         return ""  # 在发生错误时返回空字符串
-
 
 # 获取文件名，并生成对应的文件名
 # 获取当前 Python 文件名
