@@ -56,8 +56,9 @@ model = genai.GenerativeModel(model_name="gemini-1.5-pro-latest",generation_conf
 
 def getAnswer(prompt):
     his_messages = []
+    # 初始化 his_messages，parts 字段为空列表
     his_messages.append(
-        {"role": "model", "parts": [{"text": ""}]}
+        {"role": "model", "parts": []}
     )
 
     for msg in st.session_state.messages[-20:]:
