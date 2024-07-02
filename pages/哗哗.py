@@ -63,7 +63,8 @@ def getAnswer(prompt):
 
     for msg in st.session_state.messages[-20:]:
         if msg["role"] == "user":
-            his_messages.append({"role": "user", "parts": [{"text": msg["content"]}]})
+            # 正确：使用 "parts" 字段，并将 msg["content"] 放入列表中
+            his_messages.append({"role": "user", "parts": [msg["content"]]}) 
         elif msg is not None and msg["content"] is not None:
             his_messages.append({"role": "model", "parts": [{"text": msg["content"]}]})
 
@@ -82,6 +83,8 @@ def getAnswer(prompt):
     except Exception as e:
         st.error(f"An error occurred: {e}")
         return ""  # 在发生错误时返回空字符串
+
+
 # 获取文件名，并生成对应的文件名
 # 获取当前 Python 文件名
 filename = os.path.splitext(os.path.basename(__file__))[0] + ".pkl"  # 使用 .pkl 扩展名
