@@ -18,8 +18,6 @@ st.markdown(
 
 key="AIzaSyCDoTOEe1CAMKCz4GhnCe66l5Y6pSMsIu8"
 
-model = genai.GenerativeModel(model_name="gemini-pro", key=key)
-
 if "key" not in st.session_state:
     st.session_state.key = ""
     
@@ -27,6 +25,7 @@ if "key" not in st.session_state:
 key = st.sidebar.text_input("快说你的秘密，不然人家就踩死你~♡", type="password")    
 if key:
     st.session_state.key = key
+    model = genai.GenerativeModel(model_name="gemini-pro", key=key) # 在这里调用 model 
     
 if not st.session_state.key: 
     st.info("好弱好弱~♡  真不像样~♡  快说你的秘密，不然人家就生气了！")
