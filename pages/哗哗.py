@@ -148,6 +148,9 @@ if st.session_state.get("editing"):
                 st.session_state.editing = False  # 结束编辑状态
 
 if prompt := st.chat_input("臭群友，  快来跟人家玩游戏吧！~♡  "):
+    # 将用户消息添加到 his_messages 
+    his_messages.append({"role": "user", "parts": [prompt]}) 
+
     st.session_state.messages.append({"role": "user", "content": prompt})
     with st.chat_message("user"):
         st.markdown(prompt)
@@ -158,6 +161,10 @@ if prompt := st.chat_input("臭群友，  快来跟人家玩游戏吧！~♡  ")
             full_response += chunk
             message_placeholder.markdown(full_response + "▌")
         message_placeholder.markdown(full_response)
+
+    # 将 AI 的回复添加到 his_messages
+    his_messages.append({"role": "assistant", "parts": [full_response]}) 
+
     st.session_state.messages.append({"role": "assistant", "content": full_response})
 
     # 魅魔女王反问
