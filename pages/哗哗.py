@@ -148,6 +148,9 @@ if st.session_state.get("editing"):
                 st.session_state.editing = False  # 结束编辑状态
 
 if prompt := st.chat_input("臭群友，  快来跟人家玩游戏吧！~♡  "):
+    # 定义 his_messages
+    his_messages = [] 
+
     # 将用户消息添加到 his_messages 
     his_messages.append({"role": "user", "parts": [prompt]}) 
 
