@@ -66,7 +66,8 @@ def getAnswer(prompt):
             # 正确：使用 "parts" 字段，并将 msg["content"] 放入列表中
             his_messages.append({"role": "user", "parts": [msg["content"]]}) 
         elif msg is not None and msg["content"] is not None:
-            his_messages.append({"role": "model", "parts": [{"text": msg["content"]}]})
+            # 正确：将 msg["content"] 放入一个列表
+            his_messages.append({"role": "model", "parts": [msg["content"]]})
 
     try:
         # 将 his_messages 转换成 Content 类型
