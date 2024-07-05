@@ -136,33 +136,29 @@ def next_page_index():
 
 
 def reoutput_last_response():
-    """重新输出最后一条回复，将新回复添加到最后并更新上下文"""
+    """重新输出最后一条回复，直接修改最后一个元素"""
     if st.session_state.last_response:
-        # 获取当前回复在 last_response 中的索引
-        current_response_index = st.session_state.page_index
-        # 删除当前回复
-        del st.session_state.last_response[current_response_index]
-
         # 获取对应用户消息的索引
         user_message_index = len(st.session_state.messages) - 1
         # 删除旧的用户消息和回复
         del st.session_state.messages[user_message_index]
-
         # 重新发送用户消息并获取新的回复
         user_message = st.session_state.messages[-1]
         with st.chat_message("assistant"):
             message_placeholder = st.empty()
             full_response = ""
+            # 使用生成器获取回复的每个部分
             for chunk in getAnswer(user_message["content"], user_message["token"],
                                     st.session_state.img):
                 full_response += chunk
+                # 使用 markdown 显示回复，并在末尾添加 "▌" 表示正在生成
                 message_placeholder.markdown(full_response + "▌")
+            # 生成完成后，显示完整的回复
             message_placeholder.markdown(full_response)
-        # 将新的回复添加到最后
-        st.session_state.last_response.append(full_response)
 
-        # 更新页面索引，指向新的回复
-        st.session_state.page_index = len(st.session_state.last_response) - 1
+        # 直接修改 last_response 中最后一个元素的值
+        st.session_state.last_response[-1] = full_response
+        
 def generate_new_response():
     """生成新的回复并显示"""
     if st.session_state.messages:
