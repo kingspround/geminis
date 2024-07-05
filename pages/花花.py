@@ -242,14 +242,14 @@ for i, message in enumerate(st.session_state.messages):
             st.write(message["content"], key=f"message_{i}")
 
     # ===  在循环内部添加按钮和编辑逻辑 ===
-    # 使用 st.session_state.page_index 来判断是否为当前页面
-    if i == st.session_state.page_index:  
+    #  只有在最后一条消息旁边添加按钮
+    if i == len(st.session_state.messages) - 1:
         with col2:
             #  编辑按钮
             if st.button("✏️", key=f"edit_button_{i}"):
                 st.session_state.editing_index = i
-            
-            #  💬 按钮和 🔄 按钮永远显示
+                
+            #  💬 按钮和 🔄 按钮
             col3, col4 = st.columns(2)
             with col3:
                 #  💬 按钮内嵌翻页功能
@@ -269,7 +269,6 @@ for i, message in enumerate(st.session_state.messages):
                     st.write(f"第 {st.session_state.page_index + 1} 页 / 共 {len(st.session_state.last_response)} 页")
             with col4:
                 st.button("🔄", key=f"reoutput_{i}", on_click=reoutput_last_response)
-
 
     # 如果当前消息正在编辑，显示文本框
     if st.session_state.editing_index == i:
