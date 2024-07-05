@@ -186,7 +186,7 @@ st.sidebar.button("重置上一个输出", on_click=lambda: st.session_state.mes
 # 图片上传
 uploaded_file = st.sidebar.file_uploader("上传图片", type=['png', 'jpg', 'jpeg', 'gif'])
 if uploaded_file is not None:
-    # ... (代码与之前相同，省略)
+    # ... (代码与之前相同，省略) 
 
 # 使用 st.container() 包裹聊天记录显示部分
 chat_container = st.container()
@@ -198,28 +198,16 @@ with chat_container:
 
     # 处理用户输入
     if prompt := st.chat_input("Enter your message:"):
-        token = generate_token()
-        st.session_state.messages.append({"role": "user", "content": prompt, "token": token})
-        with st.chat_message("user"):
-            st.markdown(prompt)
-        with st.chat_message("assistant"):
-            message_placeholder = st.empty()
-            full_response = ""
-            for chunk in getAnswer(prompt, token, st.session_state.img):
-                full_response += chunk
-                message_placeholder.markdown(full_response + "▌")
-            message_placeholder.markdown(full_response)
-        # 更新 last_response 和 page_index
-        st.session_state.last_response.append(full_response)
-        st.session_state.page_index = len(st.session_state.last_response) - 1
+        # ... (代码与之前相同，省略)
 
     # 显示当前页面的 AI 回复和按钮
-    if st.session_state.last_response: #  判断是否存在回复
-        if st.session_state.page_index >= 0 and st.session_state.page_index < len(st.session_state.last_response):
+    if st.session_state.last_response:  # 判断是否存在回复
+        if st.session_state.page_index >= 0 and st.session_state.page_index < len(
+                st.session_state.last_response):
             with st.chat_message("assistant"):
                 st.markdown(st.session_state.last_response[st.session_state.page_index])
 
-                # 控制按钮
+                #  ！！！ 控制按钮的正确位置 ！！！
                 if len(st.session_state.last_response) > 1:
                     col1, col2 = st.columns(2)
                     with col1:
@@ -236,7 +224,6 @@ with chat_container:
     # 显示页码
     if len(st.session_state.last_response) > 1:
         st.write(f"第 {st.session_state.page_index + 1} 页 / 共 {len(st.session_state.last_response)} 页")
-
 
 # 自动保存聊天记录
 save_history()
