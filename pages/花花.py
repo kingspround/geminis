@@ -128,11 +128,19 @@ def increase_page_index():
 def decrease_page_index():
     """减少页面索引"""
     st.session_state.page_index = max(0, st.session_state.page_index - 1)
+    # 重新显示当前页面的 AI 回复
+    if st.session_state.page_index >= 0 and st.session_state.page_index < len(st.session_state.last_response):
+        with st.chat_message("assistant"):
+            st.markdown(st.session_state.last_response[st.session_state.page_index])
 
 
 def next_page_index():
     """跳转到下一页"""
     st.session_state.page_index = min(len(st.session_state.last_response) - 1, st.session_state.page_index + 1)
+    # 重新显示当前页面的 AI 回复
+    if st.session_state.page_index >= 0 and st.session_state.page_index < len(st.session_state.last_response):
+        with st.chat_message("assistant"):
+            st.markdown(st.session_state.last_response[st.session_state.page_index])
 
 
 def reoutput_last_response():
@@ -143,7 +151,7 @@ def reoutput_last_response():
             message_placeholder = st.empty()
             full_response = ""
             for chunk in getAnswer(st.session_state.messages[-1]["content"], st.session_state.messages[-1]["token"],
-                                   st.session_state.img):
+                                    st.session_state.img):
                 full_response += chunk
                 message_placeholder.markdown(full_response + "▌")
             message_placeholder.markdown(full_response)
@@ -193,7 +201,7 @@ if "messages" not in st.session_state:
 if "img" not in st.session_state:
     st.session_state.img = None
 if "last_response" not in st.session_state:
-    st.session_state.last_response = [""] # 初始化时添加默认值
+    st.session_state.last_response = [""]  # 初始化时添加默认值
 if "page_index" not in st.session_state:
     st.session_state.page_index = 0
 
@@ -219,25 +227,42 @@ if uploaded_file is not None:
     st.session_state.img = img  # 保存到 st.session_state.img
     st.sidebar.image(bytes_io, width=150)  # 在侧边栏显示图片
 
-
 # 循环显示聊天消息
 for i, message in enumerate(st.session_state.messages):
-    col1, col2 = st.columns([10, 1]) # 创建两列，聊天消息占据大部分空间，按钮放在旁边
+    col1, col2 = st.columns([9, 1])  # 调整列宽，为按钮预留更多空间
     with col1:
         with st.chat_message(message["role"]):
             st.write(message["content"], key=f"message_{i}")
 
+    # AI 最后一条回复管理按钮
     with col2:
-        #  编辑按钮
-        if st.button("✏️", key=f"edit_button_{i}"):
-            st.session_state.editing_index = i
+        col3, col4, col5, col6, col7 = st.columns(5)  # 创建 5 列来放置按钮
+
+        with col3:
+            #  编辑按钮
+            if st.button("✏️", key=f"edit_button_{i}"):
+                st.session_state.editing_index = i
+
+        with col4:
+            st.button("✨", key=f"reoutput_{i}", on_click=reoutput_last_response)
+
+        with col5:
+            st.button("➡️", key=f"generate_{i}", on_click=generate_new_response)
+
+        with col6:
+            st.button("⏪", key=f"decrease_{i}", on_click=decrease_page_index,
+                       disabled=st.session_state.page_index == 0)
+
+        with col7:
+            st.button("⏩", key=f"next_{i}", on_click=next_page_index,
+                       disabled=st.session_state.page_index == len(st.session_state.last_response) - 1)
 
     # 如果当前消息正在编辑，显示文本框
     if st.session_state.editing_index == i:
         with st.chat_message(message["role"]):
             new_content = st.text_area(
-                "编辑消息:", 
-                value=message["content"], 
+                "编辑消息:",
+                value=message["content"],
                 key=f"edit_text_{i}"
             )
             if st.button("保存", key=f"save_button_{i}"):
@@ -249,21 +274,7 @@ for i, message in enumerate(st.session_state.messages):
                 # 重置编辑状态
                 st.session_state.editing_index = None
                 # 刷新页面，重新加载聊天记录
-                st.experimental_rerun() 
-
-# AI 最后一条回复管理按钮
-col1, col2 = st.columns(2)
-with col1:
-    st.button("✨", on_click=reoutput_last_response, help="重新输出这条回复")
-with col2:
-    st.button("➡️", on_click=generate_new_response, help="翻页并输出新结果")
-# 侧边栏按钮切换结果
-if len(st.session_state.last_response) > 1:
-    col3, col4 = st.columns(2)
-    with col3:
-        st.button("⏪", on_click=decrease_page_index, help="上一页")
-    with col4:
-        st.button("⏩", on_click=next_page_index, help="下一页")
+                st.experimental_rerun()
 
 # 显示当前页面的 AI 回复
 if st.session_state.page_index >= 0 and st.session_state.page_index < len(st.session_state.last_response):
@@ -274,9 +285,10 @@ if st.session_state.page_index >= 0 and st.session_state.page_index < len(st.ses
 if len(st.session_state.last_response) > 1:
     st.write(f"第 {st.session_state.page_index + 1} 页 / 共 {len(st.session_state.last_response)} 页")
 
+
 if prompt := st.chat_input("Enter your message:"):
     token = generate_token()
-    st.session_state.messages.append({"role": "user", "content": prompt, "token":token})
+    st.session_state.messages.append({"role": "user", "content": prompt, "token": token})
     with st.chat_message("user"):
         st.markdown(prompt)
     with st.chat_message("assistant"):
