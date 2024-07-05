@@ -216,15 +216,19 @@ if st.session_state.page_index >= 0 and st.session_state.page_index < len(st.ses
         if len(st.session_state.last_response) > 1:
             st.markdown(f"第 {st.session_state.page_index + 1} 页")  # 添加页码
 
+# 显示聊天记录
 for message in st.session_state.messages:
     with st.chat_message(message["role"]):
         st.markdown(message["content"])
 
+# 用户输入提示
 if prompt := st.chat_input("Enter your message (including your token):"):
     token = generate_token()
+    # 添加用户输入到聊天记录
     st.session_state.messages.append({"role": "user", "content": f"{prompt}  (token: {token})"})
     with st.chat_message("user"):
         st.markdown(f"{prompt}  (token: {token})")
+    # 生成 AI 回复
     with st.chat_message("assistant"):
         message_placeholder = st.empty()
         full_response = ""
@@ -232,8 +236,13 @@ if prompt := st.chat_input("Enter your message (including your token):"):
             full_response += chunk
             message_placeholder.markdown(full_response + "▌")
         message_placeholder.markdown(full_response)
-    # 现在将最新回复添加到 last_response 列表，而不是添加到 messages 列表中
-    st.session_state.last_response.append(full_response) 
-    
+    # 将新回复添加到 last_response 列表
+    st.session_state.last_response.append(full_response)
+    # 显示当前页面的 AI 回复
+    if st.session_state.page_index >= 0 and st.session_state.page_index < len(st.session_state.last_response):
+        with st.chat_message("assistant"):
+            st.markdown(st.session_state.last_response[st.session_state.page_index])
+            if len(st.session_state.last_response) > 1:
+                st.markdown(f"第 {st.session_state.page_index + 1} 页")  # 添加页码
     # 自动保存聊天记录
     save_history()
