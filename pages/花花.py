@@ -200,30 +200,30 @@ with chat_container:
     if prompt := st.chat_input("Enter your message:"):
         # ... (代码与之前相同，省略)
 
-    # 显示当前页面的 AI 回复和按钮
-    if st.session_state.last_response:  # 判断是否存在回复
-        if st.session_state.page_index >= 0 and st.session_state.page_index < len(
+        # 显示当前页面的 AI 回复和按钮
+        if st.session_state.last_response:  # 判断是否存在回复
+            if st.session_state.page_index >= 0 and st.session_state.page_index < len(
                 st.session_state.last_response):
-            with st.chat_message("assistant"):
-                st.markdown(st.session_state.last_response[st.session_state.page_index])
+                with st.chat_message("assistant"):
+                    st.markdown(st.session_state.last_response[st.session_state.page_index])
 
-                #  ！！！ 控制按钮的正确位置 ！！！
-                if len(st.session_state.last_response) > 1:
-                    col1, col2 = st.columns(2)
-                    with col1:
-                        st.button("✨", on_click=reoutput_last_response, help="重新输出这条回复")
-                    with col2:
-                        st.button("➡️", on_click=generate_new_response, help="翻页并输出新结果")
-                if len(st.session_state.last_response) > 1:
-                    col3, col4 = st.columns(2)
-                    with col3:
-                        st.button("⏪", on_click=decrease_page_index, help="上一页")
-                    with col4:
-                        st.button("⏩", on_click=next_page_index, help="下一页")
+                    #  ！！！ 将控制按钮放到这里 ！！！
+                    if len(st.session_state.last_response) > 1:
+                        col1, col2 = st.columns(2)
+                        with col1:
+                            st.button("✨", on_click=reoutput_last_response, help="重新输出这条回复")
+                        with col2:
+                            st.button("➡️", on_click=generate_new_response, help="翻页并输出新结果")
+                    if len(st.session_state.last_response) > 1:
+                        col3, col4 = st.columns(2)
+                        with col3:
+                            st.button("⏪", on_click=decrease_page_index, help="上一页")
+                        with col4:
+                            st.button("⏩", on_click=next_page_index, help="下一页")
 
-    # 显示页码
-    if len(st.session_state.last_response) > 1:
-        st.write(f"第 {st.session_state.page_index + 1} 页 / 共 {len(st.session_state.last_response)} 页")
+        # 显示页码
+        if len(st.session_state.last_response) > 1:
+            st.write(f"第 {st.session_state.page_index + 1} 页 / 共 {len(st.session_state.last_response)} 页")
 
 # 自动保存聊天记录
 save_history()
