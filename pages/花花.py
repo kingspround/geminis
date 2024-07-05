@@ -85,7 +85,7 @@ def getAnswer(prompt, token, image):
         yield chunk.text
     #  更新最后一条回复
     if st.session_state.last_response:
-        st.session_state.last_response[-1] = full_response 
+        st.session_state.last_response[-1] = full_response
 
 
 def save_history():
@@ -209,7 +209,7 @@ if "last_response" not in st.session_state:
 if "page_index" not in st.session_state:
     st.session_state.page_index = 0
 
-# ===  聊天显示和编辑 ===
+# ===  聊天显示和编辑  ===
 # 用于标记当前正在编辑的消息索引
 if "editing_index" not in st.session_state:
     st.session_state.editing_index = None
@@ -230,11 +230,6 @@ if uploaded_file is not None:
     img = img.convert('RGB')
     st.session_state.img = img  # 保存到 st.session_state.img
     st.sidebar.image(bytes_io, width=150)  # 在侧边栏显示图片
-
-# ===  聊天显示和编辑  ===
-# 用于标记当前正在编辑的消息索引
-if "editing_index" not in st.session_state:
-    st.session_state.editing_index = None
 
 # 循环显示聊天消息
 for i, message in enumerate(st.session_state.messages):
