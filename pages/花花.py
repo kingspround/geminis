@@ -118,6 +118,8 @@ def load_history():
 def clear_history():
     """清除当前聊天记录"""
     st.session_state.messages = []
+    st.session_state.last_response = []  # 清除 last_response 列表
+    st.session_state.page_index = 0     # 重置页面索引
     st.success("聊天记录已清除")
 
 def increase_page_index():
@@ -221,11 +223,11 @@ if prompt := st.chat_input("Enter your message (including your token):"):
         message_placeholder.markdown(full_response)
     # 现在将最新回复添加到 last_response 列表，而不是添加到 messages 列表中
     st.session_state.last_response.append(full_response) 
+
+    # 显示当前页面的 AI 回复
+    if st.session_state.page_index >= 0 and st.session_state.page_index < len(st.session_state.last_response):
+        with st.chat_message("assistant"):
+            st.markdown(st.session_state.last_response[st.session_state.page_index])
     
     # 自动保存聊天记录
     save_history()
-
-# 显示当前页面的 AI 回复
-if st.session_state.page_index >= 0 and st.session_state.page_index < len(st.session_state.last_response):
-    with st.chat_message("assistant"):
-        st.markdown(st.session_state.last_response[st.session_state.page_index])
