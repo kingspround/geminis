@@ -117,6 +117,11 @@ if "messages" not in st.session_state:
 if "editing_index" not in st.session_state:
     st.session_state.editing_index = None
 
+if "last_response" not in st.session_state:
+    st.session_state.last_response = [""]  # 初始化时添加默认值
+if "page_index" not in st.session_state:
+    st.session_state.page_index = 0
+
 # 显示历史记录（只执行一次）
 for i, message in enumerate(st.session_state.messages):
     col1, col2 = st.columns([9, 1])  # 调整列宽，为按钮预留更多空间
@@ -137,21 +142,21 @@ for i, message in enumerate(st.session_state.messages):
             with col3:
                 #  💬 按钮内嵌翻页功能
                 st.button("💬", key=f"generate_{i}", on_click=generate_new_response)
-                
-                #  "⏪" 和 "⏩" 按钮只在最后一条消息拥有两个回答时显示
-                if len(st.session_state.last_response) > 1:
-                    col5, col6 = st.columns(2)
-                    with col5:
-                        st.button("⏪", key=f"decrease_{i}", on_click=decrease_page_index,
-                                   disabled=st.session_state.page_index == 0)
-                    with col6:
-                        st.button("⏩", key=f"next_{i}", on_click=next_page_index,
-                                   disabled=st.session_state.page_index == len(st.session_state.last_response) - 1)
-                        
-                    #  显示页码，只在最后一条消息拥有两个回答时显示
-                    st.write(f"第 {st.session_state.page_index + 1} 页 / 共 {len(st.session_state.last_response)} 页")
             with col4:
                 st.button("🔄", key=f"reoutput_{i}", on_click=reoutput_last_response)
+
+            #  "⏪" 和 "⏩" 按钮只在最后一条消息拥有两个回答时显示
+            if len(st.session_state.last_response) > 1:
+                col5, col6 = st.columns(2)
+                with col5:
+                    st.button("⏪", key=f"decrease_{i}", on_click=lambda: decrease_page_index(0),
+                               disabled=st.session_state.page_index == 0)
+                with col6:
+                    st.button("⏩", key=f"next_{i}", on_click=lambda: next_page_index(len(st.session_state.last_response) - 1),
+                               disabled=st.session_state.page_index == len(st.session_state.last_response) - 1)
+                        
+                #  显示页码，只在最后一条消息拥有两个回答时显示
+                st.write(f"第 {st.session_state.page_index + 1} 页 / 共 {len(st.session_state.last_response)} 页")
 
     # 如果当前消息正在编辑，显示文本框
     if st.session_state.editing_index == i:
@@ -201,6 +206,22 @@ def generate_new_response():
         #  保存聊天记录
         with open(log_file, "wb") as f:  # 使用 "wb" 模式写入
             pickle.dump(st.session_state.messages, f)
+
+def decrease_page_index(min_index):
+    """减少页面索引"""
+    st.session_state.page_index = max(min_index, st.session_state.page_index - 1)
+    # 重新显示当前页面的 AI 回复
+    if st.session_state.page_index >= 0 and st.session_state.page_index < len(st.session_state.last_response):
+        with st.chat_message("assistant"):
+            st.markdown(st.session_state.last_response[st.session_state.page_index])
+
+def next_page_index(max_index):
+    """跳转到下一页"""
+    st.session_state.page_index = min(max_index, st.session_state.page_index + 1)
+    # 重新显示当前页面的 AI 回复
+    if st.session_state.page_index >= 0 and st.session_state.page_index < len(st.session_state.last_response):
+        with st.chat_message("assistant"):
+            st.markdown(st.session_state.last_response[st.session_state.page_index])
 
 # 使用 st.sidebar 放置按钮
 st.sidebar.title("操作")
