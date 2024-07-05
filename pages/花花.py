@@ -83,9 +83,9 @@ def getAnswer(prompt, token, image):
     for chunk in response:
         full_response += chunk.text
         yield chunk.text
-    #  更新最后一条回复
+    # 更新最后一条回复
     if st.session_state.last_response:
-        st.session_state.last_response[-1] = full_response 
+        st.session_state.last_response[-1] = full_response
 
 
 def save_history():
@@ -168,12 +168,13 @@ def generate_new_response():
         st.session_state.page_index = len(st.session_state.last_response) - 1
 
 
+# 初始化 session state
 if "messages" not in st.session_state:
     st.session_state.messages = []
 if "img" not in st.session_state:
     st.session_state.img = None
 if "last_response" not in st.session_state:
-    st.session_state.last_response = [""] # 初始化时添加默认值
+    st.session_state.last_response = []  # 不设置默认值
 if "page_index" not in st.session_state:
     st.session_state.page_index = 0
 
@@ -185,61 +186,57 @@ st.sidebar.button("重置上一个输出", on_click=lambda: st.session_state.mes
 # 图片上传
 uploaded_file = st.sidebar.file_uploader("上传图片", type=['png', 'jpg', 'jpeg', 'gif'])
 if uploaded_file is not None:
-# 图片上传
-uploaded_file = st.sidebar.file_uploader("上传图片", type=['png', 'jpg', 'jpeg', 'gif'])
-if uploaded_file is not None:
-    # To read file as bytes:
-    bytes_data = uploaded_file.getvalue()
-    bytes_io = BytesIO(bytes_data)
-    img = Image.open(bytes_io)
-    # 将图片转换为 JPEG 格式
-    img = img.convert('RGB')
-    st.session_state.img = img  # 保存到 st.session_state.img
-    st.sidebar.image(bytes_io, width=150)  # 在侧边栏显示图片
+    # ... (代码与之前相同，省略)
+
+# 使用 st.container() 包裹聊天记录显示部分
+chat_container = st.container()
+with chat_container:
+    # 显示历史消息
+    for message in st.session_state.messages:
+        with st.chat_message(message["role"]):
+            st.markdown(message["content"])
+
+    # 处理用户输入
+    if prompt := st.chat_input("Enter your message:"):
+        token = generate_token()
+        st.session_state.messages.append({"role": "user", "content": prompt, "token": token})
+        with st.chat_message("user"):
+            st.markdown(prompt)
+        with st.chat_message("assistant"):
+            message_placeholder = st.empty()
+            full_response = ""
+            for chunk in getAnswer(prompt, token, st.session_state.img):
+                full_response += chunk
+                message_placeholder.markdown(full_response + "▌")
+            message_placeholder.markdown(full_response)
+        # 更新 last_response 和 page_index
+        st.session_state.last_response.append(full_response)
+        st.session_state.page_index = len(st.session_state.last_response) - 1
+
+    # 显示当前页面的 AI 回复和按钮
+    if st.session_state.last_response: #  判断是否存在回复
+        if st.session_state.page_index >= 0 and st.session_state.page_index < len(st.session_state.last_response):
+            with st.chat_message("assistant"):
+                st.markdown(st.session_state.last_response[st.session_state.page_index])
+
+                # 控制按钮
+                if len(st.session_state.last_response) > 1:
+                    col1, col2 = st.columns(2)
+                    with col1:
+                        st.button("✨", on_click=reoutput_last_response, help="重新输出这条回复")
+                    with col2:
+                        st.button("➡️", on_click=generate_new_response, help="翻页并输出新结果")
+                if len(st.session_state.last_response) > 1:
+                    col3, col4 = st.columns(2)
+                    with col3:
+                        st.button("⏪", on_click=decrease_page_index, help="上一页")
+                    with col4:
+                        st.button("⏩", on_click=next_page_index, help="下一页")
+
+    # 显示页码
+    if len(st.session_state.last_response) > 1:
+        st.write(f"第 {st.session_state.page_index + 1} 页 / 共 {len(st.session_state.last_response)} 页")
 
 
-# 显示当前页面的 AI 回复和按钮
-if st.session_state.page_index >= 0 and st.session_state.page_index < len(st.session_state.last_response):
-    with st.chat_message("assistant"):
-        st.markdown(st.session_state.last_response[st.session_state.page_index]) 
-
-        # ！！！控制按钮的正确位置！！！
-        if len(st.session_state.last_response) > 1:
-            col1, col2 = st.columns(2)
-            with col1:
-                st.button("✨", on_click=reoutput_last_response, help="重新输出这条回复")
-            with col2:
-                st.button("➡️", on_click=generate_new_response, help="翻页并输出新结果")
-        if len(st.session_state.last_response) > 1:
-            col3, col4 = st.columns(2)
-            with col3:
-                st.button("⏪", on_click=decrease_page_index, help="上一页")
-            with col4:
-                st.button("⏩", on_click=next_page_index, help="下一页")
-
-
-# 显示页码
-if len(st.session_state.last_response) > 1:
-    st.write(f"第 {st.session_state.page_index + 1} 页 / 共 {len(st.session_state.last_response)} 页")
-
-for message in st.session_state.messages:
-    with st.chat_message(message["role"]):
-        st.markdown(message["content"])
-if prompt := st.chat_input("Enter your message:"):
-    token = generate_token()
-    st.session_state.messages.append({"role": "user", "content": prompt, "token":token})
-    with st.chat_message("user"):
-        st.markdown(prompt)
-    with st.chat_message("assistant"):
-        message_placeholder = st.empty()
-        full_response = ""
-        # 在获取回复时传入token
-        for chunk in getAnswer(prompt, token, st.session_state.img):
-            full_response += chunk
-            message_placeholder.markdown(full_response + "▌")
-        message_placeholder.markdown(full_response)
-    # 更新 last_response 和 page_index
-    st.session_state.last_response.append(full_response)
-    st.session_state.page_index = len(st.session_state.last_response) - 1
 # 自动保存聊天记录
 save_history()
