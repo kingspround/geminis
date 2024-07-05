@@ -101,7 +101,12 @@ def save_history():
     os.makedirs("logs", exist_ok=True)
     filename = f"logs/{generate_token()}.pkl"  # 使用随机 token 生成文件名
     with open(filename, "wb") as f:
-        pickle.dump(st.session_state.messages, f)
+        # 将消息内容转换为纯文本
+        messages_to_save = [
+            {"role": msg["role"], "content": msg["content"].replace("  ✨ ➡️", "").replace("  ⏪ ⏩ ✨ ➡️", "")}
+            for msg in st.session_state.messages
+        ]
+        pickle.dump(messages_to_save, f)
     # 不再显示保存提示
 
 def load_history():
@@ -153,20 +158,12 @@ for i, message in enumerate(st.session_state.messages):
             if "responses" in message:
                 current_index = message.get("current_index", 0)
                 if len(message["responses"]) > 1:
-                    st.markdown(f"  ⏪ ⏩ ✨ ➡️")
-                    st.session_state.messages[i]["content"] += f"  ⏪ ⏩ ✨ ➡️"
+                    st.markdown(f"  ✨ ➡️ ⏪ ⏩")
                     st.button("⏪", key=f"prev_{i}", on_click=lambda i=i: setattr(st.session_state.messages[i], "current_index", (current_index - 1) % len(st.session_state.messages[i]["responses"])))
                     st.button("⏩", key=f"next_{i}", on_click=lambda i=i: setattr(st.session_state.messages[i], "current_index", (current_index + 1) % len(st.session_state.messages[i]["responses"])))
-                    st.button("✨", key=f"regenerate_{i}", on_click=lambda i=i: regenerate_last_message(i))
-                    st.button("➡️", key=f"add_new_{i}", on_click=lambda i=i: add_new_response(i))
-                else:
-                    st.markdown(f"  ✨ ➡️")
-                    st.session_state.messages[i]["content"] += f"  ✨ ➡️"
-                    st.button("✨", key=f"regenerate_{i}", on_click=lambda i=i: regenerate_last_message(i))
-                    st.button("➡️", key=f"add_new_{i}", on_click=lambda i=i: add_new_response(i))
+                st.button("✨", key=f"regenerate_{i}", on_click=lambda i=i: regenerate_last_message(i))
+                st.button("➡️", key=f"add_new_{i}", on_click=lambda i=i: add_new_response(i))
             else:
-                st.markdown(f"  ✨ ➡️")
-                st.session_state.messages[i]["content"] += f"  ✨ ➡️"
                 st.button("✨", key=f"regenerate_{i}", on_click=lambda i=i: regenerate_last_message(i))
                 st.button("➡️", key=f"add_new_{i}", on_click=lambda i=i: add_new_response(i))
 
