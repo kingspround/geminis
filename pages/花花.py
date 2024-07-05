@@ -181,9 +181,20 @@ def display_chat_history():
                             st.markdown(message["content"])
                         with col2:
                             button_placeholder.empty()  # 占位符清空
-
+                            
                         # 在占位符中添加按钮
                         with button_placeholder:
+                            st.markdown(
+                                f"""
+                                <div style="position: relative; right: 0px; top: -20px;">
+                                    <button id="regenerate_{i}" style="font-size: 12px; padding: 5px 10px;">✨</button>
+                                    <button id="extra_output_{i}" style="font-size: 12px; padding: 5px 10px;">➡️</button>
+                                </div>
+                                """,
+                                unsafe_allow_html=True
+                            )
+
+                            # 添加按钮的事件监听
                             if st.button(" ", key=f"regenerate_{i}"):
                                 # 重新输出
                                 st.session_state.messages[i] = {"role": "assistant", "content":  "正在重新输出..."}
@@ -227,7 +238,6 @@ def handle_new_response(response, prompt, token):
             new_response = getAnswer(prompt, generate_token(), st.session_state.img)  # 生成新的 token
             st.markdown(new_response)
         st.session_state.messages.append({"role": "assistant", "content": new_response})
-
 
 display_chat_history()  # 显示聊天历史
 
