@@ -152,8 +152,6 @@ def generate_new_response():
         # 更新 last_response 和 page_index
         st.session_state.last_response.append(full_response)
         st.session_state.page_index = len(st.session_state.last_response) - 1
-        # 添加新回复到聊天记录
-        st.session_state.messages.append({"role": "assistant", "content": full_response})
         # 显示新回复
         with st.chat_message("assistant"):
             st.markdown(full_response)
@@ -221,16 +219,12 @@ if prompt := st.chat_input("Enter your message (including your token):"):
             full_response += chunk
             message_placeholder.markdown(full_response + "▌")
         message_placeholder.markdown(full_response)
-    st.session_state.messages.append({"role": "assistant", "content": full_response})
-    st.session_state.last_response.append(full_response)  # 将最新回复添加到 last_response 列表
-
+    # 现在将最新回复添加到 last_response 列表，而不是添加到 messages 列表中
+    st.session_state.last_response.append(full_response) 
+    
     # 自动保存聊天记录
     save_history()
 
-# 显示当前页面的 AI 回复
-if st.session_state.page_index >= 0 and st.session_state.page_index < len(st.session_state.last_response):
-    with st.chat_message("assistant"):
-        st.markdown(st.session_state.last_response[st.session_state.page_index])
 # 显示当前页面的 AI 回复
 if st.session_state.page_index >= 0 and st.session_state.page_index < len(st.session_state.last_response):
     with st.chat_message("assistant"):
