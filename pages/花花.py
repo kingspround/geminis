@@ -129,6 +129,10 @@ def decrease_page_index():
     """减少页面索引"""
     st.session_state.page_index = max(0, st.session_state.page_index - 1)
 
+def next_page_index():
+    """跳转到下一页"""
+    st.session_state.page_index = min(len(st.session_state.last_response) - 1, st.session_state.page_index + 1)
+
 if "messages" not in st.session_state:
     st.session_state.messages = []
 if "img" not in st.session_state:
@@ -163,7 +167,7 @@ st.sidebar.button(" ", on_click=increase_page_index, help="翻页并输出新结
 # 侧边栏按钮切换结果
 if len(st.session_state.last_response) > 1:
     st.sidebar.button(" ", on_click=decrease_page_index, help="上一页")
-    st.sidebar.button(" ", on_click=lambda: st.session_state.page_index = min(len(st.session_state.last_response) - 1, st.session_state.page_index + 1), help="下一页")
+    st.sidebar.button(" ", on_click=next_page_index, help="下一页")
 
 for message in st.session_state.messages:
     with st.chat_message(message["role"]):
