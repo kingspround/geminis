@@ -68,11 +68,10 @@ def getAnswer(prompt, token, image):
         {"role": "model", "parts": [{"text": f"你的随机token是：{token}"""}]}
     )
 
-    for msg in st.session_state.messages[-20:]:
+    # 只保留用户输入的最后一条消息
+    for msg in st.session_state.messages[-1:]:
         if msg["role"] == "user":
             his_messages.append({"role": "user", "parts": [{"text": msg["content"]}]})
-        elif msg is not None and msg["content"] is not None:
-            his_messages.append({"role": "model", "parts": [{"text": msg["content"]}]})
 
     if image is not None:
         # 将图片转换为字节流
@@ -81,7 +80,7 @@ def getAnswer(prompt, token, image):
         img_bytes.seek(0)
         
         prompt_v = ""
-        for msg in st.session_state.messages[-20:]:
+        for msg in st.session_state.messages[-1:]:
             prompt_v += f'''{msg["role"]}:{msg["content"]}
 '''
         response = model_v.generate_content([prompt_v, img_bytes], stream=True)  # 将图片字节流传递给模型
@@ -136,8 +135,11 @@ def next_page_index():
 def reoutput_last_response():
     """重新输出最后一条回复"""
     if st.session_state.last_response:
+        token = generate_token()
+        full_response = getAnswer(st.session_state.messages[-1]["content"], token, st.session_state.img)
         with st.chat_message("assistant"):
-            st.markdown(st.session_state.last_response[-1])  # 输出 last_response 中的最后一条
+            st.markdown(full_response)
+        st.session_state.last_response[-1] = full_response
 
 def generate_new_response():
     """生成新的回复"""
@@ -225,6 +227,10 @@ if prompt := st.chat_input("Enter your message (including your token):"):
     # 自动保存聊天记录
     save_history()
 
+# 显示当前页面的 AI 回复
+if st.session_state.page_index >= 0 and st.session_state.page_index < len(st.session_state.last_response):
+    with st.chat_message("assistant"):
+        st.markdown(st.session_state.last_response[st.session_state.page_index])
 # 显示当前页面的 AI 回复
 if st.session_state.page_index >= 0 and st.session_state.page_index < len(st.session_state.last_response):
     with st.chat_message("assistant"):
