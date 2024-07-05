@@ -112,7 +112,39 @@ def load_history():
         st.warning("logs 文件夹中没有记录文件")
 
 
+def clear_history():
+    """清除当前聊天记录"""
+    st.session_state.messages = []
+    st.session_state.last_response = []  # 清除 last_response 列表
+    st.session_state.page_index = 0  # 重置页面索引
+    st.success("聊天记录已清除")
 
+
+def increase_page_index():
+    """增加页面索引"""
+    st.session_state.page_index += 1
+    # 重新显示当前页面的 AI 回复
+    if st.session_state.page_index >= 0 and st.session_state.page_index < len(st.session_state.last_response):
+        with st.chat_message("assistant"):
+            st.markdown(st.session_state.last_response[st.session_state.page_index])
+
+
+def decrease_page_index():
+    """减少页面索引"""
+    st.session_state.page_index = max(0, st.session_state.page_index - 1)
+    # 重新显示当前页面的 AI 回复
+    if st.session_state.page_index >= 0 and st.session_state.page_index < len(st.session_state.last_response):
+        with st.chat_message("assistant"):
+            st.markdown(st.session_state.last_response[st.session_state.page_index])
+
+
+def next_page_index():
+    """跳转到下一页"""
+    st.session_state.page_index = min(len(st.session_state.last_response) - 1, st.session_state.page_index + 1)
+    # 重新显示当前页面的 AI 回复
+    if st.session_state.page_index >= 0 and st.session_state.page_index < len(st.session_state.last_response):
+        with st.chat_message("assistant"):
+            st.markdown(st.session_state.last_response[st.session_state.page_index])
 
 
 def reoutput_last_response():
