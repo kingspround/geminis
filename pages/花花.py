@@ -172,7 +172,9 @@ def display_chat_history():
                     
                     # 添加重新输出按钮和额外输出按钮
                     if message["role"] == "assistant":
-                        col1, col2 = st.columns([1, 1])
+                        # 使用 st.empty() 创建空容器，并将其设置为按钮所在位置
+                        container = st.empty()
+                        col1, col2 = container.columns([1, 1])
                         with col1:
                             if st.button("✨", key=f"regenerate_{i}"):
                                 # 重新输出
