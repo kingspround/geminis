@@ -9,8 +9,8 @@ from io import StringIO
 import random
 import pickle
 
-# Insert your API key here
-st.session_state.key = "AIzaSyDPFZ7gRba9mhKTqbXA_Y7fhAxS8IEu0bY" 
+# API Key 设置
+st.session_state.key = "AIzaSyDPFZ7gRba9mhKTqbXA_Y7fhAxS8IEu0bY"  # **请勿将您的API Key 泄露在公开场合**
 if "key" not in st.session_state:
     st.session_state.key = None
 if not st.session_state.key:
@@ -19,7 +19,7 @@ if not st.session_state.key:
 
 genai.configure(api_key=st.session_state.key)
 
-# Set up the model
+# 模型设置
 generation_config = {
     "temperature": 1,
     "top_p": 0,
@@ -58,6 +58,7 @@ def generate_token():
     token = ''.join(random.choice(characters) for i in range(token_length))
     return token
 
+
 def getAnswer(prompt, token, image):
     his_messages = []
     his_messages.append(
@@ -82,7 +83,9 @@ def getAnswer(prompt, token, image):
     for chunk in response:
         full_response += chunk.text
         yield chunk.text
-    st.session_state.last_response[-1] = full_response # 更新最后一条回复
+    #  更新最后一条回复
+    if st.session_state.last_response:
+        st.session_state.last_response[-1] = full_response 
 
 
 def save_history():
@@ -170,7 +173,7 @@ if "messages" not in st.session_state:
 if "img" not in st.session_state:
     st.session_state.img = None
 if "last_response" not in st.session_state:
-    st.session_state.last_response = []
+    st.session_state.last_response = [""] # 初始化时添加默认值
 if "page_index" not in st.session_state:
     st.session_state.page_index = 0
 
