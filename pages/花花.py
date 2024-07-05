@@ -271,3 +271,27 @@ def clear_history(log_file):
         st.success(f"成功清除 {filename} 的历史记录！")
     except FileNotFoundError:
         st.warning(f"{filename} 不存在。")
+
+def generate_new_response():
+    """生成新的回复并显示"""
+    if st.session_state.messages:
+        # 获取最后一个用户的提示和token
+        last_user_prompt = st.session_state.messages[-1]["content"]
+        last_user_token = st.session_state.messages[-1]["token"]
+        # 生成新回复
+        with st.chat_message("assistant"):
+            message_placeholder = st.empty()
+            full_response = ""
+            for chunk in getAnswer(last_user_prompt, last_user_token, st.session_state.img):
+                full_response += chunk
+                message_placeholder.markdown(full_response + "▌")
+            message_placeholder.markdown(full_response)
+        # 更新 last_response 和 page_index
+        st.session_state.last_response.append(full_response)
+        st.session_state.page_index = len(st.session_state.last_response) - 1
+        
+        # 现在，在更新 last_response 后，我们需要更新 page_index，以确保编辑功能可以定位到最新的 AI 回复
+        st.session_state.page_index += 1
+        
+        #  保存聊天记录
+        save_history()
