@@ -201,7 +201,7 @@ def handle_new_response(response, prompt, token):
     st.session_state.messages.append({"role": "assistant", "content": response})
 
     # 添加重新输出按钮
-    if st.button("✨", key=f"regenerate_{len(st.session_state.messages)-1}"):
+    if st.button("✨", key=f"regenerate_{generate_token()}"):
         # 重新输出
         st.session_state.messages[-1] = {"role": "assistant", "content":  "正在重新输出..."}
         st.experimental_rerun()
@@ -211,7 +211,7 @@ def handle_new_response(response, prompt, token):
         st.session_state.messages[-1] = {"role": "assistant", "content": response}
 
     # 添加额外输出按钮
-    if st.button("➡️", key=f"extra_output_{len(st.session_state.messages)-1}"):
+    if st.button("➡️", key=f"extra_output_{generate_token()}"):
         # 额外输出
         with st.chat_message("assistant"):
             response = getAnswer(prompt, token, st.session_state.img)
@@ -230,10 +230,3 @@ if prompt := st.chat_input("Enter your message (including your token):"):
         full_response = ""
         for chunk in getAnswer(prompt, token, st.session_state.img):
             full_response += chunk
-            message_placeholder.markdown(full_response + "▌")
-        message_placeholder.markdown(full_response)
-    st.session_state.messages.append({"role": "assistant", "content": full_response})
-    save_history()  # 自动保存聊天记录
-
-    # 处理新回复
-    handle_new_response(full_response, prompt, token)
