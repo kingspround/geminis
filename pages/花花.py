@@ -248,22 +248,26 @@ for i, message in enumerate(st.session_state.messages):
             #  编辑按钮
             if st.button("✏️", key=f"edit_button_{i}"):
                 st.session_state.editing_index = i
-
-            col3, col4, col5, col6, col7 = st.columns(5)
-
+            
+            #  💬 按钮和 🔄 按钮永远显示
+            col3, col4 = st.columns(2)
             with col3:
+                #  💬 按钮内嵌翻页功能
+                col5, col6, col7 = st.columns(3)
+                with col5:
+                    st.button("💬", key=f"generate_{i}", on_click=generate_new_response)
+                with col6:
+                    st.button("⏪", key=f"decrease_{i}", on_click=decrease_page_index,
+                               disabled=st.session_state.page_index == 0)
+                with col7:
+                    st.button("⏩", key=f"next_{i}", on_click=next_page_index,
+                               disabled=st.session_state.page_index == len(st.session_state.last_response) - 1)
+            with col4:
                 st.button("🔄", key=f"reoutput_{i}", on_click=reoutput_last_response)
 
-            with col4:
-                st.button("💬", key=f"generate_{i}", on_click=generate_new_response)
-
-            with col5:
-                st.button("⏪", key=f"decrease_{i}", on_click=decrease_page_index,
-                           disabled=st.session_state.page_index == 0)
-
-            with col6:
-                st.button("⏩", key=f"next_{i}", on_click=next_page_index,
-                           disabled=st.session_state.page_index == len(st.session_state.last_response) - 1)
+            #  显示页码，只在最后一条消息拥有两个回答时显示
+            if len(st.session_state.last_response) > 1:
+                st.write(f"第 {st.session_state.page_index + 1} 页 / 共 {len(st.session_state.last_response)} 页")
 
     # 如果当前消息正在编辑，显示文本框
     if st.session_state.editing_index == i:
@@ -287,10 +291,6 @@ for i, message in enumerate(st.session_state.messages):
 if st.session_state.page_index >= 0 and st.session_state.page_index < len(st.session_state.last_response):
     with st.chat_message("assistant"):
         st.markdown(st.session_state.last_response[st.session_state.page_index])
-
-# 显示页码
-if len(st.session_state.last_response) > 1:
-    st.write(f"第 {st.session_state.page_index + 1} 页 / 共 {len(st.session_state.last_response)} 页")
 
 
 if prompt := st.chat_input("Enter your message:"):
