@@ -139,6 +139,22 @@ def reoutput_last_response():
         with st.chat_message("assistant"):
             st.markdown(st.session_state.last_response[-1])  # 输出 last_response 中的最后一条
 
+def generate_new_response():
+    """生成新的回复"""
+    if st.session_state.messages:
+        # 获取最后一个用户的提示
+        last_user_prompt = st.session_state.messages[-1]["content"]
+        # 生成新回复
+        token = generate_token()
+        full_response = getAnswer(last_user_prompt, token, st.session_state.img)
+        # 更新 last_response 和 page_index
+        st.session_state.last_response.append(full_response)
+        st.session_state.page_index = len(st.session_state.last_response) - 1
+        # 添加新回复到聊天记录
+        st.session_state.messages.append({"role": "assistant", "content": full_response})
+        # 显示新回复
+        with st.chat_message("assistant"):
+            st.markdown(full_response)
 
 if "messages" not in st.session_state:
     st.session_state.messages = []
@@ -172,7 +188,7 @@ col1, col2 = st.sidebar.columns(2)
 with col1:
     st.button("✨", on_click=reoutput_last_response, help="重新输出这条回复")
 with col2:
-    st.button("➡️", on_click=increase_page_index, help="翻页并输出新结果")
+    st.button("➡️", on_click=generate_new_response, help="翻页并输出新结果")
 
 # 侧边栏按钮切换结果
 if len(st.session_state.last_response) > 1:
