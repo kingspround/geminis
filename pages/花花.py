@@ -170,14 +170,6 @@ def display_chat_history():
                 else:
                     # 创建占位符
                     button_placeholder = st.empty()
-
-                    # 使用 st.columns 分割
-                    col1, col2 = st.columns([1, 0.1])  # 将第二列宽度设置为较小
-                    with col1:
-                        st.markdown(message["content"])
-                    with col2:
-                        button_placeholder.empty()  # 占位符清空
-
                     # 在占位符中添加按钮
                     with button_placeholder:
                         st.markdown(
@@ -190,21 +182,12 @@ def display_chat_history():
                             unsafe_allow_html=True
                         )
 
-                        # 添加按钮的事件监听
-                        if st.button(" ", key=f"regenerate_{i}"):
-                            # 重新输出
-                            st.session_state.messages[i] = {"role": "assistant", "content":  "正在重新输出..."}
-                            st.experimental_rerun()
-                            with st.chat_message("assistant"):
-                                response = getAnswer(message["content"], generate_token(), st.session_state.img)
-                                st.markdown(response)
-                            st.session_state.messages[i] = {"role": "assistant", "content": response}
-                        if st.button(" ", key=f"extra_output_{i}"):
-                            # 额外输出
-                            with st.chat_message("assistant"):
-                                response = getAnswer(message["content"], generate_token(), st.session_state.img)
-                                st.markdown(response)
-                            st.session_state.messages.append({"role": "assistant", "content": response})
+                    # 使用 st.columns 分割
+                    col1, col2 = st.columns([1, 0.1])  # 将第二列宽度设置为较小
+                    with col1:
+                        st.markdown(message["content"])
+                    with col2:
+                        button_placeholder.empty()  # 占位符清空
             else:
                 st.markdown(message["content"])
 
