@@ -133,6 +133,12 @@ def next_page_index():
     """跳转到下一页"""
     st.session_state.page_index = min(len(st.session_state.last_response) - 1, st.session_state.page_index + 1)
 
+def reoutput_last_response():
+    """重新输出最后一条回复"""
+    if st.session_state.last_response:
+        with st.chat_message("assistant"):
+            st.markdown(st.session_state.last_response[-1])  # 输出 last_response 中的最后一条
+
 if "messages" not in st.session_state:
     st.session_state.messages = []
 if "img" not in st.session_state:
@@ -161,13 +167,13 @@ if uploaded_file is not None:
     st.sidebar.image(bytes_io, width=150)  # 在侧边栏显示图片
 
 # AI 最后一条回复管理按钮
-st.sidebar.button(" ", on_click=lambda: st.session_state.last_response.append(st.session_state.messages[-1]["content"]), help="重新输出这条回复")
-st.sidebar.button(" ", on_click=increase_page_index, help="翻页并输出新结果")
+st.sidebar.button("✨", on_click=reoutput_last_response, help="重新输出这条回复")
+st.sidebar.button("➡️", on_click=increase_page_index, help="翻页并输出新结果")
 
 # 侧边栏按钮切换结果
 if len(st.session_state.last_response) > 1:
-    st.sidebar.button(" ", on_click=decrease_page_index, help="上一页")
-    st.sidebar.button(" ", on_click=next_page_index, help="下一页")
+    st.sidebar.button("⏪", on_click=decrease_page_index, help="上一页")
+    st.sidebar.button("⏩", on_click=next_page_index, help="下一页")
 
 for message in st.session_state.messages:
     with st.chat_message(message["role"]):
