@@ -231,12 +231,41 @@ if uploaded_file is not None:
     st.session_state.img = img  # 保存到 st.session_state.img
     st.sidebar.image(bytes_io, width=150)  # 在侧边栏显示图片
 
+# ===  聊天显示和编辑  ===
+# 用于标记当前正在编辑的消息索引
+if "editing_index" not in st.session_state:
+    st.session_state.editing_index = None
+
 # 循环显示聊天消息
 for i, message in enumerate(st.session_state.messages):
     col1, col2 = st.columns([9, 1])  # 调整列宽，为按钮预留更多空间
     with col1:
         with st.chat_message(message["role"]):
             st.write(message["content"], key=f"message_{i}")
+
+    # === 在循环内部添加按钮和编辑逻辑 ===
+    if i == len(st.session_state.messages) - 1:  # 仅在最后一条消息旁边添加按钮
+        with col2:
+            col3, col4, col5, col6, col7 = st.columns(5)
+
+            with col3:
+                #  编辑按钮
+                if st.button("✏️", key=f"edit_button_{i}"):
+                    st.session_state.editing_index = i
+
+            with col4:
+                st.button("✨", key=f"reoutput_{i}", on_click=reoutput_last_response)
+
+            with col5:
+                st.button("➡️", key=f"generate_{i}", on_click=generate_new_response)
+
+            with col6:
+                st.button("⏪", key=f"decrease_{i}", on_click=decrease_page_index,
+                           disabled=st.session_state.page_index == 0)
+
+            with col7:
+                st.button("⏩", key=f"next_{i}", on_click=next_page_index,
+                           disabled=st.session_state.page_index == len(st.session_state.last_response) - 1)
 
     # 如果当前消息正在编辑，显示文本框
     if st.session_state.editing_index == i:
@@ -256,32 +285,6 @@ for i, message in enumerate(st.session_state.messages):
                 st.session_state.editing_index = None
                 # 刷新页面，重新加载聊天记录
                 st.experimental_rerun()
-
-# ===  仅在最后一个消息旁边添加按钮  ===
-if st.session_state.messages:  # 检查消息列表是否为空
-    last_message_index = len(st.session_state.messages) - 1
-    col1, col2 = st.columns([9, 1])
-    with col2:
-        col3, col4, col5, col6, col7 = st.columns(5)
-
-        with col3:
-            #  编辑按钮
-            if st.button("✏️", key=f"edit_button_{last_message_index}"):
-                st.session_state.editing_index = last_message_index
-
-        with col4:
-            st.button("✨", key=f"reoutput_{last_message_index}", on_click=reoutput_last_response)
-
-        with col5:
-            st.button("➡️", key=f"generate_{last_message_index}", on_click=generate_new_response)
-
-        with col6:
-            st.button("⏪", key=f"decrease_{last_message_index}", on_click=decrease_page_index,
-                       disabled=st.session_state.page_index == 0)
-
-        with col7:
-            st.button("⏩", key=f"next_{last_message_index}", on_click=next_page_index,
-                       disabled=st.session_state.page_index == len(st.session_state.last_response) - 1)
 # 显示当前页面的 AI 回复
 if st.session_state.page_index >= 0 and st.session_state.page_index < len(st.session_state.last_response):
     with st.chat_message("assistant"):
