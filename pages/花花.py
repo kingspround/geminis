@@ -136,7 +136,7 @@ def next_page_index():
 
 
 def reoutput_last_response():
-    """重新输出最后一条回复，替换原回复并更新上下文"""
+    """重新输出最后一条回复，将新回复添加到最后并更新上下文"""
     if st.session_state.last_response:
         # 获取当前回复在 last_response 中的索引
         current_response_index = st.session_state.page_index
@@ -145,10 +145,9 @@ def reoutput_last_response():
 
         # 获取对应用户消息的索引
         user_message_index = len(st.session_state.messages) - 1
-        
         # 删除旧的用户消息和回复
         del st.session_state.messages[user_message_index]
-        
+
         # 重新发送用户消息并获取新的回复
         user_message = st.session_state.messages[-1]
         with st.chat_message("assistant"):
@@ -159,11 +158,11 @@ def reoutput_last_response():
                 full_response += chunk
                 message_placeholder.markdown(full_response + "▌")
             message_placeholder.markdown(full_response)
-        # 将新的回复插入到删除位置
-        st.session_state.last_response.insert(current_response_index, full_response)
-        # 保持页面索引不变，指向新的回复
-        st.session_state.page_index = current_response_index
+        # 将新的回复添加到最后
+        st.session_state.last_response.append(full_response)
 
+        # 更新页面索引，指向新的回复
+        st.session_state.page_index = len(st.session_state.last_response) - 1
 def generate_new_response():
     """生成新的回复并显示"""
     if st.session_state.messages:
