@@ -100,12 +100,9 @@ def save_history():
     """将聊天记录保存到 logs 文件夹的 .pkl 文件"""
     os.makedirs("logs", exist_ok=True)
     filename = f"logs/{generate_token()}.pkl"  # 使用随机 token 生成文件名
-    try:
-        with open(filename, "wb") as f:
-            # 使用自定义的序列化函数
-            pickle.dump(st.session_state.messages, f, protocol=pickle.HIGHEST_PROTOCOL, default=custom_serializer)
-    except pickle.PickleError as e:
-        print(f"无法序列化聊天记录：{e}")  # 打印错误信息
+    with open(filename, "wb") as f:
+        pickle.dump(st.session_state.messages, f)
+    # 不再显示保存提示
 
 def load_history():
     """从 logs 文件夹加载聊天记录"""
