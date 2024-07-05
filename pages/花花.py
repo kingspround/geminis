@@ -154,29 +154,41 @@ def display_chat_history():
                     
                     # 添加结果切换按钮
                     if len(results) > 1:
-                        if st.button(" ", key=f"prev_result_{i}"):
-                            current_result_index = (current_result_index - 1) % len(results)
-                            message["current_result_index"] = current_result_index
-                            st.session_state.messages[i] = message
-                            st.experimental_rerun()  # 刷新页面
-                        if st.button(" ", key=f"next_result_{i}"):
-                            current_result_index = (current_result_index + 1) % len(results)
-                            message["current_result_index"] = current_result_index
-                            st.session_state.messages[i] = message
-                            st.experimental_rerun()  # 刷新页面
+                        col1, col2 = st.columns([1, 1])
+                        with col1:
+                            if st.button(" ", key=f"prev_result_{i}"):
+                                current_result_index = (current_result_index - 1) % len(results)
+                                message["current_result_index"] = current_result_index
+                                st.session_state.messages[i] = message
+                                st.experimental_rerun()  # 刷新页面
+                        with col2:
+                            if st.button(" ", key=f"next_result_{i}"):
+                                current_result_index = (current_result_index + 1) % len(results)
+                                message["current_result_index"] = current_result_index
+                                st.session_state.messages[i] = message
+                                st.experimental_rerun()  # 刷新页面
                 else:
                     st.markdown(message["content"])
                     
-                    # 添加重新输出按钮
+                    # 添加重新输出按钮和额外输出按钮
                     if message["role"] == "assistant":
-                        if st.button(" ", key=f"regenerate_{i}"):
-                            # 重新输出
-                            st.session_state.messages[i] = {"role": "assistant", "content":  "正在重新输出..."}
-                            st.experimental_rerun()
-                            with st.chat_message("assistant"):
-                                response = getAnswer(message["content"], generate_token(), st.session_state.img)
-                                st.markdown(response)
-                            st.session_state.messages[i] = {"role": "assistant", "content": response}
+                        col1, col2 = st.columns([1, 1])
+                        with col1:
+                            if st.button(" ", key=f"regenerate_{i}"):
+                                # 重新输出
+                                st.session_state.messages[i] = {"role": "assistant", "content":  "正在重新输出..."}
+                                st.experimental_rerun()
+                                with st.chat_message("assistant"):
+                                    response = getAnswer(message["content"], generate_token(), st.session_state.img)
+                                    st.markdown(response)
+                                st.session_state.messages[i] = {"role": "assistant", "content": response}
+                        with col2:
+                            if st.button(" ", key=f"extra_output_{i}"):
+                                # 额外输出
+                                with st.chat_message("assistant"):
+                                    response = getAnswer(message["content"], generate_token(), st.session_state.img)
+                                    st.markdown(response)
+                                st.session_state.messages.append({"role": "assistant", "content": response})
             else:
                 st.markdown(message["content"])
 
