@@ -138,42 +138,67 @@ if uploaded_file is not None:
     st.session_state.img = img # 保存到 st.session_state.img
     st.sidebar.image(bytes_io, width=150) # 在侧边栏显示图片
 
-def display_chat_history():
-    for i, message in enumerate(st.session_state.messages):
-        with st.chat_message(message["role"]):
-            if i == len(st.session_state.messages) - 1:
-                # 最后一条回复的特殊处理
-                if message["role"] == "assistant" and "results" in message:
-                    # 有多个结果
-                    current_result_index = message.get("current_result_index", 0)
-                    results = message["results"]
-                    st.markdown(results[current_result_index])
-                    # 添加结果切换按钮
-                    if len(results) > 1:
-                        col1, col2 = st.columns([1, 1])
-                        with col1:
-                            if st.button(" ", key=f"prev_result_{i}"):
-                                current_result_index = (current_result_index - 1) % len(results)
-                                message["current_result_index"] = current_result_index
-                                st.session_state.messages[i] = message
-                                st.experimental_rerun()  # 刷新页面
-                        with col2:
-                            if st.button(" ", key=f"next_result_{i}"):
-                                current_result_index = (current_result_index + 1) % len(results)
-                                message["current_result_index"] = current_result_index
-                                st.session_state.messages[i] = message
-                                st.experimental_rerun()  # 刷新页面
-                else:
-                    st.markdown(message["content"])
-            else:
-                st.markdown(message["content"])
-
 # 新的按钮栏
-col1, col2, col3 = st.columns([3, 1, 1]) # 修正宽度设置
+col1, col2, col3 = st.columns([3, 1, 1]) 
+
+# 重新输出按钮
+with col2:
+    if st.button(" ", key="regenerate"):
+        # 获取最后一条回复
+        last_message = st.session_state.messages[-1]
+        if last_message["role"] == "assistant":
+            # 重新输出
+            st.session_state.messages[-1] = {"role": "assistant", "content":  "正在重新输出..."}
+            st.experimental_rerun()
+            with st.chat_message("assistant"):
+                response = getAnswer(last_message["content"], generate_token(), st.session_state.img)
+                st.markdown(response)
+            st.session_state.messages[-1] = {"role": "assistant", "content": response}
+
+# 额外输出按钮
+with col3:
+    if st.button(" ", key="extra_output"):
+        # 获取最后一条回复
+        last_message = st.session_state.messages[-1]
+        if last_message["role"] == "assistant":
+            # 额外输出
+            with st.chat_message("assistant"):
+                response = getAnswer(last_message["content"], generate_token(), st.session_state.img)
+                st.markdown(response)
+            st.session_state.messages.append({"role": "assistant", "content": response})
 
 with col1:
     # 聊天区域
-    display_chat_history() 
+    def display_chat_history():
+        for i, message in enumerate(st.session_state.messages):
+            with st.chat_message(message["role"]):
+                if i == len(st.session_state.messages) - 1:
+                    # 最后一条回复的特殊处理
+                    if message["role"] == "assistant" and "results" in message:
+                        # 有多个结果
+                        current_result_index = message.get("current_result_index", 0)
+                        results = message["results"]
+                        st.markdown(results[current_result_index])
+                        # 添加结果切换按钮
+                        if len(results) > 1:
+                            col1, col2 = st.columns([1, 1])
+                            with col1:
+                                if st.button(" ", key=f"prev_result_{i}"):
+                                    current_result_index = (current_result_index - 1) % len(results)
+                                    message["current_result_index"] = current_result_index
+                                    st.session_state.messages[i] = message
+                                    st.experimental_rerun()  # 刷新页面
+                            with col2:
+                                if st.button(" ", key=f"next_result_{i}"):
+                                    current_result_index = (current_result_index + 1) % len(results)
+                                    message["current_result_index"] = current_result_index
+                                    st.session_state.messages[i] = message
+                                    st.experimental_rerun()  # 刷新页面
+                    else:
+                        st.markdown(message["content"])
+                else:
+                    st.markdown(message["content"])
+    display_chat_history()
 
     if prompt := st.chat_input("Enter your message (including your token):"):
         token = generate_token()
@@ -191,32 +216,6 @@ with col1:
         save_history() # 自动保存聊天记录
         # 处理新回复
         handle_new_response(full_response, prompt, token)
-
-with col2:
-    # 重新输出按钮
-    if st.button(" ", key="regenerate"):
-        # 获取最后一条回复
-        last_message = st.session_state.messages[-1]
-        if last_message["role"] == "assistant":
-            # 重新输出
-            st.session_state.messages[-1] = {"role": "assistant", "content":  "正在重新输出..."}
-            st.experimental_rerun()
-            with st.chat_message("assistant"):
-                response = getAnswer(last_message["content"], generate_token(), st.session_state.img)
-                st.markdown(response)
-            st.session_state.messages[-1] = {"role": "assistant", "content": response}
-
-with col3:
-    # 额外输出按钮
-    if st.button(" ", key="extra_output"):
-        # 获取最后一条回复
-        last_message = st.session_state.messages[-1]
-        if last_message["role"] == "assistant":
-            # 额外输出
-            with st.chat_message("assistant"):
-                response = getAnswer(last_message["content"], generate_token(), st.session_state.img)
-                st.markdown(response)
-            st.session_state.messages.append({"role": "assistant", "content": response})
 
 def handle_new_response(response, prompt, token):
     """处理新回复，并添加重新输出和额外输出按钮"""
