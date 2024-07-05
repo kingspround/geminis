@@ -172,7 +172,7 @@ def display_chat_history():
                     button_placeholder = st.empty()
 
                     # 使用 st.columns 分割
-                    col1, col2, col3 = st.columns([1, 0.1, 1])  # 将第二列宽度设置为较小
+                    col1, col2 = st.columns([1, 0.1])  # 将第二列宽度设置为较小
                     with col1:
                         st.markdown(message["content"])
                     with col2:
@@ -182,7 +182,7 @@ def display_chat_history():
                     with button_placeholder:
                         st.markdown(
                             f"""
-                            <div style="position: relative; right: 0px; top: -20px;">
+                            <div style="position: relative; right: 0px; top: 0px;">
                                 <button id="regenerate_{i}" style="font-size: 12px; padding: 5px 10px;">✨</button>
                                 <button id="extra_output_{i}" style="font-size: 12px; padding: 5px 10px;">➡️</button>
                             </div>
@@ -266,10 +266,8 @@ st.markdown("""
 .stEmpty {
   display: inline-block;
   position: relative;
-  top: -20px; /* 调整位置，使按钮在右上角 */
+  top: 0px; /* 调整位置，使按钮在右上角 */
   right: 10px;
 }
-</style>
-""", unsafe_allow_html=True)
 </style>
 """, unsafe_allow_html=True)
