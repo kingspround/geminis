@@ -156,13 +156,13 @@ def display_chat_history():
                     if len(results) > 1:
                         col1, col2 = st.columns([1, 1])
                         with col1:
-                            if st.button("⏪", key=f"prev_result_{i}"):
+                            if st.button(" ", key=f"prev_result_{i}"):
                                 current_result_index = (current_result_index - 1) % len(results)
                                 message["current_result_index"] = current_result_index
                                 st.session_state.messages[i] = message
                                 st.experimental_rerun()  # 刷新页面
                         with col2:
-                            if st.button("⏩", key=f"next_result_{i}"):
+                            if st.button(" ", key=f"next_result_{i}"):
                                 current_result_index = (current_result_index + 1) % len(results)
                                 message["current_result_index"] = current_result_index
                                 st.session_state.messages[i] = message
@@ -172,11 +172,19 @@ def display_chat_history():
                     
                     # 添加重新输出按钮和额外输出按钮
                     if message["role"] == "assistant":
-                        # 使用 st.empty() 创建空容器，并将其设置为按钮所在位置
-                        container = st.empty()
-                        col1, col2 = container.columns([1, 1])
+                        # 创建占位符
+                        button_placeholder = st.empty()
+
+                        # 使用 st.columns 分割
+                        col1, col2 = st.columns([1, 0.1])  # 将第二列宽度设置为较小
                         with col1:
-                            if st.button("✨", key=f"regenerate_{i}"):
+                            st.markdown(message["content"])
+                        with col2:
+                            button_placeholder.empty()  # 占位符清空
+
+                        # 在占位符中添加按钮
+                        with button_placeholder:
+                            if st.button(" ", key=f"regenerate_{i}"):
                                 # 重新输出
                                 st.session_state.messages[i] = {"role": "assistant", "content":  "正在重新输出..."}
                                 st.experimental_rerun()
@@ -184,8 +192,7 @@ def display_chat_history():
                                     response = getAnswer(message["content"], generate_token(), st.session_state.img)
                                     st.markdown(response)
                                 st.session_state.messages[i] = {"role": "assistant", "content": response}
-                        with col2:
-                            if st.button("➡️", key=f"extra_output_{i}"):
+                            if st.button(" ", key=f"extra_output_{i}"):
                                 # 额外输出
                                 with st.chat_message("assistant"):
                                     response = getAnswer(message["content"], generate_token(), st.session_state.img)
@@ -201,7 +208,7 @@ def handle_new_response(response, prompt, token):
     st.session_state.messages.append({"role": "assistant", "content": response})
 
     # 添加重新输出按钮
-    if st.button("✨", key=f"regenerate_{generate_token()}"):
+    if st.button(" ", key=f"regenerate_{len(st.session_state.messages)-1}"):
         # 重新输出
         st.session_state.messages[-1] = {"role": "assistant", "content":  "正在重新输出..."}
         st.experimental_rerun()
@@ -211,12 +218,12 @@ def handle_new_response(response, prompt, token):
         st.session_state.messages[-1] = {"role": "assistant", "content": response}
 
     # 添加额外输出按钮
-    if st.button("➡️", key=f"extra_output_{generate_token()}"):
+    if st.button(" ", key=f"extra_output_{len(st.session_state.messages)-1}"):
         # 额外输出
         with st.chat_message("assistant"):
-            response = getAnswer(prompt, token, st.session_state.img)
-            st.markdown(response)
-        st.session_state.messages.append({"role": "assistant", "content": response})
+            new_response = getAnswer(prompt, generate_token(), st.session_state.img)  # 生成新的 token
+            st.markdown(new_response)
+        st.session_state.messages.append({"role": "assistant", "content": new_response})
 
 display_chat_history()  # 显示聊天历史
 
@@ -230,3 +237,28 @@ if prompt := st.chat_input("Enter your message (including your token):"):
         full_response = ""
         for chunk in getAnswer(prompt, token, st.session_state.img):
             full_response += chunk
+            message_placeholder.markdown(full_response + "▌")
+        message_placeholder.markdown(full_response)
+    st.session_state.messages.append({"role": "assistant", "content": full_response})
+    save_history()  # 自动保存聊天记录
+
+    # 处理新回复
+    handle_new_response(full_response, prompt, token)
+
+# 添加自定义 CSS
+st.markdown("""
+<style>
+.stButton button {
+  font-size: 12px;
+  padding: 5px 10px;
+}
+
+.stEmpty {
+  display: inline-block;
+  position: relative;
+  float: right;
+  top: -30px; /* 调整位置，使按钮在右上角 */
+  right: 10px;
+}
+</style>
+""", unsafe_allow_html=True)
