@@ -153,19 +153,28 @@ for i, message in enumerate(st.session_state.messages):
             if "responses" in message:
                 current_index = message.get("current_index", 0)
                 if len(message["responses"]) > 1:
-                    st.button("⏪", on_click=lambda: setattr(message, "current_index", (current_index - 1) % len(message["responses"])))
-                    st.button("⏩", on_click=lambda: setattr(message, "current_index", (current_index + 1) % len(message["responses"])))
-                st.button("✨", on_click=lambda: regenerate_last_message(i))
-                st.button("➡️", on_click=lambda: add_new_response(i))
+                    st.markdown(f"  ⏪ ⏩ ✨ ➡️")
+                    st.session_state.messages[i]["content"] += f"  ⏪ ⏩ ✨ ➡️"
+                    st.button("⏪", key=f"prev_{i}", on_click=lambda i=i: setattr(st.session_state.messages[i], "current_index", (current_index - 1) % len(st.session_state.messages[i]["responses"])))
+                    st.button("⏩", key=f"next_{i}", on_click=lambda i=i: setattr(st.session_state.messages[i], "current_index", (current_index + 1) % len(st.session_state.messages[i]["responses"])))
+                    st.button("✨", key=f"regenerate_{i}", on_click=lambda i=i: regenerate_last_message(i))
+                    st.button("➡️", key=f"add_new_{i}", on_click=lambda i=i: add_new_response(i))
+                else:
+                    st.markdown(f"  ✨ ➡️")
+                    st.session_state.messages[i]["content"] += f"  ✨ ➡️"
+                    st.button("✨", key=f"regenerate_{i}", on_click=lambda i=i: regenerate_last_message(i))
+                    st.button("➡️", key=f"add_new_{i}", on_click=lambda i=i: add_new_response(i))
             else:
-                st.button("✨", on_click=lambda: regenerate_last_message(i))
-                st.button("➡️", on_click=lambda: add_new_response(i))
+                st.markdown(f"  ✨ ➡️")
+                st.session_state.messages[i]["content"] += f"  ✨ ➡️"
+                st.button("✨", key=f"regenerate_{i}", on_click=lambda i=i: regenerate_last_message(i))
+                st.button("➡️", key=f"add_new_{i}", on_click=lambda i=i: add_new_response(i))
 
 def regenerate_last_message(i):
     """重新生成最后一条聊天记录"""
     message = st.session_state.messages[i]
     if message["role"] == "assistant":
-        prompt = message["content"]
+        prompt = message["content"].split("  ✨ ➡️")[0]  # 获取消息内容
         token = generate_token()
         responses = getAnswer(prompt, token, st.session_state.img)
         message["responses"] = responses
@@ -177,7 +186,7 @@ def add_new_response(i):
     """额外输出一个新的结果"""
     message = st.session_state.messages[i]
     if message["role"] == "assistant":
-        prompt = message["content"]
+        prompt = message["content"].split("  ✨ ➡️")[0]  # 获取消息内容
         token = generate_token()
         new_response = getAnswer(prompt, token, st.session_state.img)
         if "responses" not in message:
@@ -193,6 +202,11 @@ def update_last_message_content(i):
         if "responses" in message:
             current_index = message.get("current_index", 0)
             st.session_state.messages[i]["content"] = message["responses"][current_index]
+            # 重新添加按钮
+            if len(message["responses"]) > 1:
+                st.session_state.messages[i]["content"] += f"  ⏪ ⏩ ✨ ➡️"
+            else:
+                st.session_state.messages[i]["content"] += f"  ✨ ➡️"
 
 if prompt := st.chat_input("Enter your message (including your token):"):
     token = generate_token()
