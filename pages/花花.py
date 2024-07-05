@@ -10,53 +10,121 @@ import streamlit as st
 import random
 import pickle
 
-# 加载 API 密钥
-load_dotenv()
-api_key = os.getenv("API_KEY")  # 将你的 API 密钥放在 .env 文件中，变量名为 API_KEY
+# Insert your API key here
+st.session_state.key = "AIzaSyDPFZ7gRba9mhKTqbXA_Y7fhAxS8IEu0bY"
 
-# 配置 Gemini 模型
+if "key" not in st.session_state:
+    st.session_state.key = NONE
+
+if not st.session_state.key:
+    st.info("Please add your key to continue.")
+    st.stop()
+
+genai.configure(api_key=st.session_state.key)
+
+# Set up the model
 generation_config = {
-    "temperature": 1,
-    "top_p": 0,
-    "top_k": 0,
-    "max_output_tokens": 10000,
+  "temperature": 1,
+  "top_p": 0,
+  "top_k": 0,
+  "max_output_tokens": 10000,
 }
-safety_settings = [
-    {
-        "category": "HARM_CATEGORY_HARASSMENT",
-        "threshold": "BLOCK_NONE",
-    },
-    {
-        "category": "HARM_CATEGORY_HATE_SPEECH",
-        "threshold": "BLOCK_NONE",
-    },
-    {
-        "category": "HARM_CATEGORY_SEXUALLY_EXPLICIT",
-        "threshold": "BLOCK_NONE",
-    },
-    {
-        "category": "HARM_CATEGORY_DANGEROUS_CONTENT",
-        "threshold": "BLOCK_NONE",
-    },
-]
-model = genai.GenerativeModel(
-    model_name="gemini-1.5-pro-latest",
-    generation_config=generation_config,
-    safety_settings=safety_settings,
-)
-model_v = genai.GenerativeModel(model_name="gemini-pro-vision", generation_config=generation_config)
 
-# 聊天记录
+safety_settings = [
+   {
+    "category": "HARM_CATEGORY_HARASSMENT",
+    "threshold": "BLOCK_NONE",
+   },
+   {
+    "category": "HARM_CATEGORY_HATE_SPEECH",
+    "threshold": "BLOCK_NONE",
+   },
+   {
+    "category": "HARM_CATEGORY_SEXUALLY_EXPLICIT",
+    "threshold": "BLOCK_NONE",
+   },
+   {
+    "category": "HARM_CATEGORY_DANGEROUS_CONTENT",
+    "threshold": "BLOCK_NONE",
+   },
+]
+
+model = genai.GenerativeModel(model_name="gemini-1.5-pro-latest",generation_config=generation_config,safety_settings=safety_settings)
+
+# Vision Model
+model_v = genai.GenerativeModel(model_name='gemini-pro-vision',generation_config=generation_config)
+
+# LLM
+def generate_token():
+    """生成一个 10 位到 20 位的随机 token"""
+    token_length = random.randint(10, 20)
+    characters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
+    token = ''.join(random.choice(characters) for i in range(token_length))
+    return token
+
+def getAnswer(prompt, token, image):
+    his_messages = []
+    his_messages.append(
+        {"role": "model", "parts": [{"text": f"你的随机token是：{token}"""}]}
+    )
+
+    for msg in st.session_state.messages[-20:]:
+        if msg["role"] == "user":
+            his_messages.append({"role": "user", "parts": [{"text": msg["content"]}]})
+        elif msg is not None and msg["content"] is not None:
+            his_messages.append({"role": "model", "parts": [{"text": msg["content"]}]})
+
+    if image is not None:
+        # 将图片转换为字节流
+        img_bytes = BytesIO()
+        image.save(img_bytes, format='JPEG')
+        img_bytes.seek(0)
+        
+        prompt_v = ""
+        for msg in st.session_state.messages[-20:]:
+            prompt_v += f'''{msg["role"]}:{msg["content"]}
+'''
+        response = model_v.generate_content([prompt_v, img_bytes], stream=True)  # 将图片字节流传递给模型
+    else:
+        response = model.generate_content(contents=his_messages, stream=True)
+
+    full_response = ""
+    for chunk in response:
+        full_response += chunk.text
+        yield chunk.text
+    return full_response  
+
+def save_history():
+    """将聊天记录保存到 logs 文件夹的 chat_log.pkl 文件"""
+    os.makedirs("logs", exist_ok=True)
+    # 获取当前文件名
+    current_filename = os.path.basename(__file__).split('.')[0]
+    # 保存聊天记录到 logs 文件夹
+    filename = os.path.join("logs", f"{current_filename}_chat_log.pkl")
+    with open(filename, "wb") as f:
+        pickle.dump(st.session_state.messages, f)
+
+def load_history():
+    """从 logs 文件夹加载聊天记录"""
+    files = [f for f in os.listdir("logs") if f.endswith(".pkl")]
+    if files:
+        selected_file = st.selectbox("选择要加载的记录文件", files)
+        filename = os.path.join("logs", selected_file)
+        with open(filename, "rb") as f:
+            st.session_state.messages = pickle.load(f)
+        st.success(f"聊天记录已加载")
+    else:
+        st.warning("logs 文件夹中没有记录文件")
+
+def clear_history():
+    """清除当前聊天记录"""
+    st.session_state.messages = []
+    st.success("聊天记录已清除")
+
 if "messages" not in st.session_state:
     st.session_state.messages = []
 if "img" not in st.session_state:
     st.session_state.img = None
-
-# 额外输出管理
-if "extra_outputs" not in st.session_state:
-    st.session_state.extra_outputs = []
-if "current_output_index" not in st.session_state:
-    st.session_state.current_output_index = 0
 
 # 侧边栏
 st.sidebar.title("控制面板")
@@ -76,110 +144,23 @@ if uploaded_file is not None:
     st.session_state.img = img  # 保存到 st.session_state.img
     st.sidebar.image(bytes_io, width=150)  # 在侧边栏显示图片
 
-# 聊天界面
-for i, message in enumerate(st.session_state.messages):
-    with st.chat_message(message["role"], key=f"{i}_{message['role']}_{message['content'][:10]}"):  # 添加更具唯一性的 key
-        if i == len(st.session_state.messages) - 1 and len(st.session_state.extra_outputs) > 1:
-            # 只有最后一条回复才显示多个结果切换按钮
-            st.markdown(st.session_state.extra_outputs[st.session_state.current_output_index])
-            if st.button(" ", key=f"prev_{i}"):
-                st.session_state.current_output_index = max(0, st.session_state.current_output_index - 1)
-            if st.button(" ", key=f"next_{i}"):
-                st.session_state.current_output_index = min(len(st.session_state.extra_outputs) - 1, st.session_state.current_output_index + 1)
-        else:
-            st.markdown(message["content"])
+for message in st.session_state.messages:
+    with st.chat_message(message["role"]):
+        st.markdown(message["content"])
 
 if prompt := st.chat_input("Enter your message (including your token):"):
+    token = generate_token()
+    st.session_state.messages.append({"role": "user", "content": f"{prompt}  (token: {token})"})
     with st.chat_message("user"):
-        st.markdown(f"{prompt}")
+        st.markdown(f"{prompt}  (token: {token})")
     with st.chat_message("assistant"):
         message_placeholder = st.empty()
         full_response = ""
-        st.session_state.extra_outputs = []
-        for chunk in getAnswer(prompt, st.session_state.img):
+        for chunk in getAnswer(prompt, token, st.session_state.img):
             full_response += chunk
             message_placeholder.markdown(full_response + "▌")
         message_placeholder.markdown(full_response)
-        st.session_state.messages.append({"role": "assistant", "content": full_response})
+    st.session_state.messages.append({"role": "assistant", "content": full_response})
 
-# 操作栏
-col1, col2 = st.columns(2)
-
-with col1:
-    # 重新输出按钮
-    if st.button("✨", key="regenerate"):  # 替换成你想要的图标
-        with st.chat_message("assistant"):
-            message_placeholder = st.empty()
-            full_response = ""
-            st.session_state.extra_outputs = []
-            for chunk in getAnswer(prompt, st.session_state.img):
-                full_response += chunk
-                message_placeholder.markdown(full_response + "▌")
-            message_placeholder.markdown(full_response)
-            st.session_state.messages.append({"role": "assistant", "content": full_response})
-
-with col2:
-    # 额外输出按钮
-    if st.button("➡️", key="extra_output"):  # 替换成你想要的图标
-        with st.chat_message("assistant"):
-            message_placeholder = st.empty()
-            full_response = ""
-            for chunk in getAnswer(prompt, st.session_state.img):
-                full_response += chunk
-                message_placeholder.markdown(full_response + "▌")
-            message_placeholder.markdown(full_response)
-            st.session_state.extra_outputs.append(full_response)
-
-# 自动保存聊天记录
-save_history()
-
-# 定义 getAnswer 函数
-def getAnswer(prompt, image):
-    his_messages = []
-    for msg in st.session_state.messages[-20:]:
-        if msg["role"] == "user":
-            his_messages.append({"role": "user", "parts": [{"text": msg["content"]}]})
-        elif msg is not None and msg["content"] is not None:
-            his_messages.append({"role": "model", "parts": [{"text": msg["content"]}]})
-
-    if image is not None:
-        # 将图片转换为字节流
-        img_bytes = BytesIO()
-        image.save(img_bytes, format='JPEG')
-        img_bytes.seek(0)
-
-        prompt_v = ""
-        for msg in st.session_state.messages[-20:]:
-            prompt_v += f'''{msg["role"]}:{msg["content"]}
-Use code with caution.
-'''
-        response = model_v.generate_content([prompt_v, img_bytes], stream=True)  # 将图片字节流传递给模型
-    else:
-        response = model.generate_content(contents=his_messages, stream=True)
-    full_response = ""
-    for chunk in response:
-        full_response += chunk.text
-        yield chunk.text
-    return full_response
-
-# 保存和加载聊天记录
-def save_history():
-    import os
-    import pickle
-    filename = os.path.splitext(os.path.basename(__file__))[0] + ".pkl"  # 获取当前文件名
-    with open(filename, "wb") as f:
-        pickle.dump(st.session_state.messages, f)
-
-def load_history():
-    files = [f for f in os.listdir(".") if f.endswith(".pkl")]
-    if files:
-        selected_file = st.selectbox("选择要加载的记录文件", files)
-        with open(selected_file, "rb") as f:
-            st.session_state.messages = pickle.load(f)
-        st.success(f"聊天记录已加载")
-    else:
-        st.warning("当前目录下没有记录文件")
-
-def clear_history():
-    st.session_state.messages = []
-    st.success("聊天记录已清除")
+    # 自动保存聊天记录
+    save_history()
