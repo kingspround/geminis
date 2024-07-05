@@ -181,6 +181,9 @@ def generate_new_response():
         
         # 现在，在更新 last_response 后，我们需要更新 page_index，以确保编辑功能可以定位到最新的 AI 回复
         st.session_state.page_index += 1
+        
+        #  保存聊天记录
+        save_history()
 
 # === 文件处理 ===
 # 获取文件名，并生成对应的文件名
