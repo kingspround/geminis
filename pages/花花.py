@@ -144,6 +144,8 @@ def reoutput_last_response():
                 full_response += chunk
                 message_placeholder.markdown(full_response + "▌")
             message_placeholder.markdown(full_response)
+        # 将最后一次回复添加到 messages 列表
+        st.session_state.messages.append({"role": "assistant", "content": full_response})
 
 def generate_new_response():
     """生成新的回复"""
@@ -162,6 +164,8 @@ def generate_new_response():
         # 更新 last_response 和 page_index
         st.session_state.last_response.append(full_response)
         st.session_state.page_index = len(st.session_state.last_response) - 1
+        # 将新回复添加到 messages 列表
+        st.session_state.messages.append({"role": "assistant", "content": full_response})
 
 if "messages" not in st.session_state:
     st.session_state.messages = []
