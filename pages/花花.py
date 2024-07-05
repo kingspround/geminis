@@ -169,7 +169,7 @@ def display_chat_history():
                 st.markdown(message["content"])
 
 # 新的按钮栏
-col1, col2, col3 = st.columns([2, 1, 1])
+col1, col2, col3 = st.columns([3, 1, 1]) # 修正宽度设置
 
 with col1:
     # 聊天区域
