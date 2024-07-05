@@ -207,15 +207,26 @@ def handle_new_response(response, prompt, token):
         st.markdown(response)
     st.session_state.messages.append({"role": "assistant", "content": response})
 
+    # 获取最后一条回复的索引
+    i = len(st.session_state.messages) - 1
+
     # 添加重新输出按钮
-    if st.button(" ", key=f"regenerate_{len(st.session_state.messages)-1}"):
+    if st.button("✨", key=f"regenerate_{i}"):  # 使用循环变量 i 生成唯一的 key
         # 重新输出
-        st.session_state.messages[-1] = {"role": "assistant", "content":  "正在重新输出..."}
+        st.session_state.messages[i] = {"role": "assistant", "content":  "正在重新输出..."}
         st.experimental_rerun()
         with st.chat_message("assistant"):
             response = getAnswer(prompt, token, st.session_state.img)
             st.markdown(response)
-        st.session_state.messages[-1] = {"role": "assistant", "content": response}
+        st.session_state.messages[i] = {"role": "assistant", "content": response}
+
+    # 添加额外输出按钮
+    if st.button("➡️", key=f"extra_output_{i}"):  # 使用循环变量 i 生成唯一的 key
+        # 额外输出
+        with st.chat_message("assistant"):
+            new_response = getAnswer(prompt, generate_token(), st.session_state.img)  # 生成新的 token
+            st.markdown(new_response)
+        st.session_state.messages.append({"role": "assistant", "content": new_response})
 
     # 添加额外输出按钮
     if st.button(" ", key=f"extra_output_{len(st.session_state.messages)-1}"):
