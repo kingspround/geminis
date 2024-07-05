@@ -125,6 +125,10 @@ if "messages" not in st.session_state:
     st.session_state.messages = []
 if "img" not in st.session_state:
     st.session_state.img = None
+if "last_response" not in st.session_state:
+    st.session_state.last_response = []
+if "page_index" not in st.session_state:
+    st.session_state.page_index = 0
 
 # 侧边栏
 st.sidebar.title("控制面板")
@@ -144,6 +148,15 @@ if uploaded_file is not None:
     st.session_state.img = img  # 保存到 st.session_state.img
     st.sidebar.image(bytes_io, width=150)  # 在侧边栏显示图片
 
+# AI 最后一条回复管理按钮
+st.sidebar.button(" ", on_click=lambda: st.session_state.last_response.append(st.session_state.messages[-1]["content"]), help="重新输出这条回复")
+st.sidebar.button(" ", on_click=lambda: st.session_state.page_index += 1, help="翻页并输出新结果")
+
+# 侧边栏按钮切换结果
+if len(st.session_state.last_response) > 1:
+    st.sidebar.button(" ", on_click=lambda: st.session_state.page_index = max(0, st.session_state.page_index - 1), help="上一页")
+    st.sidebar.button(" ", on_click=lambda: st.session_state.page_index = min(len(st.session_state.last_response) - 1, st.session_state.page_index + 1), help="下一页")
+
 for message in st.session_state.messages:
     with st.chat_message(message["role"]):
         st.markdown(message["content"])
@@ -161,6 +174,12 @@ if prompt := st.chat_input("Enter your message (including your token):"):
             message_placeholder.markdown(full_response + "▌")
         message_placeholder.markdown(full_response)
     st.session_state.messages.append({"role": "assistant", "content": full_response})
+    st.session_state.last_response.append(full_response)  # 将最新回复添加到 last_response 列表
 
     # 自动保存聊天记录
     save_history()
+
+# 显示当前页面的 AI 回复
+if st.session_state.page_index >= 0 and st.session_state.page_index < len(st.session_state.last_response):
+    with st.chat_message("assistant"):
+        st.markdown(st.session_state.last_response[st.session_state.page_index])
