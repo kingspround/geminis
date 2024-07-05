@@ -121,6 +121,10 @@ def clear_history():
     st.session_state.messages = []
     st.success("聊天记录已清除")
 
+def increase_page_index():
+    """增加页面索引"""
+    st.session_state.page_index += 1
+
 if "messages" not in st.session_state:
     st.session_state.messages = []
 if "img" not in st.session_state:
@@ -150,7 +154,7 @@ if uploaded_file is not None:
 
 # AI 最后一条回复管理按钮
 st.sidebar.button(" ", on_click=lambda: st.session_state.last_response.append(st.session_state.messages[-1]["content"]), help="重新输出这条回复")
-st.sidebar.button(" ", on_click=lambda: st.session_state.page_index += 1, help="翻页并输出新结果")
+st.sidebar.button(" ", on_click=increase_page_index, help="翻页并输出新结果")
 
 # 侧边栏按钮切换结果
 if len(st.session_state.last_response) > 1:
