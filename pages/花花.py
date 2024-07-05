@@ -256,8 +256,7 @@ st.markdown("""
 .stEmpty {
   display: inline-block;
   position: relative;
-  float: right;
-  top: -30px; /* 调整位置，使按钮在右上角 */
+  top: -20px; /* 调整位置，使按钮在右上角 */
   right: 10px;
 }
 </style>
