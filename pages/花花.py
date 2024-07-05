@@ -152,23 +152,25 @@ if uploaded_file is not None:
 # 创建一个占位符用于添加按钮
 button_placeholder = st.empty()
 
+# 显示聊天记录
 for i, message in enumerate(st.session_state.messages):
     with st.chat_message(message["role"]):
         st.markdown(message["content"])
 
-        # 在循环中添加按钮
-        if i == len(st.session_state.messages) - 1 and message["role"] == "assistant":
-            if "responses" in message:
-                current_index = message.get("current_index", 0)
-                if len(message["responses"]) > 1:
-                    button_placeholder.markdown(f"  ⏪ ⏩ ✨ ➡️")
-                    button_placeholder.button("⏪", key=f"prev_{i}", on_click=lambda i=i: setattr(st.session_state.messages[i], "current_index", (current_index - 1) % len(st.session_state.messages[i]["responses"])))
-                    button_placeholder.button("⏩", key=f"next_{i}", on_click=lambda i=i: setattr(st.session_state.messages[i], "current_index", (current_index + 1) % len(st.session_state.messages[i]["responses"])))
-                button_placeholder.button("✨", key=f"regenerate_{i}", on_click=lambda i=i: regenerate_last_message(i))
-                button_placeholder.button("➡️", key=f"add_new_{i}", on_click=lambda i=i: add_new_response(i))
-            else:
-                button_placeholder.button("✨", key=f"regenerate_{i}", on_click=lambda i=i: regenerate_last_message(i))
-                button_placeholder.button("➡️", key=f"add_new_{i}", on_click=lambda i=i: add_new_response(i))
+# 添加按钮
+if len(st.session_state.messages) > 0 and st.session_state.messages[-1]["role"] == "assistant":
+    if "responses" in st.session_state.messages[-1]:
+        current_index = st.session_state.messages[-1].get("current_index", 0)
+        if len(st.session_state.messages[-1]["responses"]) > 1:
+            button_placeholder.markdown(f"  ⏪ ⏩ ✨ ➡️")
+            button_placeholder.button("⏪", key=f"prev_{len(st.session_state.messages) - 1}", on_click=lambda: setattr(st.session_state.messages[-1], "current_index", (current_index - 1) % len(st.session_state.messages[-1]["responses"])))
+            button_placeholder.button("⏩", key=f"next_{len(st.session_state.messages) - 1}", on_click=lambda: setattr(st.session_state.messages[-1], "current_index", (current_index + 1) % len(st.session_state.messages[-1]["responses"])))
+        button_placeholder.button("✨", key=f"regenerate_{len(st.session_state.messages) - 1}", on_click=lambda: regenerate_last_message(len(st.session_state.messages) - 1))
+        button_placeholder.button("➡️", key=f"add_new_{len(st.session_state.messages) - 1}", on_click=lambda: add_new_response(len(st.session_state.messages) - 1))
+    else:
+        button_placeholder.button("✨", key=f"regenerate_{len(st.session_state.messages) - 1}", on_click=lambda: regenerate_last_message(len(st.session_state.messages) - 1))
+        button_placeholder.button("➡️", key=f"add_new_{len(st.session_state.messages) - 1}", on_click=lambda: add_new_response(len(st.session_state.messages) - 1))
+
 
 def regenerate_last_message(i):
     """重新生成最后一条聊天记录"""
@@ -211,10 +213,11 @@ def update_last_message_content(i):
             button_placeholder.empty()
             if len(message["responses"]) > 1:
                 button_placeholder.markdown(f"  ⏪ ⏩ ✨ ➡️")
-                button_placeholder.button("⏪", key=f"prev_{i}", on_click=lambda i=i: setattr(st.session_state.messages[i], "current_index", (current_index - 1) % len(st.session_state.messages[i]["responses"])))
-                button_placeholder.button("⏩", key=f"next_{i}", on_click=lambda i=i: setattr(st.session_state.messages[i], "current_index", (current_index + 1) % len(st.session_state.messages[i]["responses"])))
-            button_placeholder.button("✨", key=f"regenerate_{i}", on_click=lambda i=i: regenerate_last_message(i))
-            button_placeholder.button("➡️", key=f"add_new_{i}", on_click=lambda i=i: add_new_response(i))
+                button_placeholder.button("⏪", key=f"prev_{i}", on_click=lambda: setattr(st.session_state.messages[i], "current_index", (current_index - 1) % len(st.session_state.messages[i]["responses"])))
+                button_placeholder.button("⏩", key=f"next_{i}", on_click=lambda: setattr(st.session_state.messages[i], "current_index", (current_index + 1) % len(st.session_state.messages[i]["responses"])))
+            button_placeholder.button("✨", key=f"regenerate_{i}", on_click=lambda: regenerate_last_message(i))
+            button_placeholder.button("➡️", key=f"add_new_{i}", on_click=lambda: add_new_response(i))
+
 
 if prompt := st.chat_input("Enter your message (including your token):"):
     token = generate_token()
@@ -233,5 +236,4 @@ if prompt := st.chat_input("Enter your message (including your token):"):
         message_placeholder.markdown(full_response)
         
     # 自动保存聊天记录
-    save_history()
     save_history()
