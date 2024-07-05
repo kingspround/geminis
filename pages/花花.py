@@ -12,7 +12,7 @@ import pickle
 
 # 加载 API 密钥
 load_dotenv()
-api_key = os.getenv("AIzaSyDPFZ7gRba9mhKTqbXA_Y7fhAxS8IEu0bY")  # 将你的 API 密钥放在 .env 文件中，变量名为 API_KEY
+api_key = os.getenv("API_KEY")  # 将你的 API 密钥放在 .env 文件中，变量名为 API_KEY
 
 # 配置 Gemini 模型
 generation_config = {
@@ -102,9 +102,12 @@ if prompt := st.chat_input("Enter your message (including your token):"):
         message_placeholder.markdown(full_response)
         st.session_state.messages.append({"role": "assistant", "content": full_response})
 
-    # 额外输出管理
+# 操作栏
+col1, col2 = st.columns(2)
+
+with col1:
+    # 重新输出按钮
     if st.button("✨", key="regenerate"):  # 替换成你想要的图标
-        # 重新输出
         with st.chat_message("assistant"):
             message_placeholder = st.empty()
             full_response = ""
@@ -114,8 +117,10 @@ if prompt := st.chat_input("Enter your message (including your token):"):
                 message_placeholder.markdown(full_response + "▌")
             message_placeholder.markdown(full_response)
             st.session_state.messages.append({"role": "assistant", "content": full_response})
+
+with col2:
+    # 额外输出按钮
     if st.button("➡️", key="extra_output"):  # 替换成你想要的图标
-        # 额外输出
         with st.chat_message("assistant"):
             message_placeholder = st.empty()
             full_response = ""
@@ -125,8 +130,8 @@ if prompt := st.chat_input("Enter your message (including your token):"):
             message_placeholder.markdown(full_response)
             st.session_state.extra_outputs.append(full_response)
 
-    # 自动保存聊天记录
-    save_history()
+# 自动保存聊天记录
+save_history()
 
 # 定义 getAnswer 函数
 def getAnswer(prompt, image):
