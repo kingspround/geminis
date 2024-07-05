@@ -124,23 +124,27 @@ def clear_history():
 
 def increase_page_index():
     """增加页面索引"""
-    st.session_state.page_index += 1
+    st.session_state.page_index = (st.session_state.page_index + 1) % len(st.session_state.last_response)
 
 def decrease_page_index():
     """减少页面索引"""
-    st.session_state.page_index = max(0, st.session_state.page_index - 1)
+    st.session_state.page_index = (st.session_state.page_index - 1) % len(st.session_state.last_response)
 
 def next_page_index():
     """跳转到下一页"""
-    st.session_state.page_index = min(len(st.session_state.last_response) - 1, st.session_state.page_index + 1)
+    st.session_state.page_index = (st.session_state.page_index + 1) % len(st.session_state.last_response)
 
 def reoutput_last_response():
     """重新输出最后一条回复"""
     if st.session_state.last_response:
         token = generate_token()
-        full_response = ''.join(getAnswer(st.session_state.messages[-1]["content"], token, st.session_state.img))
         with st.chat_message("assistant"):
-            st.markdown(full_response)
+            message_placeholder = st.empty()
+            full_response = ""
+            for chunk in getAnswer(st.session_state.messages[-1]["content"], token, st.session_state.img):
+                full_response += chunk
+                message_placeholder.markdown(full_response + "▌")
+            message_placeholder.markdown(full_response)
         st.session_state.last_response[-1] = full_response
 
 def generate_new_response():
@@ -150,13 +154,16 @@ def generate_new_response():
         last_user_prompt = st.session_state.messages[-1]["content"]
         # 生成新回复
         token = generate_token()
-        full_response = ''.join(getAnswer(last_user_prompt, token, st.session_state.img))
+        with st.chat_message("assistant"):
+            message_placeholder = st.empty()
+            full_response = ""
+            for chunk in getAnswer(last_user_prompt, token, st.session_state.img):
+                full_response += chunk
+                message_placeholder.markdown(full_response + "▌")
+            message_placeholder.markdown(full_response)
         # 更新 last_response 和 page_index
         st.session_state.last_response.append(full_response)
         st.session_state.page_index = len(st.session_state.last_response) - 1
-        # 显示新回复
-        with st.chat_message("assistant"):
-            st.markdown(full_response)
 
 if "messages" not in st.session_state:
     st.session_state.messages = []
@@ -204,7 +211,8 @@ if len(st.session_state.last_response) > 1:
 if st.session_state.page_index >= 0 and st.session_state.page_index < len(st.session_state.last_response):
     with st.chat_message("assistant"):
         st.markdown(st.session_state.last_response[st.session_state.page_index])
-        st.markdown(f"第 {st.session_state.page_index + 1} 页")  # 添加页码
+        if len(st.session_state.last_response) > 1:
+            st.markdown(f"第 {st.session_state.page_index + 1} 页")  # 添加页码
 
 for message in st.session_state.messages:
     with st.chat_message(message["role"]):
@@ -229,7 +237,8 @@ if prompt := st.chat_input("Enter your message (including your token):"):
     if st.session_state.page_index >= 0 and st.session_state.page_index < len(st.session_state.last_response):
         with st.chat_message("assistant"):
             st.markdown(st.session_state.last_response[st.session_state.page_index])
-            st.markdown(f"第 {st.session_state.page_index + 1} 页")  # 添加页码
+            if len(st.session_state.last_response) > 1:
+                st.markdown(f"第 {st.session_state.page_index + 1} 页")  # 添加页码
     
     # 自动保存聊天记录
     save_history()
