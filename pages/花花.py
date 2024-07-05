@@ -164,29 +164,24 @@ Use code with caution.
 
 # 保存和加载聊天记录
 def save_history():
-    os.makedirs("logs", exist_ok=True)
-    filename = f"logs/{generate_token()}.pkl"  # 使用随机 token 生成文件名
+    import os
+    import pickle
+    filename = os.path.splitext(os.path.basename(__file__))[0] + ".pkl"  # 获取当前文件名
     with open(filename, "wb") as f:
         pickle.dump(st.session_state.messages, f)
 
 def load_history():
-    files = [f for f in os.listdir("logs") if f.endswith(".pkl")]
+    files = [f for f in os.listdir(".") if f.endswith(".pkl")]
     if files:
         selected_file = st.selectbox("选择要加载的记录文件", files)
-        filename = os.path.join("logs", selected_file)
-        with open(filename, "rb") as f:
+        with open(selected_file, "rb") as f:
             st.session_state.messages = pickle.load(f)
         st.success(f"聊天记录已加载")
     else:
-        st.warning("logs 文件夹中没有记录文件")
+        st.warning("当前目录下没有记录文件")
 
 def clear_history():
     st.session_state.messages = []
     st.success("聊天记录已清除")
 
-def generate_token():
-    """生成一个 10 位到 20 位的随机 token"""
-    token_length = random.randint(10, 20)
-    characters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
-    token = ''.join(random.choice(characters) for i in range(token_length))
-    return token
+# 移除 generate_token 函数，因为它不再需要
