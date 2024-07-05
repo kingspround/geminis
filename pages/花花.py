@@ -137,15 +137,13 @@ def next_page_index():
 def reoutput_last_response():
     """重新输出最后一条回复"""
     if st.session_state.last_response:
-        token = generate_token()
         with st.chat_message("assistant"):
             message_placeholder = st.empty()
             full_response = ""
-            for chunk in getAnswer(st.session_state.messages[-1]["content"], token, st.session_state.img):
+            for chunk in st.session_state.last_response[-1]:
                 full_response += chunk
                 message_placeholder.markdown(full_response + "▌")
             message_placeholder.markdown(full_response)
-        st.session_state.last_response[-1] = full_response
 
 def generate_new_response():
     """生成新的回复"""
@@ -232,13 +230,6 @@ if prompt := st.chat_input("Enter your message (including your token):"):
         message_placeholder.markdown(full_response)
     # 现在将最新回复添加到 last_response 列表，而不是添加到 messages 列表中
     st.session_state.last_response.append(full_response) 
-
-    # 显示当前页面的 AI 回复
-    if st.session_state.page_index >= 0 and st.session_state.page_index < len(st.session_state.last_response):
-        with st.chat_message("assistant"):
-            st.markdown(st.session_state.last_response[st.session_state.page_index])
-            if len(st.session_state.last_response) > 1:
-                st.markdown(f"第 {st.session_state.page_index + 1} 页")  # 添加页码
     
     # 自动保存聊天记录
     save_history()
