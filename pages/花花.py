@@ -239,7 +239,8 @@ for i, message in enumerate(st.session_state.messages):
             st.write(message["content"], key=f"message_{i}")
 
     # ===  在循环内部添加按钮和编辑逻辑 ===
-    if i == len(st.session_state.messages) - 1:  # 仅在最后一条消息旁边添加按钮
+    # 使用 st.session_state.page_index 来判断是否为当前页面
+    if i == st.session_state.page_index:  
         with col2:
             #  编辑按钮
             if st.button("✏️", key=f"edit_button_{i}"):
