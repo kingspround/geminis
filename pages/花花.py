@@ -149,23 +149,26 @@ if uploaded_file is not None:
     st.session_state.img = img  # 保存到 st.session_state.img
     st.sidebar.image(bytes_io, width=150)  # 在侧边栏显示图片
 
+# 创建一个占位符用于添加按钮
+button_placeholder = st.empty()
+
 for i, message in enumerate(st.session_state.messages):
     with st.chat_message(message["role"]):
         st.markdown(message["content"])
 
-        # 为最后一条聊天记录添加按钮
+        # 在循环中添加按钮
         if i == len(st.session_state.messages) - 1 and message["role"] == "assistant":
             if "responses" in message:
                 current_index = message.get("current_index", 0)
                 if len(message["responses"]) > 1:
-                    st.markdown(f"  ✨ ➡️ ⏪ ⏩")
-                    st.button("⏪", key=f"prev_{i}", on_click=lambda i=i: setattr(st.session_state.messages[i], "current_index", (current_index - 1) % len(st.session_state.messages[i]["responses"])))
-                    st.button("⏩", key=f"next_{i}", on_click=lambda i=i: setattr(st.session_state.messages[i], "current_index", (current_index + 1) % len(st.session_state.messages[i]["responses"])))
-                st.button("✨", key=f"regenerate_{i}", on_click=lambda i=i: regenerate_last_message(i))
-                st.button("➡️", key=f"add_new_{i}", on_click=lambda i=i: add_new_response(i))
+                    button_placeholder.markdown(f"  ⏪ ⏩ ✨ ➡️")
+                    button_placeholder.button("⏪", key=f"prev_{i}", on_click=lambda i=i: setattr(st.session_state.messages[i], "current_index", (current_index - 1) % len(st.session_state.messages[i]["responses"])))
+                    button_placeholder.button("⏩", key=f"next_{i}", on_click=lambda i=i: setattr(st.session_state.messages[i], "current_index", (current_index + 1) % len(st.session_state.messages[i]["responses"])))
+                button_placeholder.button("✨", key=f"regenerate_{i}", on_click=lambda i=i: regenerate_last_message(i))
+                button_placeholder.button("➡️", key=f"add_new_{i}", on_click=lambda i=i: add_new_response(i))
             else:
-                st.button("✨", key=f"regenerate_{i}", on_click=lambda i=i: regenerate_last_message(i))
-                st.button("➡️", key=f"add_new_{i}", on_click=lambda i=i: add_new_response(i))
+                button_placeholder.button("✨", key=f"regenerate_{i}", on_click=lambda i=i: regenerate_last_message(i))
+                button_placeholder.button("➡️", key=f"add_new_{i}", on_click=lambda i=i: add_new_response(i))
 
 def regenerate_last_message(i):
     """重新生成最后一条聊天记录"""
@@ -204,6 +207,14 @@ def update_last_message_content(i):
                 st.session_state.messages[i]["content"] += f"  ⏪ ⏩ ✨ ➡️"
             else:
                 st.session_state.messages[i]["content"] += f"  ✨ ➡️"
+            # 使用 empty 重新渲染按钮
+            button_placeholder.empty()
+            if len(message["responses"]) > 1:
+                button_placeholder.markdown(f"  ⏪ ⏩ ✨ ➡️")
+                button_placeholder.button("⏪", key=f"prev_{i}", on_click=lambda i=i: setattr(st.session_state.messages[i], "current_index", (current_index - 1) % len(st.session_state.messages[i]["responses"])))
+                button_placeholder.button("⏩", key=f"next_{i}", on_click=lambda i=i: setattr(st.session_state.messages[i], "current_index", (current_index + 1) % len(st.session_state.messages[i]["responses"])))
+            button_placeholder.button("✨", key=f"regenerate_{i}", on_click=lambda i=i: regenerate_last_message(i))
+            button_placeholder.button("➡️", key=f"add_new_{i}", on_click=lambda i=i: add_new_response(i))
 
 if prompt := st.chat_input("Enter your message (including your token):"):
     token = generate_token()
@@ -222,4 +233,5 @@ if prompt := st.chat_input("Enter your message (including your token):"):
         message_placeholder.markdown(full_response)
         
     # 自动保存聊天记录
+    save_history()
     save_history()
