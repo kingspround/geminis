@@ -172,7 +172,7 @@ def display_chat_history():
                     button_placeholder = st.empty()
 
                     # 使用 st.columns 分割
-                    col1, col2 = st.columns([1, 0.1])  # 将第二列宽度设置为较小
+                    col1, col2, col3 = st.columns([1, 0.1, 1])  # 将第二列宽度设置为较小
                     with col1:
                         st.markdown(message["content"])
                     with col2:
@@ -269,5 +269,7 @@ st.markdown("""
   top: -20px; /* 调整位置，使按钮在右上角 */
   right: 10px;
 }
+</style>
+""", unsafe_allow_html=True)
 </style>
 """, unsafe_allow_html=True)
