@@ -201,9 +201,9 @@ if uploaded_file is not None:
 # 显示当前页面的 AI 回复和按钮
 if st.session_state.page_index >= 0 and st.session_state.page_index < len(st.session_state.last_response):
     with st.chat_message("assistant"):
-        st.markdown(st.session_state.last_response[st.session_state.page_index])
-        
-        # 在这里添加控制按钮
+        st.markdown(st.session_state.last_response[st.session_state.page_index]) 
+
+        # ！！！控制按钮的正确位置！！！
         if len(st.session_state.last_response) > 1:
             col1, col2 = st.columns(2)
             with col1:
@@ -216,6 +216,7 @@ if st.session_state.page_index >= 0 and st.session_state.page_index < len(st.ses
                 st.button("⏪", on_click=decrease_page_index, help="上一页")
             with col4:
                 st.button("⏩", on_click=next_page_index, help="下一页")
+
 
 # 显示页码
 if len(st.session_state.last_response) > 1:
