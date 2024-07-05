@@ -113,6 +113,10 @@ if "messages" not in st.session_state:
         st.session_state.messages = []  # 清空 messages
         # 可以考虑在这里添加代码，提示用户重新创建文件或重新加载数据
 
+# 初始化 st.session_state.editing_index
+if "editing_index" not in st.session_state:
+    st.session_state.editing_index = None
+
 # 显示历史记录（只执行一次）
 for i, message in enumerate(st.session_state.messages):
     col1, col2 = st.columns([9, 1])  # 调整列宽，为按钮预留更多空间
@@ -131,7 +135,21 @@ for i, message in enumerate(st.session_state.messages):
             #  💬 按钮和 🔄 按钮
             col3, col4 = st.columns(2)
             with col3:
+                #  💬 按钮内嵌翻页功能
                 st.button("💬", key=f"generate_{i}", on_click=generate_new_response)
+                
+                #  "⏪" 和 "⏩" 按钮只在最后一条消息拥有两个回答时显示
+                if len(st.session_state.last_response) > 1:
+                    col5, col6 = st.columns(2)
+                    with col5:
+                        st.button("⏪", key=f"decrease_{i}", on_click=decrease_page_index,
+                                   disabled=st.session_state.page_index == 0)
+                    with col6:
+                        st.button("⏩", key=f"next_{i}", on_click=next_page_index,
+                                   disabled=st.session_state.page_index == len(st.session_state.last_response) - 1)
+                        
+                    #  显示页码，只在最后一条消息拥有两个回答时显示
+                    st.write(f"第 {st.session_state.page_index + 1} 页 / 共 {len(st.session_state.last_response)} 页")
             with col4:
                 st.button("🔄", key=f"reoutput_{i}", on_click=reoutput_last_response)
 
