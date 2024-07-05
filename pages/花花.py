@@ -6,7 +6,6 @@ from PIL import Image
 import numpy as np
 from io import BytesIO
 from io import StringIO
-import streamlit as st
 import random
 import pickle
 
@@ -49,6 +48,7 @@ model = genai.GenerativeModel(
     generation_config=generation_config,
     safety_settings=safety_settings,
 )
+
 # Vision Model
 model_v = genai.GenerativeModel(model_name='gemini-pro-vision',generation_config=generation_config)
 
@@ -91,13 +91,13 @@ Use code with caution.
         yield chunk.text
     return full_response
 
-# Use code with caution.
 def save_history():
     """将聊天记录保存到 logs 文件夹的 .pkl 文件"""
     os.makedirs("logs", exist_ok=True)
     filename = f"logs/{generate_token()}.pkl" # 使用随机 token 生成文件名
     with open(filename, "wb") as f:
         pickle.dump(st.session_state.messages, f)
+
 def load_history():
     """从 logs 文件夹加载聊天记录"""
     files = [f for f in os.listdir("logs") if f.endswith(".pkl")]
@@ -109,6 +109,7 @@ def load_history():
         st.success(f"聊天记录已加载")
     else:
         st.warning("logs 文件夹中没有记录文件")
+
 def clear_history():
     """清除当前聊天记录"""
     st.session_state.messages = []
@@ -164,58 +165,16 @@ def display_chat_history():
                                 st.experimental_rerun()  # 刷新页面
                 else:
                     st.markdown(message["content"])
-                    
-                    # 添加重新输出按钮和额外输出按钮
-                    if message["role"] == "assistant":
-                        col1, col2 = st.columns([1, 1])
-                        with col1:
-                            if st.button(" ", key=f"regenerate_{i}"):
-                                # 重新输出
-                                st.session_state.messages[i] = {"role": "assistant", "content":  "正在重新输出..."}
-                                st.experimental_rerun()
-                                with st.chat_message("assistant"):
-                                    response = getAnswer(message["content"], generate_token(), st.session_state.img)
-                                    st.markdown(response)
-                                st.session_state.messages[i] = {"role": "assistant", "content": response}
-                        with col2:
-                            if st.button(" ", key=f"extra_output_{i}"):
-                                # 额外输出
-                                with st.chat_message("assistant"):
-                                    response = getAnswer(message["content"], generate_token(), st.session_state.img)
-                                    st.markdown(response)
-                                st.session_state.messages.append({"role": "assistant", "content": response})
             else:
                 st.markdown(message["content"])
 
-# Use code with caution.
-def handle_new_response(response, prompt, token):
-    """处理新回复，并添加重新输出和额外输出按钮"""
-    with st.chat_message("assistant"):
-        st.markdown(response)
-    st.session_state.messages.append({"role": "assistant", "content": response})
-    # 添加重新输出按钮
-    if st.button(" ", key=f"regenerate_{len(st.session_state.messages)-1}"):
-        # 重新输出
-        st.session_state.messages[-1] = {"role": "assistant", "content":  "正在重新输出..."}
-        st.experimental_rerun()
-        with st.chat_message("assistant"):
-            response = getAnswer(prompt, token, st.session_state.img)
-            st.markdown(response)
-        st.session_state.messages[-1] = {"role": "assistant", "content": response}
-
-    # 添加额外输出按钮
-    if st.button(" ", key=f"extra_output_{len(st.session_state.messages)-1}"):
-        # 额外输出
-        with st.chat_message("assistant"):
-            response = getAnswer(prompt, token, st.session_state.img)
-            st.markdown(response)
-        st.session_state.messages.append({"role": "assistant", "content": response})
-
-# 新建一个中间列
-col1, col2, col3 = st.columns([1, 0.2, 1])
+# 新的按钮栏
+col1, col2, col3 = st.columns([2, 1, 1])
 
 with col1:
-    display_chat_history() # 显示聊天历史
+    # 聊天区域
+    display_chat_history() 
+
     if prompt := st.chat_input("Enter your message (including your token):"):
         token = generate_token()
         st.session_state.messages.append({"role": "user", "content": f"{prompt} (token: {token})"})
@@ -234,25 +193,33 @@ with col1:
         handle_new_response(full_response, prompt, token)
 
 with col2:
-    st.empty() # 空白区域
+    # 重新输出按钮
+    if st.button(" ", key="regenerate"):
+        # 获取最后一条回复
+        last_message = st.session_state.messages[-1]
+        if last_message["role"] == "assistant":
+            # 重新输出
+            st.session_state.messages[-1] = {"role": "assistant", "content":  "正在重新输出..."}
+            st.experimental_rerun()
+            with st.chat_message("assistant"):
+                response = getAnswer(last_message["content"], generate_token(), st.session_state.img)
+                st.markdown(response)
+            st.session_state.messages[-1] = {"role": "assistant", "content": response}
 
 with col3:
-    # 添加重新输出按钮和额外输出按钮
-    if len(st.session_state.messages) > 0 and st.session_state.messages[-1]["role"] == "assistant":
-        col1, col2 = st.columns([1, 1])
-        with col1:
-            if st.button(" ", key=f"regenerate_{len(st.session_state.messages)-1}"):
-                # 重新输出
-                st.session_state.messages[-1] = {"role": "assistant", "content":  "正在重新输出..."}
-                st.experimental_rerun()
-                with st.chat_message("assistant"):
-                    response = getAnswer(st.session_state.messages[-1]["content"], generate_token(), st.session_state.img)
-                    st.markdown(response)
-                st.session_state.messages[-1] = {"role": "assistant", "content": response}
-        with col2:
-            if st.button(" ", key=f"extra_output_{len(st.session_state.messages)-1}"):
-                # 额外输出
-                with st.chat_message("assistant"):
-                    response = getAnswer(st.session_state.messages[-1]["content"], generate_token(), st.session_state.img)
-                    st.markdown(response)
-                st.session_state.messages.append({"role": "assistant", "content": response})
+    # 额外输出按钮
+    if st.button(" ", key="extra_output"):
+        # 获取最后一条回复
+        last_message = st.session_state.messages[-1]
+        if last_message["role"] == "assistant":
+            # 额外输出
+            with st.chat_message("assistant"):
+                response = getAnswer(last_message["content"], generate_token(), st.session_state.img)
+                st.markdown(response)
+            st.session_state.messages.append({"role": "assistant", "content": response})
+
+def handle_new_response(response, prompt, token):
+    """处理新回复，并添加重新输出和额外输出按钮"""
+    with st.chat_message("assistant"):
+        st.markdown(response)
+    st.session_state.messages.append({"role": "assistant", "content": response})
