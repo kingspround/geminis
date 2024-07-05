@@ -112,14 +112,6 @@ def load_history():
         st.warning("logs 文件夹中没有记录文件")
 
 
-def clear_history():
-    """清除当前聊天记录"""
-    st.session_state.messages = []
-    st.session_state.last_response = []  # 清除 last_response 列表
-    st.session_state.page_index = 0  # 重置页面索引
-    st.success("聊天记录已清除")
-
-
 
 
 
