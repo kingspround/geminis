@@ -176,36 +176,32 @@ for i, message in enumerate(st.session_state.messages):
                 st.session_state.editing_index = None
                 # 刷新页面，重新加载聊天记录
                 st.experimental_rerun()
-# 显示当前页面的 AI 回复
-if st.session_state.page_index >= 0 and st.session_state.page_index < len(st.session_state.last_response):
-    with st.chat_message("assistant"):
-        st.markdown(st.session_state.last_response[st.session_state.page_index])
 
-
-def generate_new_response():
-    """生成新的回复并显示"""
-    if st.session_state.messages:
-        # 获取最后一个用户的提示和token
-        last_user_prompt = st.session_state.messages[-1]["content"]
-        last_user_token = st.session_state.messages[-1]["token"]
-        # 生成新回复
-        with st.chat_message("assistant"):
-            message_placeholder = st.empty()
-            full_response = ""
-            for chunk in getAnswer(last_user_prompt, last_user_token, st.session_state.img):
-                full_response += chunk
-                message_placeholder.markdown(full_response + "▌")
-            message_placeholder.markdown(full_response)
-        # 更新 last_response 和 page_index
-        st.session_state.last_response.append(full_response)
-        st.session_state.page_index = len(st.session_state.last_response) - 1
-        
-        # 现在，在更新 last_response 后，我们需要更新 page_index，以确保编辑功能可以定位到最新的 AI 回复
-        st.session_state.page_index += 1
-        
-        #  保存聊天记录
-        with open(log_file, "wb") as f:  # 使用 "wb" 模式写入
-            pickle.dump(st.session_state.messages, f)
+    # 定义 generate_new_response 函数
+    def generate_new_response():
+        """生成新的回复并显示"""
+        if st.session_state.messages:
+            # 获取最后一个用户的提示和token
+            last_user_prompt = st.session_state.messages[-1]["content"]
+            last_user_token = st.session_state.messages[-1]["token"]
+            # 生成新回复
+            with st.chat_message("assistant"):
+                message_placeholder = st.empty()
+                full_response = ""
+                for chunk in getAnswer(last_user_prompt, last_user_token, st.session_state.img):
+                    full_response += chunk
+                    message_placeholder.markdown(full_response + "▌")
+                message_placeholder.markdown(full_response)
+            # 更新 last_response 和 page_index
+            st.session_state.last_response.append(full_response)
+            st.session_state.page_index = len(st.session_state.last_response) - 1
+            
+            # 现在，在更新 last_response 后，我们需要更新 page_index，以确保编辑功能可以定位到最新的 AI 回复
+            st.session_state.page_index += 1
+            
+            #  保存聊天记录
+            with open(log_file, "wb") as f:  # 使用 "wb" 模式写入
+                pickle.dump(st.session_state.messages, f)
 
 def decrease_page_index(min_index):
     """减少页面索引"""
