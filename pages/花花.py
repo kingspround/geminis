@@ -51,6 +51,9 @@ safety_settings = [
 
 model = genai.GenerativeModel(model_name="gemini-1.5-pro-latest",generation_config=generation_config,safety_settings=safety_settings)
 
+# Vision Model
+model_v = genai.GenerativeModel(model_name='gemini-pro-vision',generation_config=generation_config)
+
 # LLM
 def generate_token():
     """生成一个 10 位到 20 位的随机 token"""
@@ -125,16 +128,20 @@ def getAnswer(prompt, token):
         elif msg is not None and msg["content"] is not None:
             his_messages.append({"role": "model", "parts": [{"text": msg["content"]}]})
 
-    try:
+    if image is not None:
+        prompt_v = ""
+        for msg in st.session_state.messages[-20:]:
+            prompt_v += f'''{msg["role"]}:{msg["content"]}
+'''
+        response = model_v.generate_content([prompt_v, image], stream=True)
+    else:
         response = model.generate_content(contents=his_messages, stream=True)
-        full_response = ""
-        for chunk in response:
-            full_response += chunk.text
-            yield chunk.text
-        return full_response  # 返回完整的回复
-    except Exception as e:
-        st.error(f"An error occurred: {e}")
-        return ""  # 在发生错误时返回空字符串
+
+    full_response = ""
+    for chunk in response:
+        full_response += chunk.text
+        yield chunk.text
+    return full_response  
 
 def save_history():
     """将聊天记录保存到 logs 文件夹的 .pkl 文件"""
@@ -163,12 +170,23 @@ def clear_history():
 
 if "messages" not in st.session_state:
     st.session_state.messages = []
+if "img" not in st.session_state:
+    st.session_state.img = None
 
 # 侧边栏
 st.sidebar.title("控制面板")
 st.sidebar.button("读取历史记录", on_click=load_history)
 st.sidebar.button("清除历史记录", on_click=clear_history)
 st.sidebar.button("重置上一个输出", on_click=lambda: st.session_state.messages.pop(-1))
+
+# 图片上传
+uploaded_file = st.sidebar.file_uploader("上传图片", type=['png', 'jpg', 'jpeg', 'gif'])
+if uploaded_file is not None:
+    # To read file as bytes:
+    bytes_data = uploaded_file.getvalue()
+    bytes_io = BytesIO(bytes_data)
+    st.session_state.img = Image.open(bytes_io)
+    st.sidebar.image(bytes_io, width=150)  # 在侧边栏显示图片
 
 for message in st.session_state.messages:
     with st.chat_message(message["role"]):
@@ -182,7 +200,7 @@ if prompt := st.chat_input("Enter your message (including your token):"):
     with st.chat_message("assistant"):
         message_placeholder = st.empty()
         full_response = ""
-        for chunk in getAnswer(prompt, token):
+        for chunk in getAnswer(prompt, token, st.session_state.img):
             full_response += chunk
             message_placeholder.markdown(full_response + "▌")
         message_placeholder.markdown(full_response)
