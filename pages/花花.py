@@ -78,7 +78,7 @@ if uploaded_file is not None:
 
 # 聊天界面
 for i, message in enumerate(st.session_state.messages):
-    with st.chat_message(message["role"]):
+    with st.chat_message(message["role"], key=f"{i}_{message['role']}"):  # 添加 key 属性
         if i == len(st.session_state.messages) - 1 and len(st.session_state.extra_outputs) > 1:
             # 只有最后一条回复才显示多个结果切换按钮
             st.markdown(st.session_state.extra_outputs[st.session_state.current_output_index])
@@ -183,5 +183,3 @@ def load_history():
 def clear_history():
     st.session_state.messages = []
     st.success("聊天记录已清除")
-
-# 移除 generate_token 函数，因为它不再需要
