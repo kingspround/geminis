@@ -178,6 +178,9 @@ def generate_new_response():
         # 更新 last_response 和 page_index
         st.session_state.last_response.append(full_response)
         st.session_state.page_index = len(st.session_state.last_response) - 1
+        
+        # 现在，在更新 last_response 后，我们需要更新 page_index，以确保编辑功能可以定位到最新的 AI 回复
+        st.session_state.page_index += 1
 
 # === 文件处理 ===
 # 获取文件名，并生成对应的文件名
