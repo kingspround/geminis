@@ -139,7 +139,15 @@ def reoutput_last_response():
     """重新输出最后一条回复"""
     if st.session_state.last_response:
         st.session_state.page_index = len(st.session_state.last_response) - 1
-        display_last_response()
+        with st.chat_message("assistant"):
+            message_placeholder = st.empty()
+            full_response = ""
+            for chunk in getAnswer(st.session_state.messages[-1]["content"], st.session_state.messages[-1]["token"],
+                                   st.session_state.img):
+                full_response += chunk
+                message_placeholder.markdown(full_response + "▌")
+            message_placeholder.markdown(full_response)
+
 
 def generate_new_response():
     """生成新的回复并显示"""
@@ -158,34 +166,6 @@ def generate_new_response():
         # 更新 last_response 和 page_index
         st.session_state.last_response.append(full_response)
         st.session_state.page_index = len(st.session_state.last_response) - 1
-        # 在新回复生成后立即显示按钮
-        display_buttons()
-        
-def display_last_response():
-    """显示最后一条回复以及按钮"""
-    if st.session_state.page_index >= 0 and st.session_state.page_index < len(st.session_state.last_response):
-        with st.chat_message("assistant"):
-            st.markdown(st.session_state.last_response[st.session_state.page_index])
-            # 将按钮移至此处
-            display_buttons()
-    # 显示页码
-    if len(st.session_state.last_response) > 1:
-        st.write(f"第 {st.session_state.page_index + 1} 页 / 共 {len(st.session_state.last_response)} 页")
-
-
-def display_buttons():
-    """显示所有控制按钮"""
-    col1, col2 = st.columns(2)
-    with col1:
-        st.button("✨", on_click=reoutput_last_response, help="重新输出这条回复")
-    with col2:
-        st.button("➡️", on_click=generate_new_response, help="翻页并输出新结果")
-    if len(st.session_state.last_response) > 1:
-        col3, col4 = st.columns(2)
-        with col3:
-            st.button("⏪", on_click=decrease_page_index, help="上一页")
-        with col4:
-            st.button("⏩", on_click=next_page_index, help="下一页")
 
 
 if "messages" not in st.session_state:
@@ -214,15 +194,35 @@ if uploaded_file is not None:
     st.session_state.img = img  # 保存到 st.session_state.img
     st.sidebar.image(bytes_io, width=150)  # 在侧边栏显示图片
 
-# 显示历史消息
+
+# 显示当前页面的 AI 回复和按钮
+if st.session_state.page_index >= 0 and st.session_state.page_index < len(st.session_state.last_response):
+    with st.chat_message("assistant"):
+        st.markdown(st.session_state.last_response[st.session_state.page_index])
+
+    # 在回复下方显示按钮
+    if len(st.session_state.last_response) > 1:
+        col1, col2 = st.columns(2)
+        with col1:
+            st.button("✨", on_click=reoutput_last_response, help="重新输出这条回复")
+        with col2:
+            st.button("➡️", on_click=generate_new_response, help="翻页并输出新结果")
+    if len(st.session_state.last_response) > 1:
+        col3, col4 = st.columns(2)
+        with col3:
+            st.button("⏪", on_click=decrease_page_index, help="上一页")
+        with col4:
+            st.button("⏩", on_click=next_page_index, help="下一页")
+# 显示页码
+if len(st.session_state.last_response) > 1:
+    st.write(f"第 {st.session_state.page_index + 1} 页 / 共 {len(st.session_state.last_response)} 页")
+
 for message in st.session_state.messages:
     with st.chat_message(message["role"]):
         st.markdown(message["content"])
-
-# 用户输入
 if prompt := st.chat_input("Enter your message:"):
     token = generate_token()
-    st.session_state.messages.append({"role": "user", "content": prompt, "token": token})
+    st.session_state.messages.append({"role": "user", "content": prompt, "token":token})
     with st.chat_message("user"):
         st.markdown(prompt)
     with st.chat_message("assistant"):
@@ -236,8 +236,5 @@ if prompt := st.chat_input("Enter your message:"):
     # 更新 last_response 和 page_index
     st.session_state.last_response.append(full_response)
     st.session_state.page_index = len(st.session_state.last_response) - 1
-    # 在新回复生成后立即显示按钮
-    display_buttons()
-
 # 自动保存聊天记录
 save_history()
