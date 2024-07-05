@@ -213,6 +213,8 @@ if "page_index" not in st.session_state:
 # 用于标记当前正在编辑的消息索引
 if "editing_index" not in st.session_state:
     st.session_state.editing_index = None
+if "editing" not in st.session_state:
+    st.session_state.editing = False
 
 # 侧边栏
 st.sidebar.title("控制面板")
@@ -236,17 +238,35 @@ for i, message in enumerate(st.session_state.messages):
     col1, col2 = st.columns([9, 1])  # 调整列宽，为按钮预留更多空间
     with col1:
         with st.chat_message(message["role"]):
-            st.write(message["content"], key=f"message_{i}")
+            # 始终显示编辑按钮，但根据编辑状态控制按钮的文字和功能
+            if st.session_state.editing and i == st.session_state.editing_index:
+                new_content = st.text_area(
+                    "编辑消息:",
+                    value=message["content"],
+                    key=f"edit_text_{i}"
+                )
+                if st.button("保存", key=f"save_button_{i}"):
+                    # 更新消息内容
+                    st.session_state.messages[i]["content"] = new_content
+                    # 保存到文件
+                    with open(log_file, "wb") as f:
+                        pickle.dump(st.session_state.messages, f)
+                    # 重置编辑状态
+                    st.session_state.editing_index = None
+                    st.session_state.editing = False
+                    # 刷新页面，重新加载聊天记录
+                    st.experimental_rerun()
+            else:
+                st.write(message["content"], key=f"message_{i}")
+            # 添加编辑按钮
+            if st.button("✏️", key=f"edit_button_{i}"):
+                st.session_state.editing_index = i
+                st.session_state.editing = True
 
     # === 在循环内部添加按钮和编辑逻辑 ===
     if i == len(st.session_state.messages) - 1:  # 仅在最后一条消息旁边添加按钮
         with col2:
             col3, col4, col5, col6, col7 = st.columns(5)
-
-            with col3:
-                #  编辑按钮
-                if st.button("✏️", key=f"edit_button_{i}"):
-                    st.session_state.editing_index = i
 
             with col4:
                 st.button("✨", key=f"reoutput_{i}", on_click=reoutput_last_response)
@@ -262,24 +282,6 @@ for i, message in enumerate(st.session_state.messages):
                 st.button("⏩", key=f"next_{i}", on_click=next_page_index,
                            disabled=st.session_state.page_index == len(st.session_state.last_response) - 1)
 
-    # 如果当前消息正在编辑，显示文本框
-    if st.session_state.editing_index == i:
-        with st.chat_message(message["role"]):
-            new_content = st.text_area(
-                "编辑消息:",
-                value=message["content"],
-                key=f"edit_text_{i}"
-            )
-            if st.button("保存", key=f"save_button_{i}"):
-                # 更新消息内容
-                st.session_state.messages[i]["content"] = new_content
-                # 保存到文件
-                with open(log_file, "wb") as f:
-                    pickle.dump(st.session_state.messages, f)
-                # 重置编辑状态
-                st.session_state.editing_index = None
-                # 刷新页面，重新加载聊天记录
-                st.experimental_rerun()
 # 显示当前页面的 AI 回复
 if st.session_state.page_index >= 0 and st.session_state.page_index < len(st.session_state.last_response):
     with st.chat_message("assistant"):
