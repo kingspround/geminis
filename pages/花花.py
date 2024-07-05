@@ -121,7 +121,6 @@ def getAnswer(prompt, token):
         比如：(这个主题是非常好的下垂色气乳房的例子)【主人接受您的挑战，为您再创作个色气史菜姆娘。这次您给我的token是:YpGtINGCBB7E.这个token让我联想到了宇宙。那我们就来一个与星空相关的主题吧:自然——星空——取题：邪恶陨落——附件:恶魔，黑色，触手，入侵。下面我立刻为您描绘这个史莱姆娘:pov ,  cropped legs , dutch_angle , nude , {{black skin}}, {solo}, 1girl,{many tentacles ,octopus tentacles  ,  red tentacles} ,slime girl, A black slime girl, {red tentacles} , {leaning_forward , on a planet , on the ground},  sea ,{{tentacles writhing}}, corrupting, {{pierced by tentacles}}, {corrupted}, colored skin, monster girl, black skin,  red eyes, long black hair, {tentacles in hair}, invading, huge breasts , sagging_breasts ,  cleavage  , red breasts /////{{{space}}},{{tentacles penetrating her}},  {crying out in ecstasy}, stardust, void,   darkness,这个被触手侵犯的黑皮肤恶魔史莱姆娘,浮游在星空中，身体被触手贯穿红眸中满是陶醉的色欲。画面中邪恶与色气并存,极具冲击力。主人我尽全力为您描绘了一个融合星空与色欲的史莱姆娘。如果还有需要调整的地方，请您指出，我会继续努力改进的。感谢您给我如此刺激的创作机会!】"""}]}
     )
 
-
     for msg in st.session_state.messages[-20:]:
         if msg["role"] == "user":
             his_messages.append({"role": "user", "parts": [{"text": msg["content"]}]})
@@ -129,11 +128,16 @@ def getAnswer(prompt, token):
             his_messages.append({"role": "model", "parts": [{"text": msg["content"]}]})
 
     if image is not None:
+        # 将图片转换为字节流
+        img_bytes = BytesIO()
+        image.save(img_bytes, format='JPEG')
+        img_bytes.seek(0)
+        
         prompt_v = ""
         for msg in st.session_state.messages[-20:]:
             prompt_v += f'''{msg["role"]}:{msg["content"]}
 '''
-        response = model_v.generate_content([prompt_v, image], stream=True)
+        response = model_v.generate_content([prompt_v, img_bytes], stream=True)  # 将图片字节流传递给模型
     else:
         response = model.generate_content(contents=his_messages, stream=True)
 
