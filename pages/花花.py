@@ -92,6 +92,10 @@ def getAnswer(prompt, token, image):
 # 初始化聊天记录列表
 if "messages" not in st.session_state:
     st.session_state.messages = []
+if "img" not in st.session_state:
+    st.session_state.img = None  # 初始化 img 属性为 None
+if "last_response" not in st.session_state:
+    st.session_state.last_response = [""]  # 初始化时添加默认值
 
 # 显示聊天记录
 for message in st.session_state.messages:
