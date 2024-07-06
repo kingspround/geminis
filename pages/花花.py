@@ -134,25 +134,25 @@ for i, message in enumerate(st.session_state.messages):
     if i == len(st.session_state.messages) - 1:
         with col2:
             #  编辑按钮
-            if st.button(" ", key=f"edit_button_{i}"):
+            if st.button("✏️", key=f"edit_button_{i}"):
                 st.session_state.editing_index = i
                 
-            # 按钮和 按钮
+            #✨按钮和➡️按钮
             col3, col4 = st.columns(2)
             with col3:
                 # 按钮内嵌翻页功能
-                st.button(" ", key=f"generate_{i}", on_click=generate_new_response)
+                st.button("✨", key=f"generate_{i}", on_click=generate_new_response)
             with col4:
-                st.button(" ", key=f"reoutput_{i}", on_click=reoutput_last_response)
+                st.button("➡️", key=f"reoutput_{i}", on_click=reoutput_last_response)
 
-            #  " " 和 " " 按钮只在最后一条消息拥有两个回答时显示
+            #  "⏩" 和 "⏪" 按钮只在最后一条消息拥有两个回答时显示
             if len(st.session_state.last_response) > 1:
                 col5, col6 = st.columns(2)
                 with col5:
-                    st.button(" ", key=f"decrease_{i}", on_click=lambda: decrease_page_index(0),
+                    st.button("⏩", key=f"decrease_{i}", on_click=lambda: decrease_page_index(0),
                                disabled=st.session_state.page_index == 0)
                 with col6:
-                    st.button(" ", key=f"next_{i}", on_click=lambda: next_page_index(len(st.session_state.last_response) - 1),
+                    st.button("⏪", key=f"next_{i}", on_click=lambda: next_page_index(len(st.session_state.last_response) - 1),
                                disabled=st.session_state.page_index == len(st.session_state.last_response) - 1)
                         
                 #  显示页码，只在最后一条消息拥有两个回答时显示
@@ -281,9 +281,6 @@ def load_history(log_file):
             for message in messages:
                 with st.chat_message(message["role"]):
                     st.markdown(message["content"])
-
-            # 重新运行应用程序，确保聊天记录加载后不会丢失
-            st.experimental_rerun()  
 
     except FileNotFoundError:
         st.warning(f"{filename} 不存在。")
