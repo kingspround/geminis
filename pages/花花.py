@@ -62,7 +62,6 @@ def generate_token():
 
 def getAnswer(prompt, token, image=None):
     his_messages = []
-    his_messages.append({"role": "model", "parts": [{"text": """你是一个色气AI"""}]})
     # 只保留用户输入的最后一条消息
     for msg in st.session_state.messages[-1:]:
         if msg["role"] == "user":
@@ -120,7 +119,9 @@ if prompt := st.chat_input("Enter your message:"):
                 message_placeholder.markdown(full_response + "▌")
             # 使用正则表达式过滤 "Use code with caution."
             full_response = re.sub(r"Use code with caution\.", "", full_response)
-            message_placeholder.markdown(full_response)
+            # 只输出内容，不输出 "assistant:"
+            if st.session_state.messages[-1]["role"] == "assistant":  # 检查上一个角色是否为 "assistant"
+                message_placeholder.markdown(full_response)
             st.session_state.messages.append({"role": "assistant", "content": full_response})
         else:
             for chunk in getAnswer(prompt, token):
