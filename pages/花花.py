@@ -137,22 +137,22 @@ for i, message in enumerate(st.session_state.messages):
             if st.button("✏️", key=f"edit_button_{i}"):
                 st.session_state.editing_index = i
                 
-            # 按钮和 按钮
+            #  💬 按钮和 🔄 按钮
             col3, col4 = st.columns(2)
             with col3:
-                # 按钮内嵌翻页功能
-                st.button("✨", key=f"generate_{i}", on_click=generate_new_response)
+                #  💬 按钮内嵌翻页功能
+                st.button("💬", key=f"generate_{i}", on_click=generate_new_response)
             with col4:
-                st.button("➡️", key=f"reoutput_{i}", on_click=reoutput_last_response)
+                st.button("🔄", key=f"reoutput_{i}", on_click=reoutput_last_response)
 
-            #  " " 和 " " 按钮只在最后一条消息拥有两个回答时显示
+            #  "⏪" 和 "⏩" 按钮只在最后一条消息拥有两个回答时显示
             if len(st.session_state.last_response) > 1:
                 col5, col6 = st.columns(2)
                 with col5:
-                    st.button("⏩", key=f"decrease_{i}", on_click=lambda: decrease_page_index(0),
+                    st.button("⏪", key=f"decrease_{i}", on_click=lambda: decrease_page_index(0),
                                disabled=st.session_state.page_index == 0)
                 with col6:
-                    st.button("⏪", key=f"next_{i}", on_click=lambda: next_page_index(len(st.session_state.last_response) - 1),
+                    st.button("⏩", key=f"next_{i}", on_click=lambda: next_page_index(len(st.session_state.last_response) - 1),
                                disabled=st.session_state.page_index == len(st.session_state.last_response) - 1)
                         
                 #  显示页码，只在最后一条消息拥有两个回答时显示
@@ -176,32 +176,36 @@ for i, message in enumerate(st.session_state.messages):
                 st.session_state.editing_index = None
                 # 刷新页面，重新加载聊天记录
                 st.experimental_rerun()
+# 显示当前页面的 AI 回复
+if st.session_state.page_index >= 0 and st.session_state.page_index < len(st.session_state.last_response):
+    with st.chat_message("assistant"):
+        st.markdown(st.session_state.last_response[st.session_state.page_index])
 
-    # 定义 generate_new_response 函数
-    def generate_new_response():
-        """生成新的回复并显示"""
-        if st.session_state.messages:
-            # 获取最后一个用户的提示和token
-            last_user_prompt = st.session_state.messages[-1]["content"]
-            last_user_token = st.session_state.messages[-1]["token"]
-            # 生成新回复
-            with st.chat_message("assistant"):
-                message_placeholder = st.empty()
-                full_response = ""
-                for chunk in getAnswer(last_user_prompt, last_user_token, st.session_state.img):
-                    full_response += chunk
-                    message_placeholder.markdown(full_response + "▌")
-                message_placeholder.markdown(full_response)
-            # 更新 last_response 和 page_index
-            st.session_state.last_response.append(full_response)
-            st.session_state.page_index = len(st.session_state.last_response) - 1
-            
-            # 现在，在更新 last_response 后，我们需要更新 page_index，以确保编辑功能可以定位到最新的 AI 回复
-            st.session_state.page_index += 1
-            
-            #  保存聊天记录
-            with open(log_file, "wb") as f:  # 使用 "wb" 模式写入
-                pickle.dump(st.session_state.messages, f)
+
+def generate_new_response():
+    """生成新的回复并显示"""
+    if st.session_state.messages:
+        # 获取最后一个用户的提示和token
+        last_user_prompt = st.session_state.messages[-1]["content"]
+        last_user_token = st.session_state.messages[-1]["token"]
+        # 生成新回复
+        with st.chat_message("assistant"):
+            message_placeholder = st.empty()
+            full_response = ""
+            for chunk in getAnswer(last_user_prompt, last_user_token, st.session_state.img):
+                full_response += chunk
+                message_placeholder.markdown(full_response + "▌")
+            message_placeholder.markdown(full_response)
+        # 更新 last_response 和 page_index
+        st.session_state.last_response.append(full_response)
+        st.session_state.page_index = len(st.session_state.last_response) - 1
+        
+        # 现在，在更新 last_response 后，我们需要更新 page_index，以确保编辑功能可以定位到最新的 AI 回复
+        st.session_state.page_index += 1
+        
+        #  保存聊天记录
+        with open(log_file, "wb") as f:  # 使用 "wb" 模式写入
+            pickle.dump(st.session_state.messages, f)
 
 def decrease_page_index(min_index):
     """减少页面索引"""
@@ -218,16 +222,6 @@ def next_page_index(max_index):
     if st.session_state.page_index >= 0 and st.session_state.page_index < len(st.session_state.last_response):
         with st.chat_message("assistant"):
             st.markdown(st.session_state.last_response[st.session_state.page_index])
-
-def reoutput_last_response():
-    """重新输出上一个 AI 的回答"""
-    if st.session_state.last_response and len(st.session_state.last_response) > 1:
-        # 如果存在上一个 AI 的回答，且超过一个回答
-        st.session_state.page_index = (st.session_state.page_index + 1) % len(st.session_state.last_response)
-        # 更新页面索引，循环显示 AI 的回答
-        with st.chat_message("assistant"):
-            st.markdown(st.session_state.last_response[st.session_state.page_index])
-            # 重新显示当前页面的 AI 回复
 
 # 使用 st.sidebar 放置按钮
 st.sidebar.title("操作")
@@ -292,6 +286,9 @@ def load_history(log_file):
                 with st.chat_message(message["role"]):
                     st.markdown(message["content"])
 
+            # 重新运行应用程序，确保聊天记录加载后不会丢失
+            st.experimental_rerun()  
+
     except FileNotFoundError:
         st.warning(f"{filename} 不存在。")
     except EOFError:  # 处理 EOFError
@@ -304,47 +301,3 @@ def clear_history(log_file):
         st.success(f"成功清除 {filename} 的历史记录！")
     except FileNotFoundError:
         st.warning(f"{filename} 不存在。")
-
-# 在 Streamlit 界面中添加输入框
-user_input = st.text_input("输入你的消息:", key="user_input")
-
-# 添加发送消息按钮
-if st.button("发送", on_click=send_message):
-    if user_input:
-        # 获取用户输入的消息
-        message = user_input
-        # 将用户消息添加到聊天记录中
-        st.session_state.messages.append({"role": "user", "content": message})
-        # 显示用户消息
-        with st.chat_message("user"):
-            st.markdown(message)
-        # 清空输入框
-        st.session_state.user_input = ""
-
-def send_message():
-    """发送用户消息并显示 AI 的回复"""
-    # 获取用户输入的消息
-    message = st.session_state.user_input
-    # 生成随机 token
-    token = generate_token()
-    # 将用户消息和 token 添加到聊天记录
-    st.session_state.messages.append({"role": "user", "content": message, "token": token})
-    # 显示用户消息
-    with st.chat_message("user"):
-        st.markdown(message)
-    # 清空输入框
-    st.session_state.user_input = ""
-    # 生成 AI 回复
-    with st.chat_message("assistant"):
-        message_placeholder = st.empty()
-        full_response = ""
-        for chunk in getAnswer(message, token, st.session_state.img):
-            full_response += chunk
-            message_placeholder.markdown(full_response + "▌")
-        message_placeholder.markdown(full_response)
-    # 更新 last_response 和 page_index
-    st.session_state.last_response.append(full_response)
-    st.session_state.page_index = len(st.session_state.last_response) - 1
-    # 保存聊天记录
-    with open(log_file, "wb") as f:
-        pickle.dump(st.session_state.messages, f)
