@@ -113,10 +113,6 @@ if "messages" not in st.session_state:
 if "last_response" not in st.session_state:
     st.session_state.last_response = []
 
-# 初始化 token 开关
-if "use_token" not in st.session_state:
-    st.session_state.use_token = True
-
 # 显示聊天记录
 for message in st.session_state.messages:
     with st.chat_message(message["role"]):
@@ -124,13 +120,17 @@ for message in st.session_state.messages:
 
 # 用户输入并处理
 if prompt := st.chat_input("Enter your message:"):
-    if st.session_state.use_token:
+    if "random_token" in st.session_state and st.session_state.random_token:
         token = generate_token()
+        st.session_state.messages.append({"role": "user", "content": f"{prompt} (token: {token})"})
+        with st.chat_message("user"):
+            st.markdown(f"{prompt} (token: {token})")
     else:
         token = ""
-    st.session_state.messages.append({"role": "user", "content": f"{prompt} (token: {token})"})
-    with st.chat_message("user"):
-        st.markdown(f"{prompt} (token: {token})")
+        st.session_state.messages.append({"role": "user", "content": f"{prompt}"})
+        with st.chat_message("user"):
+            st.markdown(f"{prompt}")
+
     with st.chat_message("assistant"):
         message_placeholder = st.empty()
         full_response = ""
@@ -201,5 +201,9 @@ if st.sidebar.button("清除历史记录"):
 if len(st.session_state.messages) > 0:
     st.sidebar.button("重置上一个输出", on_click=lambda: st.session_state.messages.pop(-1))
 
-# 随机token开关
-st.sidebar.checkbox("随机token", key="use_token", value=True)
+# --- 随机 token 开关 ---
+st.session_state.random_token = True  # 默认开启
+st.sidebar.checkbox("随机 Token", value=st.session_state.random_token,
+                   key="random_token", on_change=lambda: st.session_state.random_token)
+if not st.session_state.random_token:
+    st.sidebar.empty()
