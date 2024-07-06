@@ -48,6 +48,7 @@ model = genai.GenerativeModel(
     generation_config=generation_config,
     safety_settings=safety_settings,
 )
+model_v = genai.GenerativeModel(model_name='gemini-pro-vision', generation_config=generation_config)  # 添加 gemini-pro-vision 模型
 
 # LLM
 def generate_token():
@@ -68,13 +69,12 @@ def getAnswer(prompt, token, image=None):
 
     if image is not None:
         # 使用 gemini-pro-vision 模型处理图片
-        model_v = genai.GenerativeModel(model_name='gemini-pro-vision', generation_config=generation_config)
         prompt_v = ""
         for msg in st.session_state.messages[-20:]:
             prompt_v += f'''{msg["role"]}:{msg["content"]}
             Use code with caution.
             '''
-        response = model_v.generate_content([prompt_v, image], stream=True)
+        response = model_v.generate_content([prompt_v, image], stream=True)  # 使用 model_v 生成内容
     else:
         response = model.generate_content(contents=his_messages, stream=True)
 
@@ -139,7 +139,7 @@ uploaded_file = st.sidebar.file_uploader("上传图片", type=['png', 'jpg', 'jp
 if uploaded_file is not None:
     bytes_data = uploaded_file.getvalue()
     bytes_io = BytesIO(bytes_data)
-    st.session_state.img = Image.open(bytes_io)
+    st.session_state.img = Image.open(bytes_io)  # 存储图片到 st.session_state.img
     st.sidebar.image(bytes_io, width=150)
 
 # 读取历史记录
