@@ -130,18 +130,23 @@ def getAnswer(prompt, token, image=None):
             Use code with caution.
             '''
         response = model_v.generate_content([prompt_v, image], stream=True)  # 使用 model_v 生成内容
+        # 修正：将 response 转换为字符串列表
+        response = [chunk.text for chunk in response if hasattr(chunk, 'text')]
+        full_response = "".join(response)  # 将字符串列表拼接成一个字符串
+
     else:
         response = model.generate_content(contents=his_messages, stream=True)
 
     full_response = ""
     for chunk in response:
-        if hasattr(chunk, 'text'):  # 检查 chunk 是否包含 text 属性
-            full_response += chunk.text
+        # 修正：首先判断 chunk 是否是字符串类型
+        if isinstance(chunk, str):
+            full_response += chunk
             message_placeholder.markdown(full_response + "▌")  # 使用 st.markdown 更新聊天记录
-        yield chunk.text
+        yield chunk
 
-    st.experimental.rerun() # 重新渲染页面
-    
+    st.experimental.rerun()  # 重新渲染页面
+
     # 更新最后一条回复
     if "last_response" in st.session_state and st.session_state.last_response:  # 判断列表是否为空
         st.session_state.last_response[-1] = full_response
