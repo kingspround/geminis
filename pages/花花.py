@@ -159,27 +159,49 @@ for message in st.session_state.messages:
 
 # 用户输入并处理
 if prompt := st.chat_input("Enter your message:"):
-    token = generate_token()
-    st.session_state.messages.append({"role": "user", "content": f"{prompt} (token: {token})"})
-    with st.chat_message("user"):
-        st.markdown(f"{prompt} (token: {token})")
-    with st.chat_message("assistant"):
-        message_placeholder = st.empty()
-        full_response = ""
-        # 在获取回复时传入token
-        # 只有在 st.session_state.img 不为空时才传入图片
-        if "img" in st.session_state:
-            for chunk in getAnswer(prompt, token, st.session_state.img):
-                full_response += chunk
-                message_placeholder.markdown(full_response + "▌")
-            message_placeholder.markdown(full_response)
-            st.session_state.messages.append({"role": "assistant", "content": full_response})
-        else:
-            for chunk in getAnswer(prompt, token):
-                full_response += chunk
-                message_placeholder.markdown(full_response + "▌")
-            message_placeholder.markdown(full_response)
-            st.session_state.messages.append({"role": "assistant", "content": full_response})
+    if st.session_state.generate_token:
+        token = generate_token()
+        st.session_state.messages.append({"role": "user", "content": f"{prompt} (token: {token})"})
+        with st.chat_message("user"):
+            st.markdown(f"{prompt} (token: {token})")
+        with st.chat_message("assistant"):
+            message_placeholder = st.empty()
+            full_response = ""
+            # 在获取回复时传入token
+            # 只有在 st.session_state.img 不为空时才传入图片
+            if "img" in st.session_state:
+                for chunk in getAnswer(prompt, token, st.session_state.img):
+                    full_response += chunk
+                    message_placeholder.markdown(full_response + "▌")
+                message_placeholder.markdown(full_response)
+                st.session_state.messages.append({"role": "assistant", "content": full_response})
+            else:
+                for chunk in getAnswer(prompt, token):
+                    full_response += chunk
+                    message_placeholder.markdown(full_response + "▌")
+                message_placeholder.markdown(full_response)
+                st.session_state.messages.append({"role": "assistant", "content": full_response})
+    else:
+        # 如果没有生成 token，则直接发送提示
+        st.session_state.messages.append({"role": "user", "content": f"{prompt}"})
+        with st.chat_message("user"):
+            st.markdown(f"{prompt}")
+        with st.chat_message("assistant"):
+            message_placeholder = st.empty()
+            full_response = ""
+            if "img" in st.session_state:
+                for chunk in getAnswer(prompt, image=st.session_state.img):
+                    full_response += chunk
+                    message_placeholder.markdown(full_response + "▌")
+                message_placeholder.markdown(full_response)
+                st.session_state.messages.append({"role": "assistant", "content": full_response})
+            else:
+                for chunk in getAnswer(prompt):
+                    full_response += chunk
+                    message_placeholder.markdown(full_response + "▌")
+                message_placeholder.markdown(full_response)
+                st.session_state.messages.append({"role": "assistant", "content": full_response})
+
 
 # --- 自动保存到本地文件 ---
 # 获取文件名，并生成对应的文件名
@@ -204,6 +226,9 @@ if uploaded_file is not None:
     bytes_io = BytesIO(bytes_data)
     st.session_state.img = Image.open(bytes_io)  # 存储图片到 st.session_state.img
     st.sidebar.image(bytes_io, width=150)
+
+# 随机token开关
+st.session_state.generate_token = st.sidebar.checkbox("生成随机token", value=False)  # 默认关闭
 
 # 读取历史记录
 if st.sidebar.button("读取历史记录"):
