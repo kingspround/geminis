@@ -124,6 +124,17 @@ with open(log_file, "wb") as f:
 # --- 侧边栏功能 ---
 st.sidebar.title("操作")
 
+# 上传图片
+uploaded_file = st.sidebar.file_uploader("上传图片", type=["jpg", "jpeg", "png"])
+if uploaded_file is not None:
+    # 读取图片并显示
+    image = Image.open(uploaded_file)
+    st.sidebar.image(image, caption="上传的图片", use_column_width=True)
+
+    # 处理图片逻辑（这里仅作为示例）
+    # 例如，可以将图片转换为文本描述
+    # ...
+
 # 读取历史记录
 if st.sidebar.button("读取历史记录"):
     try:
