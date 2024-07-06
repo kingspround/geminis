@@ -135,7 +135,8 @@ def getAnswer(prompt, token, image=None):
 
     full_response = ""
     for chunk in response:
-        full_response += chunk.text
+        if hasattr(chunk, 'text'):  # 检查 chunk 是否包含 text 属性
+            full_response += chunk.text
         yield chunk.text
 
     # 更新最后一条回复
