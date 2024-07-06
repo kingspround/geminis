@@ -135,9 +135,13 @@ def getAnswer(prompt, token, image=None):
 
     full_response = ""
     for chunk in response:
-        if hasattr(chunk, 'text'):  # 检查 chunk 是否包含 text 属性
-            full_response += chunk.text
-        yield chunk.text
+        try:
+            if hasattr(chunk, 'text'):  # 检查 chunk 是否包含 text 属性
+                full_response += chunk.text
+        except AttributeError:
+            print("chunk 对象没有 text 属性，可能格式错误")
+            # 处理格式错误情况，例如打印错误信息或跳过此 chunk
+        yield chunk.text 
 
     # 更新最后一条回复
     if "last_response" in st.session_state and st.session_state.last_response:  # 判断列表是否为空
