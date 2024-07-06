@@ -86,8 +86,10 @@ def getAnswer(prompt, token, image):
         full_response += chunk.text
     yield chunk.text
     # 更新最后一条回复
-    if st.session_state.last_response:
+    if "last_response" in st.session_state:  # 检查是否存在
         st.session_state.last_response[-1] = full_response
+    else:
+        st.session_state.last_response = [full_response]  # 初始化
 
 # 初始化聊天记录列表
 if "messages" not in st.session_state:
