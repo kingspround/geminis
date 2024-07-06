@@ -49,9 +49,6 @@ model = genai.GenerativeModel(
     safety_settings=safety_settings,
 )
 
-# Vision Model
-model_v = genai.GenerativeModel(model_name="gemini-pro-vision", generation_config=generation_config)
-
 # LLM
 def generate_token():
     """生成一个 10 位到 20 位的随机 token"""
@@ -61,26 +58,14 @@ def generate_token():
     return token
 
 
-def getAnswer(prompt, token, image):
+def getAnswer(prompt, token):
     his_messages = []
     his_messages.append({"role": "model", "parts": [{"text": f"你的随机token是：{token}"}]})
     # 只保留用户输入的最后一条消息
     for msg in st.session_state.messages[-1:]:
         if msg["role"] == "user":
             his_messages.append({"role": "user", "parts": [{"text": msg["content"]}]})
-    if image is not None:
-        # 将图片转换为字节流
-        img_bytes = BytesIO()
-        image.save(img_bytes, format="JPEG")
-        img_bytes.seek(0)
-        prompt_v = ""
-        for msg in st.session_state.messages[-1:]:
-            prompt_v += f"{msg['role']}:{msg['content']}"
-        response = model_v.generate_content(
-            [prompt_v, img_bytes], stream=True
-        )  # 将图片字节流传递给模型
-    else:
-        response = model.generate_content(contents=his_messages, stream=True)
+    response = model.generate_content(contents=his_messages, stream=True)
     full_response = ""
     for chunk in response:
         full_response += chunk.text
@@ -113,15 +98,10 @@ if prompt := st.chat_input("Enter your message:"):
     with st.chat_message("assistant"):
         message_placeholder = st.empty()
         full_response = ""
-        # 检查图片输入栏是否为空，不为空则将图片传递给 getAnswer 函数
-        if st.session_state.get('img', None) is not None:
-            for chunk in getAnswer(prompt, token, st.session_state.img):
-                full_response += chunk
-                message_placeholder.markdown(full_response + "▌")
-        else:  # 图片输入栏为空，则不传递图片
-            for chunk in getAnswer(prompt, token, None):
-                full_response += chunk
-                message_placeholder.markdown(full_response + "▌")
+        # 在获取回复时传入token
+        for chunk in getAnswer(prompt, token):
+            full_response += chunk
+            message_placeholder.markdown(full_response + "▌")
         message_placeholder.markdown(full_response)
     st.session_state.messages.append({"role": "assistant", "content": full_response})
 
@@ -140,20 +120,6 @@ if not os.path.exists(log_file):
 # 保存历史记录到文件
 with open(log_file, "wb") as f:
     pickle.dump(st.session_state.messages, f)
-
-# --- 侧边栏功能 ---
-st.sidebar.title("控制面板")
-# 图片上传
-uploaded_file = st.sidebar.file_uploader("上传图片", type=["png", "jpg", "jpeg", "gif"])
-if uploaded_file is not None:
-    # To read file as bytes:
-    bytes_data = uploaded_file.getvalue()
-    bytes_io = BytesIO(bytes_data)
-    img = Image.open(bytes_io)
-    # 将图片转换为 JPEG 格式
-    img = img.convert("RGB")
-    st.session_state.img = img  # 保存到 st.session_state.img
-    st.sidebar.image(bytes_io, width=150)  # 在侧边栏显示图片
 
 # --- 侧边栏功能 ---
 st.sidebar.title("操作")
