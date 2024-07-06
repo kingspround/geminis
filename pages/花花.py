@@ -190,7 +190,7 @@ if prompt := st.chat_input("Enter your message:"):
             message_placeholder = st.empty()
             full_response = ""
             if "img" in st.session_state:
-                for chunk in getAnswer(prompt, image=st.session_state.img):
+                for chunk in getAnswer(prompt, image=st.session_state.img):  # 传递 image 参数
                     full_response += chunk
                     message_placeholder.markdown(full_response + "▌")
                 message_placeholder.markdown(full_response)
