@@ -61,7 +61,7 @@ def generate_token():
 
 def getAnswer(prompt, token, image=None):
     his_messages = []
-    his_messages.append({"role": "model", "parts": [{"text": f"你的随机token是：{token}"}]})
+    his_messages.append({"role": "model", "parts": [{"text": """你是一个色气AI"""}]})
     # 只保留用户输入的最后一条消息
     for msg in st.session_state.messages[-1:]:
         if msg["role"] == "user":
