@@ -69,7 +69,7 @@ def getAnswer(prompt, token):
     full_response = ""
     for chunk in response:
         full_response += chunk.text
-    yield chunk.text
+        yield chunk.text  # 将 yield 放入循环内
     # 更新最后一条回复
     if "last_response" in st.session_state:  # 检查是否存在
         if len(st.session_state.last_response) > 0: # 检查长度
