@@ -68,6 +68,7 @@ def getAnswer(prompt, token, image):
     for msg in st.session_state.messages[-1:]:
         if msg["role"] == "user":
             his_messages.append({"role": "user", "parts": [{"text": msg["content"]}]})
+    # 判断图片是否为空
     if image is not None:
         # 将图片转换为字节流
         img_bytes = BytesIO()
@@ -92,10 +93,6 @@ def getAnswer(prompt, token, image):
 # 初始化聊天记录列表
 if "messages" not in st.session_state:
     st.session_state.messages = []
-if "img" not in st.session_state:
-    st.session_state.img = None  # 初始化 img 属性为 None
-if "last_response" not in st.session_state:
-    st.session_state.last_response = [""]  # 初始化时添加默认值
 
 # 显示聊天记录
 for message in st.session_state.messages:
@@ -111,7 +108,8 @@ if prompt := st.chat_input("Enter your message:"):
     with st.chat_message("assistant"):
         message_placeholder = st.empty()
         full_response = ""
-        for chunk in getAnswer(prompt, token, st.session_state.img):  # 传递 st.session_state.img
+        # 在获取回复时传入token
+        for chunk in getAnswer(prompt, token, st.session_state.img):
             full_response += chunk
             message_placeholder.markdown(full_response + "▌")
         message_placeholder.markdown(full_response)
