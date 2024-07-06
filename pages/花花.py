@@ -107,7 +107,7 @@ if prompt := st.chat_input("Enter your message:"):
     with st.chat_message("assistant"):
         message_placeholder = st.empty()
         full_response = ""
-        for chunk in getAnswer(prompt, token, st.session_state.img):
+        for chunk in getAnswer(prompt, token, st.session_state.img):  # 传递 st.session_state.img
             full_response += chunk
             message_placeholder.markdown(full_response + "▌")
         message_placeholder.markdown(full_response)
@@ -129,7 +129,6 @@ if not os.path.exists(log_file):
 with open(log_file, "wb") as f:
     pickle.dump(st.session_state.messages, f)
 
-
 # --- 侧边栏功能 ---
 st.sidebar.title("控制面板")
 # 图片上传
@@ -143,7 +142,6 @@ if uploaded_file is not None:
     img = img.convert("RGB")
     st.session_state.img = img  # 保存到 st.session_state.img
     st.sidebar.image(bytes_io, width=150)  # 在侧边栏显示图片
-
 
 # --- 侧边栏功能 ---
 st.sidebar.title("操作")
