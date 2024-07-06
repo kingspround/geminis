@@ -93,6 +93,10 @@ def getAnswer(prompt, token, image):
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
+# 初始化 last_response 列表
+if "last_response" not in st.session_state:
+    st.session_state.last_response = []  
+
 # 显示聊天记录
 for message in st.session_state.messages:
     with st.chat_message(message["role"]):
@@ -108,7 +112,7 @@ if prompt := st.chat_input("Enter your message:"):
         message_placeholder = st.empty()
         full_response = ""
         # 在获取回复时传入token，以及图片
-        for chunk in getAnswer(prompt, token, st.session_state.img):
+        for chunk in getAnswer(prompt, token, st.session_state.get('img', None)):
             full_response += chunk
             message_placeholder.markdown(full_response + "▌")
         message_placeholder.markdown(full_response)
