@@ -57,23 +57,27 @@ def generate_token():
     token = "".join(random.choice(characters) for i in range(token_length))
     return token
 
-
-def getAnswer(prompt, token):
+def getAnswer(prompt, token, image):
     his_messages = []
     his_messages.append({"role": "model", "parts": [{"text": f"你的随机token是：{token}"}]})
     # 只保留用户输入的最后一条消息
     for msg in st.session_state.messages[-1:]:
         if msg["role"] == "user":
             his_messages.append({"role": "user", "parts": [{"text": msg["content"]}]})
+
+    if image is not None:
+        # 将图像添加到消息列表中
+        his_messages.append({"role": "user", "parts": [{"image": image}]})
+
     response = model.generate_content(contents=his_messages, stream=True)
     full_response = ""
     for chunk in response:
         full_response += chunk.text
-        yield chunk.text  # 将 yield 放入循环内
+        yield chunk.text
+
     # 更新最后一条回复
     if "last_response" in st.session_state:  # 检查是否存在
-        if len(st.session_state.last_response) > 0: # 检查长度
-            st.session_state.last_response[-1] = full_response
+        st.session_state.last_response[-1] = full_response
     else:
         st.session_state.last_response = [full_response]  # 初始化
 
@@ -83,7 +87,7 @@ if "messages" not in st.session_state:
 
 # 初始化 last_response 列表
 if "last_response" not in st.session_state:
-    st.session_state.last_response = []  
+    st.session_state.last_response = []
 
 # 显示聊天记录
 for message in st.session_state.messages:
@@ -93,48 +97,42 @@ for message in st.session_state.messages:
 # 用户输入并处理
 if prompt := st.chat_input("Enter your message:"):
     token = generate_token()
-    st.session_state.messages.append({"role": "user", "content": f"{prompt}  (token: {token})"})
+    st.session_state.messages.append({"role": "user", "content": f"{prompt} (token: {token})"})
     with st.chat_message("user"):
-        st.markdown(f"{prompt}  (token: {token})")
+        st.markdown(f"{prompt} (token: {token})")
     with st.chat_message("assistant"):
         message_placeholder = st.empty()
         full_response = ""
-        # 在获取回复时传入token
-        for chunk in getAnswer(prompt, token):
+        # 在获取回复时传入token和图片
+        for chunk in getAnswer(prompt, token, st.session_state.image):
             full_response += chunk
             message_placeholder.markdown(full_response + "▌")
         message_placeholder.markdown(full_response)
-    st.session_state.messages.append({"role": "assistant", "content": full_response})
+        st.session_state.messages.append({"role": "assistant", "content": full_response})
 
 # --- 自动保存到本地文件 ---
 # 获取文件名，并生成对应的文件名
-filename = os.path.splitext(os.path.basename(__file__))[0] + ".pkl"  # 使用 .pkl 扩展名
-
+filename = os.path.splitext(os.path.basename(file))[0] + ".pkl"  # 使用 .pkl 扩展名
 # 获取完整路径
-log_file = os.path.join(os.path.dirname(__file__), filename)  # 使用 os.path.dirname 获取当前目录
-
+log_file = os.path.join(os.path.dirname(file), filename)  # 使用 os.path.dirname 获取当前目录
 # 检查文件是否存在，如果不存在就创建空文件
 if not os.path.exists(log_file):
     with open(log_file, "wb") as f:
         pass  # 创建空文件
-
 # 保存历史记录到文件
 with open(log_file, "wb") as f:
     pickle.dump(st.session_state.messages, f)
 
 # --- 侧边栏功能 ---
 st.sidebar.title("操作")
-
-# 上传图片
-uploaded_file = st.sidebar.file_uploader("上传图片", type=["jpg", "jpeg", "png"])
+# 上传图片功能
+uploaded_file = st.sidebar.file_uploader("上传图片", type=["png", "jpg", "jpeg"])
 if uploaded_file is not None:
-    # 读取图片并显示
-    image = Image.open(uploaded_file)
-    st.sidebar.image(image, caption="上传的图片", use_column_width=True)
-
-    # 处理图片逻辑（这里仅作为示例）
-    # 例如，可以将图片转换为文本描述
-    # ...
+    # 读取文件作为字节数据
+    bytes_data = uploaded_file.getvalue()
+    # 将字节数据转换为 PIL Image
+    st.session_state.image = Image.open(BytesIO(bytes_data))
+    st.sidebar.image(st.session_state.image, width=150)  # 在侧边栏显示图片
 
 # 读取历史记录
 if st.sidebar.button("读取历史记录"):
