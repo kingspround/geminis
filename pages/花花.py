@@ -144,110 +144,30 @@ if uploaded_file is not None:
     st.session_state.img = img  # 保存到 st.session_state.img
     st.sidebar.image(bytes_io, width=150)  # 在侧边栏显示图片
 
+
 # --- 侧边栏功能 ---
+st.sidebar.title("操作")
 
-# ---  ---
-
-#  ---- 适配  ----
-def load_history():
-    """从 logs 文件夹加载聊天记录"""
+# 读取历史记录
+if st.sidebar.button("读取历史记录"):
     try:
         with open(log_file, "rb") as f:
             st.session_state.messages = pickle.load(f)
         st.success(f"聊天记录已加载")
     except FileNotFoundError:
-        st.warning("logs 文件夹中没有记录文件")
+        st.warning("聊天记录文件不存在。")
+    except EOFError:
+        st.warning(f"读取聊天记录失败：文件可能损坏。")
 
-def clear_history():
-    """清除当前聊天记录"""
+# 清除历史记录
+if st.sidebar.button("清除历史记录"):
     st.session_state.messages = []
-    st.session_state.last_response = []  # 清除 last_response 列表
-    st.success("聊天记录已清除")
+    try:
+        os.remove(log_file)
+        st.success(f"成功清除聊天记录！")
+    except FileNotFoundError:
+        st.warning("聊天记录文件不存在。")
 
-# --- 
-
-# 使用 st.sidebar 放置按钮
-st.sidebar.title("操作")
-st.sidebar.button("读取历史记录", on_click=load_history)
-st.sidebar.button("清除历史记录", on_click=clear_history)
-
-# 使用 st.sidebar 放置按钮
-st.sidebar.title("操作")
+# 重置上一个输出
 if len(st.session_state.messages) > 0:
     st.sidebar.button("重置上一个输出", on_click=lambda: st.session_state.messages.pop(-1))
-st.sidebar.download_button(
-    label="下载聊天记录",  # 使用 st.sidebar.download_button 直接下载
-    data=open(log_file, "rb").read(),  # 读取文件内容
-    file_name=filename,  # 设置下载文件名
-    mime="application/octet-stream",  # 设置 MIME 类型
-)
-st.sidebar.button("读取历史记录", on_click=lambda: load_history(log_file))
-st.sidebar.button("清除历史记录", on_click=lambda: clear_history(log_file))
-
-# 添加读取本地文件的按钮
-if st.sidebar.button("读取本地文件"):
-    st.session_state.file_upload_mode = True
-
-if st.session_state.get("file_upload_mode"):
-    uploaded_file = st.sidebar.file_uploader("选择文件", type=["pkl"])
-    if "file_loaded" not in st.session_state:  # 如果 file_loaded 不存在
-        st.session_state.file_loaded = False
-
-    if uploaded_file is not None and not st.session_state.file_loaded:  # 只有当 file_loaded 为 False 时才读取文件
-        try:
-            # 读取文件内容
-            loaded_messages = pickle.load(uploaded_file)
-
-            # 合并到 st.session_state.messages 中
-            st.session_state.messages.extend(loaded_messages)
-
-            # 显示聊天记录和编辑按钮
-            for i, message in enumerate(st.session_state.messages):
-                with st.chat_message(message["role"]):
-                    st.write(message["content"], key=f"message_{i}")
-                    if i >= len(st.session_state.messages) - 2:  # 在最后两条消息中添加编辑按钮
-                        if st.button("编辑", key=f"edit_{i}"):
-                            st.session_state.editable_index = i
-                            st.session_state.editing = True
-
-            # 添加关闭按钮
-            if st.sidebar.button("关闭", key="close_upload"):
-                st.session_state.file_upload_mode = False
-                st.session_state.file_loaded = False  # 将 file_loaded 设置为 False
-
-            # 保存合并后的历史记录到文件
-            with open(log_file, "wb") as f:
-                pickle.dump(st.session_state.messages, f)
-
-            st.session_state.file_loaded = True  # 将 file_loaded 设置为 True
-
-        except Exception as e:
-            st.error(f"读取本地文件失败：{e}")
-
-
-def load_history(log_file):
-    try:
-        # 重新打开文件
-        with open(log_file, "rb") as f:  # 使用 "rb" 模式读取
-            messages = pickle.load(f)
-            for message in messages:
-                with st.chat_message(message["role"]):
-                    st.markdown(message["content"])
-
-            # 重新运行应用程序，确保聊天记录加载后不会丢失
-            st.experimental_rerun()  
-
-    except FileNotFoundError:
-        st.warning(f"{filename} 不存在。")
-    except EOFError:  # 处理 EOFError
-        st.warning(f"读取历史记录失败：文件可能损坏。")
-
-def clear_history(log_file):
-    st.session_state.messages = []
-    try:
-        os.remove(log_file)  # 删除文件
-        st.success(f"成功清除 {filename} 的历史记录！")
-    except FileNotFoundError:
-        st.warning(f"{filename} 不存在。")
-    except FileNotFoundError:
-        st.warning(f"{filename} 不存在。")
