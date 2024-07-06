@@ -68,6 +68,7 @@ def getAnswer(prompt, token, image):
     for msg in st.session_state.messages[-1:]:
         if msg["role"] == "user":
             his_messages.append({"role": "user", "parts": [{"text": msg["content"]}]})
+    # 判断图片是否为空
     if image is not None:
         # 将图片转换为字节流
         img_bytes = BytesIO()
@@ -89,37 +90,48 @@ def getAnswer(prompt, token, image):
     if st.session_state.last_response:
         st.session_state.last_response[-1] = full_response
 
-# === 文件处理 ===
+# 初始化聊天记录列表
+if "messages" not in st.session_state:
+    st.session_state.messages = []
+
+# 显示聊天记录
+for message in st.session_state.messages:
+    with st.chat_message(message["role"]):
+        st.markdown(message["content"])
+
+# 用户输入并处理
+if prompt := st.chat_input("Enter your message:"):
+    token = generate_token()
+    st.session_state.messages.append({"role": "user", "content": f"{prompt}  (token: {token})"})
+    with st.chat_message("user"):
+        st.markdown(f"{prompt}  (token: {token})")
+    with st.chat_message("assistant"):
+        message_placeholder = st.empty()
+        full_response = ""
+        # 在获取回复时传入token，以及图片
+        for chunk in getAnswer(prompt, token, st.session_state.img):
+            full_response += chunk
+            message_placeholder.markdown(full_response + "▌")
+        message_placeholder.markdown(full_response)
+    st.session_state.messages.append({"role": "assistant", "content": full_response})
+
+# --- 自动保存到本地文件 ---
 # 获取文件名，并生成对应的文件名
-filename = os.path.splitext(os.path.basename(__file__))[0] + ".pkl"
-log_file = os.path.join(os.path.dirname(__file__), filename)
+filename = os.path.splitext(os.path.basename(__file__))[0] + ".pkl"  # 使用 .pkl 扩展名
+
+# 获取完整路径
+log_file = os.path.join(os.path.dirname(__file__), filename)  # 使用 os.path.dirname 获取当前目录
+
 # 检查文件是否存在，如果不存在就创建空文件
 if not os.path.exists(log_file):
     with open(log_file, "wb") as f:
-        pass
-# 加载历史记录（只执行一次）
-if "messages" not in st.session_state:
-    try:
-        with open(log_file, "rb") as f:
-            st.session_state.messages = pickle.load(f)
-    except FileNotFoundError:
-        st.session_state.messages = []
-    except EOFError:
-        st.warning(f"读取历史记录失败：文件可能损坏。")
-        st.session_state.messages = []
-if "messages" not in st.session_state:
-    st.session_state.messages = []
-if "img" not in st.session_state:
-    st.session_state.img = None
-if "last_response" not in st.session_state:
-    st.session_state.last_response = [""]  # 初始化时添加默认值
+        pass  # 创建空文件
 
-# === 聊天显示和编辑 ===
-# 用于标记当前正在编辑的消息索引
-if "editing_index" not in st.session_state:
-    st.session_state.editing_index = None
+# 保存历史记录到文件
+with open(log_file, "wb") as f:
+    pickle.dump(st.session_state.messages, f)
 
-# 侧边栏
+# --- 侧边栏功能 ---
 st.sidebar.title("控制面板")
 # 图片上传
 uploaded_file = st.sidebar.file_uploader("上传图片", type=["png", "jpg", "jpeg", "gif"])
@@ -133,64 +145,9 @@ if uploaded_file is not None:
     st.session_state.img = img  # 保存到 st.session_state.img
     st.sidebar.image(bytes_io, width=150)  # 在侧边栏显示图片
 
-# 循环显示聊天消息
-col1, col2 = st.columns([9, 1])  # 调整列宽，为按钮预留更多空间
-for i, message in enumerate(st.session_state.messages):
-    with col1:
-        with st.chat_message(message["role"]):
-            st.write(message["content"], key=f"message_{i}")
-
-#  只有在最后一条消息旁边添加按钮
-if i == len(st.session_state.messages) - 1:
-    with col2:
-        #  编辑按钮
-        edit_button = st.button("✏️", key=f"edit_button_{i}")  # 循环外创建按钮
-        if edit_button:  # 循环内修改按钮状态
-            st.session_state.editing_index = i
-
-        # 按钮
-        reoutput_button = st.button("🔄", key=f"reoutput_{i}")  # 循环外创建按钮
-        if reoutput_button:  # 循环内修改按钮状态
-            reoutput_last_response()
-
-# 如果当前消息正在编辑，显示文本框
-if st.session_state.editing_index == i:
-    with st.chat_message(message["role"]):
-        new_content = st.text_area(
-            "编辑消息:", value=message["content"], key=f"edit_text_{i}"
-        )
-        if st.button("保存", key=f"save_button_{i}"):
-            # 更新消息内容
-            st.session_state.messages[i]["content"] = new_content
-            # 保存到文件
-            with open(log_file, "wb") as f:
-                pickle.dump(st.session_state.messages, f)
-            # 重置编辑状态
-            st.session_state.editing_index = None
-            # 刷新页面，重新加载聊天记录
-            st.experimental_rerun()
-
-# 用户输入
-if prompt := st.chat_input("Enter your message:"):
-    token = generate_token()
-    st.session_state.messages.append({"role": "user", "content": prompt, "token": token})
-    with st.chat_message("user"):
-        st.markdown(prompt)
-    with st.chat_message("assistant"):
-        message_placeholder = st.empty()
-        full_response = ""
-        # 在获取回复时传入token，以及图片
-        for chunk in getAnswer(prompt, token, st.session_state.get('img', None)):
-            full_response += chunk
-            message_placeholder.markdown(full_response + "▌")
-        message_placeholder.markdown(full_response)
-    st.session_state.messages.append({"role": "assistant", "content": full_response})
-    # 保存历史记录到文件
-    with open(log_file, "wb") as f:
-        pickle.dump(st.session_state.messages, f)
-
 # --- 侧边栏功能 ---
 st.sidebar.title("操作")
+
 # 读取历史记录
 if st.sidebar.button("读取历史记录"):
     try:
