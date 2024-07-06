@@ -120,13 +120,12 @@ for message in st.session_state.messages:
 
 # 用户输入并处理
 if prompt := st.chat_input("Enter your message:"):
-    if "random_token" in st.session_state and st.session_state.random_token:
+    if "use_token" in st.session_state and st.session_state.use_token:
         token = generate_token()
         st.session_state.messages.append({"role": "user", "content": f"{prompt} (token: {token})"})
         with st.chat_message("user"):
             st.markdown(f"{prompt} (token: {token})")
     else:
-        token = ""
         st.session_state.messages.append({"role": "user", "content": f"{prompt}"})
         with st.chat_message("user"):
             st.markdown(f"{prompt}")
@@ -137,21 +136,42 @@ if prompt := st.chat_input("Enter your message:"):
         # 在获取回复时传入token
         # 只有在 st.session_state.img 不为空时才传入图片
         if "img" in st.session_state:
-            for chunk in getAnswer_image(prompt, token, st.session_state.img):
-                full_response += chunk
-                message_placeholder.markdown(full_response + "▌")
-            # 使用正则表达式过滤 "Use code with caution."
-            full_response = re.sub(r"Use code with caution\.", "", full_response)
-            # 只输出内容，不输出 "assistant:"
-            if st.session_state.messages[-1]["role"] == "assistant":  # 检查上一个角色是否为 "assistant"
-                message_placeholder.markdown(full_response)
-            st.session_state.messages.append({"role": "assistant", "content": full_response})
+            if "use_token" in st.session_state and st.session_state.use_token:
+                token = generate_token()
+                for chunk in getAnswer_image(prompt, token, st.session_state.img):
+                    full_response += chunk
+                    message_placeholder.markdown(full_response + "▌")
+                # 使用正则表达式过滤 "Use code with caution."
+                full_response = re.sub(r"Use code with caution\.", "", full_response)
+                # 只输出内容，不输出 "assistant:"
+                if st.session_state.messages[-1]["role"] == "assistant":  # 检查上一个角色是否为 "assistant"
+                    message_placeholder.markdown(full_response)
+                st.session_state.messages.append({"role": "assistant", "content": full_response})
+            else:
+                for chunk in getAnswer_image(prompt, "", st.session_state.img):
+                    full_response += chunk
+                    message_placeholder.markdown(full_response + "▌")
+                # 使用正则表达式过滤 "Use code with caution."
+                full_response = re.sub(r"Use code with caution\.", "", full_response)
+                # 只输出内容，不输出 "assistant:"
+                if st.session_state.messages[-1]["role"] == "assistant":  # 检查上一个角色是否为 "assistant"
+                    message_placeholder.markdown(full_response)
+                st.session_state.messages.append({"role": "assistant", "content": full_response})
+
         else:
-            for chunk in getAnswer_text(prompt, token):
-                full_response += chunk
-                message_placeholder.markdown(full_response + "▌")
-            message_placeholder.markdown(full_response)
-            st.session_state.messages.append({"role": "assistant", "content": full_response})
+            if "use_token" in st.session_state and st.session_state.use_token:
+                token = generate_token()
+                for chunk in getAnswer_text(prompt, token):
+                    full_response += chunk
+                    message_placeholder.markdown(full_response + "▌")
+                message_placeholder.markdown(full_response)
+                st.session_state.messages.append({"role": "assistant", "content": full_response})
+            else:
+                for chunk in getAnswer_text(prompt, ""):
+                    full_response += chunk
+                    message_placeholder.markdown(full_response + "▌")
+                message_placeholder.markdown(full_response)
+                st.session_state.messages.append({"role": "assistant", "content": full_response})
 
 # --- 自动保存到本地文件 ---
 # 获取文件名，并生成对应的文件名
@@ -201,9 +221,6 @@ if st.sidebar.button("清除历史记录"):
 if len(st.session_state.messages) > 0:
     st.sidebar.button("重置上一个输出", on_click=lambda: st.session_state.messages.pop(-1))
 
-# --- 随机 token 开关 ---
-st.session_state.random_token = True  # 默认开启
-st.sidebar.checkbox("随机 Token", value=st.session_state.random_token,
-                   key="random_token", on_change=lambda: st.session_state.random_token)
-if not st.session_state.random_token:
-    st.sidebar.empty()
+# ---  随机token开关 ---
+st.sidebar.title("设置")
+st.session_state.use_token = st.sidebar.checkbox("开启随机token", value=True)
