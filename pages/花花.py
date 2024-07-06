@@ -158,7 +158,7 @@ for message in st.session_state.messages:
         st.markdown(message["content"])
 
 # 用户输入并处理
-if prompt := st.chat_input("Enter your message:"):
+if prompt := st.chat_input("请输入您的消息："):
     if st.session_state.generate_token:
         token = generate_token()
         st.session_state.messages.append({"role": "user", "content": f"{prompt} (token: {token})"})
@@ -190,7 +190,7 @@ if prompt := st.chat_input("Enter your message:"):
             message_placeholder = st.empty()
             full_response = ""
             if "img" in st.session_state:
-                for chunk in getAnswer(prompt, image=st.session_state.img):  # 传递 image 参数
+                for chunk in getAnswer(prompt, image=st.session_state.img, token=None):  # 修正：传递 token=None
                     full_response += chunk
                     message_placeholder.markdown(full_response + "▌")
                 message_placeholder.markdown(full_response)
