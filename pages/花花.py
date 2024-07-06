@@ -108,8 +108,8 @@ if prompt := st.chat_input("Enter your message:"):
     with st.chat_message("assistant"):
         message_placeholder = st.empty()
         full_response = ""
-        # 在获取回复时传入token
-        for chunk in getAnswer(prompt, token, st.session_state.img):
+        # 在获取回复时传入token，以及图片
+        for chunk in getAnswer(prompt, token, st.session_state.get('img', None)):
             full_response += chunk
             message_placeholder.markdown(full_response + "▌")
         message_placeholder.markdown(full_response)
