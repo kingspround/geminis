@@ -69,9 +69,15 @@ def getAnswer(prompt, token, image):
 
     # 添加图片到消息列表
     if image is not None:
-        his_messages.append({"role": "user", "parts": [{"image": image}]})
+        # 将图像对象转换为字节流
+        img_bytes = BytesIO()
+        image.save(img_bytes, format="JPEG")
+        img_bytes.seek(0)  # 将指针重置到开头
+        his_messages.append(
+            {"role": "user", "parts": [{"image": img_bytes.getvalue()}]}
+        )
 
-    response = model_v.generate_content(contents=his_messages, stream=True)  # 使用 model_v.generate_content(...)
+    response = model_v.generate_content(contents=his_messages, stream=True)
     full_response = ""
     for chunk in response:
         full_response += chunk.text
@@ -82,6 +88,7 @@ def getAnswer(prompt, token, image):
         st.session_state.last_response[-1] = full_response
     else:
         st.session_state.last_response = [full_response]  # 初始化
+
 
 # 初始化聊天记录列表
 if "messages" not in st.session_state:
