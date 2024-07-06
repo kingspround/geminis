@@ -177,18 +177,18 @@ for i, message in enumerate(st.session_state.messages):
         with st.chat_message(message["role"]):
             st.write(message["content"], key=f"message_{i}")
 
-    #  只有在最后一条消息旁边添加按钮
-    if i == len(st.session_state.messages) - 1:
-        with col2:
-            #  编辑按钮
-            edit_button = st.button("✏️", key=f"edit_button_{i}")  # 循环外创建按钮
-            if edit_button:  # 循环内修改按钮状态
-                st.session_state.editing_index = i
+#  只有在最后一条消息旁边添加按钮
+if i == len(st.session_state.messages) - 1:
+    with col2:
+        #  编辑按钮
+        edit_button = st.button("✏️", key=f"edit_button_{i}")  # 循环外创建按钮
+        if edit_button:  # 循环内修改按钮状态
+            st.session_state.editing_index = i
 
-            # 按钮
-            reoutput_button = st.button("🔄", key=f"reoutput_{i}")  # 循环外创建按钮
-            if reoutput_button:  # 循环内修改按钮状态
-                reoutput_last_response()
+        # 按钮
+        reoutput_button = st.button("🔄", key=f"reoutput_{i}")  # 循环外创建按钮
+        if reoutput_button:  # 循环内修改按钮状态
+            reoutput_last_response()
 
 # 如果当前消息正在编辑，显示文本框
 if st.session_state.editing_index == i:
