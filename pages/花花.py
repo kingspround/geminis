@@ -171,11 +171,12 @@ if uploaded_file is not None:
     st.sidebar.image(bytes_io, width=150)  # 在侧边栏显示图片
 
 # 循环显示聊天消息
+col1, col2 = st.columns([9, 1])  # 调整列宽，为按钮预留更多空间
 for i, message in enumerate(st.session_state.messages):
-    col1, col2 = st.columns([9, 1])  # 调整列宽，为按钮预留更多空间
-    with col1:
+    with col1:  # 使用之前定义好的列 col1
         with st.chat_message(message["role"]):
             st.write(message["content"], key=f"message_{i}")
+
     # ===  在循环内部添加按钮和编辑逻辑 ===
     #  只有在最后一条消息旁边添加按钮
     if i == len(st.session_state.messages) - 1:
