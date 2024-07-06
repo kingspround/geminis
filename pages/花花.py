@@ -170,13 +170,13 @@ if prompt := st.chat_input("Enter your message:"):
             # 在获取回复时传入token
             # 只有在 st.session_state.img 不为空时才传入图片
             if "img" in st.session_state:
-                for chunk in getAnswer(prompt, token, st.session_state.img):  # 传递 token 参数
+                for chunk in getAnswer(prompt, token, st.session_state.img):
                     full_response += chunk
                     message_placeholder.markdown(full_response + "▌")
                 message_placeholder.markdown(full_response)
                 st.session_state.messages.append({"role": "assistant", "content": full_response})
             else:
-                for chunk in getAnswer(prompt, token):  # 传递 token 参数
+                for chunk in getAnswer(prompt, token):
                     full_response += chunk
                     message_placeholder.markdown(full_response + "▌")
                 message_placeholder.markdown(full_response)
@@ -190,13 +190,13 @@ if prompt := st.chat_input("Enter your message:"):
             message_placeholder = st.empty()
             full_response = ""
             if "img" in st.session_state:
-                for chunk in getAnswer(prompt, image=st.session_state.img):  # 传递 image 参数
+                for chunk in getAnswer(prompt, image=st.session_state.img):
                     full_response += chunk
                     message_placeholder.markdown(full_response + "▌")
                 message_placeholder.markdown(full_response)
                 st.session_state.messages.append({"role": "assistant", "content": full_response})
             else:
-                for chunk in getAnswer(prompt, token=None):  # 传递 token 参数，即使为 None
+                for chunk in getAnswer(prompt):
                     full_response += chunk
                     message_placeholder.markdown(full_response + "▌")
                 message_placeholder.markdown(full_response)
