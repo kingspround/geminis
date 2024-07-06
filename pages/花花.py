@@ -84,7 +84,7 @@ def getAnswer(prompt, token, image=None):
         yield chunk.text
 
     # 更新最后一条回复
-    if "last_response" in st.session_state:  # 检查是否存在
+    if "last_response" in st.session_state and st.session_state.last_response:  # 判断列表是否为空
         st.session_state.last_response[-1] = full_response
     else:
         st.session_state.last_response = [full_response]  # 初始化
