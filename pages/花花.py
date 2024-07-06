@@ -25,7 +25,6 @@ generation_config = {
     "top_k": 0,
     "max_output_tokens": 10000,
 }
-
 safety_settings = [
     {
         "category": "HARM_CATEGORY_HARASSMENT",
@@ -49,8 +48,7 @@ model = genai.GenerativeModel(
     generation_config=generation_config,
     safety_settings=safety_settings,
 )
-
-model_v = genai.GenerativeModel(model_name='gemini-pro-vision', generation_config=generation_config, safety_settings=safety_settings)  # 添加 gemini-pro-vision 模型
+model_v = genai.GenerativeModel(model_name='gemini-pro-vision', generation_config=generation_config)  # 添加 gemini-pro-vision 模型
 
 # LLM
 def generate_token():
@@ -59,6 +57,7 @@ def generate_token():
     characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
     token = "".join(random.choice(characters) for i in range(token_length))
     return token
+
 
 
 def getAnswer(prompt, token, image=None):
