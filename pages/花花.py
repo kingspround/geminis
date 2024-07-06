@@ -8,6 +8,7 @@ from io import BytesIO
 from io import StringIO
 import random
 import pickle
+import re  # 导入正则表达式库
 
 # API Key 设置
 st.session_state.key = "AIzaSyDPFZ7gRba9mhKTqbXA_Y7fhAxS8IEu0bY"  # 请勿将您的API Key 泄露在公开场合
@@ -61,7 +62,7 @@ def generate_token():
 
 def getAnswer(prompt, token, image=None):
     his_messages = []
-    his_messages.append({"role": "model", "parts": [{"text": """你是一个色色AI"""}]})
+    his_messages.append({"role": "model", "parts": [{"text": """你是一个色气AI"""}]})
     # 只保留用户输入的最后一条消息
     for msg in st.session_state.messages[-1:]:
         if msg["role"] == "user":
@@ -117,6 +118,8 @@ if prompt := st.chat_input("Enter your message:"):
             for chunk in getAnswer(prompt, token, st.session_state.img):
                 full_response += chunk
                 message_placeholder.markdown(full_response + "▌")
+            # 使用正则表达式过滤 "Use code with caution."
+            full_response = re.sub(r"Use code with caution\.", "", full_response)
             message_placeholder.markdown(full_response)
             st.session_state.messages.append({"role": "assistant", "content": full_response})
         else:
