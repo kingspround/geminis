@@ -58,8 +58,7 @@ def generate_token():
     token = "".join(random.choice(characters) for i in range(token_length))
     return token
 
-
-def getAnswer(prompt, token, image=None):
+def getAnswer(prompt, token=None, image=None):
     his_messages = []
     his_messages.append({"role": "model", "parts": [{"text": """你是一个色气AI"""}]})
     # 只保留用户输入的最后一条消息
@@ -97,6 +96,10 @@ if "messages" not in st.session_state:
 if "last_response" not in st.session_state:
     st.session_state.last_response = []
 
+# 初始化随机token开关，默认开启
+if "use_token" not in st.session_state:
+    st.session_state.use_token = True
+
 # 显示聊天记录
 for message in st.session_state.messages:
     with st.chat_message(message["role"]):
@@ -104,27 +107,47 @@ for message in st.session_state.messages:
 
 # 用户输入并处理
 if prompt := st.chat_input("Enter your message:"):
-    token = generate_token()
-    st.session_state.messages.append({"role": "user", "content": f"{prompt} (token: {token})"})
-    with st.chat_message("user"):
-        st.markdown(f"{prompt} (token: {token})")
+    if st.session_state.use_token:
+        token = generate_token()
+        st.session_state.messages.append({"role": "user", "content": f"{prompt} (token: {token})"})
+        with st.chat_message("user"):
+            st.markdown(f"{prompt} (token: {token})")
+    else:
+        st.session_state.messages.append({"role": "user", "content": f"{prompt}"})
+        with st.chat_message("user"):
+            st.markdown(f"{prompt}")
+
     with st.chat_message("assistant"):
         message_placeholder = st.empty()
         full_response = ""
         # 在获取回复时传入token
         # 只有在 st.session_state.img 不为空时才传入图片
         if "img" in st.session_state:
-            for chunk in getAnswer(prompt, token, st.session_state.img):
-                full_response += chunk
-                message_placeholder.markdown(full_response + "▌")
-            message_placeholder.markdown(full_response)
-            st.session_state.messages.append({"role": "assistant", "content": full_response})
+            if st.session_state.use_token:
+                for chunk in getAnswer(prompt, token, st.session_state.img):
+                    full_response += chunk
+                    message_placeholder.markdown(full_response + "▌")
+                message_placeholder.markdown(full_response)
+                st.session_state.messages.append({"role": "assistant", "content": full_response})
+            else:
+                for chunk in getAnswer(prompt, image=st.session_state.img):
+                    full_response += chunk
+                    message_placeholder.markdown(full_response + "▌")
+                message_placeholder.markdown(full_response)
+                st.session_state.messages.append({"role": "assistant", "content": full_response})
         else:
-            for chunk in getAnswer(prompt, token):
-                full_response += chunk
-                message_placeholder.markdown(full_response + "▌")
-            message_placeholder.markdown(full_response)
-            st.session_state.messages.append({"role": "assistant", "content": full_response})
+            if st.session_state.use_token:
+                for chunk in getAnswer(prompt, token):
+                    full_response += chunk
+                    message_placeholder.markdown(full_response + "▌")
+                message_placeholder.markdown(full_response)
+                st.session_state.messages.append({"role": "assistant", "content": full_response})
+            else:
+                for chunk in getAnswer(prompt):
+                    full_response += chunk
+                    message_placeholder.markdown(full_response + "▌")
+                message_placeholder.markdown(full_response)
+                st.session_state.messages.append({"role": "assistant", "content": full_response})
 
 # --- 自动保存到本地文件 ---
 # 获取文件名，并生成对应的文件名
@@ -173,3 +196,6 @@ if st.sidebar.button("清除历史记录"):
 # 重置上一个输出
 if len(st.session_state.messages) > 0:
     st.sidebar.button("重置上一个输出", on_click=lambda: st.session_state.messages.pop(-1))
+
+# 添加控制随机token开关
+st.sidebar.checkbox("使用随机token", value=True, key="use_token")
