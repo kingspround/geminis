@@ -113,6 +113,10 @@ if "messages" not in st.session_state:
 if "last_response" not in st.session_state:
     st.session_state.last_response = []
 
+# 初始化 token 开关
+if "use_token" not in st.session_state:
+    st.session_state.use_token = True
+
 # 显示聊天记录
 for message in st.session_state.messages:
     with st.chat_message(message["role"]):
@@ -120,7 +124,10 @@ for message in st.session_state.messages:
 
 # 用户输入并处理
 if prompt := st.chat_input("Enter your message:"):
-    token = generate_token()
+    if st.session_state.use_token:
+        token = generate_token()
+    else:
+        token = ""
     st.session_state.messages.append({"role": "user", "content": f"{prompt} (token: {token})"})
     with st.chat_message("user"):
         st.markdown(f"{prompt} (token: {token})")
@@ -193,3 +200,6 @@ if st.sidebar.button("清除历史记录"):
 # 重置上一个输出
 if len(st.session_state.messages) > 0:
     st.sidebar.button("重置上一个输出", on_click=lambda: st.session_state.messages.pop(-1))
+
+# 随机token开关
+st.sidebar.checkbox("随机token", key="use_token", value=True)
