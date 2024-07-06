@@ -59,24 +59,40 @@ def generate_token():
     token = "".join(random.choice(characters) for i in range(token_length))
     return token
 
-
-def getAnswer(prompt, token, image=None):
+def getAnswer_text(prompt, token):
     his_messages = []
     # 只保留用户输入的最后一条消息
     for msg in st.session_state.messages[-1:]:
         if msg["role"] == "user":
             his_messages.append({"role": "user", "parts": [{"text": msg["content"]}]})
 
-    if image is not None:
-        # 使用 gemini-pro-vision 模型处理图片
-        prompt_v = ""
-        for msg in st.session_state.messages[-20:]:
-            prompt_v += f'''{msg["role"]}:{msg["content"]}
-            Use code with caution.
-            '''
-        response = model_v.generate_content([prompt_v, image], stream=True)  # 使用 model_v 生成内容
+    response = model.generate_content(contents=his_messages, stream=True)
+
+    full_response = ""
+    for chunk in response:
+        full_response += chunk.text
+        yield chunk.text
+
+    # 更新最后一条回复
+    if "last_response" in st.session_state and st.session_state.last_response:  # 判断列表是否为空
+        st.session_state.last_response[-1] = full_response
     else:
-        response = model.generate_content(contents=his_messages, stream=True)
+        st.session_state.last_response = [full_response]  # 初始化
+
+def getAnswer_image(prompt, token, image):
+    his_messages = []
+    # 只保留用户输入的最后一条消息
+    for msg in st.session_state.messages[-1:]:
+        if msg["role"] == "user":
+            his_messages.append({"role": "user", "parts": [{"text": msg["content"]}]})
+
+    # 使用 gemini-pro-vision 模型处理图片
+    prompt_v = ""
+    for msg in st.session_state.messages[-20:]:
+        prompt_v += f'''{msg["role"]}:{msg["content"]}
+        Use code with caution.
+        '''
+    response = model_v.generate_content([prompt_v, image], stream=True)  # 使用 model_v 生成内容
 
     full_response = ""
     for chunk in response:
@@ -114,7 +130,7 @@ if prompt := st.chat_input("Enter your message:"):
         # 在获取回复时传入token
         # 只有在 st.session_state.img 不为空时才传入图片
         if "img" in st.session_state:
-            for chunk in getAnswer(prompt, token, st.session_state.img):
+            for chunk in getAnswer_image(prompt, token, st.session_state.img):
                 full_response += chunk
                 message_placeholder.markdown(full_response + "▌")
             # 使用正则表达式过滤 "Use code with caution."
@@ -124,7 +140,7 @@ if prompt := st.chat_input("Enter your message:"):
                 message_placeholder.markdown(full_response)
             st.session_state.messages.append({"role": "assistant", "content": full_response})
         else:
-            for chunk in getAnswer(prompt, token):
+            for chunk in getAnswer_text(prompt, token):
                 full_response += chunk
                 message_placeholder.markdown(full_response + "▌")
             message_placeholder.markdown(full_response)
