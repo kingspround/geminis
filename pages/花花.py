@@ -158,7 +158,7 @@ for i, message in enumerate(st.session_state.messages):
                 #  显示页码，只在最后一条消息拥有两个回答时显示
                 st.write(f"第 {st.session_state.page_index + 1} 页 / 共 {len(st.session_state.last_response)} 页")
 
-    # 如果当前消息正在编辑，显示文本框
+    # 如当前消息正在编辑，显示文本框
     if st.session_state.editing_index == i:
         with st.chat_message(message["role"]):
             new_content = st.text_area(
