@@ -43,9 +43,8 @@ safety_settings = [
         "threshold": "BLOCK_NONE",
     },
 ]
-# 使用 gemini-pro-vision 模型
-model_v = genai.GenerativeModel(
-    model_name="gemini-pro-vision",
+model = genai.GenerativeModel(
+    model_name="gemini-1.5-pro-latest",
     generation_config=generation_config,
     safety_settings=safety_settings,
 )
@@ -59,7 +58,7 @@ def generate_token():
     return token
 
 
-def getAnswer(prompt, token, image):
+def getAnswer(prompt, token, image=None):
     his_messages = []
     his_messages.append({"role": "model", "parts": [{"text": f"你的随机token是：{token}"}]})
     # 只保留用户输入的最后一条消息
@@ -67,17 +66,18 @@ def getAnswer(prompt, token, image):
         if msg["role"] == "user":
             his_messages.append({"role": "user", "parts": [{"text": msg["content"]}]})
 
-    # 添加图片到消息列表
     if image is not None:
-        # 将图像对象转换为字节流
-        img_bytes = BytesIO()
-        image.save(img_bytes, format="JPEG")
-        img_bytes.seek(0)  # 将指针重置到开头
-        his_messages.append(
-            {"role": "user", "parts": [{"image": img_bytes.getvalue()}]}
-        )
+        # 使用 gemini-pro-vision 模型处理图片
+        model_v = genai.GenerativeModel(model_name='gemini-pro-vision', generation_config=generation_config)
+        prompt_v = ""
+        for msg in st.session_state.messages[-20:]:
+            prompt_v += f'''{msg["role"]}:{msg["content"]}
+            Use code with caution.
+            '''
+        response = model_v.generate_content([prompt_v, image], stream=True)
+    else:
+        response = model.generate_content(contents=his_messages, stream=True)
 
-    response = model_v.generate_content(contents=his_messages, stream=True)
     full_response = ""
     for chunk in response:
         full_response += chunk.text
@@ -88,7 +88,6 @@ def getAnswer(prompt, token, image):
         st.session_state.last_response[-1] = full_response
     else:
         st.session_state.last_response = [full_response]  # 初始化
-
 
 # 初始化聊天记录列表
 if "messages" not in st.session_state:
@@ -112,8 +111,8 @@ if prompt := st.chat_input("Enter your message:"):
     with st.chat_message("assistant"):
         message_placeholder = st.empty()
         full_response = ""
-        # 在获取回复时传入token和图片
-        for chunk in getAnswer(prompt, token, st.session_state.image):
+        # 在获取回复时传入token
+        for chunk in getAnswer(prompt, token, st.session_state.img):
             full_response += chunk
             message_placeholder.markdown(full_response + "▌")
         message_placeholder.markdown(full_response)
@@ -121,9 +120,9 @@ if prompt := st.chat_input("Enter your message:"):
 
 # --- 自动保存到本地文件 ---
 # 获取文件名，并生成对应的文件名
-filename = os.path.splitext(os.path.basename(file))[0] + ".pkl"  # 使用 .pkl 扩展名
+filename = os.path.splitext(os.path.basename(__file__))[0] + ".pkl"  # 使用 .pkl 扩展名
 # 获取完整路径
-log_file = os.path.join(os.path.dirname(file), filename)  # 使用 os.path.dirname 获取当前目录
+log_file = os.path.join(os.path.dirname(__file__), filename)  # 使用 os.path.dirname 获取当前目录
 # 检查文件是否存在，如果不存在就创建空文件
 if not os.path.exists(log_file):
     with open(log_file, "wb") as f:
@@ -134,14 +133,14 @@ with open(log_file, "wb") as f:
 
 # --- 侧边栏功能 ---
 st.sidebar.title("操作")
-# 上传图片功能
-uploaded_file = st.sidebar.file_uploader("上传图片", type=["png", "jpg", "jpeg"])
+
+# 上传图片
+uploaded_file = st.sidebar.file_uploader("上传图片", type=['png', 'jpg', 'jpeg', 'gif'])
 if uploaded_file is not None:
-    # 读取文件作为字节数据
     bytes_data = uploaded_file.getvalue()
-    # 将字节数据转换为 PIL Image
-    st.session_state.image = Image.open(BytesIO(bytes_data))
-    st.sidebar.image(st.session_state.image, width=150)  # 在侧边栏显示图片
+    bytes_io = BytesIO(bytes_data)
+    st.session_state.img = Image.open(bytes_io)
+    st.sidebar.image(bytes_io, width=150)
 
 # 读取历史记录
 if st.sidebar.button("读取历史记录"):
