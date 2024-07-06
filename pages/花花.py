@@ -201,6 +201,11 @@ if uploaded_file is not None:
     st.session_state.img = Image.open(bytes_io)  # 存储图片到 st.session_state.img
     st.sidebar.image(bytes_io, width=150)
 
+# 清除图片
+if st.session_state.img is not None:
+    if st.sidebar.button("清除图片"):
+        st.session_state.img = None
+
 # 读取历史记录
 if st.sidebar.button("读取历史记录"):
     try:
