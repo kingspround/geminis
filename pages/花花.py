@@ -68,7 +68,6 @@ def getAnswer(prompt, token, image):
     for msg in st.session_state.messages[-1:]:
         if msg["role"] == "user":
             his_messages.append({"role": "user", "parts": [{"text": msg["content"]}]})
-    # 判断图片是否为空
     if image is not None:
         # 将图片转换为字节流
         img_bytes = BytesIO()
@@ -109,7 +108,7 @@ if prompt := st.chat_input("Enter your message:"):
         message_placeholder = st.empty()
         full_response = ""
         # 在获取回复时传入token，以及图片
-        for chunk in getAnswer(prompt, token, st.session_state.img):
+        for chunk in getAnswer(prompt, token, st.session_state.get('img', None)):
             full_response += chunk
             message_placeholder.markdown(full_response + "▌")
         message_placeholder.markdown(full_response)
