@@ -113,10 +113,15 @@ if prompt := st.chat_input("Enter your message:"):
     with st.chat_message("assistant"):
         message_placeholder = st.empty()
         full_response = ""
-        # 在获取回复时传入token，以及图片
-        for chunk in getAnswer(prompt, token, st.session_state.get('img', None)):
-            full_response += chunk
-            message_placeholder.markdown(full_response + "▌")
+        # 检查图片输入栏是否为空，不为空则将图片传递给 getAnswer 函数
+        if st.session_state.get('img', None) is not None:
+            for chunk in getAnswer(prompt, token, st.session_state.img):
+                full_response += chunk
+                message_placeholder.markdown(full_response + "▌")
+        else:  # 图片输入栏为空，则不传递图片
+            for chunk in getAnswer(prompt, token, None):
+                full_response += chunk
+                message_placeholder.markdown(full_response + "▌")
         message_placeholder.markdown(full_response)
     st.session_state.messages.append({"role": "assistant", "content": full_response})
 
