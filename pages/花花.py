@@ -43,8 +43,9 @@ safety_settings = [
         "threshold": "BLOCK_NONE",
     },
 ]
-model = genai.GenerativeModel(
-    model_name="gemini-1.5-pro-latest",
+# 使用 gemini-pro-vision 模型
+model_v = genai.GenerativeModel(
+    model_name="gemini-pro-vision",
     generation_config=generation_config,
     safety_settings=safety_settings,
 )
@@ -57,6 +58,7 @@ def generate_token():
     token = "".join(random.choice(characters) for i in range(token_length))
     return token
 
+
 def getAnswer(prompt, token, image):
     his_messages = []
     his_messages.append({"role": "model", "parts": [{"text": f"你的随机token是：{token}"}]})
@@ -65,11 +67,11 @@ def getAnswer(prompt, token, image):
         if msg["role"] == "user":
             his_messages.append({"role": "user", "parts": [{"text": msg["content"]}]})
 
+    # 添加图片到消息列表
     if image is not None:
-        # 将图像添加到消息列表中
         his_messages.append({"role": "user", "parts": [{"image": image}]})
 
-    response = model.generate_content(contents=his_messages, stream=True)
+    response = model_v.generate_content(contents=his_messages, stream=True)  # 使用 model_v.generate_content(...)
     full_response = ""
     for chunk in response:
         full_response += chunk.text
