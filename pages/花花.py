@@ -228,7 +228,7 @@ if uploaded_file is not None:
     st.sidebar.image(bytes_io, width=150)
 
 # 随机token开关
-st.session_state.generate_token = st.sidebar.checkbox("生成随机token", value=False)  # 默认关闭
+st.session_state.generate_token = st.sidebar.checkbox("生成随机token", value=True)
 
 # 读取历史记录
 if st.sidebar.button("读取历史记录"):
