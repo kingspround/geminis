@@ -95,8 +95,21 @@ def save_history():
     current_filename = os.path.basename(__file__).split('.')[0]
     # 保存聊天记录到 logs 文件夹
     filename = os.path.join("logs", f"{current_filename}_chat_log.pkl")
+    
+    #  获取用户的输入和模型的回复
+    user_messages = []
+    model_responses = []
+    for message in st.session_state.messages:
+        if message["role"] == "user":
+            user_messages.append(message)
+        else:
+            model_responses.append(message)
+    
+    #  将用户输入和模型回复打包成一个字典
+    chat_history = {"user_messages": user_messages, "model_responses": model_responses}
+    
     with open(filename, "wb") as f:
-        pickle.dump(st.session_state.messages, f)
+        pickle.dump(chat_history, f)  #  保存字典到文件
 
 
 def load_history():
@@ -106,7 +119,11 @@ def load_history():
         selected_file = st.selectbox("选择要加载的记录文件", files)
         filename = os.path.join("logs", selected_file)
         with open(filename, "rb") as f:
-            st.session_state.messages = pickle.load(f)
+            #  加载字典
+            chat_history = pickle.load(f)
+            
+            #  将用户输入和模型回复合并到 `st.session_state.messages`
+            st.session_state.messages = chat_history["user_messages"] + chat_history["model_responses"]
         st.success(f"聊天记录已加载")
     else:
         st.warning("logs 文件夹中没有记录文件")
@@ -220,11 +237,15 @@ if "page_index" not in st.session_state:
 if "editing_index" not in st.session_state:
     st.session_state.editing_index = None
 
+def emoji_to_html(emoji):
+    """将 emoji 表情转换为 HTML 代码"""
+    return f"<span style='font-size: 20px;'>{emoji}</span>"
+
 # 侧边栏
 st.sidebar.title("控制面板")
-st.sidebar.button("读取历史记录", on_click=load_history)
-st.sidebar.button("清除历史记录", on_click=clear_history)
-st.sidebar.button("重置上一个输出", on_click=lambda: st.session_state.messages.pop(-1))
+st.sidebar.markdown(emoji_to_html("📁") + " 读取历史记录", key="load_history_button", on_click=load_history, use_container_width=True)
+st.sidebar.markdown(emoji_to_html("🗑️") + " 清除历史记录", key="clear_history_button", on_click=clear_history, use_container_width=True)
+st.sidebar.markdown(emoji_to_html("🔄") + " 重置上一个输出", key="reset_output_button", on_click=lambda: st.session_state.messages.pop(-1), use_container_width=True)
 # 图片上传
 uploaded_file = st.sidebar.file_uploader("上传图片", type=['png', 'jpg', 'jpeg', 'gif'])
 if uploaded_file is not None:
@@ -249,29 +270,28 @@ for i, message in enumerate(st.session_state.messages):
     if i == len(st.session_state.messages) - 1:
         with col2:
             #  编辑按钮
-            if st.button("✏️", key=f"edit_button_{i}"):
-                st.session_state.editing_index = i
-                
+            st.button(label="编辑", use_container_width=True, icon="pencil-square", key=f"edit_button_{i}")
+            
             #  💬 按钮和 🔄 按钮
             col3, col4 = st.columns(2)
             with col3:
                 #  💬 按钮内嵌翻页功能
-                st.button("💬", key=f"generate_{i}", on_click=generate_new_response)
+                st.markdown(emoji_to_html("💬"), key=f"generate_{i}", on_click=generate_new_response)
                 
                 #  "⏪" 和 "⏩" 按钮只在最后一条消息拥有两个回答时显示
                 if len(st.session_state.last_response) > 1:
                     col5, col6 = st.columns(2)
                     with col5:
-                        st.button("⏪", key=f"decrease_{i}", on_click=decrease_page_index,
+                        st.button(label="上一页", use_container_width=True, icon="arrow-left-circle", key=f"decrease_{i}", on_click=decrease_page_index,
                                    disabled=st.session_state.page_index == 0)
                     with col6:
-                        st.button("⏩", key=f"next_{i}", on_click=next_page_index,
+                        st.button(label="下一页", use_container_width=True, icon="arrow-right-circle", key=f"next_{i}", on_click=next_page_index,
                                    disabled=st.session_state.page_index == len(st.session_state.last_response) - 1)
                         
                     #  显示页码，只在最后一条消息拥有两个回答时显示
                     st.write(f"第 {st.session_state.page_index + 1} 页 / 共 {len(st.session_state.last_response)} 页")
             with col4:
-                st.button("🔄", key=f"reoutput_{i}", on_click=reoutput_last_response)
+                st.markdown(emoji_to_html("🔄"), key=f"reoutput_{i}", on_click=reoutput_last_response)
 
     # 如果当前消息正在编辑，显示文本框
     if st.session_state.editing_index == i:
