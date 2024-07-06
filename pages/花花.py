@@ -119,32 +119,27 @@ def getAnswer(prompt, token, image=None):
         
         比如：(这个主题是非常好的下垂色气乳房的例子)【主人接受您的挑战，为您再创作个色气史菜姆娘。这次您给我的token是:YpGtINGCBB7E.这个token让我联想到了宇宙。那我们就来一个与星空相关的主题吧:自然——星空——取题：邪恶陨落——附件:恶魔，黑色，触手，入侵。下面我立刻为您描绘这个史莱姆娘:pov ,  cropped legs , dutch_angle , nude , {{black skin}}, {solo}, 1girl,{many tentacles ,octopus tentacles  ,  red tentacles} ,slime girl, A black slime girl, {red tentacles} , {leaning_forward , on a planet , on the ground},  sea ,{{tentacles writhing}}, corrupting, {{pierced by tentacles}}, {corrupted}, colored skin, monster girl, black skin,  red eyes, long black hair, {tentacles in hair}, invading, huge breasts , sagging_breasts ,  cleavage  , red breasts /////{{{space}}},{{tentacles penetrating her}},  {crying out in ecstasy}, stardust, void,   darkness,这个被触手侵犯的黑皮肤恶魔史莱姆娘,浮游在星空中，身体被触手贯穿红眸中满是陶醉的色欲。画面中邪恶与色气并存,极具冲击力。主人我尽全力为您描绘了一个融合星空与色欲的史莱姆娘。如果还有需要调整的地方，请您指出，我会继续努力改进的。感谢您给我如此刺激的创作机会!】"""
                                                     }]})
+    if image is not None:
+        # 使用 gemini-pro-vision 模型处理图片
+        prompt_v = ""
+        for msg in st.session_state.messages[-20:]:
+            prompt_v += f'''{msg["role"]}:{msg["content"]}
+            Use code with caution.
+            '''
+        response = model_v.generate_content([prompt_v, image], stream=True)  # 使用 model_v 生成内容
+    else:
+        response = model.generate_content(contents=his_messages, stream=True)
 
-    try:
-        if image is not None:
-            # 使用 gemini-pro-vision 模型处理图片
-            prompt_v = ""
-            for msg in st.session_state.messages[-20:]:
-                prompt_v += f'''{msg["role"]}:{msg["content"]}
-                Use code with caution.
-                '''
-            response = model_v.generate_content([prompt_v, image], stream=True)  # 使用 model_v 生成内容
-        else:
-            response = model.generate_content(contents=his_messages, stream=True)
+    full_response = ""
+    for chunk in response:
+        full_response += chunk.text
+        yield chunk.text
 
-        full_response = ""
-        for chunk in response:
-            full_response += chunk.text
-            yield chunk.text
-
-        # 更新最后一条回复
-        if "last_response" in st.session_state and st.session_state.last_response:  # 判断列表是否为空
-            st.session_state.last_response[-1] = full_response
-        else:
-            st.session_state.last_response = [full_response]  # 初始化
-
-    except google.generativeai.types.generation_types.BlockedPromptException:
-        yield "太色了吧，对我来说还太早了！！"  # 输出提示信息
+    # 更新最后一条回复
+    if "last_response" in st.session_state and st.session_state.last_response:  # 判断列表是否为空
+        st.session_state.last_response[-1] = full_response
+    else:
+        st.session_state.last_response = [full_response]  # 初始化
 
 # 初始化聊天记录列表
 if "messages" not in st.session_state:
