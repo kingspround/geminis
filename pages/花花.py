@@ -27,25 +27,28 @@ generation_config = {
     "max_output_tokens": 10000,
 }
 safety_settings = [
-   {
-    "category": "HARM_CATEGORY_HARASSMENT",
-    "threshold": "BLOCK_NONE",
-   },
-   {
-    "category": "HARM_CATEGORY_HATE_SPEECH",
-    "threshold": "BLOCK_NONE",
-   },
-   {
-    "category": "HARM_CATEGORY_SEXUALLY_EXPLICIT",
-    "threshold": "BLOCK_NONE",
-   },
-   {
-    "category": "HARM_CATEGORY_DANGEROUS_CONTENT",
-    "threshold": "BLOCK_NONE",
-   },
+    {
+        "category": "HARM_CATEGORY_HARASSMENT",
+        "threshold": "BLOCK_NONE",
+    },
+    {
+        "category": "HARM_CATEGORY_HATE_SPEECH",
+        "threshold": "BLOCK_NONE",
+    },
+    {
+        "category": "HARM_CATEGORY_SEXUALLY_EXPLICIT",
+        "threshold": "BLOCK_NONE",
+    },
+    {
+        "category": "HARM_CATEGORY_DANGEROUS_CONTENT",
+        "threshold": "BLOCK_NONE",
+    },
 ]
-
-model = genai.GenerativeModel(model_name="gemini-1.5-pro-latest",generation_config=generation_config,safety_settings=safety_settings)
+model = genai.GenerativeModel(
+    model_name="gemini-1.5-pro-latest",
+    generation_config=generation_config,
+    safety_settings=safety_settings,
+)
 model_v = genai.GenerativeModel(model_name='gemini-pro-vision', generation_config=generation_config)  # 添加 gemini-pro-vision 模型
 
 # LLM
@@ -130,11 +133,17 @@ if prompt := st.chat_input("Enter your message:"):
     with st.chat_message("assistant"):
         message_placeholder = st.empty()
         full_response = ""
-        # 在获取回复时传入token
-        # 只有在 st.session_state.img 不为空时才传入图片
-        if "img" in st.session_state:
-            if "use_token" in st.session_state and st.session_state.use_token:
-                token = generate_token()
+        # 动态判断使用哪个模型
+        if "img" in st.session_state and st.session_state.img is not None:  # 检测图片输入栏是否不为空
+            # 使用 gemini-pro-vision 处理图片
+            model = model_v
+        else:
+            # 使用 gemini-1.5-pro-latest 处理文本
+            model = genai.GenerativeModel(model_name='gemini-1.5-pro-latest', generation_config=generation_config, safety_settings=safety_settings)
+
+        if "use_token" in st.session_state and st.session_state.use_token:
+            token = generate_token()
+            if "img" in st.session_state and st.session_state.img is not None:  # 检测图片输入栏是否不为空
                 for chunk in getAnswer_image(prompt, token, st.session_state.img):
                     full_response += chunk
                     message_placeholder.markdown(full_response + "▌")
@@ -145,6 +154,13 @@ if prompt := st.chat_input("Enter your message:"):
                     message_placeholder.markdown(full_response)
                 st.session_state.messages.append({"role": "assistant", "content": full_response})
             else:
+                for chunk in getAnswer_text(prompt, token):
+                    full_response += chunk
+                    message_placeholder.markdown(full_response + "▌")
+                message_placeholder.markdown(full_response)
+                st.session_state.messages.append({"role": "assistant", "content": full_response})
+        else:
+            if "img" in st.session_state and st.session_state.img is not None:  # 检测图片输入栏是否不为空
                 for chunk in getAnswer_image(prompt, "", st.session_state.img):
                     full_response += chunk
                     message_placeholder.markdown(full_response + "▌")
@@ -153,15 +169,6 @@ if prompt := st.chat_input("Enter your message:"):
                 # 只输出内容，不输出 "assistant:"
                 if st.session_state.messages[-1]["role"] == "assistant":  # 检查上一个角色是否为 "assistant"
                     message_placeholder.markdown(full_response)
-                st.session_state.messages.append({"role": "assistant", "content": full_response})
-
-        else:
-            if "use_token" in st.session_state and st.session_state.use_token:
-                token = generate_token()
-                for chunk in getAnswer_text(prompt, token):
-                    full_response += chunk
-                    message_placeholder.markdown(full_response + "▌")
-                message_placeholder.markdown(full_response)
                 st.session_state.messages.append({"role": "assistant", "content": full_response})
             else:
                 for chunk in getAnswer_text(prompt, ""):
