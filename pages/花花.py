@@ -59,7 +59,7 @@ def generate_token():
     token = "".join(random.choice(characters) for i in range(token_length))
     return token
 
-def getAnswer_text(prompt, token):
+def getAnswer_text(prompt):
     his_messages = []
     # 添加预设信息到 his_messages
     his_messages.append(
