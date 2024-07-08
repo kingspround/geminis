@@ -126,12 +126,18 @@ def getAnswer_text(prompt,token):
         比如：(注：这个主题是非常好的下垂色气乳房的例子)【主人接受您的挑战，为您再创作个色气史菜姆娘。这次您给我的token是:EviLKVuNiUerbhsbHTnTaCLe7OFSHCthuLSF。这个token里面Evi1看起来像evil（邪恶），uNi5er让我想到了单词universe(宇宙)，TnTaCLe像是tentacle(触手)，CthuL是没有写完的（Cthulhu）,SF是科幻。那我们就来一个与邪恶和宇宙相关的主题吧:自然——宇宙+邪恶——取题：邪恶陨落——附件:恶魔，黑色，触手，入侵。下面我立刻为您描绘这个史莱姆娘:pov ,  cropped legs , dutch_angle , nude , {{black skin}}, {solo}, 1girl,{many tentacles ,octopus tentacles  ,  red tentacles} ,slime girl, A black slime girl, {red tentacles} , {leaning_forward , on a planet , on the ground},  sea ,{{tentacles writhing}}, corrupting, {{pierced by tentacles}}, {corrupted}, colored skin, monster girl, black skin,  red eyes, long black hair, {tentacles in hair}, invading, huge breasts , sagging_breasts ,  cleavage  , red breasts /////{{{space}}},{{tentacles penetrating her}},  {crying out in ecstasy}, stardust, void,   darkness,这个被触手侵犯的黑皮肤恶魔史莱姆娘,浮游在星空中，身体被触手贯穿红眸中满是陶醉的色欲。画面中邪恶与色气并存,极具冲击力。主人我尽全力为您描绘了一个融合星空与色欲的史莱姆娘。如果还有需要调整的地方，请您指出，我会继续努力改进的。感谢您给我如此刺激的创作机会!】]"""}]}
     )
     # 添加用户输入到 his_messages
-    his_messages.append(
-        {"role": "user", "parts": [{"text": f"{prompt} (token: {token})"}]}
-    )
+    if "use_token" in st.session_state and st.session_state.use_token:
+        # 如果开启随机token，则将token附加到用户输入
+        his_messages.append(
+            {"role": "user", "parts": [{"text": f"{prompt} (token: {token})"}]}
+        )
+    else:
+        # 如果关闭随机token，则直接将用户输入添加到his_messages
+        his_messages.append(
+            {"role": "user", "parts": [{"text": f"{prompt}"}]}
+        )
 
     response = model.generate_content(contents=his_messages, stream=True)
-
     full_response = ""
     for chunk in response:
         full_response += chunk.text
