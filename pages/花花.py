@@ -182,24 +182,13 @@ def getAnswer_text(prompt, token):
         his_messages.append(
             {"role": "user", "parts": [{"text": f"{prompt}"}]}
         )
-    for msg in st.session_state.messages[-20:]:  # 遍历最后 20 条记录
-        if msg["role"] == "user":
-            his_messages.append({"role": "user", "parts": [{"text": msg["content"]}]})
-        elif msg is not None and msg["content"] is not None:
-            his_messages.append({"role": "model", "parts": [{"text": msg["content"]}]})
 
+    response = model.generate_content(contents=his_messages, stream=True)
+    full_response = ""
+    for chunk in response:
+        full_response += chunk.text
+        yield chunk.text
 
-    try:
-        response = model.generate_content(contents=his_messages, stream=True)
-        full_response = ""
-        for chunk in response:
-            full_response += chunk.text
-            yield chunk.text
-        return full_response  # 返回完整的回复
-    except Exception as e:
-        st.error(f"An error occurred: {e}")
-        return ""  # 在发生错误时返回空字符串
-        
     # 更新最后一条回复
     if "last_response" in st.session_state and st.session_state.last_response:  # 判断列表是否为空
         st.session_state.last_response[-1] = full_response
@@ -271,13 +260,10 @@ if prompt := st.chat_input("Enter your message:"):
             # 使用 gemini-1.5-pro-latest 处理文本
             model = genai.GenerativeModel(model_name='gemini-1.5-pro-latest', generation_config=generation_config, safety_settings=safety_settings)
 
-# 创建容器来放置按钮
-    button_container = st.container()
-    with button_container:
-        if st.button("✨", key=f"rewrite_button_{len(st.session_state.messages)-1}"):  # 创建按钮
-            # 重新生成回复
+        if "use_token" in st.session_state and st.session_state.use_token:
+            token = generate_token()
             if "img" in st.session_state and st.session_state.img is not None:  # 检测图片输入栏是否不为空
-                for chunk in getAnswer_image(st.session_state.messages[-1]["content"], "", st.session_state.img):
+                for chunk in getAnswer_image(prompt, token, st.session_state.img):
                     full_response += chunk
                     message_placeholder.markdown(full_response + "▌")
                 # 使用正则表达式过滤 "Use code with caution."
@@ -285,14 +271,29 @@ if prompt := st.chat_input("Enter your message:"):
                 # 只输出内容，不输出 "assistant:"
                 if st.session_state.messages[-1]["role"] == "assistant":  # 检查上一个角色是否为 "assistant"
                     message_placeholder.markdown(full_response)
-                st.session_state.messages[-1] = {"role": "assistant", "content": full_response}  # 更新最后一条消息
+                st.session_state.messages.append({"role": "assistant", "content": full_response})
             else:
-                for chunk in getAnswer_text(st.session_state.messages[-1]["content"], ""):
+                for chunk in getAnswer_text(prompt, token):
                     full_response += chunk
                     message_placeholder.markdown(full_response + "▌")
                 message_placeholder.markdown(full_response)
-                st.session_state.messages[-1] = {"role": "assistant", "content": full_response}  # 更新最后一条消息
-            button_container.empty()  # 清空按钮容器
+                st.session_state.messages.append({"role": "assistant", "content": full_response})
+        else:
+            if "img" in st.session_state and st.session_state.img is not None:  # 检测图片输入栏是否不为空
+                for chunk in getAnswer_image(prompt, "", st.session_state.img):
+                    full_response += chunk
+                    message_placeholder.markdown(full_response + "▌")
+                # 使用正则表达式过滤 "Use code with caution."
+                full_response = re.sub(r"Use code with caution\.", "", full_response)
+                # 只输出内容，不输出 "assistant:"
+                if st.session_state.messages[-1]["role"] == "assistant":  # 检查上一个角色是否为 "assistant"
+                    message_placeholder.markdown(full_response)
+                st.session_state.messages.append({"role": "assistant", "content": full_response})
+            else:
+                for chunk in getAnswer_text(prompt, ""):
+                    full_response += chunk
+                    message_placeholder.markdown(full_response + "▌")
+                message_placeholder.markdown(full_response)
                 st.session_state.messages.append({"role": "assistant", "content": full_response})
 
 # --- 自动保存到本地文件 ---
@@ -328,8 +329,7 @@ if st.session_state.img is not None:
 if st.sidebar.button("读取历史记录"):
     try:
         with open(log_file, "rb") as f:
-            loaded_messages = pickle.load(f)  # 加载历史记录到一个新变量
-            st.session_state.messages = loaded_messages  # 将新变量赋值给 st.session_state.messages
+            st.session_state.messages = pickle.load(f)
         st.success(f"聊天记录已加载")
     except FileNotFoundError:
         st.warning("聊天记录文件不存在。")
