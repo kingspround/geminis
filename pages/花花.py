@@ -244,11 +244,6 @@ if "img" not in st.session_state:
     st.session_state.img = None
 
 # 显示聊天记录
-for message in st.session_state.messages:
-    with st.chat_message(message["role"]):
-        st.markdown(message["content"])
-
-# 显示聊天记录
 for i, message in enumerate(st.session_state.messages):
     with st.chat_message(message["role"]):
         st.markdown(message["content"])
