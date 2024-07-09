@@ -244,10 +244,48 @@ if "last_response" not in st.session_state:
 if "img" not in st.session_state:
     st.session_state.img = None
 
+# 加载历史记录
+if "messages" not in st.session_state:
+    # 从文件加载历史记录
+    try:
+        with open(log_file, "rb") as f:  # 使用 "rb" 模式读取
+            st.session_state.messages = pickle.load(f)
+    except FileNotFoundError:
+        st.session_state.messages = []
+    except EOFError:
+        st.warning(f"读取历史记录失败：文件可能损坏。")
+        st.session_state.messages = []  # 清空 messages
+        # 可以考虑在这里添加代码，提示用户重新创建文件或重新加载数据
+
 # 显示聊天记录
-for message in st.session_state.messages:
+for i, message in enumerate(st.session_state.messages):
     with st.chat_message(message["role"]):
-        st.markdown(message["content"])
+        st.markdown(message["content"], key=f"message_{i}")
+        if i >= len(st.session_state.messages) - 2:
+            if st.button("编辑♡", key=f"edit_{i}"):
+                st.session_state.editable_index = i
+                st.session_state.editing = True
+
+if st.session_state.get("editing"):
+    i = st.session_state.editable_index
+    message = st.session_state.messages[i]
+
+    with st.chat_message(message["role"]):
+        new_content = st.text_area(
+            f"{message['role']}:", message["content"], key=f"message_edit_{i}"
+        )
+
+        col1, col2 = st.columns(2)
+        with col1:
+            if st.button("保存", key=f"save_{i}"):
+                st.session_state.messages[i]["content"] = new_content
+                with open(log_file, "wb") as f:  # 使用 "wb" 模式写入
+                    pickle.dump(st.session_state.messages, f)
+                st.success(f"已保存更改！")
+                st.session_state.editing = False
+        with col2:
+            if st.button("取消", key=f"cancel_{i}"):
+                st.session_state.editing = False
 
 # 用户输入并处理
 if prompt := st.chat_input("Enter your message:"):
