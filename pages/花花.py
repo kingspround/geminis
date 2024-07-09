@@ -271,18 +271,28 @@ if prompt := st.chat_input("Enter your message:"):
             # 使用 gemini-1.5-pro-latest 处理文本
             model = genai.GenerativeModel(model_name='gemini-1.5-pro-latest', generation_config=generation_config, safety_settings=safety_settings)
 
-        if st.button("✨", key="rewrite_button"):  # 创建 "✨" 按钮
-            st.session_state.messages.pop(-1)  # 删除最后一条回复
-            st.session_state.last_response.pop(-1) # 删除最后一条回复
+        # 创建容器来放置按钮
+    button_container = st.container()
+    with button_container:
+        if st.button("✨", key=f"rewrite_button_{len(st.session_state.messages)-1}"):  # 创建按钮
             # 重新生成回复
-            for chunk in getAnswer_text(prompt, token):
-                full_response += chunk
-                message_placeholder.markdown(full_response + "▌")
-            message_placeholder.markdown(full_response)
-            st.session_state.messages.append({"role": "assistant", "content": full_response})  # 添加新回复
-
-        st.session_state.messages.append({"role": "assistant", "content": full_response})  # 添加新回复
-
+            if "img" in st.session_state and st.session_state.img is not None:  # 检测图片输入栏是否不为空
+                for chunk in getAnswer_image(st.session_state.messages[-1]["content"], "", st.session_state.img):
+                    full_response += chunk
+                    message_placeholder.markdown(full_response + "▌")
+                # 使用正则表达式过滤 "Use code with caution."
+                full_response = re.sub(r"Use code with caution\.", "", full_response)
+                # 只输出内容，不输出 "assistant:"
+                if st.session_state.messages[-1]["role"] == "assistant":  # 检查上一个角色是否为 "assistant"
+                    message_placeholder.markdown(full_response)
+                st.session_state.messages[-1] = {"role": "assistant", "content": full_response}  # 更新最后一条消息
+            else:
+                for chunk in getAnswer_text(st.session_state.messages[-1]["content"], ""):
+                    full_response += chunk
+                    message_placeholder.markdown(full_response + "▌")
+                message_placeholder.markdown(full_response)
+                st.session_state.messages[-1] = {"role": "assistant", "content": full_response}  # 更新最后一条消息
+            button_container.empty()  # 清空按钮容器
         
         if "use_token" in st.session_state and st.session_state.use_token:
             token = generate_token()
