@@ -270,10 +270,7 @@ def load_history(log_file):
                         if st.button("编辑♡", key=f"edit_{i}"):
                             st.session_state.editable_index = i
                             st.session_state.editing = True
-
-            # 重新运行应用程序，确保聊天记录加载后不会丢失
-            st.experimental_rerun()  
-
+            st.success(f"{filename} 加载成功")
     except FileNotFoundError:
         st.warning(f"{filename} 不存在。")
     except EOFError:  # 处理 EOFError
@@ -315,17 +312,8 @@ if st.sidebar.button("清除历史记录"):
 st.sidebar.title("设置")
 st.session_state.use_token = st.sidebar.checkbox("开启随机token", value=True)
 
-# 显示聊天记录
-for i, message in enumerate(st.session_state.messages):
-    with st.chat_message(message["role"]):
-        # 使用 st.write 显示对话内容
-        st.write(message["content"], key=f"message_{i}")
-        # 在最后两条消息中添加编辑按钮
-        if i >= len(st.session_state.messages) - 2:
-            if st.button("编辑♡", key=f"edit_{i}"):
-                st.session_state.editable_index = i
-                st.session_state.editing = True
-
+# 加载历史记录
+load_history(log_file)
 
 # 用户输入并处理
 if prompt := st.chat_input("Enter your message:"):
