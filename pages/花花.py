@@ -248,19 +248,6 @@ for message in st.session_state.messages:
     with st.chat_message(message["role"]):
         st.markdown(message["content"])
 
-# 添加“✨”按钮
-if len(st.session_state.messages) > 0:
-    last_message = st.session_state.messages[-1]
-    with st.chat_message(last_message["role"]):
-        st.markdown(last_message["content"])
-        if st.button("✨", key=f"rewrite_{len(st.session_state.messages) - 1}"):
-            st.session_state.messages.pop(-1)  # 移除最后一条消息
-            with st.chat_message("assistant"):
-                message_placeholder = st.empty()
-                full_response = ""
-                # ... (使用 getAnswer_text 或 getAnswer_image 生成新的回复) ...
-                st.session_state.messages.append({"role": "assistant", "content": full_response})
-
 # 用户输入并处理
 if prompt := st.chat_input("Enter your message:"):
     if "use_token" in st.session_state and st.session_state.use_token:
@@ -284,6 +271,19 @@ if prompt := st.chat_input("Enter your message:"):
             # 使用 gemini-1.5-pro-latest 处理文本
             model = genai.GenerativeModel(model_name='gemini-1.5-pro-latest', generation_config=generation_config, safety_settings=safety_settings)
 
+        if st.button("✨", key="rewrite_button"):  # 创建 "✨" 按钮
+            st.session_state.messages.pop(-1)  # 删除最后一条回复
+            st.session_state.last_response.pop(-1) # 删除最后一条回复
+            # 重新生成回复
+            for chunk in getAnswer_text(prompt, token):
+                full_response += chunk
+                message_placeholder.markdown(full_response + "▌")
+            message_placeholder.markdown(full_response)
+            st.session_state.messages.append({"role": "assistant", "content": full_response})  # 添加新回复
+
+        st.session_state.messages.append({"role": "assistant", "content": full_response})  # 添加新回复
+
+        
         if "use_token" in st.session_state and st.session_state.use_token:
             token = generate_token()
             if "img" in st.session_state and st.session_state.img is not None:  # 检测图片输入栏是否不为空
