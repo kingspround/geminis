@@ -189,16 +189,11 @@ def getAnswer_text(prompt, token):
             his_messages.append({"role": "model", "parts": [{"text": msg["content"]}]})
 
 
-    try:
-        response = model.generate_content(contents=his_messages, stream=True)
-        full_response = ""
-        for chunk in response:
-            full_response += chunk.text
-            yield chunk.text
-        return full_response  # 返回完整的回复
-    except Exception as e:
-        st.error(f"An error occurred: {e}")
-        return ""  # 在发生错误时返回空字符串
+    response = model.generate_content(contents=his_messages, stream=True)
+    full_response = ""
+    for chunk in response:
+        full_response += chunk.text
+        yield chunk.text
 
     # 更新最后一条回复
     if "last_response" in st.session_state and st.session_state.last_response:  # 判断列表是否为空
