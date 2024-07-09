@@ -165,8 +165,6 @@ def getAnswer_image(prompt, token, image):
         Use code with caution.
         '''
     response = model_v.generate_content([prompt_v, image], stream=True)  # 使用 model_v 生成内容
-        Use code with caution.
-        '''
 
     full_response = ""
     for chunk in response:
