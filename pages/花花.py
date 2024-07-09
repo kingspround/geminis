@@ -346,6 +346,12 @@ if st.sidebar.button("读取历史记录"):
             # 更新 st.session_state.messages
             st.session_state.messages = loaded_messages
         st.success(f"聊天记录已加载")
+
+        # 重新渲染聊天记录
+        for message in st.session_state.messages:
+            with st.chat_message(message["role"]):
+                st.markdown(message["content"])
+
     except FileNotFoundError:
         st.warning("聊天记录文件不存在。")
     except EOFError:
