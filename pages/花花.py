@@ -233,82 +233,6 @@ def getAnswer_image(prompt, token, image):
     else:
         st.session_state.last_response = [full_response]  # 初始化
 
-# 初始化聊天记录列表
-if "messages" not in st.session_state:
-    st.session_state.messages = []
-
-# 初始化 last_response 列表
-if "last_response" not in st.session_state:
-    st.session_state.last_response = []
-
-# 初始化 img 状态
-if "img" not in st.session_state:
-    st.session_state.img = None
-
-# 显示聊天记录
-for message in st.session_state.messages:
-    with st.chat_message(message["role"]):
-        st.markdown(message["content"])
-
-# 用户输入并处理
-if prompt := st.chat_input("Enter your message:"):
-    if "use_token" in st.session_state and st.session_state.use_token:
-        token = generate_token()
-        st.session_state.messages.append({"role": "user", "content": f"{prompt} (token: {token})"})
-        with st.chat_message("user"):
-            st.markdown(f"{prompt} (token: {token})")
-    else:
-        st.session_state.messages.append({"role": "user", "content": f"{prompt}"})
-        with st.chat_message("user"):
-            st.markdown(f"{prompt}")
-
-    with st.chat_message("assistant"):
-        message_placeholder = st.empty()
-        full_response = ""
-        # 动态判断使用哪个模型
-        if "img" in st.session_state and st.session_state.img is not None:  # 检测图片输入栏是否不为空
-            # 使用 gemini-pro-vision 处理图片
-            model = model_v
-        else:
-            # 使用 gemini-1.5-pro-latest 处理文本
-            model = genai.GenerativeModel(model_name='gemini-1.5-pro-latest', generation_config=generation_config, safety_settings=safety_settings)
-
-        if "use_token" in st.session_state and st.session_state.use_token:
-            token = generate_token()
-            if "img" in st.session_state and st.session_state.img is not None:  # 检测图片输入栏是否不为空
-                for chunk in getAnswer_image(prompt, token, st.session_state.img):
-                    full_response += chunk
-                    message_placeholder.markdown(full_response + "▌")
-                # 使用正则表达式过滤 "Use code with caution."
-                full_response = re.sub(r"Use code with caution\.", "", full_response)
-                # 只输出内容，不输出 "assistant:"
-                if st.session_state.messages[-1]["role"] == "assistant":  # 检查上一个角色是否为 "assistant"
-                    message_placeholder.markdown(full_response)
-                st.session_state.messages.append({"role": "assistant", "content": full_response})
-            else:
-                for chunk in getAnswer_text(prompt, token):
-                    full_response += chunk
-                    message_placeholder.markdown(full_response + "▌")
-                message_placeholder.markdown(full_response)
-                st.session_state.messages.append({"role": "assistant", "content": full_response})
-        else:
-            if "img" in st.session_state and st.session_state.img is not None:  # 检测图片输入栏是否不为空
-                for chunk in getAnswer_image(prompt, "", st.session_state.img):
-                    full_response += chunk
-                    message_placeholder.markdown(full_response + "▌")
-                # 使用正则表达式过滤 "Use code with caution."
-                full_response = re.sub(r"Use code with caution\.", "", full_response)
-                # 只输出内容，不输出 "assistant:"
-                if st.session_state.messages[-1]["role"] == "assistant":  # 检查上一个角色是否为 "assistant"
-                    message_placeholder.markdown(full_response)
-                st.session_state.messages.append({"role": "assistant", "content": full_response})
-            else:
-                for chunk in getAnswer_text(prompt, ""):
-                    full_response += chunk
-                    message_placeholder.markdown(full_response + "▌")
-                message_placeholder.markdown(full_response)
-                st.session_state.messages.append({"role": "assistant", "content": full_response})
-
 # --- 自动保存到本地文件 ---
 # 获取文件名，并生成对应的文件名
 filename = os.path.splitext(os.path.basename(__file__))[0] + ".pkl"  # 使用 .pkl 扩展名
@@ -326,6 +250,9 @@ def save_history(log_file):
 
 # ---  读取历史记录和清除历史记录 ---
 def load_history(log_file):
+    # 初始化聊天记录列表
+    if "messages" not in st.session_state:
+        st.session_state.messages = []
     try:
         with open(log_file, "rb") as f:
             st.session_state.messages = pickle.load(f)
