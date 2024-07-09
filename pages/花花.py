@@ -341,7 +341,10 @@ if st.session_state.img is not None:
 if st.sidebar.button("读取历史记录"):
     try:
         with open(log_file, "rb") as f:
-            st.session_state.messages = pickle.load(f)
+            # 读取 pickle 数据
+            loaded_messages = pickle.load(f)
+            # 更新 st.session_state.messages
+            st.session_state.messages = loaded_messages
         st.success(f"聊天记录已加载")
     except FileNotFoundError:
         st.warning("聊天记录文件不存在。")
