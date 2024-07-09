@@ -308,14 +308,13 @@ if st.sidebar.button("读取历史记录"):
 if st.sidebar.button("清除历史记录"):
     clear_history(log_file)
 
+# 重置上一个输出
+if len(st.session_state.messages) > 0:
+    st.sidebar.button("重置上一个输出，不然人家就生气了！", on_click=lambda: st.session_state.messages.pop(-1))
+
 # ---  随机token开关 ---
 st.sidebar.title("设置")
 st.session_state.use_token = st.sidebar.checkbox("开启随机token", value=True)
-
-
-# 重置上一个输出
-if len(st.session_state.messages) > 0:
-    st.sidebar.button("重置上一个输出", on_click=lambda: st.session_state.messages.pop(-1))
 
 # 加载历史记录
 load_history(log_file)
