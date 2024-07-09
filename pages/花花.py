@@ -59,8 +59,7 @@ def generate_token():
     token = "".join(random.choice(characters) for i in range(token_length))
     return token
 
-def getAnswer_text(prompt,token):
-    his_messages = []
+def getAnswer_text(prompt, token, his_messages):
     # 添加预设信息到 his_messages
     his_messages.append(
         {"role": "model", "parts": [{"text": """[
@@ -177,19 +176,11 @@ def getAnswer_text(prompt,token):
             {"role": "user", "parts": [{"text": f"{prompt}"}]}
         )
 
-    response = model.generate_content(contents=his_messages, stream=True)
-    full_response = ""
-    for chunk in response:
-        full_response += chunk.text
-        yield chunk.text
+    response = model.generate_content(contents=his_messages, stream=False)  # 去除 stream 参数
+    full_response = response.text
+    return full_response
 
-    # 更新最后一条回复
-    if "last_response" in st.session_state and st.session_state.last_response:  # 判断列表是否为空
-        st.session_state.last_response[-1] = full_response
-    else:
-        st.session_state.last_response = [full_response]  # 初始化
-
-def getAnswer_image(prompt, token, image):
+def getAnswer_image(prompt, token, image, his_messages):
     his_messages = []
     # 只保留用户输入的最后一条消息
     for msg in st.session_state.messages[-1:]:
@@ -202,18 +193,10 @@ def getAnswer_image(prompt, token, image):
         prompt_v += f'''{msg["role"]}:{msg["content"]}
         Use code with caution.
         '''
-    response = model_v.generate_content([prompt_v, image], stream=True)  # 使用 model_v 生成内容
+    response = model_v.generate_content([prompt_v, image], stream=False)  # 去除 stream 参数
 
-    full_response = ""
-    for chunk in response:
-        full_response += chunk.text
-        yield chunk.text
-
-    # 更新最后一条回复
-    if "last_response" in st.session_state and st.session_state.last_response:  # 判断列表是否为空
-        st.session_state.last_response[-1] = full_response
-    else:
-        st.session_state.last_response = [full_response]  # 初始化
+    full_response = response.text
+    return full_response
 
 # 初始化聊天记录列表
 if "messages" not in st.session_state:
@@ -258,9 +241,7 @@ if prompt := st.chat_input("Enter your message:"):
         if "use_token" in st.session_state and st.session_state.use_token:
             token = generate_token()
             if "img" in st.session_state and st.session_state.img is not None:  # 检测图片输入栏是否不为空
-                for chunk in getAnswer_image(prompt, token, st.session_state.img):
-                    full_response += chunk
-                    message_placeholder.markdown(full_response + "▌")
+                full_response = getAnswer_image(prompt, token, st.session_state.img, st.session_state.messages)
                 # 使用正则表达式过滤 "Use code with caution."
                 full_response = re.sub(r"Use code with caution\.", "", full_response)
                 # 只输出内容，不输出 "assistant:"
@@ -268,16 +249,12 @@ if prompt := st.chat_input("Enter your message:"):
                     message_placeholder.markdown(full_response)
                 st.session_state.messages.append({"role": "assistant", "content": full_response})
             else:
-                for chunk in getAnswer_text(prompt, token):
-                    full_response += chunk
-                    message_placeholder.markdown(full_response + "▌")
+                full_response = getAnswer_text(prompt, token, st.session_state.messages)
                 message_placeholder.markdown(full_response)
                 st.session_state.messages.append({"role": "assistant", "content": full_response})
         else:
             if "img" in st.session_state and st.session_state.img is not None:  # 检测图片输入栏是否不为空
-                for chunk in getAnswer_image(prompt, "", st.session_state.img):
-                    full_response += chunk
-                    message_placeholder.markdown(full_response + "▌")
+                full_response = getAnswer_image(prompt, "", st.session_state.img, st.session_state.messages)
                 # 使用正则表达式过滤 "Use code with caution."
                 full_response = re.sub(r"Use code with caution\.", "", full_response)
                 # 只输出内容，不输出 "assistant:"
@@ -285,9 +262,7 @@ if prompt := st.chat_input("Enter your message:"):
                     message_placeholder.markdown(full_response)
                 st.session_state.messages.append({"role": "assistant", "content": full_response})
             else:
-                for chunk in getAnswer_text(prompt, ""):
-                    full_response += chunk
-                    message_placeholder.markdown(full_response + "▌")
+                full_response = getAnswer_text(prompt, "", st.session_state.messages)
                 message_placeholder.markdown(full_response)
                 st.session_state.messages.append({"role": "assistant", "content": full_response})
 
