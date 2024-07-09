@@ -254,9 +254,30 @@ log_file = os.path.join(os.path.dirname(__file__), filename)  # 使用 os.path.d
 if not os.path.exists(log_file):
     with open(log_file, "wb") as f:
         pass  # 创建空文件
-# 保存历史记录到文件
-with open(log_file, "wb") as f:
-    pickle.dump(st.session_state.messages, f)
+
+# 加载历史记录（只执行一次）
+if "messages" not in st.session_state:
+    # 从文件加载历史记录
+    try:
+        with open(log_file, "rb") as f:  # 使用 "rb" 模式读取
+            st.session_state.messages = pickle.load(f)
+    except FileNotFoundError:
+        st.session_state.messages = []
+    except EOFError:
+        st.warning(f"读取历史记录失败：文件可能损坏。")
+        st.session_state.messages = []  # 清空 messages
+        # 可以考虑在这里添加代码，提示用户重新创建文件或重新加载数据
+
+# 显示历史记录（只执行一次）
+for i, message in enumerate(st.session_state.messages):
+    with st.chat_message(message["role"]):
+        # 使用 st.write 显示对话内容
+        st.write(message["content"], key=f"message_{i}")
+        # 在最后两条消息中添加编辑按钮
+        if i >= len(st.session_state.messages) - 2:
+            if st.button("编辑♡", key=f"edit_{i}"):
+                st.session_state.editable_index = i
+                st.session_state.editing = True
 
 # --- 侧边栏功能 ---
 st.sidebar.title("操作")
@@ -283,7 +304,7 @@ if st.sidebar.button("读取历史记录"):
     except FileNotFoundError:
         st.warning("聊天记录文件不存在。")
     except EOFError:
-        st.warning(f"读取聊天记录失败：文件可能损坏。")
+        st.warning(f"读取历史记录失败：文件可能损坏。")
 
 # 清除历史记录
 if st.sidebar.button("清除历史记录"):
@@ -297,11 +318,6 @@ if st.sidebar.button("清除历史记录"):
 # ---  随机token开关 ---
 st.sidebar.title("设置")
 st.session_state.use_token = st.sidebar.checkbox("开启随机token", value=True)
-
-# 显示聊天记录
-for message in st.session_state.messages:
-    with st.chat_message(message["role"]):
-        st.markdown(message["content"])
 
 # 用户输入并处理
 if prompt := st.chat_input("Enter your message:"):
@@ -361,3 +377,7 @@ if prompt := st.chat_input("Enter your message:"):
                     message_placeholder.markdown(full_response + "▌")
                 message_placeholder.markdown(full_response)
                 st.session_state.messages.append({"role": "assistant", "content": full_response})
+
+    # 保存聊天记录到文件
+    with open(log_file, "wb") as f:
+        pickle.dump(st.session_state.messages, f)
