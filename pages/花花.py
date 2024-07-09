@@ -245,7 +245,6 @@ if "img" not in st.session_state:
     st.session_state.img = None
 
 # 显示聊天记录
-# 使用一个循环，遍历 `st.session_state.messages` 并显示每个消息
 for message in st.session_state.messages:
     with st.chat_message(message["role"]):
         st.markdown(message["content"])
@@ -342,18 +341,8 @@ if st.session_state.img is not None:
 if st.sidebar.button("读取历史记录"):
     try:
         with open(log_file, "rb") as f:
-            # 读取 pickle 数据
-            loaded_messages = pickle.load(f)
-            # 更新 st.session_state.messages
-            st.session_state.messages = loaded_messages
+            st.session_state.messages = pickle.load(f)
         st.success(f"聊天记录已加载")
-
-        # 重新渲染聊天记录
-        # 使用一个循环，遍历 `st.session_state.messages` 并显示每个消息
-        for i, message in enumerate(st.session_state.messages):
-            with st.chat_message(message["role"]):
-                st.markdown(message["content"], key=f"message_{i}")
-
     except FileNotFoundError:
         st.warning("聊天记录文件不存在。")
     except EOFError:
