@@ -260,32 +260,7 @@ if "messages" not in st.session_state:
 # 显示聊天记录
 for i, message in enumerate(st.session_state.messages):
     with st.chat_message(message["role"]):
-        st.markdown(message["content"], key=f"message_{i}")
-        if i >= len(st.session_state.messages) - 2:
-            if st.button("编辑♡", key=f"edit_{i}"):
-                st.session_state.editable_index = i
-                st.session_state.editing = True
-
-if st.session_state.get("editing"):
-    i = st.session_state.editable_index
-    message = st.session_state.messages[i]
-
-    with st.chat_message(message["role"]):
-        new_content = st.text_area(
-            f"{message['role']}:", message["content"], key=f"message_edit_{i}"
-        )
-
-        col1, col2 = st.columns(2)
-        with col1:
-            if st.button("保存", key=f"save_{i}"):
-                st.session_state.messages[i]["content"] = new_content
-                with open(log_file, "wb") as f:  # 使用 "wb" 模式写入
-                    pickle.dump(st.session_state.messages, f)
-                st.success(f"已保存更改！")
-                st.session_state.editing = False
-        with col2:
-            if st.button("取消", key=f"cancel_{i}"):
-                st.session_state.editing = False
+        st.markdown(message["content"]) 
 
 # 用户输入并处理
 if prompt := st.chat_input("Enter your message:"):
