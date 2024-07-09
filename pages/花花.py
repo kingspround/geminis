@@ -318,11 +318,37 @@ log_file = os.path.join(os.path.dirname(__file__), filename)  # 使用 os.path.d
 if not os.path.exists(log_file):
     with open(log_file, "wb") as f:
         pass  # 创建空文件
-# 保存历史记录到文件
-with open(log_file, "wb") as f:
-    pickle.dump(st.session_state.messages, f)
 
-# --- 侧边栏功能 ---
+# --- 保存历史记录到文件 ---
+def save_history(log_file):
+    with open(log_file, "wb") as f:
+        pickle.dump(st.session_state.messages, f)
+
+# ---  读取历史记录和清除历史记录 ---
+def load_history(log_file):
+    try:
+        with open(log_file, "rb") as f:
+            st.session_state.messages = pickle.load(f)
+            # 手动更新界面
+            for i, message in enumerate(st.session_state.messages):
+                with st.chat_message(message["role"]):
+                    st.write(message["content"], key=f"message_{i}")
+
+    except FileNotFoundError:
+        st.warning(f"{filename} 不存在。")
+    except EOFError:
+        st.warning(f"读取历史记录失败：文件可能损坏。")
+
+def clear_history(log_file):
+    st.session_state.messages = []
+    try:
+        os.remove(log_file)  # 删除文件
+        st.success(f"成功清除 {filename} 的历史记录！")
+    except FileNotFoundError:
+        st.warning(f"{filename} 不存在。")
+
+
+# ---  侧边栏功能 ---
 st.sidebar.title("操作")
 
 # 上传图片
@@ -347,32 +373,6 @@ st.session_state.use_token = st.sidebar.checkbox("开启随机token", value=True
 st.sidebar.title("操弄 AI~♡")
 if len(st.session_state.messages) > 0:
     st.sidebar.button("重置上一个输出，不然人家就生气了！", on_click=lambda: st.session_state.messages.pop(-1))
-
-# 提取的代码块
-def save_history(log_file):
-    with open(log_file, "wb") as f:
-        pickle.dump(st.session_state.messages, f)
-
-def load_history(log_file):
-    try:
-        with open(log_file, "rb") as f:
-            messages = pickle.load(f)
-            for message in messages:
-                with st.chat_message(message["role"]):
-                    st.markdown(message["content"])
-            st.experimental_rerun()  
-    except FileNotFoundError:
-        st.warning(f"{filename} 不存在。")
-    except EOFError:
-        st.warning(f"读取历史记录失败：文件可能损坏。")
-
-def clear_history(log_file):
-    st.session_state.messages = []
-    try:
-        os.remove(log_file)
-        st.success(f"成功清除 {filename} 的历史记录！")
-    except FileNotFoundError:
-        st.warning(f"{filename} 不存在。")
 
 # 侧边栏按钮
 st.sidebar.download_button(
