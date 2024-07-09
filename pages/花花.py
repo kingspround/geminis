@@ -261,6 +261,9 @@ def load_history(log_file):
         # 重新打开文件
         with open(log_file, "rb") as f:  # 使用 "rb" 模式读取
             st.session_state.messages = pickle.load(f)
+            # 清除当前聊天记录
+            st.session_state.messages = []
+            # 加载历史记录
             for i, message in enumerate(st.session_state.messages):
                 with st.chat_message(message["role"]):
                     # 使用 st.write 显示对话内容
@@ -271,8 +274,7 @@ def load_history(log_file):
                             st.session_state.editable_index = i
                             st.session_state.editing = True
 
-            # 重新运行应用程序，确保聊天记录加载后不会丢失
-            st.experimental_rerun()  
+            st.success(f"成功加载 {filename} 的历史记录！")  # 显示成功加载的提示
 
     except FileNotFoundError:
         st.warning(f"{filename} 不存在。")
@@ -304,11 +306,11 @@ if st.session_state.img is not None:
         st.session_state.img = None
 
 # 读取历史记录
-if st.sidebar.button("读取历史记录"):
+if st.sidebar.button(f"读取 {filename} 的历史记录"):
     load_history(log_file)
 
 # 清除历史记录
-if st.sidebar.button("清除历史记录"):
+if st.sidebar.button(f"清除 {filename} 的历史记录"):
     clear_history(log_file)
 
 # ---  随机token开关 ---
