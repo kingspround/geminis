@@ -160,8 +160,8 @@ def getAnswer_image(prompt, token, image):
 
     # 使用 gemini-pro-vision 模型处理图片
     prompt_v = ""
-    for msg in st.session_state.messages:
-        prompt_v += f'''{msg["role"]}:{msg["content"]}
+    for msg in his_messages:
+        prompt_v += f'''{msg["role"]}:{msg["parts"][0]["text"]}
         Use code with caution.
         '''
     response = model_v.generate_content([prompt_v, image], stream=True)  # 使用 model_v 生成内容
