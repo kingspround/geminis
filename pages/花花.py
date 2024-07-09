@@ -191,15 +191,11 @@ def getAnswer_text(prompt, token):
 
     try:
         response = model.generate_content(contents=his_messages, stream=True)
-        full_response = ""
-        for chunk in response:
-            full_response += chunk.text
-            yield chunk.text
-        return full_response  # 返回完整的回复
-    except Exception as e:
-        st.error(f"An error occurred: {e}")
-        return ""  # 在发生错误时返回空字符串
-        
+    full_response = ""
+    for chunk in response:
+        full_response += chunk.text
+        yield chunk.text
+
     # 更新最后一条回复
     if "last_response" in st.session_state and st.session_state.last_response:  # 判断列表是否为空
         st.session_state.last_response[-1] = full_response
@@ -247,21 +243,6 @@ if "img" not in st.session_state:
 for message in st.session_state.messages:
     with st.chat_message(message["role"]):
         st.markdown(message["content"])
-
-# --- 添加 "✨" 按钮 ---
-if len(st.session_state.messages) > 0:
-    last_message = st.session_state.messages[-1]
-    with st.chat_message(last_message["role"]):
-        st.markdown(last_message["content"])
-        # 创建一个容器，放置 "✨" 按钮
-        button_container = st.empty()
-        if button_container.button("✨", key=f"rewrite_{len(st.session_state.messages) - 1}"):
-            # 如果点击 "✨" 按钮，重新生成回复
-            st.session_state.messages.pop(-1)  # 删除最后一条消息
-            with st.chat_message("assistant"):
-                p = st.empty()
-                re = getAnswer_text(last_message["content"], "")  # 使用之前的 prompt 重新生成
-                st.session_state.messages.append({"role": "assistant", "content": re})
 
 # 用户输入并处理
 if prompt := st.chat_input("Enter your message:"):
@@ -355,8 +336,7 @@ if st.session_state.img is not None:
 if st.sidebar.button("读取历史记录"):
     try:
         with open(log_file, "rb") as f:
-            loaded_messages = pickle.load(f)  # 加载历史记录到一个新变量
-            st.session_state.messages = loaded_messages  # 将新变量赋值给 st.session_state.messages
+            st.session_state.messages = pickle.load(f)
         st.success(f"聊天记录已加载")
     except FileNotFoundError:
         st.warning("聊天记录文件不存在。")
