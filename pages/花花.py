@@ -9,6 +9,9 @@ from io import StringIO
 import random
 import pickle
 import re  # 导入正则表达式库
+import streamlit as st
+import pickle
+
 
 # API Key 设置
 st.session_state.key = "AIzaSyDPFZ7gRba9mhKTqbXA_Y7fhAxS8IEu0bY"  # 请勿将您的API Key 泄露在公开场合
@@ -52,6 +55,8 @@ model = genai.GenerativeModel(
 model_v = genai.GenerativeModel(model_name='gemini-pro-vision', generation_config=generation_config)  # 添加 gemini-pro-vision 模型
 
 # LLM
+
+
 def generate_token():
     """生成一个 35 位到 40 位的随机 token"""
     token_length = random.randint(35, 40)
@@ -59,7 +64,7 @@ def generate_token():
     token = "".join(random.choice(characters) for i in range(token_length))
     return token
 
-def getAnswer_text(prompt, token):
+def getAnswer(prompt, token):
     """处理用户输入，生成文本回复并显示"""
     his_messages = []  # 存储最近的 20 条聊天记录
     # 添加预设信息到 his_messages
@@ -179,9 +184,9 @@ def getAnswer_text(prompt, token):
         )
     for msg in st.session_state.messages[-20:]:  # 遍历最后 20 条记录
         if msg["role"] == "user":
-            his_messages.append({"role": "user", "parts": msg["content"]})
-        elif msg["role"] == "assistant":
-            his_messages.append({"role": "assistant", "parts": msg["content"]})
+            his_messages.append({"role": "user", "parts": [{"text": msg["content"]}]})
+        elif msg is not None and msg["content"] is not None:
+            his_messages.append({"role": "model", "parts": [{"text": msg["content"]}]})
 
 
     try:
