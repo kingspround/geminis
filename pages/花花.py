@@ -259,8 +259,9 @@ if len(st.session_state.messages) > 0:
             if st.button("✨", key=f"rewrite_{len(st.session_state.messages) - 1}"):
                 # 重写最后一条回复
                 st.session_state.messages.pop()
+                # 使用 st.empty() 创建空的容器
+                message_placeholder = st.empty()
                 with st.chat_message("assistant"):
-                    message_placeholder = st.empty()
                     full_response = ""
                     # 动态判断使用哪个模型
                     if "img" in st.session_state and st.session_state.img is not None:  # 检测图片输入栏是否不为空
