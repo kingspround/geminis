@@ -64,7 +64,7 @@ def generate_token():
     token = "".join(random.choice(characters) for i in range(token_length))
     return token
 
-def getAnswer(prompt, token):
+def getAnswer_text(prompt, token):
     """处理用户输入，生成文本回复并显示"""
     his_messages = []  # 存储最近的 20 条聊天记录
     # 添加预设信息到 his_messages
