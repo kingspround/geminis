@@ -152,7 +152,7 @@ def getAnswer_text(prompt,token):
 def getAnswer_image(prompt, token, image):
     his_messages = []
     # 将所有聊天记录添加到 his_messages
-    for msg in st.session_state.messages:
+    for msg in st.session_state.messages:  # 使用 st.session_state.messages 获取所有聊天记录
         if msg["role"] == "user":
             his_messages.append({"role": "user", "parts": [{"text": msg["content"]}]})
         elif msg["role"] == "assistant":
@@ -165,6 +165,8 @@ def getAnswer_image(prompt, token, image):
         Use code with caution.
         '''
     response = model_v.generate_content([prompt_v, image], stream=True)  # 使用 model_v 生成内容
+        Use code with caution.
+        '''
 
     full_response = ""
     for chunk in response:
