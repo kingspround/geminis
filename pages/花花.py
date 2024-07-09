@@ -245,6 +245,7 @@ if "img" not in st.session_state:
     st.session_state.img = None
 
 # 显示聊天记录
+# 使用一个循环，遍历 `st.session_state.messages` 并显示每个消息
 for message in st.session_state.messages:
     with st.chat_message(message["role"]):
         st.markdown(message["content"])
@@ -348,9 +349,10 @@ if st.sidebar.button("读取历史记录"):
         st.success(f"聊天记录已加载")
 
         # 重新渲染聊天记录
-        for message in st.session_state.messages:
+        # 使用一个循环，遍历 `st.session_state.messages` 并显示每个消息
+        for i, message in enumerate(st.session_state.messages):
             with st.chat_message(message["role"]):
-                st.markdown(message["content"])
+                st.markdown(message["content"], key=f"message_{i}")
 
     except FileNotFoundError:
         st.warning("聊天记录文件不存在。")
