@@ -297,12 +297,18 @@ if prompt := st.chat_input("Enter your message:"):
                 if st.session_state.messages[-1]["role"] == "assistant":  # 检查上一个角色是否为 "assistant"
                     message_placeholder.markdown(full_response)
                 st.session_state.messages.append({"role": "assistant", "content": full_response})
+                # 保存历史记录到文件
+                with open(log_file, "wb") as f:
+                    pickle.dump(st.session_state.messages, f)
             else:
                 for chunk in getAnswer_text(prompt, token):
                     full_response += chunk
                     message_placeholder.markdown(full_response + "▌")
                 message_placeholder.markdown(full_response)
                 st.session_state.messages.append({"role": "assistant", "content": full_response})
+                # 保存历史记录到文件
+                with open(log_file, "wb") as f:
+                    pickle.dump(st.session_state.messages, f)
         else:
             if "img" in st.session_state and st.session_state.img is not None:  # 检测图片输入栏是否不为空
                 for chunk in getAnswer_image(prompt, "", st.session_state.img):
@@ -314,12 +320,18 @@ if prompt := st.chat_input("Enter your message:"):
                 if st.session_state.messages[-1]["role"] == "assistant":  # 检查上一个角色是否为 "assistant"
                     message_placeholder.markdown(full_response)
                 st.session_state.messages.append({"role": "assistant", "content": full_response})
+                # 保存历史记录到文件
+                with open(log_file, "wb") as f:
+                    pickle.dump(st.session_state.messages, f)
             else:
                 for chunk in getAnswer_text(prompt, ""):
                     full_response += chunk
                     message_placeholder.markdown(full_response + "▌")
                 message_placeholder.markdown(full_response)
                 st.session_state.messages.append({"role": "assistant", "content": full_response})
+                # 保存历史记录到文件
+                with open(log_file, "wb") as f:
+                    pickle.dump(st.session_state.messages, f)
 
 # --- 自动保存到本地文件 ---
 # 获取文件名，并生成对应的文件名
@@ -369,6 +381,7 @@ if st.sidebar.button("清除历史记录"):
         st.success(f"成功清除聊天记录！")
     except FileNotFoundError:
         st.warning("聊天记录文件不存在。")
+
 
 # 重置上一个输出
 if len(st.session_state.messages) > 0:
