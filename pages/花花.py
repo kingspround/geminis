@@ -11,7 +11,7 @@ import pickle
 import re  # 导入正则表达式库
 
 # API Key 设置
-st.session_state.key = "AIzaSyDPFZ7gRba9mhKTqbXA_Y7fhAxS8IEu0bY"  # 请勿将您的API Key 泄露在公开场合
+st.session_state.key = "AIzaSyDQSJDkl9Qll2qWPyDJLOc9k45-kmsIBlI"  # 请勿将您的API Key 泄露在公开场合
 if "key" not in st.session_state:
     st.session_state.key = None
 if not st.session_state.key:
