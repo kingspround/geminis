@@ -62,12 +62,6 @@ def generate_token():
 def getAnswer_text(prompt, token):
     """处理用户输入，生成文本回复并显示"""
     his_messages = []  # 存储最近的 20 条聊天记录
-    for msg in st.session_state.messages[-20:]:  # 遍历最后 20 条记录
-        if msg["role"] == "user":
-            his_messages.append({"role": "user", "parts": msg["content"]})
-        elif msg["role"] == "assistant":
-            his_messages.append({"role": "assistant", "parts": msg["content"]})
-
     # 添加预设信息到 his_messages
     his_messages.append(
         {"role": "model", "parts": [{"text": """[
@@ -183,13 +177,24 @@ def getAnswer_text(prompt, token):
         his_messages.append(
             {"role": "user", "parts": [{"text": f"{prompt}"}]}
         )
+    for msg in st.session_state.messages[-20:]:  # 遍历最后 20 条记录
+        if msg["role"] == "user":
+            his_messages.append({"role": "user", "parts": msg["content"]})
+        elif msg["role"] == "assistant":
+            his_messages.append({"role": "assistant", "parts": msg["content"]})
 
-    response = model.generate_content(contents=his_messages, stream=True)
-    full_response = ""
-    for chunk in response:
-        full_response += chunk.text
-        yield chunk.text
 
+    try:
+        response = model.generate_content(contents=his_messages, stream=True)
+        full_response = ""
+        for chunk in response:
+            full_response += chunk.text
+            yield chunk.text
+        return full_response  # 返回完整的回复
+    except Exception as e:
+        st.error(f"An error occurred: {e}")
+        return ""  # 在发生错误时返回空字符串
+        
     # 更新最后一条回复
     if "last_response" in st.session_state and st.session_state.last_response:  # 判断列表是否为空
         st.session_state.last_response[-1] = full_response
