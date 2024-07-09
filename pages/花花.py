@@ -248,6 +248,63 @@ for message in st.session_state.messages:
     with st.chat_message(message["role"]):
         st.markdown(message["content"])
 
+# 显示聊天记录
+for i, message in enumerate(st.session_state.messages):
+    with st.chat_message(message["role"]):
+        st.markdown(message["content"])
+        # 添加按钮
+        if i == len(st.session_state.messages) - 1 and message["role"] == "assistant":
+            if st.button("✨", key=f"regenerate_{i}"):
+                # 重新生成回复
+                st.session_state.messages.pop(-1)  # 删除最后一条回复
+                st.session_state.last_response.pop(-1)  # 删除最后一条回复
+                with st.chat_message("assistant"):
+                    message_placeholder = st.empty()
+                    full_response = ""
+                    # 动态判断使用哪个模型
+                    if "img" in st.session_state and st.session_state.img is not None:  # 检测图片输入栏是否不为空
+                        # 使用 gemini-pro-vision 处理图片
+                        model = model_v
+                    else:
+                        # 使用 gemini-1.5-pro-latest 处理文本
+                        model = genai.GenerativeModel(model_name='gemini-1.5-pro-latest', generation_config=generation_config, safety_settings=safety_settings)
+
+                    if "use_token" in st.session_state and st.session_state.use_token:
+                        token = generate_token()
+                        if "img" in st.session_state and st.session_state.img is not None:  # 检测图片输入栏是否不为空
+                            for chunk in getAnswer_image(prompt, token, st.session_state.img):
+                                full_response += chunk
+                                message_placeholder.markdown(full_response + "▌")
+                            # 使用正则表达式过滤 "Use code with caution."
+                            full_response = re.sub(r"Use code with caution\.", "", full_response)
+                            # 只输出内容，不输出 "assistant:"
+                            if st.session_state.messages[-1]["role"] == "assistant":  # 检查上一个角色是否为 "assistant"
+                                message_placeholder.markdown(full_response)
+                            st.session_state.messages.append({"role": "assistant", "content": full_response})
+                        else:
+                            for chunk in getAnswer_text(prompt, token):
+                                full_response += chunk
+                                message_placeholder.markdown(full_response + "▌")
+                            message_placeholder.markdown(full_response)
+                            st.session_state.messages.append({"role": "assistant", "content": full_response})
+                    else:
+                        if "img" in st.session_state and st.session_state.img is not None:  # 检测图片输入栏是否不为空
+                            for chunk in getAnswer_image(prompt, "", st.session_state.img):
+                                full_response += chunk
+                                message_placeholder.markdown(full_response + "▌")
+                            # 使用正则表达式过滤 "Use code with caution."
+                            full_response = re.sub(r"Use code with caution\.", "", full_response)
+                            # 只输出内容，不输出 "assistant:"
+                            if st.session_state.messages[-1]["role"] == "assistant":  # 检查上一个角色是否为 "assistant"
+                                message_placeholder.markdown(full_response)
+                            st.session_state.messages.append({"role": "assistant", "content": full_response})
+                        else:
+                            for chunk in getAnswer_text(prompt, ""):
+                                full_response += chunk
+                                message_placeholder.markdown(full_response + "▌")
+                            message_placeholder.markdown(full_response)
+                            st.session_state.messages.append({"role": "assistant", "content": full_response})
+
 # 用户输入并处理
 if prompt := st.chat_input("Enter your message:"):
     if "use_token" in st.session_state and st.session_state.use_token:
