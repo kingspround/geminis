@@ -422,3 +422,22 @@ if st.session_state.get("file_upload_mode"):
 
         except Exception as e:
             st.error(f"读取本地文件失败：{e}")
+
+# --- 使用 st.experimental_memo 缓存历史记录 ---
+@st.experimental_memo
+def load_history_from_file(log_file):
+    try:
+        with open(log_file, "rb") as f:
+            return pickle.load(f)
+    except FileNotFoundError:
+        return []
+    except EOFError:
+        st.warning(f"读取历史记录失败：文件可能损坏。")
+        return []
+
+# 加载历史记录
+st.session_state.messages = load_history_from_file(log_file)
+# 显示聊天记录
+for i, message in enumerate(st.session_state.messages):
+    with st.chat_message(message["role"]):
+        st.write(message["content"], key=f"message_{i}")
