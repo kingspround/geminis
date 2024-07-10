@@ -270,7 +270,8 @@ def load_history(log_file):
                         if st.button("编辑♡", key=f"edit_{i}"):
                             st.session_state.editable_index = i
                             st.session_state.editing = True
-            st.success(f"{filename} 加载成功")
+            st.success(f"聊天记录已加载！")
+            
     except FileNotFoundError:
         st.warning(f"{filename} 不存在。")
     except EOFError:  # 处理 EOFError
@@ -308,16 +309,27 @@ if st.sidebar.button("读取历史记录"):
 if st.sidebar.button("清除历史记录"):
     clear_history(log_file)
 
-# 重置上一个输出
-if len(st.session_state.messages) > 0:
-    st.sidebar.button("重置上一个输出，不然人家就生气了！", on_click=lambda: st.session_state.messages.pop(-1))
-
 # ---  随机token开关 ---
 st.sidebar.title("设置")
 st.session_state.use_token = st.sidebar.checkbox("开启随机token", value=True)
 
+# 重置上一个输出的按钮
+if len(st.session_state.messages) > 0:
+    st.sidebar.button("重置上一个输出，不然人家就生气了！", on_click=lambda: st.session_state.messages.pop(-1))
+
 # 加载历史记录
 load_history(log_file)
+
+# 显示聊天记录
+for i, message in enumerate(st.session_state.messages):
+    with st.chat_message(message["role"]):
+        # 使用 st.write 显示对话内容
+        st.write(message["content"], key=f"message_{i}")
+        # 在最后两条消息中添加编辑按钮
+        if i >= len(st.session_state.messages) - 2:
+            if st.button("编辑♡", key=f"edit_{i}"):
+                st.session_state.editable_index = i
+                st.session_state.editing = True
 
 # 用户输入并处理
 if prompt := st.chat_input("Enter your message:"):
@@ -381,3 +393,4 @@ if prompt := st.chat_input("Enter your message:"):
     # 保存聊天记录到文件
     with open(log_file, "wb") as f:
         pickle.dump(st.session_state.messages, f)
+    st.experimental_rerun()  # 页面刷新
