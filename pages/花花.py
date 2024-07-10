@@ -261,8 +261,8 @@ def load_history(log_file):
         # 重新打开文件
         with open(log_file, "rb") as f:  # 使用 "rb" 模式读取
             st.session_state.messages = pickle.load(f)
-            # 重新运行应用程序，确保聊天记录加载后不会丢失
-            st.experimental_rerun()
+            st.experimental_rerun()  # 立即刷新页面
+
     except FileNotFoundError:
         st.warning(f"{filename} 不存在。")
     except EOFError:  # 处理 EOFError
@@ -275,6 +275,7 @@ def clear_history(log_file):
         st.success(f"成功清除 {filename} 的历史记录！")
     except FileNotFoundError:
         st.warning(f"{filename} 不存在。")
+
 
 # --- 侧边栏功能 ---
 st.sidebar.title("操作")
@@ -295,7 +296,6 @@ if st.session_state.img is not None:
 # 读取历史记录
 if st.sidebar.button("读取历史记录"):
     load_history(log_file)
-    st.success(f"成功加载 {filename} 的历史记录！")  # 加载完成时提示显示文件名
 
 # 清除历史记录
 if st.sidebar.button("清除历史记录"):
@@ -309,9 +309,6 @@ if len(st.session_state.messages) > 0:
 st.sidebar.title("设置")
 st.session_state.use_token = st.sidebar.checkbox("开启随机token", value=True)
 
-# 自动加载历史记录
-load_history(log_file)  # 进入网页时自动加载一次聊天记录
-
 # 显示聊天记录
 for i, message in enumerate(st.session_state.messages):
     with st.chat_message(message["role"]):
@@ -322,7 +319,6 @@ for i, message in enumerate(st.session_state.messages):
             if st.button("编辑♡", key=f"edit_{i}"):
                 st.session_state.editable_index = i
                 st.session_state.editing = True
-
 
 # 用户输入并处理
 if prompt := st.chat_input("Enter your message:"):
@@ -386,5 +382,3 @@ if prompt := st.chat_input("Enter your message:"):
     # 保存聊天记录到文件
     with open(log_file, "wb") as f:
         pickle.dump(st.session_state.messages, f)
-
-    st.experimental_rerun()  # AI每次回复完就执行一次刷新页面
