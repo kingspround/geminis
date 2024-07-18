@@ -49,7 +49,7 @@ safety_settings = [
    },
 ]
 
-model = genai.GenerativeModel(model_name="gemini-1.5-pro-latest",generation_config=generation_config,safety_settings=safety_settings)
+model = genai.GenerativeModel(model_name="gemini-1.5-flash",generation_config=generation_config,safety_settings=safety_settings)
 
 # LLM
 
