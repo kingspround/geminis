@@ -48,7 +48,7 @@ safety_settings = [
     },
 ]
 model = genai.GenerativeModel(
-    model_name="gemini-1.5-flash",
+    model_name="gemini-1.5-flash-latest",
     generation_config=generation_config,
     safety_settings=safety_settings,
 )
@@ -340,7 +340,7 @@ if prompt := st.chat_input("Enter your message:"):
             model = model_v
         else:
             # 使用 gemini-1.5-pro-latest 处理文本
-            model = genai.GenerativeModel(model_name='gemini-1.5-flash', generation_config=generation_config, safety_settings=safety_settings)
+            model = genai.GenerativeModel(model_name='gemini-1.5-flash-latest', generation_config=generation_config, safety_settings=safety_settings)
 
         if "use_token" in st.session_state and st.session_state.use_token:
             token = generate_token()
