@@ -10,7 +10,7 @@ from io import StringIO
 import streamlit as st
 
 if "key" not in st.session_state:
-    st.session_state.key = "AIzaSyDPFZ7gRba9mhKTqbXA_Y7fhAxS8IEu0bY"
+    st.session_state.key = "AIzaSyC7vfMxqZQJVNq0rUhzpOKu1m84y737Tak"
     
 if not st.session_state.key:
     st.info("Please add your key to continue.")
