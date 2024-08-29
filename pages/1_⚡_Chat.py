@@ -18,14 +18,6 @@ if not st.session_state.key:
     
 genai.configure(api_key=st.session_state.key)
 
-# Set up the model
-generation_config = {
-  "temperature": 0.9,
-  "top_p": 1,
-  "top_k": 1,
-  "max_output_tokens": 2048,
-}
-
 safety_settings = [
   {
     "category": "HARM_CATEGORY_HARASSMENT",
@@ -99,6 +91,3 @@ if prompt := st.chat_input():
             print(re)
             st.session_state.messages.append({"role": "assistant", "content": re})
 
-# 增加重置上一个输出的按钮
-if len(st.session_state.messages) > 0:
-    st.button("重置上一个输出", on_click=lambda: st.session_state.messages.pop(-1))
