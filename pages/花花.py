@@ -14,7 +14,7 @@ import pickle
 
 
 # API Key 设置
-st.session_state.key = "AIzaSyDa-nLT0MtfDd6y2Ceea3Y4c-tMFUPPIMU"  # 请勿将您的API Key 泄露在公开场合
+st.session_state.key = "AIzaSyC7vfMxqZQJVNq0rUhzpOKu1m84y737Tak"  # 请勿将您的API Key 泄露在公开场合
 if "key" not in st.session_state:
     st.session_state.key = None
 if not st.session_state.key:
