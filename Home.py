@@ -16,7 +16,7 @@ st.markdown(
 '''
 )
 
-key="AIzaSyCDoTOEe1CAMKCz4GhnCe66l5Y6pSMsIu8"
+key=""
 
 if "key" not in st.session_state:
     st.session_state.key = None
