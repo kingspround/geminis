@@ -11,7 +11,7 @@ import streamlit as st
 import pickle
 
 # Insert your API key here
-st.session_state.key = "AIzaSyDPFZ7gRba9mhKTqbXA_Y7fhAxS8IEu0bY"
+st.session_state.key = "AIzaSyD9C7e4kCAphOkFNx1o1uLAyYa84B8-pIQ"
 
 if "key" not in st.session_state:
     st.session_state.key = None
