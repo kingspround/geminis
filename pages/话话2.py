@@ -48,10 +48,12 @@ safety_settings = [
     },
 ]
 model = genai.GenerativeModel(
-    model_name="gemini-1.5-flash",
+    model_name="gemini-1.5-pro-latest",
     generation_config=generation_config,
     safety_settings=safety_settings,
 )
+model_v = genai.GenerativeModel(model_name='gemini-pro-vision', generation_config=generation_config)  # 添加 gemini-pro-vision 模型
+
 
 # LLM
 
@@ -215,7 +217,7 @@ def getAnswer_image(prompt, token, image):
             his_messages.append({"role": "user", "parts": [{"text": msg["content"]}]})
     # 使用 gemini-pro-vision 模型处理图片
     prompt_v = ""
-    for msg in st.session_state.messages[-20:]:
+    for msg in st.session_state.messages[-2:]:
         prompt_v += f'''{msg["role"]}:{msg["content"]}
         Use code with caution.
         '''
