@@ -4,8 +4,7 @@ import pickle
 import os
 
 # 设置 OpenAI API 密钥
-api_key="sk-zGzsKlEMKwMgpXPThLcEvOQ9fuDXG0J4oBqz-yepz1T3BlbkFJrGTEp7fUWyY0RU54RfRdLqhfyui7H_gWe76PDVX2UA" 
-openai.api_key = api_key
+openai.api_key ="sk-zGzsKlEMKwMgpXPThLcEvOQ9fuDXG0J4oBqz-yepz1T3BlbkFJrGTEp7fUWyY0RU54RfRdLqhfyui7H_gWe76PDVX2UA" 
 
 # 初始化聊天历史记录
 if "messages" not in st.session_state:
