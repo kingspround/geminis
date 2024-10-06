@@ -3,7 +3,7 @@ import openai
 import streamlit as st
 
 # 从环境变量中读取 API 密钥，确保你已经设置了 OPENAI_API_KEY
-openai_api_key = "sk-zGzsKlEMKwMgpXPThLcEvOQ9fuDXG0J4oBqz-yepz1T3BlbkFJrGTEp7fUWyY0RU54RfRdLqhfyui7H_gWe76PDVX2UA"
+openai.api_key = os.getenv("OPENAI_API_KEY")
 
 if openai_api_key is None:
     st.error(
