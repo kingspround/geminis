@@ -1,4 +1,4 @@
-openai
+openai==1.51.0
 anthropic
 langchain
 google-generativeai
