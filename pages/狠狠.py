@@ -28,10 +28,7 @@ image_buffer = st.file_uploader("Upload an image (optional)", type=["jpg", "jpeg
 # Generate response from ChatGPT
 if user_input:
     try:
-        if image_buffer is not None:
-            response = await chatgpt.send_vision_message(user_input, messages, image_buffer=image_buffer)
-        else:
-            response = await chatgpt.send_message(user_input, messages)
+        response = await process_message(user_input, messages, image_buffer)  # Call the async function
         messages.append({"role": "assistant", "content": response})
         st.write("**ChatGPT:** " + response)
     except Exception as e:
@@ -44,6 +41,14 @@ for i, message in enumerate(messages):
     else:
         st.write(f"**ChatGPT:** {message['content']}")
 
+# Define the async function
+async def process_message(user_input, messages, image_buffer):
+    chatgpt = ChatGPT(model="gpt-3.5-turbo")
+    if image_buffer is not None:
+        response = await chatgpt.send_vision_message(user_input, messages, image_buffer=image_buffer)
+    else:
+        response = await chatgpt.send_message(user_input, messages)
+    return response
 
 class ChatGPT:
     def __init__(self, model="gpt-3.5-turbo"):
