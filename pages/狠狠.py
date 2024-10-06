@@ -371,4 +371,3 @@ class ChatGPT:
         n_input_tokens = len(encoding.encode(prompt)) + 1
         n_output_tokens = len(encoding.encode(answer))
 
-        return n_input_tokens, n_output_tokens
