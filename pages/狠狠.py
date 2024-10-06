@@ -1,15 +1,15 @@
 import openai
 import streamlit as st
-import pickle
-import os
 
 # 设置 OpenAI API 密钥
 api_key ="sk-zGzsKlEMKwMgpXPThLcEvOQ9fuDXG0J4oBqz-yepz1T3BlbkFJrGTEp7fUWyY0RU54RfRdLqhfyui7H_gWe76PDVX2UA" 
 openai.api_key = api_key
 
-# 初始化聊天历史记录
+# 初始化聊天历史
 if "messages" not in st.session_state:
-    st.session_state.messages = []
+    st.session_state.messages = [
+        {"role": "system", "content": "你是一个友好的 AI 助手。"}
+    ]
 
 # --- 函数定义 ---
 def generate_response(messages):
@@ -18,7 +18,7 @@ def generate_response(messages):
         model="gpt-4-1106-preview",
         messages=messages,
     )
-    return response.choices[0].message.content
+    return response.choices[0].message['content']
 
 # --- 主聊天界面 ---
 st.title("ChatGPT 对话")
