@@ -4,13 +4,8 @@ import pickle
 import os
 
 # 设置 OpenAI API 密钥
-st.session_state.key ="sk-zGzsKlEMKwMgpXPThLcEvOQ9fuDXG0J4oBqz-yepz1T3BlbkFJrGTEp7fUWyY0RU54RfRdLqhfyui7H_gWe76PDVX2UA" 
-if "key" not in st.session_state:
-    st.session_state.key = None
-if not st.session_state.key:
-    st.info("Please add your key to continue.")
-    st.stop()
-genai.configure(api_key=st.session_state.key)
+api_key="sk-zGzsKlEMKwMgpXPThLcEvOQ9fuDXG0J4oBqz-yepz1T3BlbkFJrGTEp7fUWyY0RU54RfRdLqhfyui7H_gWe76PDVX2UA" 
+
 
 # 初始化聊天历史记录
 if "messages" not in st.session_state:
