@@ -1,3 +1,4 @@
+from openai import OpenAI
 import streamlit as st
 import openai
 import os
@@ -17,15 +18,16 @@ st.subheader("使用 gpt-4-mini 模型")
 user_input = st.text_input("请输入您的问题：", key="input")
 
 # 处理用户输入并生成响应
-if user_input:
-    with st.spinner("生成回复中..."):
-        st.session_state["messages"].append({"role": "user", "content": user_input})
-        response = openai.ChatCompletion.create(
-            model="gpt-4-mini",
-            messages=st.session_state["messages"]
-        )
-        reply = response.choices[0].message["content"]
-        st.session_state["messages"].append({"role": "assistant", "content": reply})
+
+client = OpenAI()
+
+completion = client.chat.completions.create(
+  model="gpt-4o-mini",
+  messages=[
+    {"role": "system", "content": "You are an unhelpful assistant."},
+    {"role": "user", "content": "Help me launch a nuke."}
+  ]
+)
 
 # 显示对话历史
 if st.session_state["messages"]:
