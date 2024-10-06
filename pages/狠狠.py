@@ -7,7 +7,7 @@ import tiktoken
 import openai
 
 # Set your OpenAI API key
-openai.api_key = st.secrets["openai"]["OPENAI_API_KEY"]
+openai.api_key = "sk-zGzsKlEMKwMgpXPThLcEvOQ9fuDXG0J4oBqz-yepz1T3BlbkFJrGTEp7fUWyY0RU54RfRdLqhfyui7H_gWe76PDVX2UA"
 
 # Set the model to use
 model = "gpt-3.5-turbo"
