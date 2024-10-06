@@ -2,22 +2,15 @@ import os
 import openai
 import streamlit as st
 
-# 从环境变量中读取 API 密钥，确保你已经设置了 OPENAI_API_KEY
-openai.api_key = os.getenv("OPENAI_API_KEY")
+# Streamlit 应用标题
+st.title("ChatGPT 对话")
 
-if openai_api_key is None:
-    st.error(
-        "未设置 OPENAI_API_KEY 环境变量。请设置该变量以包含您的 API 密钥。"
-    )
-else:
-    openai.api_key = openai_api_key
+# 使用 st.secrets 读取 API 密钥
+openai.api_key = st.secrets["OPENAI_API_KEY"]
 
 # 初始化对话历史
 if "messages" not in st.session_state:
     st.session_state.messages = []
-
-# Streamlit 应用标题
-st.title("ChatGPT 对话")
 
 # 用户输入框
 user_input = st.text_input("你：")
