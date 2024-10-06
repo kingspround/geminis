@@ -1,4 +1,4 @@
-openai
+openai>=1.0.0
 anthropic
 langchain
 google-generativeai
@@ -7,4 +7,3 @@ promise
 asyncio
 python-dotenv
 streamlit==1.24
-openai>=1.0.0
