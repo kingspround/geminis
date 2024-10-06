@@ -14,10 +14,10 @@ if "messages" not in st.session_state:
 def generate_response(messages):
     """使用 OpenAI API 生成回复"""
     response = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo",  # 使用 ChatGPT 模型
+        model="gpt-3.5-turbo",
         messages=messages,
     )
-    return response.choices[0].message.content
+    return response['choices'][0]['message']['content']  # 使用正确的索引获取回复内容
 
 # --- Streamlit 应用程序 ---
 st.title("🤖 ChatGPT 聊天机器人")
