@@ -13,11 +13,17 @@ if "messages" not in st.session_state:
 # --- 函数定义 ---
 def generate_response(messages):
     """使用 OpenAI API 生成回复"""
-    response = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo",
-        messages=messages,
+
+    # 注意：这里使用了新的 API 调用方式
+    response = openai.Completion.create(
+        engine="gpt-3.5-turbo",  # 选择合适的模型引擎
+        prompt=''.join([f"{m['role']}: {m['content']}\n" for m in messages]), # 格式化消息
+        max_tokens=150,  # 限制回复长度
+        n=1,             # 只生成一个回复
+        stop=None,        # 不设置停止词
+        temperature=0.7, # 控制回复的随机性
     )
-    return response['choices'][0]['message']['content']  # 使用正确的索引获取回复内容
+    return response.choices[0].text.strip()  # 从回复中提取文本内容
 
 # --- Streamlit 应用程序 ---
 st.title("🤖 ChatGPT 聊天机器人")
@@ -71,9 +77,10 @@ if prompt := st.chat_input("输入你的消息:"):
     with st.chat_message("assistant"):
         message_placeholder = st.empty()
         full_response = ""
-        for chunk in generate_response(st.session_state.messages).split():
-            full_response += chunk + " "
-            message_placeholder.markdown(full_response + "▌")
+        
+        # 注意：这里不再需要逐块处理回复
+        full_response = generate_response(st.session_state.messages)
+        
         message_placeholder.markdown(full_response)
     st.session_state.messages.append({"role": "assistant", "content": full_response})
 
