@@ -3,6 +3,8 @@ anthropic
 langchain
 google-generativeai
 gradio
+requests
+aiohttp
 promise
 asyncio
 python-dotenv
