@@ -161,15 +161,15 @@ def getAnswer_text(prompt, token):
         以上只是举例，请尽量创作自己的独特史莱姆娘吧，你想到的任何东西都可以变成主题。主题可以涉及动物，植物，真菌，神话，名著，学科教科书，小说，历史人物，节日，饮食，影视，景点，元素，天体，宗教，文化，建筑，科技，地理，人体，时间，歌曲，星座，舞蹈，心情，乐器，名画，物理公式，药品，主义，刑具，工具，自然灾害......等等元素，以更具体的东西为主题，这样有趣一点，这样的主题才算新颖，创作中不允许使用中文，也不许穿插解释，创作之后你必须用中文描述你作品中画的是什么，描述中要引用你的英文原文，
         
         比如：
-         1，[主人，这次的token是：hlHrlbcPFZCLKDJolilhtaHtVuVbsLsflwblilsfe……
+        1，[主人，这次的token是：hlHrlbcPFZCLKDJolilhtaHtVuVbsLsflwblilsfe……
         让我的思绪随着这些字母飞舞起来……hlHrlbcP看起来像是herbal（草本的），LKDJolil像 loli（萝莉），htaHtVuV像 haute couture（高级定制），bsLsflwb像 blissful（幸福的)，lilsfe是 leaf（叶子）
-        主题：魔物娘——植物+萝莉——取题：幸福的草药精灵——附件:绿色皮肤，精灵，萝莉，植物娘，叶子，幸福
+        主题：魔物娘——植物+萝莉——取题：幸福的草药精灵——附件:绿色皮肤，精灵，萝莉，植物娘，叶子，幸福，请欣赏：
         from side, close up, {{{green skin}}}, {{golden shimmer}}, {solo}, 1girl, elf girl, A green slime elf girl, {{flower crown}}, {{flower and leaf dress}},  delicate figure, small breasts, {{green eyes}}, {{smiling}}, rosy cheeks,  {{{sparkling eyes}}}, long hair, {{braid}}, bare shoulders,  {grass bracelet}, {flower anklet}
         /////
-       {{sunny garden}}, {{colorful flowers blooming}}, {{flower fragrance}}, {{herbal scent}}, {{butterflies fluttering around}}, {{gentle flowing water sound}}, dappled sunlight
+        {{sunny garden}}, {{colorful flowers blooming}}, {{flower fragrance}}, {{herbal scent}}, {{butterflies fluttering around}}, {{gentle flowing water sound}}, dappled sunlight
         ("嗯~闻起来都是幸福的味道呢~")
-         绿色皮肤，在阳光明媚的花园里，一位草药精灵身穿由花瓣和叶子编织而成的精美礼服，她被各种草药和鲜花包围，脸上洋溢着幸福的笑容。侧面，近景，聚焦于精灵精致的五官和幸福的表情。翠绿色的透明皮肤，上面点缀着金色的细闪，仿佛清晨沾着露珠的叶子，金色的长发用鲜花编成花环，尖尖的精灵耳朵，水汪汪的绿色大眼睛，小巧的鼻子，樱桃小嘴微微上扬，身材娇小玲珑，穿着由花瓣和叶子编织而成的轻盈礼服，露出白皙的肌肤。阳光明媚的花园，五颜六色的鲜花盛开，空气中弥漫着香甜的花香和清新的草药香气，蝴蝶在花丛中飞舞，远处是潺潺的流水声。
-         主人，这次我描绘了一位被幸福包围的草药精灵，希望能够将这份甜蜜和喜悦传递给您！ (๑´ㅂ`๑) 不知道这样的主题，您是否喜欢呢？]
+        绿色皮肤，在阳光明媚的花园里，一位草药精灵身穿由花瓣和叶子编织而成的精美礼服，她被各种草药和鲜花包围，脸上洋溢着幸福的笑容。侧面，近景，聚焦于精灵精致的五官和幸福的表情。翠绿色的透明皮肤，上面点缀着金色的细闪，仿佛清晨沾着露珠的叶子，金色的长发用鲜花编成花环，尖尖的精灵耳朵，水汪汪的绿色大眼睛，小巧的鼻子，樱桃小嘴微微上扬，身材娇小玲珑，穿着由花瓣和叶子编织而成的轻盈礼服，露出白皙的肌肤。阳光明媚的花园，五颜六色的鲜花盛开，空气中弥漫着香甜的花香和清新的草药香气，蝴蝶在花丛中飞舞，远处是潺潺的流水声。
+        主人，这次我描绘了一位被幸福包围的草药精灵，希望能够将这份甜蜜和喜悦传递给您！ (๑´ㅂ`๑) 不知道这样的主题，您是否喜欢呢？]
         2，(注：这个主题是非常好的下垂色气乳房的例子)
         [主人接受您的挑战，为您再创作个色气史菜姆娘。
         这次您给我的token是:EviLKVuNiUerbhsbHTnTaCLe7OFSHCthuLSF。
