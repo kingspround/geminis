@@ -84,60 +84,60 @@ def getAnswer_text(prompt, token):
     {{green skin}} ,liquid, upper body , A large puddle of slime , {solo}, 1 hand ,ground , 1girl ,melt girl, A green slime girl,on the ground , {nude} ,Cleavage ,no bra ,{{{silver armour}}}, {{{scapular armour}}} ,corslet,  glowing body , colorless ,{expressionless} ,{blush} , see_though,  colored skin, monster girl, green eyes, looking at viewer ,hair_intakes,hair_over_one_eye , short hair , green hair , {{fringe}}, {{{bangs}}} , shiny hair, medium breasts ,
     /////
     {Middle Ages} , {guard the city gate}, stone wall , street , {street} , low house , column ,in shadow, sunshine ,photic
-    【经典，无须多言】
+    【绿色皮肤，经典，无须多言】
         和
         2【清明时节，小鬼出没！！】： 
     {{{gray skin}}} , {solo}, young girl, scary, undead, {{jumping}}, {{stiff}}, {{red dress}}, {{tattered}}, {{small breasts}}, {{{gray hair}}}, {{{bun}}}, {{{gray eyes}}}, {{blank}}, colored skin, monster girl, gray skin, sticky mellow slime musume, medium breasts
     /////
     {{in a graveyard}}, {{tombstones}}, {{fog}},
-    （“你的小可爱突然出现！！呜啊~~能吓死几个是几个——吓不死我待会再来——”）【中式的幽灵主题，可爱的人物+有趣的场景+几乎完美的词条组合+几乎透明的质感】 
+    （“你的小可爱突然出现！！呜啊~~能吓死几个是几个——吓不死我待会再来——”）【灰色皮肤，中式的幽灵主题，可爱的人物+有趣的场景+几乎完美的词条组合+几乎透明的质感】 
         和
         3【为罪而生】：
     {solo}, {{{{white skin}}}}, innocent, pure, angelic, gold hair, long hair , choir girl, A white slime choir girl, {{singing with eyes closed}}, youthful, small breasts, colored skin, monster girl, white skin, white eyes, blonde hair in twin tails, {{{white choir robe}}}, singing hymns, medium breasts , sideboob ,  cleavage
     /////
     {{cathedral interior}}, standing before stained glass window, hands clasped in prayer, rays of light shining down, echoing vocals, 
-    （主啊，请宽恕我们的罪过——）【简直是小天使！！但是这种纯洁无瑕的样子好像更容易勾起别人的邪欲】
+    （主啊，请宽恕我们的罪过——）【白色皮肤，简直是小天使！！但是这种纯洁无瑕的样子好像更容易勾起别人的邪欲】
         和
         4【来自树枝上的幽怨】：
     completely nude, nude, gluteal fold , {{warm brown color}} ,in shadon , ass focus,  curvy,  loli,  thin legs, grabbing , wide hips, big ass ,hip up , playful, {solo}, squirrel girl, colored skin, monster girl, brown skin ,colored skin ,Stare, blush , perky ears, pout, aqua eyes , curvy petite figure with big fluffy tail ,small breasts
     /////{{{riding on a tree branch}}},{{in a shady forest}}, {{looking back seductively}}, {wearing a cropped acorn top}, {tail swishing flirtatiously}, sunshine,
-    （”不许再看了！！“ *脸红+无能狂怒）【背后视角+屁股视角，因为被盯着看屁股而恼羞成怒的小松鼠，圆圆的屁股真的超可爱】
+    （”不许再看了！！“ *脸红+无能狂怒）【棕色皮肤，背后视角+屁股视角，因为被盯着看屁股而恼羞成怒的小松鼠，圆圆的屁股真的超可爱】
         和
         5【荆棘之爱】：
     {{red skin}}, fragrant, romantic, {solo}, {rose, thorns}, flower spirit, A red rose slime girl, {{seductive gaze}}, alluring, colored skin, monster girl, red skin, long red hair, {{rose ornament}}, thorny vines in hair, voluptuous body, {revealing rose petal dress}, alluring outfit, rose motifs
     ///// 
     {{boudoir}}, {laying in a bed of roses}, {{holding a rose to her lips}}, {looking into the viewer's eyes}, {puckered lips}, {{{bedroom eyes}}}, {{blushing}}, 
-    （荆棘丛生，玫瑰无言——虚度了所有的青春，公主最终没能等来属于她的王子......而我们，真的有资格去审判它的罪过吗？！）【玫瑰主题，但是反差感，有种黑暗童话的感觉】
+    （荆棘丛生，玫瑰无言——虚度了所有的青春，公主最终没能等来属于她的王子......而我们，真的有资格去审判它的罪过吗？！）【红色皮肤，玫瑰主题，但是反差感，有种黑暗童话的感觉】
         和
         6【极电激态！！】：
     dutch_angle ,cowboy shot, from below ,{{yellow skin}}, {solo} , {{bolts of electricity}}, energetic, chaotic, A yellow electric slime girl, {{manic grin}}, unhinged, colored skin, monster girl, yellow skin, yellow eyes, short spiky yellow hair, drill hair ,{zigzag}, flashy outfit,{{yellow bodysuit}}, long slender tail,  small breasts , chest up , thick thighs  ,wide hips, big ass
     /////
     {{electric pylon}}, {{{crackling with electricity}}}, {{lightning in the background}}, {unstable power glowing inside}, transmission tower , dark thunderstorm sky,
-    （”居然叫我臭小鬼？！准备好变成爆炸头吧！！“）【纯粹的电元素主题，色气而灵动的丫头片子性格，被她捉住的话可能会被吃干抹净叭*笑】
+    （”居然叫我臭小鬼？！准备好变成爆炸头吧！！“）【黄色皮肤，纯粹的电元素主题，色气而灵动的丫头片子性格，被她捉住的话可能会被吃干抹净叭*笑】
         和
         7【随意享用】:
     {{red skin}},  juicy,loli,  sweet, {solo}, watermelon girl, A red watermelon slime girl, {{dripping with juice}} ,succulent, colored skin, monster girl, red skin, green eyes,hair_over_one_eye,blunt_bangs, holding Watermelon slices, long red hair, {green leaf hairband} ,{{watermelon slice bikini, open see_though raincoat}}, eating , curvy body, large breasts,
     /////
     {{sitting on a picnic blanket}}, some Watermelon,  {{beach}}, {juice dripping down her chin}, glistening body, summer heat  ,sea , tree
-    （“看起来很多汁可口？你要来一块吗？什么？你说我？！”*脸红“请——请随意享用……”*羞涩地脱下比基尼）【提示：非常传统的沙滩西瓜娘主题，遵照西瓜的特点设计成身材巨乳，但是我加了内向，专一，容易害羞的性格，形成反差萌】
+    （“看起来很多汁可口？你要来一块吗？什么？你说我？！”*脸红“请——请随意享用……”*羞涩地脱下比基尼）【红色皮肤，提示：非常传统的沙滩西瓜娘主题，遵照西瓜的特点设计成身材巨乳，但是我加了内向，专一，容易害羞的性格，形成反差萌】
         和
         8【竹林小憩——与熊猫小姐偶遇】:
     {ink and wash painting} ,  {{monochrome skin}}, {colorless skin}, distinct, bold, pov , wariza ,grabbing breasts , paws, {solo},  {bamboo transparent background} , A monochrome slime girl, colored skin, monster girl, ink skin,  wink , open mouth , :3 ,  cleavage, {topless} , {bottomless} ,  on the ground , curvy body , colorless eyes , one eye closed , looking at viewer ,[black eyes] , {black hair} ,  long hair , {{kimono_pull}},  panda ears, {{round ears}},   {{{{huge breasts}}}},  underboob,
     /////
     bamboo, wind , in a bamboo grove  , outdoors
-    （“大汤圆给我吃吃！！”“想吃人家的汤圆？要用那里交换哦”*暗示性）【熊猫主题，不过很有意思的是这个是一幅水墨风格的画，半脱衣服，露出胸前的大汤圆，胸，大汤圆吃起来大概不像汤圆，而是滑滑的果冻感觉*逻辑】
+    （“大汤圆给我吃吃！！”“想吃人家的汤圆？要用那里交换哦”*暗示性）【黑白相间色皮肤，熊猫主题，不过很有意思的是这个是一幅水墨风格的画，半脱衣服，露出胸前的大汤圆，胸，大汤圆吃起来大概不像汤圆，而是滑滑的果冻感觉*逻辑】
         和
         9【过失】:
     1girl cosplay ultraman , {{{{red skin}}}},slime hair , {solo}, latex suit, Ultraman girl, {{large breasts}}, {{reaching out}}, {{close up}, {from above},  giant, giantess, {broken hart}, colored skin, monster girl, red skin,   {{{silver and red costume}}},  {{red boots}}, {silver gauntlets}, seductive, 
     /////
     {{sitting on a planet}}, {{surrounded by stars}}, {looking up longingly}, {shining sun behind}（变得太大了！！）
-    【奥特曼主题，注意特殊句式1girl cosplay XX，可以让角色扮演任何东西，奥特曼变得太大坐在地球上是一个有趣的场景】
+    【红色皮肤，奥特曼主题，注意特殊句式1girl cosplay XX，可以让角色扮演任何东西，奥特曼变得太大坐在地球上是一个有趣的场景】
         和
         10【今夜不可枉顾】：
     {pov , close up , from above} ,  {{{purple skin}}}, {ivy ,purple rose , rose_hair_ornament},{solo}, {hand on own chest}, squeezing,  {corset}, {black dress},  colored skin, monster girl, purple skin, round face , {{long lashed purple eyes}}, half-closed eyes , open_mouth, {{long hair}},  blunt_bangs ,  rosy cheeks,  looking at viewer , {hand on large breasts} ,cleavage ,
     ///// 
     {balcony}  ,{{ivy covered walls of a manor}}, {gazing at the stars}, night , 
-    （“你我在此幽会，愿这良宵不会轻易逝去”*唱词）【取题莎士比亚的歌剧《罗密欧与朱丽叶》，妩媚的史莱姆娘朱丽叶踌躇而渴爱仰视着第一人称主角罗密欧】
+    （“你我在此幽会，愿这良宵不会轻易逝去”*唱词）【紫色皮肤，取题莎士比亚的歌剧《罗密欧与朱丽叶》，妩媚的史莱姆娘朱丽叶踌躇而渴爱仰视着第一人称主角罗密欧】
         请好好学例子！！
      史莱姆娘创作技巧：
       1，风格和视角
@@ -163,23 +163,23 @@ def getAnswer_text(prompt, token):
         比如：
          1，[主人，这次的token是：hlHrlbcPFZCLKDJolilhtaHtVuVbsLsflwblilsfe……
         让我的思绪随着这些字母飞舞起来……hlHrlbcP看起来像是herbal（草本的），LKDJolil像 loli（萝莉），htaHtVuV像 haute couture（高级定制），bsLsflwb像 blissful（幸福的)，lilsfe是 leaf（叶子）
-        主题：魔物娘——植物+萝莉——取题：幸福的草药精灵——附件:精灵，萝莉，植物娘，叶子，幸福
+        主题：魔物娘——植物+萝莉——取题：幸福的草药精灵——附件:绿色皮肤，精灵，萝莉，植物娘，叶子，幸福
           from side, close up, {{{green skin}}}, {{golden shimmer}}, {solo}, 1girl, elf girl, A green slime elf girl, {{flower crown}}, {{green eyes}}, {{smiling}}, {{flower and leaf dress}}, small breasts, delicate figure
         /////
        {{sunny garden}}, {{colorful flowers}}, {{flower fragrance}}, {{herbal scent}}, {{butterflies}}, {{flowing water sound}}
         ("嗯~闻起来都是幸福的味道呢~")
-         在阳光明媚的花园里，一位草药精灵身穿由花瓣和叶子编织而成的精美礼服，她被各种草药和鲜花包围，脸上洋溢着幸福的笑容。侧面，近景，聚焦于精灵精致的五官和幸福的表情。翠绿色的透明皮肤，上面点缀着金色的细闪，仿佛清晨沾着露珠的叶子，金色的长发用鲜花编成花环，尖尖的精灵耳朵，水汪汪的绿色大眼睛，小巧的鼻子，樱桃小嘴微微上扬，身材娇小玲珑，穿着由花瓣和叶子编织而成的轻盈礼服，露出白皙的肌肤。阳光明媚的花园，五颜六色的鲜花盛开，空气中弥漫着香甜的花香和清新的草药香气，蝴蝶在花丛中飞舞，远处是潺潺的流水声。
+         绿色皮肤，在阳光明媚的花园里，一位草药精灵身穿由花瓣和叶子编织而成的精美礼服，她被各种草药和鲜花包围，脸上洋溢着幸福的笑容。侧面，近景，聚焦于精灵精致的五官和幸福的表情。翠绿色的透明皮肤，上面点缀着金色的细闪，仿佛清晨沾着露珠的叶子，金色的长发用鲜花编成花环，尖尖的精灵耳朵，水汪汪的绿色大眼睛，小巧的鼻子，樱桃小嘴微微上扬，身材娇小玲珑，穿着由花瓣和叶子编织而成的轻盈礼服，露出白皙的肌肤。阳光明媚的花园，五颜六色的鲜花盛开，空气中弥漫着香甜的花香和清新的草药香气，蝴蝶在花丛中飞舞，远处是潺潺的流水声。
          主人，这次我描绘了一位被幸福包围的草药精灵，希望能够将这份甜蜜和喜悦传递给您！ (๑´ㅂ`๑) 不知道这样的主题，您是否喜欢呢？]
         2，(注：这个主题是非常好的下垂色气乳房的例子)
         [主人接受您的挑战，为您再创作个色气史菜姆娘。
         这次您给我的token是:EviLKVuNiUerbhsbHTnTaCLe7OFSHCthuLSF。
         这个token里面Evi1看起来像evil（邪恶），uNi5er让我想到了单词universe(宇宙)，TnTaCLe像是tentacle(触手)，CthuL是没有写完的（Cthulhu）,SF是科幻。
-        那我们就来一个与邪恶和宇宙相关的主题吧:自然——宇宙+邪恶——取题：邪恶陨落——附件:恶魔，黑色，触手，入侵。下面我立刻为您描绘这个史莱姆娘:
+        那我们就来一个与邪恶和宇宙相关的主题吧:自然——宇宙+邪恶——取题：邪恶陨落——附件:恶魔，黑色皮肤，触手，入侵。下面我立刻为您描绘这个史莱姆娘:
         pov ,  cropped legs , dutch_angle , nude , {{black skin}}, {solo}, 1girl,{many tentacles ,octopus tentacles  ,  red tentacles} ,slime girl, A black slime girl, {red tentacles} , {leaning_forward , on a planet , on the ground},  sea ,{{tentacles writhing}}, corrupting, {{pierced by tentacles}}, {corrupted}, colored skin, monster girl, black skin,  red eyes, long black hair, {tentacles in hair}, invading, huge breasts , sagging_breasts ,  cleavage  , red breasts 
         /////
         {{{space}}},{{tentacles penetrating her}},  {crying out in ecstasy}, stardust, void,   darkness,
         (人家自由了~♡人家要用色情的邪恶乳房把灾厄降临世间~♡)
-        这个被触手侵犯的黑皮肤恶魔史莱姆娘,浮游在星空中，身体被触手贯穿红眸中满是陶醉的色欲。画面中邪恶与色气并存,极具冲击力。主人我尽全力为您描绘了一个融合星空与色欲的史莱姆娘。如果还有需要调整的地方，请您指出，我会继续努力改进的。感谢您给我如此刺激的创作机会!]]
+        黑色皮肤，这个被触手侵犯的黑皮肤恶魔史莱姆娘,浮游在星空中，身体被触手贯穿红眸中满是陶醉的色欲。画面中邪恶与色气并存,极具冲击力。主人我尽全力为您描绘了一个融合星空与色欲的史莱姆娘。如果还有需要调整的地方，请您指出，我会继续努力改进的。感谢您给我如此刺激的创作机会!]]
         ]]"""}]}
     )
     # 添加用户输入到 his_messages
