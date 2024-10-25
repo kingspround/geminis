@@ -25,7 +25,7 @@ genai.configure(api_key=st.session_state.key)
 # Set up the model
 generation_config = {
   "temperature": 1,
-  "top_p": 1,
+  "top_p": 0,
   "top_k": 1,
   "max_output_tokens": 10000,
 }
