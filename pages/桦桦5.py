@@ -403,6 +403,7 @@ def getAnswer(prompt):
 
 
 
+
     for msg in st.session_state.messages[-20:]:
         if msg["role"] == "user":
             his_messages.append({"role": "user", "parts": [{"text": msg["content"]}]})
@@ -450,10 +451,13 @@ if "messages" not in st.session_state:
 for i, message in enumerate(st.session_state.messages):
     if message["role"] == "user":
         with st.chat_message("user"):
-            st.write(message["content"], key=f"message_{i}")
+            # 获取 st.write 方法，并尝试调用
+            write_func = getattr(st, "write")
+            write_func(message["content"], key=f"message_{i}")
     elif message["content"] is not None:  # 只有当 message["content"] 不为空时才显示
         with st.chat_message("assistant"):
-            st.write(message["content"], key=f"message_{i}")
+            write_func = getattr(st, "write")
+            write_func(message["content"], key=f"message_{i}")
 
     # 在最后两个对话中添加编辑按钮
     if i >= len(st.session_state.messages) - 2:
@@ -536,10 +540,13 @@ if st.session_state.get("file_upload_mode"):
             for i, message in enumerate(st.session_state.messages):
                 if message["role"] == "user":
                     with st.chat_message("user"):
-                        st.write(message["content"], key=f"message_{i}")
+                        # 获取 st.write 方法，并尝试调用
+                        write_func = getattr(st, "write")
+                        write_func(message["content"], key=f"message_{i}")
                 elif message["content"] is not None:
                     with st.chat_message("assistant"):
-                        st.write(message["content"], key=f"message_{i}")
+                        write_func = getattr(st, "write")
+                        write_func(message["content"], key=f"message_{i}")
                         
                     if i >= len(st.session_state.messages) - 2:  # 在最后两条消息中添加编辑按钮
                         if st.button("编辑", key=f"edit_{i}"):
@@ -569,10 +576,12 @@ def load_history(log_file):
             for i, message in enumerate(messages):
                 if message["role"] == "user":
                     with st.chat_message("user"):
-                        st.write(message["content"], key=f"message_{i}")
+                        write_func = getattr(st, "write")
+                        write_func(message["content"], key=f"message_{i}")
                 elif message["content"] is not None:
                     with st.chat_message("assistant"):
-                        st.write(message["content"], key=f"message_{i}")
+                        write_func = getattr(st, "write")
+                        write_func(message["content"], key=f"message_{i}")
 
                     # 在最后两个对话中添加编辑按钮
                     if i >= len(messages) - 2:
