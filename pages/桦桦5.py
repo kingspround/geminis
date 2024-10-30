@@ -407,7 +407,7 @@ def getAnswer(prompt):
         elif msg is not None and msg["content"] is not None:
             his_messages.append({"role": "model", "parts": [{"text": msg["content"]}]})
 
-        try:
+    try:
         response = model.generate_content(contents=his_messages, stream=True)
         full_response = ""
         for chunk in response:
@@ -443,6 +443,8 @@ if "messages" not in st.session_state:
         st.warning(f"读取历史记录失败：文件可能损坏。")
         st.session_state.messages = []  # 清空 messages
         # 可以考虑在这里添加代码，提示用户重新创建文件或重新加载数据
+
+# ... (加载历史记录的代码块) ...
 
 # 显示历史记录（只执行一次）
 for i, message in enumerate(st.session_state.messages):
@@ -498,25 +500,17 @@ if st.session_state.get("file_upload_mode"):
         except Exception as e:
             st.error(f"读取本地文件失败：{e}")
 
+# ... (其他代码) ...
+
+
 def load_history(log_file):
     try:
         # 重新打开文件
         with open(log_file, "rb") as f:  # 使用 "rb" 模式读取
             messages = pickle.load(f)
-            for i, message in enumerate(messages):
-                if message["role"] == "user":
-                    with st.chat_message("user"):
-                        st.write(message["content"])
-                elif message["content"] is not None:
-                    with st.chat_message("assistant"):
-                        st.write(message["content"])
-
-                    # 在最后两个对话中添加编辑按钮
-                    if i >= len(messages) - 2:
-                        if st.button("编辑", key=f"edit_{i}"):
-                            # 更改为可编辑文本
-                            st.session_state.editable_index = i  # 记录可编辑的索引
-                            st.session_state.editing = True  # 表示正在编辑
+            for message in messages:
+                with st.chat_message(message["role"]):
+                    st.markdown(message["content"])
 
             # 重新运行应用程序，确保聊天记录加载后不会丢失
             st.experimental_rerun()  
