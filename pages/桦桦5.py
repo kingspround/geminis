@@ -446,9 +446,10 @@ if "messages" not in st.session_state:
 
 # 显示历史记录（只执行一次）
 for i, message in enumerate(st.session_state.messages):
-    with st.chat_message(message["role"]):
-        # 使用 st.write 显示对话内容
-        st.write(message["content"], key=f"message_{i}")
+    if "content" not in message:
+        # 如果缺少 'content' 字段，尝试使用 getAnswer 函数补全
+        message["content"] = getAnswer(message.get("prompt", ""))  # 使用 message.get("prompt", "") 获取 prompt 字段，如果没有 prompt 字段，则使用空字符串
+        st.session_state.messages[i] = message  # 更新 st.session_state.messages
 
         # 在最后两个对话中添加编辑按钮
         if i >= len(st.session_state.messages) - 2:
