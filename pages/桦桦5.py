@@ -401,6 +401,7 @@ def getAnswer(prompt):
    )
 
 
+
     for msg in st.session_state.messages[-20:]:
         if msg["role"] == "user":
             his_messages.append({"role": "user", "parts": [{"text": msg["content"]}]})
@@ -444,16 +445,74 @@ if "messages" not in st.session_state:
         st.session_state.messages = []  # 清空 messages
         # 可以考虑在这里添加代码，提示用户重新创建文件或重新加载数据
 
-# ... (加载历史记录的代码块) ...
-
 # 显示历史记录（只执行一次）
 for i, message in enumerate(st.session_state.messages):
     if message["role"] == "user":
         with st.chat_message("user"):
-            st.write(message["content"], key=f"message_{i}")  # key 作为第一个参数
-    elif message["content"] is not None:  
+            st.write(message["content"], key=f"message_{i}")
+    elif message["content"] is not None:  # 只有当 message["content"] 不为空时才显示
         with st.chat_message("assistant"):
-            st.write(message["content"], key=f"message_{i}") # key 作为第一个参数
+            st.write(message["content"], key=f"message_{i}")
+
+    # 在最后两个对话中添加编辑按钮
+    if i >= len(st.session_state.messages) - 2:
+        if st.button("编辑", key=f"edit_{i}"):
+            # 更改为可编辑文本
+            st.session_state.editable_index = i  # 记录可编辑的索引
+            st.session_state.editing = True  # 表示正在编辑
+
+if st.session_state.get("editing"):
+    # 如果正在编辑，显示编辑框和保存/取消按钮
+    i = st.session_state.editable_index
+    message = st.session_state.messages[i]
+
+    with st.chat_message(message["role"]):
+        new_content = st.text_area(
+            f"{message['role']}:", message["content"], key=f"message_edit_{i}"
+        )
+
+        col1, col2 = st.columns(2)  # 创建两列布局
+        with col1:
+            if st.button("保存", key=f"save_{i}"):
+                st.session_state.messages[i]["content"] = new_content
+                # 保存更改到文件
+                with open(log_file, "wb") as f:  # 使用 "wb" 模式写入
+                    pickle.dump(st.session_state.messages, f)
+                st.success(f"已保存更改！")
+                st.session_state.editing = False  # 结束编辑状态
+        with col2:
+            if st.button("取消", key=f"cancel_{i}"):
+                st.session_state.editing = False  # 结束编辑状态
+
+if prompt := st.chat_input("Enter your message:"):
+    st.session_state.messages.append({"role": "user", "content": prompt})
+    with st.chat_message("user"):
+        st.markdown(prompt)
+    with st.chat_message("assistant"):
+        message_placeholder = st.empty()
+        full_response = ""
+        for chunk in getAnswer(prompt):  # 正确调用 getAnswer
+            full_response += chunk
+            message_placeholder.markdown(full_response + "▌")
+        message_placeholder.markdown(full_response)
+    st.session_state.messages.append({"role": "assistant", "content": full_response})
+
+    # 保存历史记录到文件
+    with open(log_file, "wb") as f:  # 使用 "wb" 模式写入
+        pickle.dump(st.session_state.messages, f)
+
+# 使用 st.sidebar 放置按钮
+st.sidebar.title("操作")
+if len(st.session_state.messages) > 0:
+    st.sidebar.button("重置上一个输出", on_click=lambda: st.session_state.messages.pop(-1))
+st.sidebar.download_button(
+    label="下载聊天记录",  # 使用 st.sidebar.download_button 直接下载
+    data=open(log_file, "rb").read(),  # 读取文件内容
+    file_name=filename,  # 设置下载文件名
+    mime="application/octet-stream",  # 设置 MIME 类型
+)
+st.sidebar.button("读取历史记录", on_click=lambda: load_history(log_file))
+st.sidebar.button("清除历史记录", on_click=lambda: clear_history(log_file))
 
 # 添加读取本地文件的按钮
 if st.sidebar.button("读取本地文件"):
@@ -500,17 +559,26 @@ if st.session_state.get("file_upload_mode"):
         except Exception as e:
             st.error(f"读取本地文件失败：{e}")
 
-# ... (其他代码) ...
-
 
 def load_history(log_file):
     try:
         # 重新打开文件
         with open(log_file, "rb") as f:  # 使用 "rb" 模式读取
             messages = pickle.load(f)
-            for message in messages:
-                with st.chat_message(message["role"]):
-                    st.markdown(message["content"])
+            for i, message in enumerate(messages):
+                if message["role"] == "user":
+                    with st.chat_message("user"):
+                        st.write(message["content"], key=f"message_{i}")
+                elif message["content"] is not None:
+                    with st.chat_message("assistant"):
+                        st.write(message["content"], key=f"message_{i}")
+
+                    # 在最后两个对话中添加编辑按钮
+                    if i >= len(messages) - 2:
+                        if st.button("编辑", key=f"edit_{i}"):
+                            # 更改为可编辑文本
+                            st.session_state.editable_index = i  # 记录可编辑的索引
+                            st.session_state.editing = True  # 表示正在编辑
 
             # 重新运行应用程序，确保聊天记录加载后不会丢失
             st.experimental_rerun()  
