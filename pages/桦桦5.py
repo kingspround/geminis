@@ -401,6 +401,7 @@ def getAnswer(prompt):
    )
 
 
+
     for msg in st.session_state.messages[-20:]:
         if msg["role"] == "user":
             his_messages.append({"role": "user", "parts": [{"text": msg["content"]}]})
@@ -556,9 +557,16 @@ def load_history(log_file):
         # 重新打开文件
         with open(log_file, "rb") as f:  # 使用 "rb" 模式读取
             messages = pickle.load(f)
-            for message in messages:
+            for i, message in enumerate(messages):
                 with st.chat_message(message["role"]):
-                    st.markdown(message["content"])
+                    st.write(message["content"], key=f"message_{i}")
+
+                    # 在最后两个对话中添加编辑按钮
+                    if i >= len(messages) - 2:
+                        if st.button("编辑", key=f"edit_{i}"):
+                            # 更改为可编辑文本
+                            st.session_state.editable_index = i  # 记录可编辑的索引
+                            st.session_state.editing = True  # 表示正在编辑
 
             # 重新运行应用程序，确保聊天记录加载后不会丢失
             st.experimental_rerun()  
@@ -575,3 +583,5 @@ def clear_history(log_file):
         st.success(f"成功清除 {filename} 的历史记录！")
     except FileNotFoundError:
         st.warning(f"{filename} 不存在。")
+
+
