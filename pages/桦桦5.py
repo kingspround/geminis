@@ -11,7 +11,7 @@ import streamlit as st
 import pickle
 
 # Insert your API key here
-st.session_state.key = "AIzaSyBVbA7tEyyy_ASp7l9P60qSh1xOM2CSMNw"
+st.session_state.key = "AIzaSyD4UdMp5wndOAKxtO1CWpzuZEGEf78YKUQ"
 
 if "key" not in st.session_state:
     st.session_state.key = None
@@ -26,7 +26,7 @@ genai.configure(api_key=st.session_state.key)
 generation_config = {
   "temperature": 1,
   "top_p": 0,
-  "top_k": 5,
+  "top_k": 0,
   "max_output_tokens": 10000,
 }
 
@@ -481,6 +481,9 @@ if st.session_state.get("editing"):
                 st.session_state.editing = False  # 结束编辑状态
 
 if prompt := st.chat_input("Enter your message:"):
+    # 忽略空文本参数，直接发送空字符串
+    if not prompt:
+        prompt = ""
     st.session_state.messages.append({"role": "user", "content": prompt})
     with st.chat_message("user"):
         st.markdown(prompt)
