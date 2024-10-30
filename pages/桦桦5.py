@@ -450,10 +450,10 @@ if "messages" not in st.session_state:
 for i, message in enumerate(st.session_state.messages):
     if message["role"] == "user":
         with st.chat_message("user"):
-            st.write(key=f"message_{i}", message["content"])  # key 作为第一个参数
+            st.write(message["content"], key=f"message_{i}")  # key 作为第一个参数
     elif message["content"] is not None:  
         with st.chat_message("assistant"):
-            st.write(key=f"message_{i}", message["content"]) # key 作为第一个参数
+            st.write(message["content"], key=f"message_{i}") # key 作为第一个参数
 
 # 添加读取本地文件的按钮
 if st.sidebar.button("读取本地文件"):
