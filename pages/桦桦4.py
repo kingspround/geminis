@@ -26,7 +26,7 @@ genai.configure(api_key=st.session_state.key)
 generation_config = {
   "temperature": 1,
   "top_p": 0,
-  "top_k": 3,
+  "top_k": 0,
   "max_output_tokens": 10000,
 }
 
@@ -401,11 +401,15 @@ def getAnswer(prompt):
    )
 
 
+
     for msg in st.session_state.messages[-20:]:
         if msg["role"] == "user":
             his_messages.append({"role": "user", "parts": [{"text": msg["content"]}]})
-        elif msg is not None and msg["content"] is not None:
+        elif msg is not None and msg["content"] is not None:  # 检查 assistant 回复是否为空
             his_messages.append({"role": "model", "parts": [{"text": msg["content"]}]})
+
+    # 这里进行修改：忽略空回复
+    his_messages = [message for message in his_messages if message.get("parts") and message["parts"][0].get("text")]
 
     try:
         response = model.generate_content(contents=his_messages, stream=True)
@@ -446,16 +450,19 @@ if "messages" not in st.session_state:
 
 # 显示历史记录（只执行一次）
 for i, message in enumerate(st.session_state.messages):
-    with st.chat_message(message["role"]):
-        # 使用 st.write 显示对话内容
-        st.write(message["content"], key=f"message_{i}")
+    if message["role"] == "user":
+        with st.chat_message("user"):
+            st.write(message["content"], key=f"message_{i}")
+    elif message["content"] is not None:  # 只有当 message["content"] 不为空时才显示
+        with st.chat_message("assistant"):
+            st.write(message["content"], key=f"message_{i}")
 
-        # 在最后两个对话中添加编辑按钮
-        if i >= len(st.session_state.messages) - 2:
-            if st.button("编辑", key=f"edit_{i}"):
-                # 更改为可编辑文本
-                st.session_state.editable_index = i  # 记录可编辑的索引
-                st.session_state.editing = True  # 表示正在编辑
+    # 在最后两个对话中添加编辑按钮
+    if i >= len(st.session_state.messages) - 2:
+        if st.button("编辑", key=f"edit_{i}"):
+            # 更改为可编辑文本
+            st.session_state.editable_index = i  # 记录可编辑的索引
+            st.session_state.editing = True  # 表示正在编辑
 
 if st.session_state.get("editing"):
     # 如果正在编辑，显示编辑框和保存/取消按钮
@@ -529,8 +536,13 @@ if st.session_state.get("file_upload_mode"):
 
             # 显示聊天记录和编辑按钮
             for i, message in enumerate(st.session_state.messages):
-                with st.chat_message(message["role"]):
-                    st.write(message["content"], key=f"message_{i}")
+                if message["role"] == "user":
+                    with st.chat_message("user"):
+                        st.write(message["content"], key=f"message_{i}")  # key 作为第一个参数
+                elif message["content"] is not None:
+                    with st.chat_message("assistant"):
+                        st.write(message["content"], key=f"message_{i}") # key 作为第一个参数
+
                     if i >= len(st.session_state.messages) - 2:  # 在最后两条消息中添加编辑按钮
                         if st.button("编辑", key=f"edit_{i}"):
                             st.session_state.editable_index = i
@@ -553,19 +565,32 @@ if st.session_state.get("file_upload_mode"):
 
 def load_history(log_file):
     try:
-        # 重新打开文件
-        with open(log_file, "rb") as f:  # 使用 "rb" 模式读取
+        with open(log_file, "rb") as f:
             messages = pickle.load(f)
-            for message in messages:
-                with st.chat_message(message["role"]):
-                    st.markdown(message["content"])
+            # 这里进行修改：忽略空回复
+            messages = [message for message in messages if message["content"]]
+            # 显示历史记录（只执行一次）
+            for i, message in enumerate(messages):
+                if message["role"] == "user":
+                    with st.chat_message("user"):
+                        st.write(message["content"], key=f"message_{i}")
+                elif message["content"] is not None:
+                    with st.chat_message("assistant"):
+                        st.write(message["content"], key=f"message_{i}")
+
+                # 在最后两个对话中添加编辑按钮
+                if i >= len(messages) - 2:
+                    if st.button("编辑", key=f"edit_{i}"):
+                        # 更改为可编辑文本
+                        st.session_state.editable_index = i  # 记录可编辑的索引
+                        st.session_state.editing = True  # 表示正在编辑
 
             # 重新运行应用程序，确保聊天记录加载后不会丢失
-            st.experimental_rerun()  
+            st.experimental_rerun()
 
     except FileNotFoundError:
         st.warning(f"{filename} 不存在。")
-    except EOFError:  # 处理 EOFError
+    except EOFError:
         st.warning(f"读取历史记录失败：文件可能损坏。")
 
 def clear_history(log_file):
