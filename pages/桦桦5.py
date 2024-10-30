@@ -476,10 +476,10 @@ if st.session_state.get("file_upload_mode"):
             for i, message in enumerate(st.session_state.messages):
                 if message["role"] == "user":
                     with st.chat_message("user"):
-                        st.write(key=f"message_{i}", message["content"])  # key 作为第一个参数
+                        st.write(message["content"], key=f"message_{i}")  # key 作为第一个参数
                 elif message["content"] is not None:
                     with st.chat_message("assistant"):
-                        st.write(key=f"message_{i}", message["content"]) # key 作为第一个参数
+                        st.write(message["content"], key=f"message_{i}") # key 作为第一个参数
 
                     if i >= len(st.session_state.messages) - 2:  # 在最后两条消息中添加编辑按钮
                         if st.button("编辑", key=f"edit_{i}"):
