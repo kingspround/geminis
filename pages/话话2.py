@@ -59,8 +59,8 @@ model_v = genai.GenerativeModel(model_name='gemini-pro-vision', generation_confi
 
 
 def generate_token():
-    """生成一个 35 位到 40 位的随机常用汉字 token"""
-    token_length = random.randint(35, 40)
+    """生成一个 10 位到 15 位的随机常用汉字 token"""
+    token_length = random.randint(10, 15)
     
     # 使用 Unicode 范围获取常用汉字（简体中文）
     characters = ''.join(chr(i) for i in range(0x4E00, 0x9FA6))
