@@ -57,7 +57,7 @@ model_v = genai.GenerativeModel(model_name='gemini-pro-vision', generation_confi
 # LLM
 
 
-ef generate_token():
+def generate_token():
     """生成一个 35 位到 40 位的随机常用汉字 token"""
     token_length = random.randint(35, 40)
     
