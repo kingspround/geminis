@@ -60,7 +60,7 @@ model_v = genai.GenerativeModel(model_name='gemini-pro-vision', generation_confi
 def generate_token():
     """生成一个 35 位到 40 位的随机 token"""
     token_length = random.randint(35, 40)
-    characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    characters = "一-隝"
     token = "".join(random.choice(characters) for i in range(token_length))
     return token
 
