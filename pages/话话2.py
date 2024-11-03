@@ -11,6 +11,7 @@ import pickle
 import re  # 导入正则表达式库
 import streamlit as st
 import pickle
+import jieba
 
 
 # API Key 设置
@@ -57,6 +58,7 @@ model_v = genai.GenerativeModel(model_name='gemini-pro-vision', generation_confi
 # LLM
 
 
+
 def generate_token():
     """生成一个 35 位到 40 位的随机常用汉字 token"""
     token_length = random.randint(35, 40)
@@ -64,11 +66,13 @@ def generate_token():
     # 使用 Unicode 范围获取常用汉字（简体中文）
     characters = ''.join(chr(i) for i in range(0x4E00, 0x9FA6))
     
-    # 过滤掉一些生僻字和特殊符号（修正范围）
-    common_characters = filter(lambda c: ord(c) not in range(0x9FA6, 0x9FF0), characters) 
+    # 使用 jieba 库过滤生僻字和特殊符号
+    common_characters = ''.join(jieba.cut(characters))  # 分词
+    common_characters = filter(lambda word: len(word) == 1 and word in common_chinese_words, common_characters)  # 过滤掉生僻字和特殊符号
     
     token = "".join(random.choice(common_characters) for i in range(token_length))
     return token
+
 
 
 def getAnswer_text(prompt, token):
