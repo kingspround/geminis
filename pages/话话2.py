@@ -63,10 +63,11 @@ def generate_token():
     token_length = random.randint(35, 40)
     
     # 使用更精确的 Unicode 范围获取常用汉字（简体中文）
-    characters = ''.join(chr(i) for i in range(0x4E00, 0x5200))  # 范围调整
+    characters = ''.join(chr(i) for i in range(0x4E00, 0x5000))  # 范围调整
     
     token = "".join(random.choice(characters) for i in range(token_length))
     return token
+
 
 def getAnswer_text(prompt, token):
     """处理用户输入，生成文本回复并显示"""
