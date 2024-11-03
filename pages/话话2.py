@@ -62,15 +62,12 @@ def generate_token():
     """生成一个 10 位到 15 位的随机常用汉字 token"""
     token_length = random.randint(10, 15)
     
-    # 使用 Unicode 范围获取常用汉字（简体中文）
-    characters = ''.join(chr(i) for i in range(0x4E00, 0x9FA6))
+    # 加载常用汉字词典（示例）
+    with open("common_characters.txt", "r", encoding="utf-8") as f:
+        common_characters = [line.strip() for line in f]
     
-    # 过滤掉一些生僻字和特殊符号（修正范围）
-    # common_characters = filter(lambda c: ord(c) not in range(0x9FA6, 0x9FF0), characters) 
-    
-    token = "".join(random.choice(characters) for i in range(token_length))
+    token = "".join(random.choice(common_characters) for i in range(token_length))
     return token
-
 
 
 def getAnswer_text(prompt, token):
