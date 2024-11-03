@@ -11,7 +11,6 @@ import pickle
 import re  # 导入正则表达式库
 import streamlit as st
 import pickle
-import jieba
 
 
 # API Key 设置
@@ -66,11 +65,10 @@ def generate_token():
     # 使用 Unicode 范围获取常用汉字（简体中文）
     characters = ''.join(chr(i) for i in range(0x4E00, 0x9FA6))
     
-    # 使用 jieba 库过滤生僻字和特殊符号
-    common_characters = ''.join(jieba.cut(characters))  # 分词
-    common_characters = filter(lambda word: len(word) == 1 and word in common_chinese_words, common_characters)  # 过滤掉生僻字和特殊符号
+    # 过滤掉一些生僻字和特殊符号（修正范围）
+    # common_characters = filter(lambda c: ord(c) not in range(0x9FA6, 0x9FF0), characters) 
     
-    token = "".join(random.choice(common_characters) for i in range(token_length))
+    token = "".join(random.choice(characters) for i in range(token_length))
     return token
 
 
