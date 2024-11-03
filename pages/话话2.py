@@ -58,9 +58,10 @@ model_v = genai.GenerativeModel(model_name='gemini-pro-vision', generation_confi
 
 
 def generate_token():
-    """生成一个 35 位到 40 位的随机 token"""
+    """生成一个 35 位到 40 位的随机汉字 token"""
     token_length = random.randint(35, 40)
-    characters = "[一-隝]"
+    # 使用 Unicode 范围获取汉字
+    characters = ''.join(chr(i) for i in range(0x4E00, 0x9FA6))
     token = "".join(random.choice(characters) for i in range(token_length))
     return token
 
