@@ -64,8 +64,8 @@ def generate_token():
     # 使用 Unicode 范围获取常用汉字（简体中文）
     characters = ''.join(chr(i) for i in range(0x4E00, 0x9FA6))
     
-    # 过滤掉一些生僻字和特殊符号 (简体中文)
-    common_characters = filter(lambda c: ord(c) not in range(0x9FA6, 0x9FA5 + 1), characters) 
+    # 过滤掉一些生僻字和特殊符号（修正范围）
+    common_characters = filter(lambda c: ord(c) not in range(0x9FA6, 0x9FF0), characters) 
     
     token = "".join(random.choice(common_characters) for i in range(token_length))
     return token
