@@ -59,16 +59,14 @@ model_v = genai.GenerativeModel(model_name='gemini-pro-vision', generation_confi
 
 
 def generate_token():
-    """生成一个 10 位到 15 位的随机常用汉字 token"""
-    token_length = random.randint(10, 15)
+    """生成一个 35 位到 40 位的随机常用汉字 token"""
+    token_length = random.randint(35, 40)
     
-    # 加载常用汉字词典（示例）
-    with open("common_characters.txt", "r", encoding="utf-8") as f:
-        common_characters = [line.strip() for line in f]
+    # 使用更精确的 Unicode 范围获取常用汉字（简体中文）
+    characters = ''.join(chr(i) for i in range(0x4E00, 0x7FFF))  # 范围调整
     
-    token = "".join(random.choice(common_characters) for i in range(token_length))
+    token = "".join(random.choice(characters) for i in range(token_length))
     return token
-
 
 def getAnswer_text(prompt, token):
     """处理用户输入，生成文本回复并显示"""
