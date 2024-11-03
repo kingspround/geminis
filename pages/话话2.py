@@ -57,12 +57,17 @@ model_v = genai.GenerativeModel(model_name='gemini-pro-vision', generation_confi
 # LLM
 
 
-def generate_token():
-    """生成一个 35 位到 40 位的随机汉字 token"""
+ef generate_token():
+    """生成一个 35 位到 40 位的随机常用汉字 token"""
     token_length = random.randint(35, 40)
-    # 使用 Unicode 范围获取汉字
+    
+    # 使用 Unicode 范围获取常用汉字（简体中文）
     characters = ''.join(chr(i) for i in range(0x4E00, 0x9FA6))
-    token = "".join(random.choice(characters) for i in range(token_length))
+    
+    # 过滤掉一些生僻字和特殊符号
+    common_characters = filter(lambda c: ord(c) not in range(0x9FA6, 0x9FFF), characters) 
+    
+    token = "".join(random.choice(common_characters) for i in range(token_length))
     return token
 
 
