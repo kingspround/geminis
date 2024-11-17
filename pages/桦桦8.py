@@ -801,32 +801,44 @@ def clear_history(log_file):
         st.warning(f"{filename} 不存在。")
 
 
-# --- 新增角色设定侧边栏 ---
-st.sidebar.title("角色设定")
+# --- 新的可折叠侧边栏 ---
+if "sidebar_expanded" not in st.session_state:
+    st.session_state.sidebar_expanded = False
 
-if "character_settings" not in st.session_state:
-    st.session_state.character_settings = {} # 初始化角色设定字典
+col1, col2 = st.columns([1, 4]) # 分配空间，旧侧边栏占1，新侧边栏和聊天内容占4
 
-# 显示已有的角色设定并提供编辑功能
-for setting_name in st.session_state.character_settings:
-    if st.sidebar.button(setting_name):
-        st.session_state.editing_setting = setting_name # 记录正在编辑的设定名称
+with col1:
+    if st.button("展开/收起角色设定"):
+        st.session_state.sidebar_expanded = not st.session_state.sidebar_expanded
 
-# 编辑或新增角色设定
-if st.session_state.get("editing_setting"):
-    setting_name = st.session_state.editing_setting
-    setting_content = st.session_state.character_settings.get(setting_name, "") # 获取设定内容，如果没有则为空字符串
+with col2:
+    if st.session_state.sidebar_expanded:
+        st.sidebar.title("角色设定") # 将标题移到此处
 
-    new_name = st.sidebar.text_input("设定名称:", setting_name)
-    new_content = st.sidebar.text_area("设定内容:", setting_content)
+        if "character_settings" not in st.session_state:
+            st.session_state.character_settings = {}
 
-    if st.sidebar.button("保存设定"):
-        if new_name: # 只有当设定名称不为空时才保存
-            st.session_state.character_settings[new_name] = new_content
-            st.session_state.editing_setting = None # 清空编辑状态
-            st.success("设定已保存!")
-    if st.sidebar.button("取消"):
-        st.session_state.editing_setting = None # 清空编辑状态
+        for setting_name in st.session_state.character_settings:
+            if st.sidebar.button(setting_name):
+                st.session_state.editing_setting = setting_name
 
-elif st.sidebar.button("新增设定"):
-    st.session_state.editing_setting = "new_setting" # 开始新增设定
+        if st.session_state.get("editing_setting"):
+            setting_name = st.session_state.editing_setting
+            setting_content = st.session_state.character_settings.get(setting_name, "")
+
+            new_name = st.sidebar.text_input("设定名称:", setting_name)
+            new_content = st.sidebar.text_area("设定内容:", setting_content)
+
+            if st.sidebar.button("保存设定"):
+                if new_name:
+                    st.session_state.character_settings[new_name] = new_content
+                    st.session_state.editing_setting = None
+                    st.success("设定已保存!")
+            if st.sidebar.button("取消"):
+                st.session_state.editing_setting = None
+
+        elif st.sidebar.button("新增设定"):
+            st.session_state.editing_setting = "new_setting"
+    else:
+        # 在收起时，减少空间占用
+        pass # Do nothing when sidebar is collapsed
