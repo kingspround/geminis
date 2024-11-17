@@ -11,48 +11,35 @@ import streamlit as st
 import pickle
 
 
-# --- API 密钥设置 ---
-api_keys = {
-    "主要": "AIzaSyBu-IwSGM-TzrOeR_nL0Alo3szSIzyz1pE",  # 请替换成你的主要 API 密钥
-    "备用1号": "YOUR_BACKUP_API_KEY_1"  # 请替换成你的备用 API 密钥
-}
-
 if "selected_key" not in st.session_state:
-    st.session_state.selected_key = "默认"  # 默认使用默认密钥
+    st.session_state.selected_key = "默认"
 
 selected_key = st.sidebar.selectbox("选择 API 密钥", list(api_keys.keys()), key="key_selector")
-st.session_state.selected_key = selected_key  # 更新选择的密钥
-genai.configure(api_key=api_keys[selected_key])
+st.session_state.selected_key = selected_key
 
-
-# Set up the model
+# --- 模型初始化 ---
 generation_config = {
-  "temperature": 1,
-  "top_p": 0,
-  "top_k": 0,
-  "max_output_tokens": 10000,
+    "temperature": 1,
+    "top_p": 0,
+    "top_k": 0,
+    "max_output_tokens": 10000,
 }
 
 safety_settings = [
-   {
-    "category": "HARM_CATEGORY_HARASSMENT",
-    "threshold": "BLOCK_NONE",
-   },
-   {
-    "category": "HARM_CATEGORY_HATE_SPEECH",
-    "threshold": "BLOCK_NONE",
-   },
-   {
-    "category": "HARM_CATEGORY_SEXUALLY_EXPLICIT",
-    "threshold": "BLOCK_NONE",
-   },
-   {
-    "category": "HARM_CATEGORY_DANGEROUS_CONTENT",
-    "threshold": "BLOCK_NONE",
-   },
+    {"category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_NONE"},
+    {"category": "HARM_CATEGORY_HATE_SPEECH", "threshold": "BLOCK_NONE"},
+    {"category": "HARM_CATEGORY_SEXUALLY_EXPLICIT", "threshold": "BLOCK_NONE"},
+    {"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_NONE"},
 ]
 
-model = genai.GenerativeModel(model_name="gemini-1.5-pro-latest",generation_config=generation_config,safety_settings=safety_settings)
+try:
+    model = genai.GenerativeModel(model_name="gemini-1.5-pro-latest",
+                                  generation_config=generation_config,
+                                  safety_settings=safety_settings,
+                                  api_key=api_keys[selected_key]) # 在这里使用选择的API密钥
+except Exception as e:
+    st.error(f"初始化模型失败: {e}. 请检查你的 API 密钥。")
+    st.stop()
 
 # LLM
 
