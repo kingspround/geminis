@@ -709,7 +709,7 @@ with st.sidebar.expander("角色设定"):
     if "enabled_settings" not in st.session_state:
         st.session_state.enabled_settings = {}
 
-    col1, col2 = st.columns(2)  # 两列布局，一列读取和新增，一列空着
+    col1, col2 = st.columns(2)
 
     with col1:
         if st.button("读取本地设定"):
@@ -729,18 +729,32 @@ with st.sidebar.expander("角色设定"):
             st.session_state.editing_setting = "new_setting"
 
 
-    # 设定列表和启用/禁用
     if not st.session_state.get("editing_setting"):
-        for setting_name in st.session_state.character_settings:
-            col1, col2 = st.columns([1, 0.5])  # 调整列宽比例
-            with col1:
-                if st.button(setting_name, key=f"edit_{setting_name}"):
-                    st.session_state.editing_setting = setting_name
-            with col2:
-                enabled = st.session_state.enabled_settings.get(setting_name, False)
-                enabled = st.checkbox("", value=enabled, key=f"enabled_{setting_name}")
-                st.session_state.enabled_settings[setting_name] = enabled
+        cols = st.columns(4) # 将空间分成4列，每列放置一个设定
 
+        for i, setting_name in enumerate(st.session_state.character_settings):
+            with cols[i % 4]: # 使用模运算将设定分配到不同的列中
+                col1, col2 = st.columns([8,2]) # 设定名称占8份，复选框占2份
+                with col1:
+                    if st.button(setting_name, key=f"edit_{setting_name}", use_container_width=True): # use_container_width 填满可用宽度
+                        st.session_state.editing_setting = setting_name
+                with col2:
+                    enabled = st.session_state.enabled_settings.get(setting_name, False)
+                    enabled = st.checkbox("", value=enabled, key=f"enabled_{setting_name}")
+                    st.session_state.enabled_settings[setting_name] = enabled
+
+
+        #  添加一些CSS样式来减少按钮和复选框间的间距 (可选)
+        st.markdown("""
+            <style>
+                div[data-testid="stCheckbox"] {
+                    margin-left: 5px; /* 调整间距 */
+                }
+                div[data-testid="stButton"] {
+                    margin-right: 5px; /* 调整间距 */
+                }
+            </style>
+            """, unsafe_allow_html=True)
 
     # 设定编辑区域 (与之前版本相同)
     if st.session_state.get("editing_setting"):
