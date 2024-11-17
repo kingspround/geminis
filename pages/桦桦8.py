@@ -13,6 +13,7 @@ import pickle
 # Insert your API key here
 st.session_state.key = "AIzaSyBu-IwSGM-TzrOeR_nL0Alo3szSIzyz1pE"
 
+
 if "key" not in st.session_state:
     st.session_state.key = None
     
@@ -583,11 +584,20 @@ def getAnswer(prompt):
 
 “呵呵，石像淫魔培育计划启动♡” 石像鬼娘使用魔能，将雕塑的姿态调整，坐在地上，双腿两边向上岔开，露出小穴。小嘴张开，里面可以直接伸进胃部，表情淫乱，双手比剪刀。
 
+意识海，天鹰看着自己淫魔的身体，愤怒不已。
+“混蛋，把我变成这副模样！”
+突然，周围出现许多虚空，从里面钻出许多触手，将天鹰的身躯紧紧缠住。
+“干什么！！玩……玩捆绑play么？可以啊♡等下！我在说什么！！！这个石像鬼，在我的额头写了什么就成这样了！！混蛋！”
+只见触手只是将自己的四肢缠绕住，并没有再继续深入嘴巴，小穴。
+“啊？就把我缠住了，不深入么……”天鹰的表情稍微有些失落。
+“我这是怎么了！为什么不高兴！我是男人！是勇者！等我出来了，我一定要回去把冒险者协会会长的精液榨干！再把他头砍下来！！！！”
+
 】
 
 
 ]"""}]}
    )
+
 
 
 
@@ -789,3 +799,34 @@ def clear_history(log_file):
         st.success(f"成功清除 {filename} 的历史记录！")
     except FileNotFoundError:
         st.warning(f"{filename} 不存在。")
+
+
+# --- 新增角色设定侧边栏 ---
+st.sidebar.title("角色设定")
+
+if "character_settings" not in st.session_state:
+    st.session_state.character_settings = {} # 初始化角色设定字典
+
+# 显示已有的角色设定并提供编辑功能
+for setting_name in st.session_state.character_settings:
+    if st.sidebar.button(setting_name):
+        st.session_state.editing_setting = setting_name # 记录正在编辑的设定名称
+
+# 编辑或新增角色设定
+if st.session_state.get("editing_setting"):
+    setting_name = st.session_state.editing_setting
+    setting_content = st.session_state.character_settings.get(setting_name, "") # 获取设定内容，如果没有则为空字符串
+
+    new_name = st.sidebar.text_input("设定名称:", setting_name)
+    new_content = st.sidebar.text_area("设定内容:", setting_content)
+
+    if st.sidebar.button("保存设定"):
+        if new_name: # 只有当设定名称不为空时才保存
+            st.session_state.character_settings[new_name] = new_content
+            st.session_state.editing_setting = None # 清空编辑状态
+            st.success("设定已保存!")
+    if st.sidebar.button("取消"):
+        st.session_state.editing_setting = None # 清空编辑状态
+
+elif st.sidebar.button("新增设定"):
+    st.session_state.editing_setting = "new_setting" # 开始新增设定
