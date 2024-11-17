@@ -706,8 +706,10 @@ with st.sidebar.expander("文件操作"):
 with st.sidebar.expander("角色设定"):
     if "character_settings" not in st.session_state:
         st.session_state.character_settings = {}
+    if "enabled_settings" not in st.session_state:
+        st.session_state.enabled_settings = {}
 
-    col1, col2 = st.columns(2) # 将按钮分成两列
+    col1, col2 = st.columns(2)
 
     with col1:
         if st.button("读取本地设定"):
@@ -733,22 +735,22 @@ with st.sidebar.expander("角色设定"):
         new_name = st.text_input("设定名称:", setting_name)
         new_content = st.text_area("设定内容:", setting_content)
 
-        col1, col2 = st.columns(2) # 将按钮分成两列
+        col1, col2 = st.columns(2)
         with col1:
             if st.button("导出设定"):
                 with open(f"{new_name}.txt", "w", encoding="utf-8") as f:
                     f.write(new_content)
                 st.success(f"设定已导出到 {new_name}.txt!")
 
-            # 删除设定
             if st.button("删除设定"):
                 if new_name in st.session_state.character_settings:
                     del st.session_state.character_settings[new_name]
                     st.session_state.editing_setting = None
                     st.success(f"设定 '{new_name}' 已删除!")
+                    if new_name in st.session_state.enabled_settings:
+                        del st.session_state.enabled_settings[new_name] # 删除启用状态
                 else:
                     st.warning(f"设定 '{new_name}' 不存在!")
-
 
         with col2:
             if st.button("保存设定"):
@@ -758,6 +760,12 @@ with st.sidebar.expander("角色设定"):
                     st.success("设定已保存!")
         if st.button("取消"):
             st.session_state.editing_setting = None
+
+    else: # 不在编辑状态时显示设定列表和启用状态
+        for setting_name in st.session_state.character_settings:
+            enabled = st.session_state.enabled_settings.get(setting_name, False)
+            enabled = st.checkbox(setting_name, value=enabled)
+            st.session_state.enabled_settings[setting_name] = enabled
 
 
 # --- Helper functions ---
