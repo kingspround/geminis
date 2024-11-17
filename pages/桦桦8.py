@@ -709,7 +709,7 @@ with st.sidebar.expander("角色设定"):
     if "enabled_settings" not in st.session_state:
         st.session_state.enabled_settings = {}
 
-    col1, col2 = st.columns(2)
+    col1, col2 = st.columns(2)  # 两列布局，一列读取和新增，一列空着
 
     with col1:
         if st.button("读取本地设定"):
@@ -729,22 +729,20 @@ with st.sidebar.expander("角色设定"):
             st.session_state.editing_setting = "new_setting"
 
 
-    # 设定列表和编辑/启用/禁用
-    if not st.session_state.get("editing_setting"): # 不在编辑模式下显示设定列表和启用/禁用
+    # 设定列表和启用/禁用
+    if not st.session_state.get("editing_setting"):
         for setting_name in st.session_state.character_settings:
-            col1, col2 = st.columns([1,1]) # 两列布局，设定名称占一列，启用和编辑占一列
+            col1, col2 = st.columns([1, 0.5])  # 调整列宽比例
             with col1:
+                if st.button(setting_name, key=f"edit_{setting_name}"):
+                    st.session_state.editing_setting = setting_name
+            with col2:
                 enabled = st.session_state.enabled_settings.get(setting_name, False)
-                enabled = st.checkbox(setting_name, value=enabled, key=f"enabled_{setting_name}")
+                enabled = st.checkbox("", value=enabled, key=f"enabled_{setting_name}")
                 st.session_state.enabled_settings[setting_name] = enabled
 
-            with col2:
-                if st.button(f"编辑", key=f"edit_{setting_name}"):
-                    st.session_state.editing_setting = setting_name
 
-
-
-    # 设定编辑区域
+    # 设定编辑区域 (与之前版本相同)
     if st.session_state.get("editing_setting"):
         setting_name = st.session_state.editing_setting
         setting_content = st.session_state.character_settings.get(setting_name, "")
