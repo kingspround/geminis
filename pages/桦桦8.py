@@ -735,7 +735,7 @@ with st.sidebar.expander("角色设定"):
                 st.session_state.editing_setting = setting_name
 
 
-    if st.session_state.get("editing_setting"):
+       if st.session_state.get("editing_setting"):
         setting_name = st.session_state.editing_setting
         setting_content = st.session_state.character_settings.get(setting_name, "")
         new_name = st.text_input("设定名称:", setting_name)
@@ -769,6 +769,7 @@ with st.sidebar.expander("角色设定"):
             st.session_state.editing_setting = None
     elif st.button("新增设定"):
         st.session_state.editing_setting = "new_setting"
+
 
 # --- Helper functions ---
 def load_history(log_file):
