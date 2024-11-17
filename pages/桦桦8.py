@@ -707,21 +707,30 @@ with st.sidebar.expander("角色设定"):
     if "character_settings" not in st.session_state:
         st.session_state.character_settings = {}
 
-    # 读取本地设定
-    for filename in os.listdir():
-        if filename.endswith(".txt"):
-            setting_name = filename[:-4]
-            try:
-                with open(filename, "r", encoding="utf-8") as f:
-                    content = f.read()
-                    st.session_state.character_settings[setting_name] = content
-            except Exception as e:
-                st.error(f"读取文件 {filename} 失败: {e}")
+    # 读取本地设定按钮和新增设定按钮并排
+    col1, col2 = st.columns(2) # 创建两列
+    with col1:
+        if st.button("读取本地设定"):
+            for filename in os.listdir():
+                if filename.endswith(".txt"):
+                    setting_name = filename[:-4]
+                    try:
+                        with open(filename, "r", encoding="utf-8") as f:
+                            content = f.read()
+                            st.session_state.character_settings[setting_name] = content
+                    except Exception as e:
+                        st.error(f"读取文件 {filename} 失败: {e}")
+            st.experimental_rerun() #刷新页面显示读取结果
+
+    with col2:
+        if st.button("新增设定"):
+            st.session_state.editing_setting = "new_setting"
+
 
     # 使用columns节省空间，显示设定按钮
-    cols = st.columns(min(len(st.session_state.character_settings), 3)) #最多显示3列
+    cols = st.columns(min(len(st.session_state.character_settings), 3))
     for i, setting_name in enumerate(st.session_state.character_settings):
-        with cols[i % 3]: #循环使用columns
+        with cols[i % 3]:
             if st.button(setting_name):
                 st.session_state.editing_setting = setting_name
 
