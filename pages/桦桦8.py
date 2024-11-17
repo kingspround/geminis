@@ -10,41 +10,46 @@ from io import StringIO
 import streamlit as st
 import pickle
 
-# --- API 密钥设置 ---
-api_keys = {
-    "默认": "AIzaSyAWfFf6zqy1DizINOwPfxPD8EF2ACdwCaQ",  # 请替换成你的默认 API 密钥
-    "备用1号": "YOUR_BACKUP_API_KEY_1"  # 请替换成你的备用 API 密钥
-}
+# Insert your API key here
+st.session_state.key = "AIzaSyAWfFf6zqy1DizINOwPfxPD8EF2ACdwCaQ" # 请替换成你的API Key
 
-if "selected_key" not in st.session_state:
-    st.session_state.selected_key = "默认"
+if "key" not in st.session_state:
+    st.session_state.key = None
+    
+if not st.session_state.key:
+    st.info("Please add your key to continue.")
+    st.stop()
+    
+genai.configure(api_key=st.session_state.key)
 
-selected_key = st.sidebar.selectbox("选择 API 密钥", list(api_keys.keys()), key="key_selector")
-st.session_state.selected_key = selected_key
-
-# --- 模型初始化 ---
+# Set up the model
 generation_config = {
-    "temperature": 1,
-    "top_p": 0,
-    "top_k": 0,
-    "max_output_tokens": 10000,
+  "temperature": 1,
+  "top_p": 0,
+  "top_k": 0,
+  "max_output_tokens": 10000,
 }
 
 safety_settings = [
-    {"category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_NONE"},
-    {"category": "HARM_CATEGORY_HATE_SPEECH", "threshold": "BLOCK_NONE"},
-    {"category": "HARM_CATEGORY_SEXUALLY_EXPLICIT", "threshold": "BLOCK_NONE"},
-    {"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_NONE"},
+   {
+    "category": "HARM_CATEGORY_HARASSMENT",
+    "threshold": "BLOCK_NONE",
+   },
+   {
+    "category": "HARM_CATEGORY_HATE_SPEECH",
+    "threshold": "BLOCK_NONE",
+   },
+   {
+    "category": "HARM_CATEGORY_SEXUALLY_EXPLICIT",
+    "threshold": "BLOCK_NONE",
+   },
+   {
+    "category": "HARM_CATEGORY_DANGEROUS_CONTENT",
+    "threshold": "BLOCK_NONE",
+   },
 ]
 
-try:
-    model = genai.GenerativeModel(model_name="gemini-1.5-pro-latest",
-                                  generation_config=generation_config,
-                                  safety_settings=safety_settings,
-                                  api_key=api_keys[selected_key]) # 在这里使用选择的API密钥
-except Exception as e:
-    st.error(f"初始化模型失败: {e}. 请检查你的 API 密钥。")
-    st.stop()
+model = genai.GenerativeModel(model_name="gemini-1.5-pro-latest",generation_config=generation_config,safety_settings=safety_settings)
 
 # LLM
 
