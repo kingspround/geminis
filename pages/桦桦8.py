@@ -638,6 +638,17 @@ if "messages" not in st.session_state:
     except (FileNotFoundError, EOFError):
         st.session_state.messages = []
 
+
+# --- 聊天输入和响应 ---
+with st.expander("选择 API 密钥"): # 使用expander在主区域显示API选择
+    selected_key = st.selectbox("选择 API 密钥", list(api_keys.keys()), key="api_key_select")
+    api_key = api_keys[selected_key]
+    if not api_key:
+        st.info("请设置 API 密钥。")
+        st.stop()
+    genai.configure(api_key=api_key) # 更新API Key
+
+
 # 显示历史记录和编辑功能 (与之前相同，略作简化)
 for i, message in enumerate(st.session_state.messages):
     with st.chat_message(message["role"]):
@@ -664,7 +675,7 @@ if st.session_state.get("editing"):
             if st.button("取消", key=f"cancel_{i}"):
                 st.session_state.editing = False
 
-# --- 聊天输入和响应 ---
+# 在这里添加聊天输入和响应部分
 if prompt := st.chat_input("输入你的消息:"):
     st.session_state.messages.append({"role": "user", "content": prompt})
     with st.chat_message("user"):
