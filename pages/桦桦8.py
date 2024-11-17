@@ -719,25 +719,28 @@ with st.sidebar.expander("角色设定"):
     if "enabled_settings" not in st.session_state:
         st.session_state.enabled_settings = {}
 
+    # 读取geminis/logs/下的设定文件
+    settings_dir = "geminis/logs/"  # 设定文件的目录
+    if os.path.exists(settings_dir):
+        for filename in os.listdir(settings_dir):
+            if filename.endswith(".txt"):
+                setting_name = filename[:-4]
+                filepath = os.path.join(settings_dir, filename)
+                try:
+                    with open(filepath, "r", encoding="utf-8") as f:
+                        content = f.read()
+                        st.session_state.character_settings[setting_name] = content
+                except Exception as e:
+                    st.error(f"读取文件 {filepath} 失败: {e}")
+        st.success("geminis/logs/下的设定文件已读取!")
+    else:
+        st.warning(f"目录 '{settings_dir}' 不存在!")
+
+
     col1, col2 = st.columns([1, 0.7])
 
     with col1:
-        if st.button("读取本地设定"):
-            log_dir = "geminis/logs"  # 设置设定文件的目录
-            if not os.path.exists(log_dir):
-                os.makedirs(log_dir) # 如果目录不存在，则创建它
-            for filename in os.listdir(log_dir):
-                if filename.endswith(".txt"):
-                    filepath = os.path.join(log_dir, filename)
-                    setting_name = filename[:-4]
-                    try:
-                        with open(filepath, "r", encoding="utf-8") as f:
-                            content = f.read()
-                            st.session_state.character_settings[setting_name] = content
-                    except Exception as e:
-                        st.error(f"读取文件 {filepath} 失败: {e}")
-            st.success("本地设定已读取!")
-
+        pass # 空着
 
     with col2:
         if st.button("新增设定", key="add_setting"):
