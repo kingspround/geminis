@@ -10,18 +10,21 @@ from io import StringIO
 import streamlit as st
 import pickle
 
-# Insert your API key here
-st.session_state.key = "AIzaSyBu-IwSGM-TzrOeR_nL0Alo3szSIzyz1pE"
 
+# --- API 密钥设置 ---
+api_keys = {
+    "主要": "AIzaSyBu-IwSGM-TzrOeR_nL0Alo3szSIzyz1pE",  # 请替换成你的主要 API 密钥
+    "备用1号": "YOUR_BACKUP_API_KEY_1"  # 请替换成你的备用 API 密钥
+}
 
-if "key" not in st.session_state:
-    st.session_state.key = None
-    
-if not st.session_state.key:
-    st.info("Please add your key to continue.")
+selected_key = st.sidebar.selectbox("选择 API 密钥", list(api_keys.keys()), key="api_key_select")
+api_key = api_keys[selected_key]
+
+if not api_key:
+    st.info("请设置 API 密钥。")
     st.stop()
-    
-genai.configure(api_key=st.session_state.key)
+
+genai.configure(api_key=api_key)
 
 # Set up the model
 generation_config = {
