@@ -17,6 +17,13 @@ api_keys = {
     "备用1号": "YOUR_BACKUP_API_KEY_1"  # 请替换成你的备用 API 密钥
 }
 
+if "selected_key" not in st.session_state:
+    st.session_state.selected_key = "默认"  # 默认使用默认密钥
+
+selected_key = st.sidebar.selectbox("选择 API 密钥", list(api_keys.keys()), key="key_selector")
+st.session_state.selected_key = selected_key  # 更新选择的密钥
+genai.configure(api_key=api_keys[selected_key])
+
 
 # Set up the model
 generation_config = {
@@ -611,7 +618,7 @@ def getAnswer(prompt):
             yield chunk.text
         return full_response
     except Exception as e:
-        st.error(f"发生错误: {e}")
+        st.error(f"发生错误: {e}. 请检查你的API密钥是否有效。")
         return ""
 
 
@@ -660,34 +667,21 @@ if st.session_state.get("editing"):
                 st.session_state.editing = False
 
 # --- 聊天输入和响应 ---
-col1, col2 = st.columns([0.25, 0.75]) # 调整列宽比例，API 选择器更窄
+if prompt := st.chat_input("输入你的消息:"):
+    st.session_state.messages.append({"role": "user", "content": prompt})
+    with st.chat_message("user"):
+        st.markdown(prompt)
+    with st.chat_message("assistant"):
+        message_placeholder = st.empty()
+        full_response = ""
+        for chunk in getAnswer(prompt):
+            full_response += chunk
+            message_placeholder.markdown(full_response + "▌")
+        message_placeholder.markdown(full_response)
+    st.session_state.messages.append({"role": "assistant", "content": full_response})
+    with open(log_file, "wb") as f:
+        pickle.dump(st.session_state.messages, f)
 
-with col1:
-    api_key_selection = st.selectbox(
-        "选择 API 密钥", list(api_keys.keys()), key="api_key_select_main", help="选择要使用的 Google AI API 密钥"
-    )
-    st.session_state.api_key = api_keys[api_key_selection]
-    st.write("") # 增加一些空行，调整间距
-
-with col2:
-    if prompt := st.chat_input("输入你的消息:"):
-        st.session_state.messages.append({"role": "user", "content": prompt})
-        with st.chat_message("user"):
-            st.markdown(prompt)
-        with st.chat_message("assistant"):
-            message_placeholder = st.empty()
-            full_response = ""
-            try:
-                genai.configure(api_key=st.session_state.api_key)
-                for chunk in getAnswer(prompt):
-                    full_response += chunk
-                    message_placeholder.markdown(full_response + "▌")
-                message_placeholder.markdown(full_response)
-                st.session_state.messages.append({"role": "assistant", "content": full_response})
-                with open(log_file, "wb") as f:
-                    pickle.dump(st.session_state.messages, f)
-            except Exception as e:
-                st.error(f"对话发生错误：{e}")
 
 
 
