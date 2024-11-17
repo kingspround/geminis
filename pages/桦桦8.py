@@ -729,6 +729,22 @@ with st.sidebar.expander("角色设定"):
             st.session_state.editing_setting = "new_setting"
 
 
+    # 设定列表和编辑/启用/禁用
+    if not st.session_state.get("editing_setting"): # 不在编辑模式下显示设定列表和启用/禁用
+        for setting_name in st.session_state.character_settings:
+            col1, col2 = st.columns([1,1]) # 两列布局，设定名称占一列，启用和编辑占一列
+            with col1:
+                enabled = st.session_state.enabled_settings.get(setting_name, False)
+                enabled = st.checkbox(setting_name, value=enabled, key=f"enabled_{setting_name}")
+                st.session_state.enabled_settings[setting_name] = enabled
+
+            with col2:
+                if st.button(f"编辑", key=f"edit_{setting_name}"):
+                    st.session_state.editing_setting = setting_name
+
+
+
+    # 设定编辑区域
     if st.session_state.get("editing_setting"):
         setting_name = st.session_state.editing_setting
         setting_content = st.session_state.character_settings.get(setting_name, "")
@@ -748,7 +764,7 @@ with st.sidebar.expander("角色设定"):
                     st.session_state.editing_setting = None
                     st.success(f"设定 '{new_name}' 已删除!")
                     if new_name in st.session_state.enabled_settings:
-                        del st.session_state.enabled_settings[new_name] # 删除启用状态
+                        del st.session_state.enabled_settings[new_name]
                 else:
                     st.warning(f"设定 '{new_name}' 不存在!")
 
@@ -760,13 +776,6 @@ with st.sidebar.expander("角色设定"):
                     st.success("设定已保存!")
         if st.button("取消"):
             st.session_state.editing_setting = None
-
-    else: # 不在编辑状态时显示设定列表和启用状态
-        for setting_name in st.session_state.character_settings:
-            enabled = st.session_state.enabled_settings.get(setting_name, False)
-            enabled = st.checkbox(setting_name, value=enabled)
-            st.session_state.enabled_settings[setting_name] = enabled
-
 
 # --- Helper functions ---
 def load_history(log_file):
