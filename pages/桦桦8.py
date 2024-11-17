@@ -10,6 +10,11 @@ from io import StringIO
 import streamlit as st
 import pickle
 
+# --- API 密钥设置 ---
+api_keys = {
+    "默认": "AIzaSyAWfFf6zqy1DizINOwPfxPD8EF2ACdwCaQ",  # 请替换成你的默认 API 密钥
+    "备用1号": "YOUR_BACKUP_API_KEY_1"  # 请替换成你的备用 API 密钥
+}
 
 if "selected_key" not in st.session_state:
     st.session_state.selected_key = "默认"
