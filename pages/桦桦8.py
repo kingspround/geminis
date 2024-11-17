@@ -707,6 +707,18 @@ with st.sidebar.expander("角色设定"):
     if "character_settings" not in st.session_state:
         st.session_state.character_settings = {}
 
+    # 读取本地设定
+    for filename in os.listdir(): # 读取当前目录下的所有文件
+        if filename.endswith(".txt"):
+            setting_name = filename[:-4] # 去掉.txt扩展名
+            try:
+                with open(filename, "r", encoding="utf-8") as f:
+                    content = f.read()
+                    st.session_state.character_settings[setting_name] = content
+            except Exception as e:
+                st.error(f"读取文件 {filename} 失败: {e}")
+
+
     for setting_name in st.session_state.character_settings:
         if st.button(setting_name):
             st.session_state.editing_setting = setting_name
@@ -716,6 +728,14 @@ with st.sidebar.expander("角色设定"):
         setting_content = st.session_state.character_settings.get(setting_name, "")
         new_name = st.text_input("设定名称:", setting_name)
         new_content = st.text_area("设定内容:", setting_content)
+
+        # 导出设定
+        if st.button("导出设定"):
+            with open(f"{new_name}.txt", "w", encoding="utf-8") as f:
+                f.write(new_content)
+            st.success(f"设定已导出到 {new_name}.txt!")
+
+
         if st.button("保存设定"):
             if new_name:
                 st.session_state.character_settings[new_name] = new_content
