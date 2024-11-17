@@ -600,7 +600,30 @@ def getAnswer(prompt):
 
 
 
-# --- 文件处理 ---
+    for msg in st.session_state.messages[-20:]:
+        if msg["role"] == "user":
+            his_messages.append({"role": "user", "parts": [{"text": msg["content"]}]})
+        elif msg is not None and msg["content"] is not None:
+            his_messages.append({"role": "model", "parts": [{"text": msg["content"]}]})
+
+    his_messages = [
+        message
+        for message in his_messages
+        if message.get("parts") and message["parts"][0].get("text")
+    ]
+
+    try:
+        response = model.generate_content(contents=his_messages, stream=True)
+        full_response = ""
+        for chunk in response:
+            full_response += chunk.text
+            yield chunk.text
+        return full_response
+    except Exception as e:
+        st.error(f"An error occurred: {e}")
+        return ""
+
+# --- File Handling ---
 filename = os.path.splitext(os.path.basename(__file__))[0] + ".pkl"
 log_file = os.path.join(os.path.dirname(__file__), filename)
 
@@ -615,31 +638,51 @@ if "messages" not in st.session_state:
     except (FileNotFoundError, EOFError):
         st.session_state.messages = []
 
-
-# --- 聊天界面 ---
+# --- Chat History Display and Editing ---
 for i, message in enumerate(st.session_state.messages):
-    # ... (This section remains largely unchanged) ...
+    if message["role"] == "user":
+        with st.chat_message("user"):
+            st.write(message["content"], key=f"message_{i}")
+    elif message["content"] is not None:
+        with st.chat_message("assistant"):
+            st.write(message["content"], key=f"message_{i}")
 
-# --- 聊天输入和响应 ---
-if prompt := st.chat_input("输入你的消息:"):
-    # ... (This section remains largely unchanged) ...
+    if i >= len(st.session_state.messages) - 2:
+        if st.button("编辑", key=f"edit_{i}"):
+            st.session_state.editable_index = i
+            st.session_state.editing = True
+
+if st.session_state.get("editing"):
+    i = st.session_state.editable_index
+    message = st.session_state.messages[i]
+
+    with st.chat_message(message["role"]):
+        new_content = st.text_area(
+            f"{message['role']}:", message["content"], key=f"message_edit_{i}"
+        )
+
+        col1, col2 = st.columns(2)
+        with col1:
+            if st.button("保存", key=f"save_{i}"):
+                st.session_state.messages[i]["content"] = new_content
+                with open(log_file, "wb") as f:
+                    pickle.dump(st.session_state.messages, f)
+                st.success(f"已保存更改！")
+                st.session_state.editing = False
+        with col2:
+            if st.button("取消", key=f"cancel_{i}"):
+                st.session_state.editing = False
 
 
-# --- 可折叠侧边栏 ---
-if "file_expanded" not in st.session_state:
-    st.session_state.file_expanded = False
-if "settings_expanded" not in st.session_state:
-    st.session_state.settings_expanded = False
-if "functions_expanded" not in st.session_state:
-    st.session_state.functions_expanded = False
+# --- Character Settings ---
+if "character_settings" not in st.session_state:
+    st.session_state.character_settings = {}
 
-st.sidebar.header("操作面板")
+# --- Sidebar with Collapsible Sections ---
+st.sidebar.title("操作")
 
-# 文件操作侧边栏
-if st.sidebar.button("文件操作"):
-    st.session_state.file_expanded = not st.session_state.file_expanded
-
-if st.session_state.file_expanded:
+# 文件操作面板
+with st.sidebar.expander("文件操作"):
     st.sidebar.download_button(
         label="下载聊天记录",
         data=open(log_file, "rb").read(),
@@ -647,9 +690,23 @@ if st.session_state.file_expanded:
         mime="application/octet-stream",
     )
     if st.sidebar.button("读取历史记录"):
-        load_history(log_file)
+        try:
+            with open(log_file, "rb") as f:
+                messages = pickle.load(f)
+                messages = [message for message in messages if message.get("content")]
+                st.session_state.messages = messages
+                st.experimental_rerun()
+        except (FileNotFoundError, EOFError):
+            st.warning(f"读取历史记录失败：文件可能损坏或不存在。")
+
     if st.sidebar.button("清除历史记录"):
-        clear_history(log_file)
+        st.session_state.messages = []
+        try:
+            os.remove(log_file)
+            st.success(f"成功清除 {filename} 的历史记录！")
+        except FileNotFoundError:
+            st.warning(f"{filename} 不存在。")
+
     if st.sidebar.button("读取本地文件"):
         st.session_state.file_upload_mode = True
 
@@ -659,38 +716,69 @@ if st.session_state.file_expanded:
             try:
                 loaded_messages = pickle.load(uploaded_file)
                 st.session_state.messages.extend(loaded_messages)
+                for i, message in enumerate(st.session_state.messages):
+                    if message["role"] == "user":
+                        with st.chat_message("user"):
+                            st.write(message["content"], key=f"message_{i}")
+                    elif message["content"] is not None:
+                        with st.chat_message("assistant"):
+                            st.write(message["content"], key=f"message_{i}")
+                if st.sidebar.button("关闭", key="close_upload"):
+                    st.session_state.file_upload_mode = False
                 with open(log_file, "wb") as f:
                     pickle.dump(st.session_state.messages, f)
-                st.success("文件已加载!")
-                st.session_state.file_upload_mode = False  # 关闭文件上传模式
+
             except Exception as e:
-                st.error(f"读取本地文件失败: {e}")
+                st.error(f"读取本地文件失败：{e}")
 
-# 角色设定侧边栏
-if st.sidebar.button("角色设定"):
-    st.session_state.settings_expanded = not st.session_state.settings_expanded
 
-if st.session_state.settings_expanded:
-    if "character_settings" not in st.session_state:
-        st.session_state.character_settings = {}
-
+# 角色设定面板
+with st.sidebar.expander("角色设定"):
     for setting_name in st.session_state.character_settings:
         if st.sidebar.button(setting_name):
             st.session_state.editing_setting = setting_name
 
     if st.session_state.get("editing_setting"):
-        # ... (Character setting editing remains unchanged) ...
+        setting_name = st.session_state.editing_setting
+        setting_content = st.session_state.character_settings.get(setting_name, "")
 
-# 功能侧边栏 (currently empty)
-if st.sidebar.button("功能"):
-    st.session_state.functions_expanded = not st.session_state.functions_expanded
+        new_name = st.sidebar.text_input("设定名称:", setting_name)
+        new_content = st.sidebar.text_area("设定内容:", setting_content)
 
-if st.session_state.functions_expanded:
-    st.sidebar.info("此功能暂未实现。")
+        if st.sidebar.button("保存设定"):
+            if new_name:
+                st.session_state.character_settings[new_name] = new_content
+                st.session_state.editing_setting = None
+                st.success("设定已保存!")
+        if st.sidebar.button("取消"):
+            st.session_state.editing_setting = None
+
+    elif st.sidebar.button("新增设定"):
+        st.session_state.editing_setting = "new_setting"
 
 
-def load_history(log_file):
-    # ... (This function remains unchanged) ...
+# 功能操作面板
+with st.sidebar.expander("功能操作"):
+    if len(st.session_state.messages) > 0:
+        if st.sidebar.button("重置上一个输出"):
+            st.session_state.messages.pop(-1)
+            with open(log_file, "wb") as f:
+                pickle.dump(st.session_state.messages, f)
+            st.experimental_rerun()
 
-def clear_history(log_file):
-    # ... (This function remains unchanged) ...
+
+# --- Main Chat Input ---
+if prompt := st.chat_input("Enter your message:"):
+    st.session_state.messages.append({"role": "user", "content": prompt})
+    with st.chat_message("user"):
+        st.markdown(prompt)
+    with st.chat_message("assistant"):
+        message_placeholder = st.empty()
+        full_response = ""
+        for chunk in getAnswer(prompt):
+            full_response += chunk
+            message_placeholder.markdown(full_response + "▌")
+        message_placeholder.markdown(full_response)
+    st.session_state.messages.append({"role": "assistant", "content": full_response})
+    with open(log_file, "wb") as f:
+        pickle.dump(st.session_state.messages, f)
