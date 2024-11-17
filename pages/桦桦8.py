@@ -712,42 +712,33 @@ with st.sidebar.expander("文件操作"):
             st.error(f"读取本地文件失败：{e}")
 
 # 功能区 2: 角色设定
-# 功能区 2: 角色设定
 with st.sidebar.expander("角色设定"):
     if "character_settings" not in st.session_state:
         st.session_state.character_settings = {}
     if "enabled_settings" not in st.session_state:
         st.session_state.enabled_settings = {}
 
-    # 读取geminis/logs/下的设定文件
-    settings_dir = "geminis/logs/"  # 设定文件的目录
-    if os.path.exists(settings_dir):
-        for filename in os.listdir(settings_dir):
-            if filename.endswith(".txt"):
-                setting_name = filename[:-4]
-                filepath = os.path.join(settings_dir, filename)
+    col1, col2 = st.columns([1, 0.7])
+
+    with col1:
+        if st.button("读取本地设定"):
+            log_dir = "geminis/logs/"  # 指定日志目录
+            for filepath in glob.glob(os.path.join(log_dir, "*.txt")):
+                setting_name = os.path.basename(filepath)[:-4]  # 获取文件名（不含扩展名）
                 try:
                     with open(filepath, "r", encoding="utf-8") as f:
                         content = f.read()
                         st.session_state.character_settings[setting_name] = content
                 except Exception as e:
                     st.error(f"读取文件 {filepath} 失败: {e}")
-        st.success("geminis/logs/下的设定文件已读取!")
-    else:
-        st.warning(f"目录 '{settings_dir}' 不存在!")
-
-
-    col1, col2 = st.columns([1, 0.7])
-
-    with col1:
-        pass # 空着
+            st.success("本地设定已读取!")
 
     with col2:
         if st.button("新增设定", key="add_setting"):
             st.session_state.editing_setting = "new_setting"
 
 
-    # 设定列表和启用/禁用 (与之前版本相同)
+    # 设定列表和启用/禁用
     if not st.session_state.get("editing_setting"):
         for setting_name in st.session_state.character_settings:
             container = st.container()
@@ -760,6 +751,7 @@ with st.sidebar.expander("角色设定"):
                     enabled = st.session_state.enabled_settings.get(setting_name, False)
                     enabled = st.checkbox("", value=enabled, key=f"enabled_{setting_name}")
                     st.session_state.enabled_settings[setting_name] = enabled
+
 
 
 
