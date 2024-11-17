@@ -9,6 +9,8 @@ from io import BytesIO
 from io import StringIO
 import streamlit as st
 import pickle
+import glob
+
 
 
 # --- API 密钥设置 ---
@@ -789,9 +791,6 @@ with st.sidebar.expander("角色设定"):
             st.session_state.editing_setting = None
 
 # --- 聊天界面 ---
-
-# API 密钥选择器 (在聊天输入框之前)
-st.header("AI 聊天机器人")
 
 # 显示当前生效的设定
 enabled_settings = st.session_state.get("enabled_settings", {})
