@@ -640,13 +640,30 @@ if "messages" not in st.session_state:
 
 
 # --- 聊天输入和响应 ---
-with st.expander("选择 API 密钥"): # 使用expander在主区域显示API选择
+with st.form("my_form", clear_on_submit=True):
     selected_key = st.selectbox("选择 API 密钥", list(api_keys.keys()), key="api_key_select")
     api_key = api_keys[selected_key]
     if not api_key:
         st.info("请设置 API 密钥。")
         st.stop()
-    genai.configure(api_key=api_key) # 更新API Key
+    genai.configure(api_key=api_key)
+    prompt = st.chat_input("输入你的消息:")
+    submitted = st.form_submit_button("发送")
+    if submitted and prompt:
+        st.session_state.messages.append({"role": "user", "content": prompt})
+        with st.chat_message("user"):
+            st.markdown(prompt)
+        with st.chat_message("assistant"):
+            message_placeholder = st.empty()
+            full_response = ""
+            for chunk in getAnswer(prompt):
+                full_response += chunk
+                message_placeholder.markdown(full_response + "▌")
+            message_placeholder.markdown(full_response)
+        st.session_state.messages.append({"role": "assistant", "content": full_response})
+        with open(log_file, "wb") as f:
+            pickle.dump(st.session_state.messages, f)
+
 
 
 # 显示历史记录和编辑功能 (与之前相同，略作简化)
@@ -675,21 +692,6 @@ if st.session_state.get("editing"):
             if st.button("取消", key=f"cancel_{i}"):
                 st.session_state.editing = False
 
-# 在这里添加聊天输入和响应部分
-if prompt := st.chat_input("输入你的消息:"):
-    st.session_state.messages.append({"role": "user", "content": prompt})
-    with st.chat_message("user"):
-        st.markdown(prompt)
-    with st.chat_message("assistant"):
-        message_placeholder = st.empty()
-        full_response = ""
-        for chunk in getAnswer(prompt):
-            full_response += chunk
-            message_placeholder.markdown(full_response + "▌")
-        message_placeholder.markdown(full_response)
-    st.session_state.messages.append({"role": "assistant", "content": full_response})
-    with open(log_file, "wb") as f:
-        pickle.dump(st.session_state.messages, f)
 
 
 # ---  三个功能区侧边栏 ---
