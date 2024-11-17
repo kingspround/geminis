@@ -709,7 +709,7 @@ with st.sidebar.expander("角色设定"):
     if "enabled_settings" not in st.session_state:
         st.session_state.enabled_settings = {}
 
-    col1, col2 = st.columns([1, 0.8]) # 调整列宽比例，新增设定按钮占更小的空间
+    col1, col2 = st.columns(2)
 
     with col1:
         if st.button("读取本地设定", key="read_local_settings"):
@@ -728,18 +728,25 @@ with st.sidebar.expander("角色设定"):
         if st.button("新增设定", key="add_new_setting"):
             st.session_state.editing_setting = "new_setting"
 
-    # 设定列表，启用/禁用复选框和编辑按钮
+
+    # 设定列表和启用/禁用  ---  关键修改在此部分 ---
     if not st.session_state.get("editing_setting"):
         for setting_name in st.session_state.character_settings:
-            c1, c2 = st.columns([2, 1]) # 使用更窄的列来节省空间
-            with c1:
-                st.button(setting_name, key=f"edit_{setting_name}", use_container_width=True, type="primary") # 使用 use_container_width=True 让按钮充满容器宽度
-            with c2:
+            # 使用 st.columns 分配空间
+            col1, col2 = st.columns([1, 0.3])  # 调整列宽比例，设定名称占更多空间
+
+            with col1:
+                # 使用 st.button 的 style 属性设置按钮大小
+                if st.button(setting_name, key=f"edit_{setting_name}", use_container_width=True, style={'margin-right': '5px', 'font-size': '12px'}): # 调整按钮样式
+                    st.session_state.editing_setting = setting_name
+
+            with col2:
                 enabled = st.session_state.enabled_settings.get(setting_name, False)
                 enabled = st.checkbox("", value=enabled, key=f"enabled_{setting_name}")
                 st.session_state.enabled_settings[setting_name] = enabled
 
-    # 设定编辑区域 (与之前版本相同，这里没有修改)
+
+    # 设定编辑区域 (与之前版本相同)
     if st.session_state.get("editing_setting"):
         setting_name = st.session_state.editing_setting
         setting_content = st.session_state.character_settings.get(setting_name, "")
