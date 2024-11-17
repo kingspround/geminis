@@ -603,14 +603,10 @@ def getAnswer(prompt):
     for msg in st.session_state.messages[-20:]:
         if msg["role"] == "user":
             his_messages.append({"role": "user", "parts": [{"text": msg["content"]}]})
-        elif msg is not None and msg["content"] is not None:
+        elif msg and msg["content"]:
             his_messages.append({"role": "model", "parts": [{"text": msg["content"]}]})
 
-    his_messages = [
-        message
-        for message in his_messages
-        if message.get("parts") and message["parts"][0].get("text")
-    ]
+    his_messages = [m for m in his_messages if m.get("parts") and m["parts"][0].get("text")]
 
     try:
         response = model.generate_content(contents=his_messages, stream=True)
@@ -620,16 +616,15 @@ def getAnswer(prompt):
             yield chunk.text
         return full_response
     except Exception as e:
-        st.error(f"An error occurred: {e}")
+        st.error(f"错误: {e}")
         return ""
 
-# --- File Handling ---
+# --- 文件操作函数 ---
 filename = os.path.splitext(os.path.basename(__file__))[0] + ".pkl"
 log_file = os.path.join(os.path.dirname(__file__), filename)
 
 if not os.path.exists(log_file):
-    with open(log_file, "wb") as f:
-        pass
+    with open(log_file, "wb") as f: pass
 
 if "messages" not in st.session_state:
     try:
@@ -638,14 +633,31 @@ if "messages" not in st.session_state:
     except (FileNotFoundError, EOFError):
         st.session_state.messages = []
 
-# --- Chat History Display and Editing ---
+
+def save_history():
+    with open(log_file, "wb") as f:
+        pickle.dump(st.session_state.messages, f)
+
+def load_history():
+    try:
+        with open(log_file, "rb") as f:
+            st.session_state.messages = pickle.load(f)
+            st.experimental_rerun()
+    except (FileNotFoundError, EOFError):
+        st.warning("加载历史记录失败，文件可能损坏。")
+
+def clear_history():
+    st.session_state.messages = []
+    try:
+        os.remove(log_file)
+        st.success("历史记录已清除。")
+    except FileNotFoundError:
+        st.warning("没有历史记录可以清除。")
+
+# --- 聊天界面 ---
 for i, message in enumerate(st.session_state.messages):
-    if message["role"] == "user":
-        with st.chat_message("user"):
-            st.write(message["content"], key=f"message_{i}")
-    elif message["content"] is not None:
-        with st.chat_message("assistant"):
-            st.write(message["content"], key=f"message_{i}")
+    with st.chat_message(message["role"]):
+        st.write(message["content"], key=f"message_{i}")
 
     if i >= len(st.session_state.messages) - 2:
         if st.button("编辑", key=f"edit_{i}"):
@@ -655,120 +667,20 @@ for i, message in enumerate(st.session_state.messages):
 if st.session_state.get("editing"):
     i = st.session_state.editable_index
     message = st.session_state.messages[i]
-
     with st.chat_message(message["role"]):
-        new_content = st.text_area(
-            f"{message['role']}:", message["content"], key=f"message_edit_{i}"
-        )
-
+        new_content = st.text_area(f"{message['role']}:", message["content"], key=f"message_edit_{i}")
         col1, col2 = st.columns(2)
         with col1:
             if st.button("保存", key=f"save_{i}"):
                 st.session_state.messages[i]["content"] = new_content
-                with open(log_file, "wb") as f:
-                    pickle.dump(st.session_state.messages, f)
-                st.success(f"已保存更改！")
+                save_history()
+                st.success("已保存更改！")
                 st.session_state.editing = False
         with col2:
             if st.button("取消", key=f"cancel_{i}"):
                 st.session_state.editing = False
 
-
-# --- Character Settings ---
-if "character_settings" not in st.session_state:
-    st.session_state.character_settings = {}
-
-# --- Sidebar with Collapsible Sections ---
-st.sidebar.title("操作")
-
-# 文件操作面板
-with st.sidebar.expander("文件操作"):
-    st.sidebar.download_button(
-        label="下载聊天记录",
-        data=open(log_file, "rb").read(),
-        file_name=filename,
-        mime="application/octet-stream",
-    )
-    if st.sidebar.button("读取历史记录"):
-        try:
-            with open(log_file, "rb") as f:
-                messages = pickle.load(f)
-                messages = [message for message in messages if message.get("content")]
-                st.session_state.messages = messages
-                st.experimental_rerun()
-        except (FileNotFoundError, EOFError):
-            st.warning(f"读取历史记录失败：文件可能损坏或不存在。")
-
-    if st.sidebar.button("清除历史记录"):
-        st.session_state.messages = []
-        try:
-            os.remove(log_file)
-            st.success(f"成功清除 {filename} 的历史记录！")
-        except FileNotFoundError:
-            st.warning(f"{filename} 不存在。")
-
-    if st.sidebar.button("读取本地文件"):
-        st.session_state.file_upload_mode = True
-
-    if st.session_state.get("file_upload_mode"):
-        uploaded_file = st.sidebar.file_uploader("选择文件", type=["pkl"])
-        if uploaded_file is not None:
-            try:
-                loaded_messages = pickle.load(uploaded_file)
-                st.session_state.messages.extend(loaded_messages)
-                for i, message in enumerate(st.session_state.messages):
-                    if message["role"] == "user":
-                        with st.chat_message("user"):
-                            st.write(message["content"], key=f"message_{i}")
-                    elif message["content"] is not None:
-                        with st.chat_message("assistant"):
-                            st.write(message["content"], key=f"message_{i}")
-                if st.sidebar.button("关闭", key="close_upload"):
-                    st.session_state.file_upload_mode = False
-                with open(log_file, "wb") as f:
-                    pickle.dump(st.session_state.messages, f)
-
-            except Exception as e:
-                st.error(f"读取本地文件失败：{e}")
-
-
-# 角色设定面板
-with st.sidebar.expander("角色设定"):
-    for setting_name in st.session_state.character_settings:
-        if st.sidebar.button(setting_name):
-            st.session_state.editing_setting = setting_name
-
-    if st.session_state.get("editing_setting"):
-        setting_name = st.session_state.editing_setting
-        setting_content = st.session_state.character_settings.get(setting_name, "")
-
-        new_name = st.sidebar.text_input("设定名称:", setting_name)
-        new_content = st.sidebar.text_area("设定内容:", setting_content)
-
-        if st.sidebar.button("保存设定"):
-            if new_name:
-                st.session_state.character_settings[new_name] = new_content
-                st.session_state.editing_setting = None
-                st.success("设定已保存!")
-        if st.sidebar.button("取消"):
-            st.session_state.editing_setting = None
-
-    elif st.sidebar.button("新增设定"):
-        st.session_state.editing_setting = "new_setting"
-
-
-# 功能操作面板
-with st.sidebar.expander("功能操作"):
-    if len(st.session_state.messages) > 0:
-        if st.sidebar.button("重置上一个输出"):
-            st.session_state.messages.pop(-1)
-            with open(log_file, "wb") as f:
-                pickle.dump(st.session_state.messages, f)
-            st.experimental_rerun()
-
-
-# --- Main Chat Input ---
-if prompt := st.chat_input("Enter your message:"):
+if prompt := st.chat_input("输入你的消息:"):
     st.session_state.messages.append({"role": "user", "content": prompt})
     with st.chat_message("user"):
         st.markdown(prompt)
@@ -780,5 +692,58 @@ if prompt := st.chat_input("Enter your message:"):
             message_placeholder.markdown(full_response + "▌")
         message_placeholder.markdown(full_response)
     st.session_state.messages.append({"role": "assistant", "content": full_response})
-    with open(log_file, "wb") as f:
-        pickle.dump(st.session_state.messages, f)
+    save_history()
+
+
+# --- 侧边栏 ---
+st.sidebar.title("操作")
+
+#文件管理部分
+if st.sidebar.expander("文件管理"):
+    if st.sidebar.button("读取历史记录"):
+        load_history()
+    if st.sidebar.button("清除历史记录"):
+        clear_history()
+    st.sidebar.download_button(
+        label="下载聊天记录",
+        data=open(log_file, "rb").read(),
+        file_name=filename,
+        mime="application/octet-stream",
+    )
+    uploaded_file = st.sidebar.file_uploader("上传文件(.pkl)", type=["pkl"])
+    if uploaded_file:
+        try:
+            loaded_messages = pickle.load(uploaded_file)
+            st.session_state.messages.extend(loaded_messages)
+            st.experimental_rerun()
+        except Exception as e:
+            st.error(f"上传失败: {e}")
+
+#角色设定部分
+if "character_settings" not in st.session_state:
+    st.session_state.character_settings = {}
+
+if st.sidebar.expander("角色设定"):
+    for setting_name in st.session_state.character_settings:
+        if st.sidebar.button(setting_name):
+            st.session_state.editing_setting = setting_name
+
+    if st.session_state.get("editing_setting"):
+        setting_name = st.session_state.editing_setting
+        setting_content = st.session_state.character_settings.get(setting_name, "")
+        new_name = st.sidebar.text_input("设定名称:", setting_name)
+        new_content = st.sidebar.text_area("设定内容:", setting_content)
+        if st.sidebar.button("保存设定"):
+            if new_name:
+                st.session_state.character_settings[new_name] = new_content
+                st.session_state.editing_setting = None
+                st.success("设定已保存!")
+        if st.sidebar.button("取消"):
+            st.session_state.editing_setting = None
+    elif st.sidebar.button("新增设定"):
+        st.session_state.editing_setting = "new_setting"
+
+
+#功能设定部分(可扩展)
+if st.sidebar.expander("功能设定"):
+    st.sidebar.write("此处可以添加其他功能设定") #示例，可以根据实际需求添加功能
