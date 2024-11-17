@@ -708,9 +708,9 @@ with st.sidebar.expander("角色设定"):
         st.session_state.character_settings = {}
 
     # 读取本地设定
-    for filename in os.listdir(): # 读取当前目录下的所有文件
+    for filename in os.listdir():
         if filename.endswith(".txt"):
-            setting_name = filename[:-4] # 去掉.txt扩展名
+            setting_name = filename[:-4]
             try:
                 with open(filename, "r", encoding="utf-8") as f:
                     content = f.read()
@@ -718,10 +718,13 @@ with st.sidebar.expander("角色设定"):
             except Exception as e:
                 st.error(f"读取文件 {filename} 失败: {e}")
 
+    # 使用columns节省空间，显示设定按钮
+    cols = st.columns(min(len(st.session_state.character_settings), 3)) #最多显示3列
+    for i, setting_name in enumerate(st.session_state.character_settings):
+        with cols[i % 3]: #循环使用columns
+            if st.button(setting_name):
+                st.session_state.editing_setting = setting_name
 
-    for setting_name in st.session_state.character_settings:
-        if st.button(setting_name):
-            st.session_state.editing_setting = setting_name
 
     if st.session_state.get("editing_setting"):
         setting_name = st.session_state.editing_setting
@@ -735,6 +738,18 @@ with st.sidebar.expander("角色设定"):
                 f.write(new_content)
             st.success(f"设定已导出到 {new_name}.txt!")
 
+        # 删除设定
+        if st.button("删除设定"):
+            if st.session_state.editing_setting in st.session_state.character_settings:
+                del st.session_state.character_settings[st.session_state.editing_setting]
+                try:
+                    os.remove(f"{setting_name}.txt")  #删除本地文件
+                    st.success(f"设定 '{setting_name}' 已删除!")
+                except FileNotFoundError:
+                    st.warning(f"本地文件 '{setting_name}.txt' 不存在, 可能已手动删除.")
+                st.session_state.editing_setting = None
+                st.experimental_rerun() #刷新页面
+
 
         if st.button("保存设定"):
             if new_name:
@@ -745,7 +760,6 @@ with st.sidebar.expander("角色设定"):
             st.session_state.editing_setting = None
     elif st.button("新增设定"):
         st.session_state.editing_setting = "new_setting"
-
 
 # --- Helper functions ---
 def load_history(log_file):
