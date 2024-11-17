@@ -712,38 +712,44 @@ with st.sidebar.expander("文件操作"):
             st.error(f"读取本地文件失败：{e}")
 
 # 功能区 2: 角色设定
+# 功能区 2: 角色设定
 with st.sidebar.expander("角色设定"):
     if "character_settings" not in st.session_state:
         st.session_state.character_settings = {}
     if "enabled_settings" not in st.session_state:
         st.session_state.enabled_settings = {}
 
-    col1, col2 = st.columns([1, 0.7])  # 调整列宽比例，增加新增和读取按钮的宽度
+    col1, col2 = st.columns([1, 0.7])
 
     with col1:
         if st.button("读取本地设定"):
-            for filename in os.listdir():
+            log_dir = "geminis/logs"  # 设置设定文件的目录
+            if not os.path.exists(log_dir):
+                os.makedirs(log_dir) # 如果目录不存在，则创建它
+            for filename in os.listdir(log_dir):
                 if filename.endswith(".txt"):
+                    filepath = os.path.join(log_dir, filename)
                     setting_name = filename[:-4]
                     try:
-                        with open(filename, "r", encoding="utf-8") as f:
+                        with open(filepath, "r", encoding="utf-8") as f:
                             content = f.read()
                             st.session_state.character_settings[setting_name] = content
                     except Exception as e:
-                        st.error(f"读取文件 {filename} 失败: {e}")
+                        st.error(f"读取文件 {filepath} 失败: {e}")
             st.success("本地设定已读取!")
 
+
     with col2:
-        if st.button("新增设定", key="add_setting"):  # 添加 key 以避免重复
+        if st.button("新增设定", key="add_setting"):
             st.session_state.editing_setting = "new_setting"
 
 
-    # 设定列表和启用/禁用
+    # 设定列表和启用/禁用 (与之前版本相同)
     if not st.session_state.get("editing_setting"):
         for setting_name in st.session_state.character_settings:
-            container = st.container()  # 使用 container 来控制布局
+            container = st.container()
             with container:
-                col1, col2 = st.columns([0.8, 0.2])  # 调整列宽比例，按钮更窄
+                col1, col2 = st.columns([0.8, 0.2])
                 with col1:
                     if st.button(setting_name, key=f"edit_{setting_name}", use_container_width=True):
                         st.session_state.editing_setting = setting_name
@@ -751,6 +757,7 @@ with st.sidebar.expander("角色设定"):
                     enabled = st.session_state.enabled_settings.get(setting_name, False)
                     enabled = st.checkbox("", value=enabled, key=f"enabled_{setting_name}")
                     st.session_state.enabled_settings[setting_name] = enabled
+
 
 
     # 设定编辑区域
