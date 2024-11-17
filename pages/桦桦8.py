@@ -709,10 +709,10 @@ with st.sidebar.expander("角色设定"):
     if "enabled_settings" not in st.session_state:
         st.session_state.enabled_settings = {}
 
-    col1, col2 = st.columns([1, 0.5])  # 分成两列，第一列宽一些，第二列窄一些
+    col1, col2 = st.columns([1, 0.7])  # 调整列宽比例，增加新增和读取按钮的宽度
 
     with col1:
-        if st.button("读取本地设定", key="read_local_settings"):  # 添加key避免冲突
+        if st.button("读取本地设定"):
             for filename in os.listdir():
                 if filename.endswith(".txt"):
                     setting_name = filename[:-4]
@@ -725,25 +725,26 @@ with st.sidebar.expander("角色设定"):
             st.success("本地设定已读取!")
 
     with col2:
-        if st.button("新增设定", key="add_new_setting"):  # 添加key避免冲突
+        if st.button("新增设定", key="add_setting"):  # 添加 key 以避免重复
             st.session_state.editing_setting = "new_setting"
 
 
-    # 设定列表和启用/禁用  ---  关键改进部分
+    # 设定列表和启用/禁用
     if not st.session_state.get("editing_setting"):
         for setting_name in st.session_state.character_settings:
-            with st.container(): # 使用container让checkbox和button在同一行
-                col1, col2 = st.columns([7,1]) # 调整列宽比例，设定名称占7，复选框占1
+            container = st.container()  # 使用 container 来控制布局
+            with container:
+                col1, col2 = st.columns([0.8, 0.2])  # 调整列宽比例，按钮更窄
                 with col1:
-                    st.button(setting_name, key=f"edit_{setting_name}", use_container_width=True) # 使用use_container_width调整按钮宽度
-
+                    if st.button(setting_name, key=f"edit_{setting_name}", use_container_width=True):
+                        st.session_state.editing_setting = setting_name
                 with col2:
                     enabled = st.session_state.enabled_settings.get(setting_name, False)
                     enabled = st.checkbox("", value=enabled, key=f"enabled_{setting_name}")
                     st.session_state.enabled_settings[setting_name] = enabled
 
 
-    # 设定编辑区域 (与之前版本相同)
+    # 设定编辑区域
     if st.session_state.get("editing_setting"):
         setting_name = st.session_state.editing_setting
         setting_content = st.session_state.character_settings.get(setting_name, "")
@@ -752,12 +753,12 @@ with st.sidebar.expander("角色设定"):
 
         col1, col2 = st.columns(2)
         with col1:
-            if st.button("导出设定", key="export_setting"):
+            if st.button("导出设定"):
                 with open(f"{new_name}.txt", "w", encoding="utf-8") as f:
                     f.write(new_content)
                 st.success(f"设定已导出到 {new_name}.txt!")
 
-            if st.button("删除设定", key="delete_setting"):
+            if st.button("删除设定"):
                 if new_name in st.session_state.character_settings:
                     del st.session_state.character_settings[new_name]
                     st.session_state.editing_setting = None
@@ -768,14 +769,13 @@ with st.sidebar.expander("角色设定"):
                     st.warning(f"设定 '{new_name}' 不存在!")
 
         with col2:
-            if st.button("保存设定", key="save_setting"):
+            if st.button("保存设定"):
                 if new_name:
                     st.session_state.character_settings[new_name] = new_content
                     st.session_state.editing_setting = None
                     st.success("设定已保存!")
-        if st.button("取消", key="cancel_editing"):
+        if st.button("取消"):
             st.session_state.editing_setting = None
-
 
 
 # --- Helper functions ---
