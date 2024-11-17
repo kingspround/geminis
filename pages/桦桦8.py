@@ -707,8 +707,8 @@ with st.sidebar.expander("角色设定"):
     if "character_settings" not in st.session_state:
         st.session_state.character_settings = {}
 
-    # 读取本地设定按钮和新增设定按钮并排
-    col1, col2 = st.columns(2) # 创建两列
+    col1, col2 = st.columns(2) # 将按钮分成两列
+
     with col1:
         if st.button("读取本地设定"):
             for filename in os.listdir():
@@ -720,55 +720,44 @@ with st.sidebar.expander("角色设定"):
                             st.session_state.character_settings[setting_name] = content
                     except Exception as e:
                         st.error(f"读取文件 {filename} 失败: {e}")
-            st.experimental_rerun() #刷新页面显示读取结果
+            st.success("本地设定已读取!")
 
     with col2:
         if st.button("新增设定"):
             st.session_state.editing_setting = "new_setting"
 
 
-    # 使用columns节省空间，显示设定按钮
-    cols = st.columns(min(len(st.session_state.character_settings), 3))
-    for i, setting_name in enumerate(st.session_state.character_settings):
-        with cols[i % 3]:
-            if st.button(setting_name):
-                st.session_state.editing_setting = setting_name
-
-
-       if st.session_state.get("editing_setting"):
+    if st.session_state.get("editing_setting"):
         setting_name = st.session_state.editing_setting
         setting_content = st.session_state.character_settings.get(setting_name, "")
         new_name = st.text_input("设定名称:", setting_name)
         new_content = st.text_area("设定内容:", setting_content)
 
-        # 导出设定
-        if st.button("导出设定"):
-            with open(f"{new_name}.txt", "w", encoding="utf-8") as f:
-                f.write(new_content)
-            st.success(f"设定已导出到 {new_name}.txt!")
+        col1, col2 = st.columns(2) # 将按钮分成两列
+        with col1:
+            if st.button("导出设定"):
+                with open(f"{new_name}.txt", "w", encoding="utf-8") as f:
+                    f.write(new_content)
+                st.success(f"设定已导出到 {new_name}.txt!")
 
-        # 删除设定
-        if st.button("删除设定"):
-            if st.session_state.editing_setting in st.session_state.character_settings:
-                del st.session_state.character_settings[st.session_state.editing_setting]
-                try:
-                    os.remove(f"{setting_name}.txt")  #删除本地文件
-                    st.success(f"设定 '{setting_name}' 已删除!")
-                except FileNotFoundError:
-                    st.warning(f"本地文件 '{setting_name}.txt' 不存在, 可能已手动删除.")
-                st.session_state.editing_setting = None
-                st.experimental_rerun() #刷新页面
+            # 删除设定
+            if st.button("删除设定"):
+                if new_name in st.session_state.character_settings:
+                    del st.session_state.character_settings[new_name]
+                    st.session_state.editing_setting = None
+                    st.success(f"设定 '{new_name}' 已删除!")
+                else:
+                    st.warning(f"设定 '{new_name}' 不存在!")
 
 
-        if st.button("保存设定"):
-            if new_name:
-                st.session_state.character_settings[new_name] = new_content
-                st.session_state.editing_setting = None
-                st.success("设定已保存!")
+        with col2:
+            if st.button("保存设定"):
+                if new_name:
+                    st.session_state.character_settings[new_name] = new_content
+                    st.session_state.editing_setting = None
+                    st.success("设定已保存!")
         if st.button("取消"):
             st.session_state.editing_setting = None
-    elif st.button("新增设定"):
-        st.session_state.editing_setting = "new_setting"
 
 
 # --- Helper functions ---
