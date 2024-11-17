@@ -17,14 +17,6 @@ api_keys = {
     "备用1号": "YOUR_BACKUP_API_KEY_1"  # 请替换成你的备用 API 密钥
 }
 
-selected_key = st.sidebar.selectbox("选择 API 密钥", list(api_keys.keys()), key="api_key_select")
-api_key = api_keys[selected_key]
-
-if not api_key:
-    st.info("请设置 API 密钥。")
-    st.stop()
-
-genai.configure(api_key=api_key)
 
 # Set up the model
 generation_config = {
@@ -668,7 +660,7 @@ if st.session_state.get("editing"):
                 st.session_state.editing = False
 
 # --- 聊天输入和响应 ---
-api_key_selection = st.selectbox("选择 API 密钥", list(api_keys.keys()), key="api_key_select")
+api_key_selection = st.selectbox("选择 API 密钥", list(api_keys.keys()), key="api_key_select_main") # 这里修改了键
 st.session_state.api_key = api_keys[api_key_selection]
 
 
