@@ -668,29 +668,27 @@ if st.session_state.get("editing"):
                 st.session_state.editing = False
 
 # --- 聊天输入和响应 ---
-with st.form("my_form", clear_on_submit=True):
-    selected_key = st.selectbox("选择 API 密钥", list(api_keys.keys()), key="api_key_select")
-    api_key = api_keys[selected_key]
-    if not api_key:
-        st.info("请设置 API 密钥。")
-        st.stop()
-    genai.configure(api_key=api_key)
-    prompt = st.chat_input("输入你的消息:")
-    submitted = st.form_submit_button("发送")
-    if submitted and prompt:
-        st.session_state.messages.append({"role": "user", "content": prompt})
-        with st.chat_message("user"):
-            st.markdown(prompt)
-        with st.chat_message("assistant"):
-            message_placeholder = st.empty()
-            full_response = ""
+api_key_selection = st.selectbox("选择 API 密钥", list(api_keys.keys()), key="api_key_select")
+st.session_state.api_key = api_keys[api_key_selection]
+
+
+if prompt := st.chat_input("输入你的消息:"):
+    st.session_state.messages.append({"role": "user", "content": prompt})
+    with st.chat_message("user"):
+        st.markdown(prompt)
+    with st.chat_message("assistant"):
+        message_placeholder = st.empty()
+        full_response = ""
+        try: # 新增错误处理
             for chunk in getAnswer(prompt):
                 full_response += chunk
                 message_placeholder.markdown(full_response + "▌")
             message_placeholder.markdown(full_response)
-        st.session_state.messages.append({"role": "assistant", "content": full_response})
-        with open(log_file, "wb") as f:
-            pickle.dump(st.session_state.messages, f)
+            st.session_state.messages.append({"role": "assistant", "content": full_response})
+            with open(log_file, "wb") as f:
+                pickle.dump(st.session_state.messages, f)
+        except Exception as e:
+            st.error(f"对话发生错误：{e}")
 
 
 # ---  三个功能区侧边栏 ---
