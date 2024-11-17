@@ -660,8 +660,8 @@ if st.session_state.get("editing"):
                 st.session_state.editing = False
 
 # --- 聊天输入和响应 ---
-api_key_selection = st.selectbox("选择 API 密钥", list(api_keys.keys()), key="api_key_select_main") # 这里修改了键
-st.session_state.api_key = api_keys[api_key_selection]
+api_key_selection = st.selectbox("选择 API 密钥", list(api_keys.keys()), key="api_key_select_main")
+st.session_state.api_key = api_keys[api_key_selection]  # 将选中的 API 密钥保存到 session state
 
 
 if prompt := st.chat_input("输入你的消息:"):
@@ -671,7 +671,8 @@ if prompt := st.chat_input("输入你的消息:"):
     with st.chat_message("assistant"):
         message_placeholder = st.empty()
         full_response = ""
-        try: # 新增错误处理
+        try:
+            genai.configure(api_key=st.session_state.api_key) #在这里配置api key
             for chunk in getAnswer(prompt):
                 full_response += chunk
                 message_placeholder.markdown(full_response + "▌")
