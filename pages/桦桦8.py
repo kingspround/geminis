@@ -682,34 +682,13 @@ if prompt := st.chat_input("输入你的消息:"):
 st.sidebar.title("功能菜单")
 
 # 功能区 1: 文件操作
-with st.sidebar.expander("文件操作"):
-    if len(st.session_state.messages) > 0:
-        st.button("重置上一个输出", on_click=lambda: st.session_state.messages.pop(-1))
-    st.download_button(
-        label="下载聊天记录",
-        data=open(log_file, "rb").read(),
-        file_name=filename,
-        mime="application/octet-stream",
-    )
-    st.button("读取历史记录", on_click=lambda: load_history(log_file))
-    st.button("清除历史记录", on_click=lambda: clear_history(log_file))
-    uploaded_file = st.file_uploader("选择文件", type=["pkl"])
-    if uploaded_file is not None:
-        try:
-            loaded_messages = pickle.load(uploaded_file)
-            st.session_state.messages.extend(loaded_messages)
-            st.experimental_rerun()  # 重新运行以显示更新后的聊天记录
-        except Exception as e:
-            st.error(f"读取本地文件失败：{e}")
-
-# 功能区 2: 角色设定
 with st.sidebar.expander("角色设定"):
     if "character_settings" not in st.session_state:
         st.session_state.character_settings = {}
     if "enabled_settings" not in st.session_state:
         st.session_state.enabled_settings = {}
 
-    col1, col2 = st.columns(2)
+    col1, col2 = st.columns([1, 1])  # 两列布局，一列读取和新增，一列空着
 
     with col1:
         if st.button("读取本地设定"):
@@ -729,32 +708,21 @@ with st.sidebar.expander("角色设定"):
             st.session_state.editing_setting = "new_setting"
 
 
+    # 设定列表和启用/禁用  (关键改进部分)
     if not st.session_state.get("editing_setting"):
-        cols = st.columns(4) # 将空间分成4列，每列放置一个设定
+        settings_list = list(st.session_state.character_settings.keys())
+        num_cols = min(len(settings_list), 4) # 最多4列
+        cols = st.columns(num_cols)
 
-        for i, setting_name in enumerate(st.session_state.character_settings):
-            with cols[i % 4]: # 使用模运算将设定分配到不同的列中
-                col1, col2 = st.columns([8,2]) # 设定名称占8份，复选框占2份
-                with col1:
-                    if st.button(setting_name, key=f"edit_{setting_name}", use_container_width=True): # use_container_width 填满可用宽度
-                        st.session_state.editing_setting = setting_name
-                with col2:
-                    enabled = st.session_state.enabled_settings.get(setting_name, False)
-                    enabled = st.checkbox("", value=enabled, key=f"enabled_{setting_name}")
-                    st.session_state.enabled_settings[setting_name] = enabled
+        for i, setting_name in enumerate(settings_list):
+            with cols[i % num_cols]: # 使用模运算在列之间循环
+                if st.button(setting_name, key=f"edit_{setting_name}", use_container_width=True):
+                    st.session_state.editing_setting = setting_name
+                enabled = st.session_state.enabled_settings.get(setting_name, False)
+                enabled = st.checkbox("", value=enabled, key=f"enabled_{setting_name}")
+                st.session_state.enabled_settings[setting_name] = enabled
 
 
-        #  添加一些CSS样式来减少按钮和复选框间的间距 (可选)
-        st.markdown("""
-            <style>
-                div[data-testid="stCheckbox"] {
-                    margin-left: 5px; /* 调整间距 */
-                }
-                div[data-testid="stButton"] {
-                    margin-right: 5px; /* 调整间距 */
-                }
-            </style>
-            """, unsafe_allow_html=True)
 
     # 设定编辑区域 (与之前版本相同)
     if st.session_state.get("editing_setting"):
