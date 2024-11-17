@@ -660,28 +660,32 @@ if st.session_state.get("editing"):
                 st.session_state.editing = False
 
 # --- 聊天输入和响应 ---
-api_key_selection = st.selectbox("选择 API 密钥", list(api_keys.keys()), key="api_key_select_main")
-st.session_state.api_key = api_keys[api_key_selection]  # 将选中的 API 密钥保存到 session state
+col1, col2 = st.columns([0.2, 0.8]) # 创建两列，API 选择器占较小部分
 
+with col1:
+    api_key_selection = st.selectbox("选择 API 密钥", list(api_keys.keys()), key="api_key_select_main",
+                                     help="选择要使用的 Google AI API 密钥")
+    st.session_state.api_key = api_keys[api_key_selection]
 
-if prompt := st.chat_input("输入你的消息:"):
-    st.session_state.messages.append({"role": "user", "content": prompt})
-    with st.chat_message("user"):
-        st.markdown(prompt)
-    with st.chat_message("assistant"):
-        message_placeholder = st.empty()
-        full_response = ""
-        try:
-            genai.configure(api_key=st.session_state.api_key) #在这里配置api key
-            for chunk in getAnswer(prompt):
-                full_response += chunk
-                message_placeholder.markdown(full_response + "▌")
-            message_placeholder.markdown(full_response)
-            st.session_state.messages.append({"role": "assistant", "content": full_response})
-            with open(log_file, "wb") as f:
-                pickle.dump(st.session_state.messages, f)
-        except Exception as e:
-            st.error(f"对话发生错误：{e}")
+with col2: # 对话输入框在右侧
+    if prompt := st.chat_input("输入你的消息:"):
+        st.session_state.messages.append({"role": "user", "content": prompt})
+        with st.chat_message("user"):
+            st.markdown(prompt)
+        with st.chat_message("assistant"):
+            message_placeholder = st.empty()
+            full_response = ""
+            try:
+                genai.configure(api_key=st.session_state.api_key)
+                for chunk in getAnswer(prompt):
+                    full_response += chunk
+                    message_placeholder.markdown(full_response + "▌")
+                message_placeholder.markdown(full_response)
+                st.session_state.messages.append({"role": "assistant", "content": full_response})
+                with open(log_file, "wb") as f:
+                    pickle.dump(st.session_state.messages, f)
+            except Exception as e:
+                st.error(f"对话发生错误：{e}")
 
 
 # ---  三个功能区侧边栏 ---
