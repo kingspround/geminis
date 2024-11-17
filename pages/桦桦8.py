@@ -788,6 +788,37 @@ with st.sidebar.expander("角色设定"):
         if st.button("取消"):
             st.session_state.editing_setting = None
 
+# --- 聊天界面 ---
+
+# API 密钥选择器 (在聊天输入框之前)
+st.header("AI 聊天机器人")
+
+# 显示当前生效的设定
+enabled_settings = st.session_state.get("enabled_settings", {})
+active_settings = [name for name, enabled in enabled_settings.items() if enabled]
+if active_settings:
+    st.write(f"当前生效的设定：{', '.join(active_settings)}")
+else:
+    st.write("当前未启用任何设定")
+
+
+# --- 页面初始化时加载设定 ---
+if "settings_loaded" not in st.session_state:
+    st.session_state.settings_loaded = False
+
+if not st.session_state.settings_loaded:
+    log_dir = "geminis/logs/"
+    for filepath in glob.glob(os.path.join(log_dir, "*.txt")):
+        setting_name = os.path.basename(filepath)[:-4]
+        try:
+            with open(filepath, "r", encoding="utf-8") as f:
+                content = f.read()
+                st.session_state.character_settings[setting_name] = content
+        except Exception as e:
+            st.error(f"读取文件 {filepath} 失败: {e}")
+    st.session_state.settings_loaded = True # 标记设定已加载
+
+
 
 # --- Helper functions ---
 def load_history(log_file):
