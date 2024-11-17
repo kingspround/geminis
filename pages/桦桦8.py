@@ -659,28 +659,17 @@ if st.session_state.get("editing"):
             if st.button("取消", key=f"cancel_{i}"):
                 st.session_state.editing = False
 
-# Custom CSS for positioning
-st.markdown(
-    """
-    <style>
-    div.api-key-select {
-        width: 200px; /* Adjust width as needed */
-        float: left;
-        margin-right: 20px; /* Add margin for separation */
-        margin-top: 20px; /* Adjust top margin as needed */
-    }
-    </style>
-    """,
-    unsafe_allow_html=True,
-)
-
 # --- 聊天输入和响应 ---
-with st.container(): # 使用container包裹api选择和对话框，使他们在一行显示
-    with st.container(): # 使用container包裹api选择器，利用css定位
-        api_key_selection = st.selectbox("选择 API 密钥", list(api_keys.keys()), key="api_key_select_main", help="选择要使用的 Google AI API 密钥",  )
-        st.session_state.api_key = api_keys[api_key_selection]
-        st.markdown('<div class="api-key-select"></div>', unsafe_allow_html=True) #为了防止selectbox独自占一行，加个空的div
+col1, col2 = st.columns([0.25, 0.75]) # 调整列宽比例，API 选择器更窄
 
+with col1:
+    api_key_selection = st.selectbox(
+        "选择 API 密钥", list(api_keys.keys()), key="api_key_select_main", help="选择要使用的 Google AI API 密钥"
+    )
+    st.session_state.api_key = api_keys[api_key_selection]
+    st.write("") # 增加一些空行，调整间距
+
+with col2:
     if prompt := st.chat_input("输入你的消息:"):
         st.session_state.messages.append({"role": "user", "content": prompt})
         with st.chat_message("user"):
@@ -699,6 +688,9 @@ with st.container(): # 使用container包裹api选择和对话框，使他们在
                     pickle.dump(st.session_state.messages, f)
             except Exception as e:
                 st.error(f"对话发生错误：{e}")
+
+
+
 
 
 # ---  三个功能区侧边栏 ---
