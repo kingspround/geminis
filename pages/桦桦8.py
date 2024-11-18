@@ -15,7 +15,7 @@ import glob
 
 # --- API 密钥设置 ---
 api_keys = {
-    "主密钥": "AIzaSyCBjZbA78bPusYmUNvfsmHpt6rPx6Ur0QEaQ",  # 替换成你的主 API 密钥
+    "主密钥": "AIzaSyCBjZbA78bPusYmUNvfsmHpt6rPx6Ur0QE",  # 替换成你的主 API 密钥
     "备用1号": "YOUR_BACKUP_API_KEY_1"  # 替换成你的备用 API 密钥
 }
 
