@@ -45,7 +45,7 @@ safety_settings = [
     {
         "category": "HARM_CATEGORY_DANGEROUS_CONTENT",
         "threshold": "NEGLIGIBLE",
-    },
+    }
 ]
 model = genai.GenerativeModel(
     model_name="gemini-1.5-pro-latest",
