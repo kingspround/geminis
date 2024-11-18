@@ -32,7 +32,7 @@ generation_config = {
 safety_settings = [
     {
         "category": "HARM_CATEGORY_HARASSMENT",
-        "threshold": "NEGLIGIBLE",
+        "threshold": "BLOCK_NONE",
     },
     {
         "category": "HARM_CATEGORY_HATE_SPEECH",
@@ -44,6 +44,10 @@ safety_settings = [
     },
     {
         "category": "HARM_CATEGORY_DANGEROUS_CONTENT",
+        "threshold": "BLOCK_NONE",
+    },
+    {
+        "category": "HARM_CATEGORY_CIVIC_INTEGRITY",
         "threshold": "BLOCK_NONE",
     },
 ]
