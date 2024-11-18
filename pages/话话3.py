@@ -47,7 +47,7 @@ safety_settings = [
         "threshold": "BLOCK_NONE",
     },
     {
-        "category": "HARM_CATEGORY_Civic_Integrity",
+        "category": "HARM_CATEGORY_CIVIC_INTTEGRITY",
         "threshold": "BLOCK_NONE",
     },
 ]
