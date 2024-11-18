@@ -32,20 +32,20 @@ generation_config = {
 safety_settings = [
     {
         "category": "HARM_CATEGORY_HARASSMENT",
-        "threshold": "NEGLIGIBLE",
+        "threshold": "BLOCK_NONE",
     },
     {
         "category": "HARM_CATEGORY_HATE_SPEECH",
-        "threshold": "NEGLIGIBLE",
+        "threshold": "BLOCK_NONE",
     },
     {
         "category": "HARM_CATEGORY_SEXUALLY_EXPLICIT",
-        "threshold": "NEGLIGIBLE",
+        "threshold": "BLOCK_NONE",
     },
     {
         "category": "HARM_CATEGORY_DANGEROUS_CONTENT",
-        "threshold": "NEGLIGIBLE",
-    }
+        "threshold": "BLOCK_NONE",
+    },
 ]
 model = genai.GenerativeModel(
     model_name="gemini-1.5-pro-latest",
