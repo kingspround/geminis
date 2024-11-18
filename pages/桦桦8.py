@@ -690,7 +690,7 @@ if prompt := st.chat_input("输入你的消息:"):
 
 
 # ---  三个功能区侧边栏 ---
-st.sidebar.title("功能菜单")
+
 
 # 功能区 1: 文件操作
 with st.sidebar.expander("文件操作"):
@@ -702,16 +702,35 @@ with st.sidebar.expander("文件操作"):
         file_name=filename,
         mime="application/octet-stream",
     )
-    st.button("读取历史记录", on_click=lambda: load_history(log_file))
-    st.button("清除历史记录", on_click=lambda: clear_history(log_file))
-    uploaded_file = st.file_uploader("选择文件", type=["pkl"])
+
+    uploaded_file = st.file_uploader("上传本地文件", type=["txt", "pdf", "docx"]) # 支持多种文件类型
     if uploaded_file is not None:
         try:
-            loaded_messages = pickle.load(uploaded_file)
-            st.session_state.messages.extend(loaded_messages)
-            st.experimental_rerun()  # 重新运行以显示更新后的聊天记录
+            file_contents = ""
+            if uploaded_file.type == "text/plain":
+                file_contents = uploaded_file.read().decode("utf-8") # 直接读取文本文件
+            elif uploaded_file.type == "application/pdf":
+                # 使用合适的库提取PDF文本内容 (例如PyPDF2)
+                # file_contents = extract_text_from_pdf(uploaded_file)  # 需要实现 extract_text_from_pdf 函数
+                pass # 暂时跳过PDF处理，需要添加库
+            elif uploaded_file.type == "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
+                # 使用合适的库提取docx文本内容 (例如python-docx)
+                # file_contents = extract_text_from_docx(uploaded_file) # 需要实现 extract_text_from_docx 函数
+                pass  # 暂时跳过docx处理，需要添加库
+            else:
+                st.error("不支持的文件类型")
+
+            if file_contents:  # 仅当成功提取文本内容时才添加到聊天记录
+                st.session_state.messages.append({"role": "user", "content": file_contents})
+                st.experimental_rerun()
+
         except Exception as e:
             st.error(f"读取本地文件失败：{e}")
+
+    st.button("读取历史记录", on_click=lambda: load_history(log_file))
+    st.button("清除历史记录", on_click=lambda: clear_history(log_file))
+
+
 
 # 功能区 2: 角色设定
 with st.sidebar.expander("角色设定"):
@@ -802,58 +821,6 @@ else:
 
 
 # --- 页面初始化时加载设定 ---
-if "settings_loaded" not in st.session_state:
-    st.session_state.settings_loaded = False
-
-if not st.session_state.settings_loaded:
-    log_dir = "geminis/logs/"
-    for filepath in glob.glob(os.path.join(log_dir, "*.txt")):
-        setting_name = os.path.basename(filepath)[:-4]
-        try:
-            with open(filepath, "r", encoding="utf-8") as f:
-                content = f.read()
-                st.session_state.character_settings[setting_name] = content
-        except Exception as e:
-            st.error(f"读取文件 {filepath} 失败: {e}")
-    st.session_state.settings_loaded = True # 标记设定已加载
-
-
-
-# --- Helper functions ---
-# 读取本地文件
-def read_local_file(uploaded_file):
-    try:
-        if uploaded_file.type == "text/plain":  # 处理文本文件
-            content = uploaded_file.read().decode("utf-8") # 使用utf-8解码
-            st.session_state.messages.append({"role": "user", "content": f"文件内容:\n{content}"})  # 显示文件内容
-            st.experimental_rerun()
-        elif uploaded_file.type == "text/csv":  # 处理 CSV 文件 (示例)
-            import pandas as pd
-            df = pd.read_csv(uploaded_file)
-            st.session_state.messages.append({"role": "user", "content": f"CSV 文件内容:\n{df.to_string()}"})
-            st.experimental_rerun()
-        #  可以添加其他文件类型的处理，例如图片等
-        else:
-            st.warning(f"不支持的文件类型: {uploaded_file.type}")
-    except Exception as e:
-        st.error(f"读取本地文件失败：{e}")
-
-
-# ...在文件操作部分...
-uploaded_file = st.file_uploader("选择本地文件", type=["txt", "csv", "pkl"]) # 添加支持的文件类型
-if uploaded_file is not None:
-    if uploaded_file.name.endswith(".pkl"): # 如果是pkl文件，则加载历史记录
-        try:
-            loaded_messages = pickle.load(uploaded_file)
-            st.session_state.messages.extend(loaded_messages)  # or = loaded_messages, depending on your needs
-            st.experimental_rerun()  # 重新运行以显示更新后的聊天记录
-        except Exception as e:
-            st.error(f"读取历史记录文件失败：{e}")
-    else:  # 如果不是pkl文件，则读取文件内容
-        read_local_file(uploaded_file)
-
-
-
 
 def clear_history(log_file):
     st.session_state.messages = []
