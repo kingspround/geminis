@@ -820,15 +820,50 @@ if not st.session_state.settings_loaded:
 
 
 # --- Helper functions ---
-def load_history(log_file):
-    try:
-        with open(log_file, "rb") as f:
-            messages = pickle.load(f)
-            messages = [m for m in messages if m.get("content")]
-            st.session_state.messages = messages
-            st.experimental_rerun()
-    except (FileNotFoundError, EOFError):
-        st.warning(f"{filename} 不存在或损坏。")
+# 添加读取本地文件的按钮
+if st.sidebar.button("读取本地文件"):
+    st.session_state.file_upload_mode = True
+
+if st.session_state.get("file_upload_mode"):
+    uploaded_file = st.sidebar.file_uploader("选择文件", type=["pkl"])
+    if "file_loaded" not in st.session_state:  # 如果 file_loaded 不存在
+        st.session_state.file_loaded = False
+
+    if uploaded_file is not None and not st.session_state.file_loaded:  # 只有当 file_loaded 为 False 时才读取文件
+        try:
+            # 读取文件内容
+            loaded_messages = pickle.load(uploaded_file)
+
+            # 合并到 st.session_state.messages 中
+            st.session_state.messages.extend(loaded_messages)
+
+            # 显示聊天记录和编辑按钮
+            for i, message in enumerate(st.session_state.messages):
+                if message["role"] == "user":
+                    with st.chat_message("user"):
+                        st.write(message["content"], key=f"message_{i}")  # key 作为第一个参数
+                elif message["content"] is not None:
+                    with st.chat_message("assistant"):
+                        st.write(message["content"], key=f"message_{i}") # key 作为第一个参数
+
+                    if i >= len(st.session_state.messages) - 2:  # 在最后两条消息中添加编辑按钮
+                        if st.button("编辑", key=f"edit_{i}"):
+                            st.session_state.editable_index = i
+                            st.session_state.editing = True
+
+            # 添加关闭按钮
+            if st.sidebar.button("关闭", key="close_upload"):
+                st.session_state.file_upload_mode = False
+                st.session_state.file_loaded = False  # 将 file_loaded 设置为 False
+
+            # 保存合并后的历史记录到文件
+            with open(log_file, "wb") as f:
+                pickle.dump(st.session_state.messages, f)
+
+            st.session_state.file_loaded = True  # 将 file_loaded 设置为 True
+
+        except Exception as e:
+            st.error(f"读取本地文件失败：{e}")
 
 
 def clear_history(log_file):
