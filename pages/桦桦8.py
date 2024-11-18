@@ -706,37 +706,19 @@ with st.sidebar.expander("文件操作"):
         mime="application/octet-stream",
     )
 
-
-    uploaded_file = st.file_uploader("读取本地文本", type=["txt", "pdf", "docx"])  # 支持多种文件类型
+    uploaded_file = st.file_uploader("读取本地pkl文件", type=["pkl"])  # 只接受 .pkl 文件
     if uploaded_file is not None:
         try:
-            file_contents = ""
-            if uploaded_file.type == "text/plain":
-                file_contents = uploaded_file.read().decode("utf-8") # 直接读取文本文件
-            elif uploaded_file.type == "application/pdf":
-                # 使用合适的库提取PDF文本内容 (例如PyPDF2)
-                #  需要安装： pip install PyPDF2
-                from PyPDF2 import PdfReader
-                pdf_reader = PdfReader(uploaded_file)
-                for page in pdf_reader.pages:
-                    file_contents += page.extract_text()
+            loaded_messages = pickle.load(uploaded_file)
+            # 将加载的消息添加到现有的消息列表中 (或替换，取决于你的需求)
+            st.session_state.messages.extend(loaded_messages) #  使用extend追加消息
+            # st.session_state.messages = loaded_messages #  使用 = 替换现有消息
 
-            elif uploaded_file.type == "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
-                # 使用合适的库提取docx文本内容 (例如python-docx)
-                # 需要安装：pip install python-docx
-                from docx import Document
-                doc = Document(uploaded_file)
-                for paragraph in doc.paragraphs:
-                    file_contents += paragraph.text + "\n"
-            else:
-                st.error("不支持的文件类型")
-
-            if file_contents:  # 仅当成功提取文本内容时才添加到聊天记录
-                st.session_state.messages.append({"role": "user", "content": file_contents})
-                st.experimental_rerun()
+            st.experimental_rerun() # 刷新页面以显示新的消息
 
         except Exception as e:
-            st.error(f"读取本地文件失败：{e}")
+            st.error(f"读取本地pkl文件失败：{e}")
+
 
 
 
