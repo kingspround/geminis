@@ -706,14 +706,18 @@ with st.sidebar.expander("文件操作"):
         mime="application/octet-stream",
     )
 
+    if "pkl_file_loaded" not in st.session_state:
+        st.session_state.pkl_file_loaded = False  # 初始化标志
+
     uploaded_file = st.file_uploader("读取本地pkl文件", type=["pkl"])  # 只接受 .pkl 文件
-    if uploaded_file is not None:
+    if uploaded_file is not None and not st.session_state.pkl_file_loaded:
         try:
             loaded_messages = pickle.load(uploaded_file)
             # 将加载的消息添加到现有的消息列表中 (或替换，取决于你的需求)
-            st.session_state.messages.extend(loaded_messages) #  使用extend追加消息
-            # st.session_state.messages = loaded_messages #  使用 = 替换现有消息
+            st.session_state.messages.extend(loaded_messages)  # 使用extend追加消息
+            # st.session_state.messages = loaded_messages  # 使用 = 替换现有消息
 
+            st.session_state.pkl_file_loaded = True  # 设置标志，防止重复读取
             st.experimental_rerun() # 刷新页面以显示新的消息
 
         except Exception as e:
