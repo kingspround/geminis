@@ -696,6 +696,9 @@ if prompt := st.chat_input("输入你的消息:"):
 with st.sidebar.expander("文件操作"):
     if len(st.session_state.messages) > 0:
         st.button("重置上一个输出", on_click=lambda: st.session_state.messages.pop(-1))
+
+    st.button("读取历史记录", on_click=lambda: load_history(log_file))
+    st.button("清除历史记录", on_click=lambda: clear_history(log_file))
     st.download_button(
         label="下载聊天记录",
         data=open(log_file, "rb").read(),
@@ -703,7 +706,8 @@ with st.sidebar.expander("文件操作"):
         mime="application/octet-stream",
     )
 
-    uploaded_file = st.file_uploader("上传本地文件", type=["txt", "pdf", "docx"]) # 支持多种文件类型
+
+    uploaded_file = st.file_uploader("读取本地文本", type=["txt", "pdf", "docx"])  # 支持多种文件类型
     if uploaded_file is not None:
         try:
             file_contents = ""
@@ -711,12 +715,19 @@ with st.sidebar.expander("文件操作"):
                 file_contents = uploaded_file.read().decode("utf-8") # 直接读取文本文件
             elif uploaded_file.type == "application/pdf":
                 # 使用合适的库提取PDF文本内容 (例如PyPDF2)
-                # file_contents = extract_text_from_pdf(uploaded_file)  # 需要实现 extract_text_from_pdf 函数
-                pass # 暂时跳过PDF处理，需要添加库
+                #  需要安装： pip install PyPDF2
+                from PyPDF2 import PdfReader
+                pdf_reader = PdfReader(uploaded_file)
+                for page in pdf_reader.pages:
+                    file_contents += page.extract_text()
+
             elif uploaded_file.type == "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
                 # 使用合适的库提取docx文本内容 (例如python-docx)
-                # file_contents = extract_text_from_docx(uploaded_file) # 需要实现 extract_text_from_docx 函数
-                pass  # 暂时跳过docx处理，需要添加库
+                # 需要安装：pip install python-docx
+                from docx import Document
+                doc = Document(uploaded_file)
+                for paragraph in doc.paragraphs:
+                    file_contents += paragraph.text + "\n"
             else:
                 st.error("不支持的文件类型")
 
@@ -726,9 +737,6 @@ with st.sidebar.expander("文件操作"):
 
         except Exception as e:
             st.error(f"读取本地文件失败：{e}")
-
-    st.button("读取历史记录", on_click=lambda: load_history(log_file))
-    st.button("清除历史记录", on_click=lambda: clear_history(log_file))
 
 
 
