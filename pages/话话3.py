@@ -46,10 +46,6 @@ safety_settings = [
         "category": "HARM_CATEGORY_DANGEROUS_CONTENT",
         "threshold": "BLOCK_NONE",
     },
-    {
-        "category": "HARM_CATEGORY_CIVIC_INTEGRITY",
-        "threshold": "BLOCK_NONE",
-    },
 ]
 model = genai.GenerativeModel(
     model_name="gemini-1.5-pro-latest",
