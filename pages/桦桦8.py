@@ -820,50 +820,39 @@ if not st.session_state.settings_loaded:
 
 
 # --- Helper functions ---
-# 添加读取本地文件的按钮
-if st.sidebar.button("读取本地文件"):
-    st.session_state.file_upload_mode = True
+# 读取本地文件
+def read_local_file(uploaded_file):
+    try:
+        if uploaded_file.type == "text/plain":  # 处理文本文件
+            content = uploaded_file.read().decode("utf-8") # 使用utf-8解码
+            st.session_state.messages.append({"role": "user", "content": f"文件内容:\n{content}"})  # 显示文件内容
+            st.experimental_rerun()
+        elif uploaded_file.type == "text/csv":  # 处理 CSV 文件 (示例)
+            import pandas as pd
+            df = pd.read_csv(uploaded_file)
+            st.session_state.messages.append({"role": "user", "content": f"CSV 文件内容:\n{df.to_string()}"})
+            st.experimental_rerun()
+        #  可以添加其他文件类型的处理，例如图片等
+        else:
+            st.warning(f"不支持的文件类型: {uploaded_file.type}")
+    except Exception as e:
+        st.error(f"读取本地文件失败：{e}")
 
-if st.session_state.get("file_upload_mode"):
-    uploaded_file = st.sidebar.file_uploader("选择文件", type=["pkl"])
-    if "file_loaded" not in st.session_state:  # 如果 file_loaded 不存在
-        st.session_state.file_loaded = False
 
-    if uploaded_file is not None and not st.session_state.file_loaded:  # 只有当 file_loaded 为 False 时才读取文件
+# ...在文件操作部分...
+uploaded_file = st.file_uploader("选择本地文件", type=["txt", "csv", "pkl"]) # 添加支持的文件类型
+if uploaded_file is not None:
+    if uploaded_file.name.endswith(".pkl"): # 如果是pkl文件，则加载历史记录
         try:
-            # 读取文件内容
             loaded_messages = pickle.load(uploaded_file)
-
-            # 合并到 st.session_state.messages 中
-            st.session_state.messages.extend(loaded_messages)
-
-            # 显示聊天记录和编辑按钮
-            for i, message in enumerate(st.session_state.messages):
-                if message["role"] == "user":
-                    with st.chat_message("user"):
-                        st.write(message["content"], key=f"message_{i}")  # key 作为第一个参数
-                elif message["content"] is not None:
-                    with st.chat_message("assistant"):
-                        st.write(message["content"], key=f"message_{i}") # key 作为第一个参数
-
-                    if i >= len(st.session_state.messages) - 2:  # 在最后两条消息中添加编辑按钮
-                        if st.button("编辑", key=f"edit_{i}"):
-                            st.session_state.editable_index = i
-                            st.session_state.editing = True
-
-            # 添加关闭按钮
-            if st.sidebar.button("关闭", key="close_upload"):
-                st.session_state.file_upload_mode = False
-                st.session_state.file_loaded = False  # 将 file_loaded 设置为 False
-
-            # 保存合并后的历史记录到文件
-            with open(log_file, "wb") as f:
-                pickle.dump(st.session_state.messages, f)
-
-            st.session_state.file_loaded = True  # 将 file_loaded 设置为 True
-
+            st.session_state.messages.extend(loaded_messages)  # or = loaded_messages, depending on your needs
+            st.experimental_rerun()  # 重新运行以显示更新后的聊天记录
         except Exception as e:
-            st.error(f"读取本地文件失败：{e}")
+            st.error(f"读取历史记录文件失败：{e}")
+    else:  # 如果不是pkl文件，则读取文件内容
+        read_local_file(uploaded_file)
+
+
 
 
 def clear_history(log_file):
