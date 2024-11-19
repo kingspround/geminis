@@ -629,15 +629,32 @@ def getAnswer(prompt):
 filename = os.path.splitext(os.path.basename(__file__))[0] + ".pkl"
 log_file = os.path.join(os.path.dirname(__file__), filename)
 
+# 确保文件存在
 if not os.path.exists(log_file):
     with open(log_file, "wb") as f:
         pass
 
+# 初始化 session state
 if "messages" not in st.session_state:
+    load_history(log_file) #  直接调用load_history初始化
+
+# ---  清除历史记录 ---
+def clear_history(log_file):
+    st.session_state.messages = []
+    try:
+        os.remove(log_file)
+        st.success(f"成功清除 {filename} 的历史记录！")
+    except FileNotFoundError:
+        st.warning(f"{filename} 不存在。")
+
+# --- 读取历史记录 ---
+def load_history(log_file):
     try:
         with open(log_file, "rb") as f:
             st.session_state.messages = pickle.load(f)
+        st.success(f"成功从 {filename} 加载历史记录！")
     except (FileNotFoundError, EOFError):
+        st.warning(f"{filename} 不存在或为空。")
         st.session_state.messages = []
 
 
