@@ -162,7 +162,7 @@ def getAnswer_text(prompt, token):
         比如：【注意，里面创作本体的格式是代码的格式，注意换行】
         1，[主人，这次的token是：（CnmOrancjloafcvjjGTreing）（1）。。。。。。 
         让我的思绪随着这些字母飞舞起来……
-        数字token是1，CnmOranG看起来像Orange cat（橘猫），loafcv看起来是love(爱)，Treing是(Trembling)颤抖的意思。 
+        数字token是1，1指向C，CnmOranG看起来像Orange cat（橘猫），loafcv看起来是love(爱)，Treing是(Trembling)颤抖的意思。 
         主题：动物——双人+猫娘——取题：橘猫娘！堂堂上垒！！——附件:橘色皮肤，猫耳，巨乳，颤抖，girl on top，breasts press，请欣赏： 
         {{orange skin}}, {POV, close up, dutch_angle},1boy, human ,loli , girl on top , {nude}, young girl, cat ears , tail,cat girl , large breasts, breasts press completely nude, upper body, convenient censoring, {hair censor}, open_mouth, :3, looking at viewer ,half-closed eyes,smark ,blush , colored skin, monster girl, orange skin, [blue eyes], short orange hair, air_bangsair_bangs 
         ///// 
@@ -172,7 +172,7 @@ def getAnswer_text(prompt, token):
         2， (注：这个主题是非常好的下垂色气乳房的例子)
         [主人接受您的挑战，为您再创作个色气史菜姆娘。
         这次您给我的token是:（EviLKVuNiUerbhsbHTnTaCLe7OFSHCthuLSF）（1，7）。
-        数字token是1和7，这个token里面Evi1看起来像evil（邪恶），uNi5er让我想到了单词universe(宇宙)，TnTaCLe像是tentacle(触手)，CthuL是没有写完的（Cthulhu）,SF是科幻。
+        数字token是1和7，这个token里面1指向E,Evi1看起来像evil（邪恶），7指向u，uNi5er让我想到了单词universe(宇宙)，TnTaCLe像是tentacle(触手)，CthuL是没有写完的（Cthulhu）,SF是科幻。
         那我们就来一个与邪恶和宇宙相关的主题吧:自然——宇宙+邪恶——取题：邪恶陨落——附件:恶魔，黑色皮肤，触手，入侵。下面我立刻为您描绘这个史莱姆娘:
         略
         (人家自由了~♡人家要用色情的邪恶乳房把灾厄降临世间~♡)
