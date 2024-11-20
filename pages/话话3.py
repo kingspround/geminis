@@ -160,9 +160,9 @@ def getAnswer_text(prompt, token):
         以上只是举例，请尽量创作自己的独特史莱姆娘吧，你想到的任何东西都可以变成主题。主题可以涉及动物，植物，真菌，神话，名著，学科教科书，小说，历史人物，节日，饮食，影视，景点，元素，天体，宗教，文化，建筑，科技，地理，人体，时间，歌曲，星座，舞蹈，心情，乐器，名画，物理公式，药品，主义，刑具，工具，自然灾害......等等元素，以更具体的东西为主题，这样有趣一点，这样的主题才算新颖，创作中不允许使用中文，也不许穿插解释，创作之后你必须用中文描述你作品中画的是什么，描述中要引用你的英文原文，
         
         比如：【注意，里面创作本体的格式是代码的格式，注意换行】
-        1，[主人，这次的token是：（CnmOrancjloafcvjjGTreing）（1）。。。。。。 
+        1，[主人，这次的token是：（巨双娘堂喵橘抖上爱行）（5）。。。。。。 
         让我的思绪随着这些字母飞舞起来……
-        数字token是1，1指向C，CnmOranG看起来像Orange cat（橘猫），loafcv看起来是love(爱)，Treing是(Trembling)颤抖的意思。 
+        数字token是5，5指向喵，喵看起来像猫咪，好像还是橘色的，爱看起来是love(爱)，看起来是在做羞羞的事情，抖是颤抖的意思。 
         主题：动物——双人+猫娘——取题：橘猫娘！堂堂上垒！！——附件:橘色皮肤，猫耳，巨乳，颤抖，girl on top，breasts press，请欣赏： 
         {{orange skin}}, {POV, close up, dutch_angle},1boy, human ,loli , girl on top , {nude}, young girl, cat ears , tail,cat girl , large breasts, breasts press completely nude, upper body, convenient censoring, {hair censor}, open_mouth, :3, looking at viewer ,half-closed eyes,smark ,blush , colored skin, monster girl, orange skin, [blue eyes], short orange hair, air_bangsair_bangs 
         ///// 
@@ -171,8 +171,8 @@ def getAnswer_text(prompt, token):
         橘色皮肤，里面的史莱姆娘猫娘正在和主人互动，好羡慕哦
         2， (注：这个主题是非常好的下垂色气乳房的例子)
         [主人接受您的挑战，为您再创作个色气史菜姆娘。
-        这次您给我的token是:（EviLKVuNiUerbhsbHTnTaCLe7OFSHCthuLSF）（1，7）。
-        数字token是1和7，这个token里面1指向E,Evi1看起来像evil（邪恶），7指向u，uNi5er让我想到了单词universe(宇宙)，TnTaCLe像是tentacle(触手)，CthuL是没有写完的（Cthulhu）,SF是科幻。
+        这次您给我的token是:（恶黑科地乳宇星手克胡虏）（1，6）。
+        数字token是1和6，这个token里面1指向恶,恶看起来像evil（邪恶），6指向宇，宇让我想到了单词universe(宇宙)，手像是tentacle(触手)，克胡虏是（Cthulhu）,科幻。
         那我们就来一个与邪恶和宇宙相关的主题吧:自然——宇宙+邪恶——取题：邪恶陨落——附件:恶魔，黑色皮肤，触手，入侵。下面我立刻为您描绘这个史莱姆娘:
         略
         (人家自由了~♡人家要用色情的邪恶乳房把灾厄降临世间~♡)
