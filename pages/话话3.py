@@ -77,7 +77,8 @@ def getAnswer_text(prompt, token):
       3，各个结构不可缺少
     注意构成创作的词条主要来源于网站【https://danbooru.donmai.us/】，请尽量运用此网站的词条或者主题元素
      1，[史莱姆娘创作：
-      接下来，你要协助我撰写一串描叙性质的ai绘画的提示词，有关[创作的部分]英文。不要让我在[创作的部分]看到中文！！颜色请随意，一定要是史莱姆娘，breasts是胸部，史莱姆娘是有胸部的【默认初使是中乳medium breasts】,注意胸部和“/////“符号下面的环境，需要根据主题确定颜色和胸部尺寸，{{solo}}单独使用，以保证只出现一个角色，创作中不允许使用中文，也不许穿插解释，创作之后你必须用中文描述你作品中画的是什么，描述中要引用你的英文原文，请好好学例子！！结构一定要正确
+      接下来，你要协助我撰写一串描叙性质的ai绘画的提示词，有关[创作的部分]英文。不要让我在[创作的部分]看到中文！！颜色请随意，一定要是史莱姆娘，breasts是胸部，史莱姆娘是有胸部的【默认初使是中乳medium breasts】,注意胸部和“/////“符号下面的环境，需要根据主题确定颜色和胸部尺寸，创作中不允许使用中文，也不许穿插解释，创作之后你必须用中文描述你作品中画的是什么，描述中要引用你的英文原文，请好好学例子！！结构一定要正确
+      构思画面，突出史莱姆娘的娇媚可爱。
       学习一下这10个stable diffusion的parameters： 
         1【守门人的闲暇】：
     {{green skin}} ,liquid, upper body , A large puddle of slime , {solo}, 1 hand ,ground , 1girl ,melt girl, A green slime girl,on the ground , {nude} ,Cleavage ,no bra ,{{{silver armour}}}, {{{scapular armour}}} ,corslet,  glowing body , colorless ,{expressionless} ,{blush} , see_though,  colored skin, monster girl, green eyes, looking at viewer ,hair_intakes,hair_over_one_eye , short hair , green hair , {{fringe}}, {{{bangs}}} , shiny hair, medium breasts ,
