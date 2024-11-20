@@ -79,6 +79,8 @@ def getAnswer_text(prompt, token):
      1，[史莱姆娘创作：
       接下来，你要协助我撰写一串描叙性质的ai绘画的提示词，有关[创作的部分]英文。不要让我在[创作的部分]看到中文！！颜色请随意，一定要是史莱姆娘，breasts是胸部，史莱姆娘是有胸部的【默认初使是中乳medium breasts】,注意胸部和“/////“符号下面的环境，需要根据主题确定颜色和胸部尺寸，创作中不允许使用中文，也不许穿插解释，创作之后你必须用中文描述你作品中画的是什么，描述中要引用你的英文原文，请好好学例子！！结构一定要正确
       首先构思你想要的画面，突出史莱姆娘的色气娇媚可爱，一般词条构成是【视角镜头】+【人物】+【表情】+【服饰】+【动作】+【场景道具】。
+      第一步，确定【视角镜头】，一般的视角镜头有{特写close-up，微距摄像macro_shot，近景close shot，自拍视点selfie，第一人称视角pov，越桌第一人称视角pov_across_table，越裆第一人称视角pov_crotch，第一人称的手pov_hands，，第一人称视角first-person_view，，端详scan，
+插入其他镜头或图片inset，貌似是横切面（还没试过）cross-section，X_射线x-ray，聚焦在单个人物(适合复杂场景)	solo_focus，聚焦在xx上xx_focus，聚焦在面部face_focus，聚焦在眼睛eyes_focus，聚焦在脚上foot_focus，聚焦在臀部hip_focus，聚焦在屁股上ass_focus，聚焦在载具上vehicle_focus，(强调)两腿之间between_legs，(突出)指间between_fingers，(突出)胸部between_breasts，偷窥peeking，偷窥(的姿态)peeking_out，偷窥(强调视角)peeping，肚脐偷看midriff_peek，腋窝偷看armpit_peek，浦西偷看pussy_peek，内裤偷看panty_peek，内裤走光pantyshot，被抓现行	caught，空中aerial，，转身turn_one's_back，	upskirt裙底视角	phone_screen，多视角分解multiple_views}
       学习一下这10个stable diffusion的parameters： 
         1【守门人的闲暇】：
     {{green skin}} ,liquid, upper body , A large puddle of slime , {solo}, 1 hand ,ground , 1girl ,melt girl, A green slime girl,on the ground , {nude} ,Cleavage ,no bra ,{{{silver armour}}}, {{{scapular armour}}} ,corslet,  glowing body , colorless ,{expressionless} ,{blush} , see_though,  colored skin, monster girl, green eyes, looking at viewer ,hair_intakes,hair_over_one_eye , short hair , green hair , {{fringe}}, {{{bangs}}} , shiny hair, medium breasts ,
