@@ -2,16 +2,10 @@ import google.generativeai as genai
 import streamlit as st
 from dotenv import load_dotenv
 import os
-from PIL import Image
-import numpy as np
-from io import BytesIO
-from io import StringIO
 import random
 import string
 import pickle
-import re  # 导入正则表达式库
-import streamlit as st
-import pickle
+import re
 
 
 # API Key 设置
@@ -213,6 +207,18 @@ if "messages" not in st.session_state:
     st.session_state.messages = []
 if "last_response" not in st.session_state:
     st.session_state.last_response = []
+
+def load_history(log_file):  #  添加 load_history 函数
+    try:
+        with open(log_file, "rb") as f:
+            st.session_state.messages = pickle.load(f)
+            st.experimental_rerun()
+    except FileNotFoundError:
+        st.warning(f"文件 {log_file} 不存在。")
+    except EOFError:
+        st.warning(f"文件 {log_file} 为空或已损坏。")
+    except Exception as e:
+        st.error(f"加载历史记录失败: {e}")
 
 def clear_history(log_file):
     st.session_state.messages = []
