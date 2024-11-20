@@ -203,7 +203,18 @@ if "messages" not in st.session_state:
 if "last_response" not in st.session_state:
     st.session_state.last_response = []
 
-# 文件保存路径
+def clear_history(log_file):
+    st.session_state.messages = []
+    try:
+        os.remove(log_file)
+        st.success(f"成功清除历史记录！")
+    except FileNotFoundError:
+        st.warning(f"文件 {log_file} 不存在。")
+    except OSError as e:  # 处理其他潜在的 OSError，例如权限错误
+        st.error(f"清除历史记录失败: {e}")
+
+
+# ... 在 Streamlit 应用的初始化部分 ...
 filename = os.path.splitext(os.path.basename(__file__))[0] + ".pkl"
 log_file = os.path.join(os.path.dirname(__file__), filename)
 
