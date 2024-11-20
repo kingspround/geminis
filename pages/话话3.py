@@ -226,19 +226,6 @@ if not os.path.exists(log_file):
 # --- 侧边栏功能 ---
 st.sidebar.title("操作")
 
-# 上传图片
-uploaded_file = st.sidebar.file_uploader("上传图片", type=['png', 'jpg', 'jpeg', 'gif'])
-if uploaded_file is not None:
-    bytes_data = uploaded_file.getvalue()
-    bytes_io = BytesIO(bytes_data)
-    st.session_state.img = Image.open(bytes_io)  # 存储图片到 st.session_state.img
-    st.sidebar.image(bytes_io, width=150)
-
-# 清除图片
-if st.session_state.img is not None:
-    if st.sidebar.button("清除图片"):
-        st.session_state.img = None
-
 # 读取历史记录
 if st.sidebar.button("读取历史记录"):
     load_history(log_file)
