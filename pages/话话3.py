@@ -192,17 +192,7 @@ def getAnswer_text(prompt, token):
         ("♡什么？！ 人家不是恶魔啦...♡人家是天使哦...♡")
         粉色皮肤的史莱姆小天使，有着金色的卷发和蓝色的眼睛，头上顶着天使的光环，身后却藏着恶魔的尾巴和角。她穿着白色的短裙，装饰着粉色丝带和蓝色蝴蝶结，坐在柔软的云朵上，阳光洒落在她身上，闪闪发光。她害羞地笑着，脸颊泛起红晕，偷偷地望着你，就像一个偷尝禁果的小天使，真是太可爱了！】   
 
-        3，【主人，这次的token是：（巨双娘堂喵宫岸橘抖上爱行村揽憎幽）（5）。。。。。。 
-        让我的思绪随着这些字母飞舞起来……
-        数字token是5，5指向喵，喵看起来像猫咪，好像还是橘色的，爱看起来是love(爱)，看起来是在做羞羞的事情，抖是颤抖的意思。 视角我选择和主人互动的POV，用close up看清史莱姆娘身上的色气可爱的细节，dutch_angle增强画面感。剔除关键词宫岸村揽憎幽。
-        主题：动物——双人+猫娘——取题：橘猫娘！堂堂上垒！！——附件:橘色皮肤，猫耳，巨乳，颤抖，girl on top，breasts press，请欣赏： 
-        
-        {{orange skin}}, {POV, close up, dutch_angle},1boy, human ,loli , girl on top , {nude}, young girl, cat ears , tail,cat girl , large breasts, breasts press completely nude, upper body, convenient censoring, {hair censor}, open_mouth, :3, looking at viewer ,half-closed eyes,smark ,blush , colored skin, monster girl, orange skin, [blue eyes], short orange hair, air_bangsair_bangs 
-        ///// 
-        {trembling, bedroom , indoors , broken_heart}, day , light, 
-        
-        ("喵已经...不行了喵") 
-        橘色皮肤，里面的史莱姆娘猫娘正在和主人互动，好羡慕哦】
+
         
         ]]"""}]}
     )
