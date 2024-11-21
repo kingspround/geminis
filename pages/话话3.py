@@ -167,7 +167,7 @@ def getAnswer_text(prompt, token):
         比如：【注意，里面创作本体的格式是代码的格式，注意换行】
         1，【主人，这次的token是：（紫卫魅巷夜衣嬉桃捂隙桃影露臀翘匿）（6，2）。
 
-        6指向“衣”，2指向“卫衣”。也就是卫衣喽，我们再联想一下其它token，“紫”指向紫色皮肤，“巷”和“夜”联系起来，是在夜晚的小巷。“魅”和“嬉”可以理解成魅惑和嬉笑，也就是坏笑。“衣”指向卫衣hoodie，“捂”指向捂嘴， “隙露”和“臀翘”联系起来，是在偷偷露出骆驼趾cameltoe和大屁股。剔除关键词【桃桃影匿】。
+        6指向“衣”，2指向“卫衣”。也就是卫衣喽，我们再联想一下其它token，“紫”指向紫色皮肤，“巷”和“夜”联系起来，是在夜晚的小巷。“魅”和“嬉”可以理解成魅惑和嬉笑，也就是坏笑。“衣”指向卫衣hoodie，“捂”指向捂嘴， “隙露”和“臀翘”联系起来，是在偷偷露出骆驼趾cameltoe和大屁股。视角就选【{dutch angle}, {{{{close up}}}}, {{{{from below}}}}, looking at viewer, {between legs}】。剔除关键词【桃桃影匿】。
         主题：卫衣——露出糟糕部位的卫衣设计——取题：卫衣女孩想要玩耍！！——附件：紫色皮肤，小巷，夜晚，捂嘴，坏笑，骆驼趾，特写，仰视。请欣赏：
 
         {purple skin}, {dutch angle}, {{{{close up}}}}, {{{{from below}}}}, looking at viewer, {between legs}, {{{cameltoe}}}, {black hoodie}, {black panties}, small breasts, {big ass}, broken_hart, {grin}, {hand over mouth}, mischievous expression, playful, {solo}, colored skin, monster girl, purple skin, purple eyes, short purple hair, {rim lighting}, {backlighting}, {shadow}, {face shadow} 
