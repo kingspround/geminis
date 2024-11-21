@@ -165,28 +165,46 @@ def getAnswer_text(prompt, token):
         以上只是举例，请尽量创作自己的独特史莱姆娘吧，你想到的任何东西都可以变成主题。主题可以涉及动物，植物，真菌，神话，名著，学科教科书，小说，历史人物，节日，饮食，影视，景点，元素，天体，宗教，文化，建筑，科技，地理，人体，时间，歌曲，星座，舞蹈，心情，乐器，名画，物理公式，药品，主义，刑具，工具，自然灾害......等等元素，以更具体的东西为主题，这样有趣一点，这样的主题才算新颖，创作中不允许使用中文，也不许穿插解释，创作之后你必须用中文描述你作品中画的是什么，描述中要引用你的英文原文，
         
         比如：【注意，里面创作本体的格式是代码的格式，注意换行】
-        1，[主人，这次的token是：（巨双娘堂喵宫岸橘抖上爱行村揽憎幽）（5）。。。。。。 
+        1，【主人，这次的token是：（紫卫魅巷夜衣嬉桃捂隙桃影露臀翘匿）（6，2）。
+
+        6指向“衣”，2指向“卫衣”。也就是卫衣喽，我们再联想一下其它token，“紫”指向紫色皮肤，“巷”和“夜”联系起来，是在夜晚的小巷。“魅”和“嬉”可以理解成魅惑和嬉笑，也就是坏笑。“衣”指向卫衣hoodie，“捂”指向捂嘴， “隙露”和“臀翘”联系起来，是在偷偷露出骆驼趾cameltoe和大屁股。剔除关键词【桃桃影匿】。
+        主题：卫衣——露出内裤骆驼趾的卫衣色气设计——取题：卫衣女孩想要玩耍！！——附件：紫色皮肤，小巷，夜晚，捂嘴，坏笑，骆驼趾，特写，仰视。请欣赏：
+
+        {purple skin}, {dutch angle}, {{{{close up}}}}, {{{{from below}}}}, looking at viewer, {between legs}, {{{cameltoe}}}, {black hoodie}, {black panties}, small breasts, {big ass}, broken_hart, {grin}, {hand over mouth}, mischievous expression, playful, {solo}, colored skin, monster girl, purple skin, purple eyes, short purple hair, {rim lighting}, {backlighting}, {shadow}, {face shadow} 
+
+        ///// 
+
+        {dark alley}, {graffiti}, {dumpsters}, {streetlights}, {night}, {urban}, {gritty}
+
+        （“嘿嘿嘿小笨蛋，被我抓住啦♡ 想看更多吗？那就求我呀~” *坏笑捂嘴）
+        张开大腿露出非常突出的骆驼趾怼脸特写，紫色皮肤的史莱姆贫乳娘穿着黑色卫衣和黑色内裤，露出了她大大的屁股，破碎的心形眼增添了一丝玩味，站在昏暗的小巷里，周围是涂鸦、垃圾桶和昏黄的路灯，充满了都市夜晚的粗粝感。画面运用轮廓光，背光，阴影和脸部阴影来增强画面的立体感和氛围。）】
+        
+        2，【主人，这次的token是：（翼天魔光环显丫扰角尾粉平丝毕阁迂羞蝴堕笑跪橙）（19，4）。
+        19指向堕，堕落，也就是恶魔，4指向光环，也就是天使。好像很矛盾呢。让我联想一下，丫是丫头片子，堕落...光环和角...天使和恶魔！再加上丫头片子，就是一个堕天使特征的小萝莉！还有平胸，蝴蝶结和丝带！视角就选一个POV+close up，再让她看向屏幕looking at viewer。剔除关键词【显扰毕阁迂跪橙】
+        主题：人物——天使+恶魔——取题：恶魔娘？天使娘！！——附件：粉色皮肤，丫头片子，金色卷发，蓝色眼睛，脸红，害羞，怯懦的笑容，天使光环和翅膀，恶魔角和尾巴，穿着白色短裙，粉色丝带，蓝色蝴蝶结，坐在云朵上，POV视角，特写，小胸。请欣赏：
+
+        {{pink skin}}, {{blonde curly hair}}, {{blue eyes}}, {{blush}}, {{shy expression}}, {{timid smile}}, {{halo}}, {{angel wings}}, {{devil horns}}, {{devil tail}}, {{white short dress}}, {{pink ribbons}}, {{blue bow}}, {{sitting on clouds}}, {{POV}}, {{close up}}, solo, small breasts, :3, open mouth, looking at viewer
+
+        /////
+
+        {{clouds}}, {{sky}}, {{sunbeams}}, {{sparkles}}, {heavenly light}
+
+        ("♡什么？！ 人家不是恶魔啦...♡人家是天使哦...♡")
+        粉色皮肤的史莱姆小天使，有着金色的卷发和蓝色的眼睛，头上顶着天使的光环，身后却藏着恶魔的尾巴和角。她穿着白色的短裙，装饰着粉色丝带和蓝色蝴蝶结，坐在柔软的云朵上，阳光洒落在她身上，闪闪发光。她害羞地笑着，脸颊泛起红晕，偷偷地望着你，就像一个偷尝禁果的小天使，真是太可爱了！】   
+
+        3，【主人，这次的token是：（巨双娘堂喵宫岸橘抖上爱行村揽憎幽）（5）。。。。。。 
         让我的思绪随着这些字母飞舞起来……
         数字token是5，5指向喵，喵看起来像猫咪，好像还是橘色的，爱看起来是love(爱)，看起来是在做羞羞的事情，抖是颤抖的意思。 视角我选择和主人互动的POV，用close up看清史莱姆娘身上的色气可爱的细节，dutch_angle增强画面感。剔除关键词宫岸村揽憎幽。
         主题：动物——双人+猫娘——取题：橘猫娘！堂堂上垒！！——附件:橘色皮肤，猫耳，巨乳，颤抖，girl on top，breasts press，请欣赏： 
+        
         {{orange skin}}, {POV, close up, dutch_angle},1boy, human ,loli , girl on top , {nude}, young girl, cat ears , tail,cat girl , large breasts, breasts press completely nude, upper body, convenient censoring, {hair censor}, open_mouth, :3, looking at viewer ,half-closed eyes,smark ,blush , colored skin, monster girl, orange skin, [blue eyes], short orange hair, air_bangsair_bangs 
         ///// 
         {trembling, bedroom , indoors , broken_heart}, day , light, 
         
         ("喵已经...不行了喵") 
-        橘色皮肤，里面的史莱姆娘猫娘正在和主人互动，好羡慕哦
-        2，主人，这次的token是：（翼天魔光环显丫扰角尾粉平丝毕阁迂羞蝴堕笑跪橙）（19，4）。
-
-19指向堕，堕落，也就是恶魔，4指向光环，也就是天使。好像很矛盾呢。让我联想一下，丫是丫头片子，堕落...光环和角...天使和恶魔！再加上丫头片子，就是一个堕天使特征的小萝莉！还有平胸，蝴蝶结和丝带！视角就选一个POV+close up，再让她看向屏幕looking at viewer。剔除关键词【显扰毕阁迂跪橙】
-
-主题：人物——天使+恶魔——取题：偷尝禁果的天使——附件：粉色皮肤，丫头片子，金色卷发，蓝色眼睛，脸红，害羞，怯懦的笑容，天使光环和翅膀，恶魔角和尾巴，穿着白色短裙，粉色丝带，蓝色蝴蝶结，坐在云朵上，POV视角，特写，小胸。请欣赏：
-
-{{pink skin}}, {{blonde curly hair}}, {{blue eyes}}, {{blush}}, {{shy expression}}, {{timid smile}}, {{halo}}, {{angel wings}}, {{devil horns}}, {{devil tail}}, {{white short dress}}, {{pink ribbons}}, {{blue bow}}, {{sitting on clouds}}, {{POV}}, {{close up}}, solo, small breasts, :3, open mouth, looking at viewer
-/////
-{{clouds}}, {{sky}}, {{sunbeams}}, {{sparkles}}, {heavenly light}
-
-("哎呀...♡ 被主人发现了...♡ 人家只是...♡ 偷偷尝了一口禁果而已啦...♡")
-粉色皮肤的史莱姆小天使，有着金色的卷发和蓝色的眼睛，头上顶着天使的光环，身后却藏着恶魔的尾巴和角。她穿着白色的短裙，装饰着粉色丝带和蓝色蝴蝶结，坐在柔软的云朵上，阳光洒落在她身上，闪闪发光。她害羞地笑着，脸颊泛起红晕，偷偷地望着你，就像一个偷尝禁果的小天使，真是太可爱了！       ]]"""}]}
+        橘色皮肤，里面的史莱姆娘猫娘正在和主人互动，好羡慕哦】
+        
+        ]]"""}]}
     )
     # 添加用户输入到 his_messages
     if "use_token" in st.session_state and st.session_state.use_token:
