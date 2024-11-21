@@ -8,15 +8,19 @@ import pickle
 import re
 
 
-# API Key 设置
-st.session_state.key = "AIzaSyDezEpxvtY1AKN6JACMU9XHte5sxATNcUs"  # 请勿将您的API Key 泄露在公开场合
-if "key" not in st.session_state:
-    st.session_state.key = None
-if not st.session_state.key:
-    st.info("Please add your key to continue.")
-    st.stop()
-genai.configure(api_key=st.session_state.key)
+# --- API 密钥设置 ---
+api_keys = {
+    "主密钥": "AIzaSyDezEpxvtY1AKN6JACMU9XHte5sxATNcUs",  # 替换成你的主 API 密钥
+    "备用1号": "AIzaSyAWfFf6zqy1DizINOwPfxPD8EF2ACdwCaQ",  # 替换成你的备用 API 密钥
+    "备用2号":"AIzaSyD4UdMp5wndOAKxtO1CWpzuZEGEf78YKUQ"
+}
 
+selected_key = st.sidebar.selectbox("选择 API 密钥", list(api_keys.keys()), index=0) # 默认选择主密钥
+api_key = api_keys[selected_key]
+
+if not api_key:
+    st.error("请设置有效的API密钥。")
+    st.stop()
 # 模型设置
 generation_config = {
     "temperature": 1,
