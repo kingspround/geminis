@@ -12,7 +12,7 @@ import re
 api_keys = {
     "主密钥": "AIzaSyDezEpxvtY1AKN6JACMU9XHte5sxATNcUs",  # 替换成你的主 API 密钥
     "备用1号": "AIzaSyBgyyy2kTTAdsLB53OCR2omEbj7zlx1mjw",  # 替换成你的备用 API 密钥
-    "备用2号":"AIzaSyBVbA7tEyyy_ASp7l9P60qSh1xOM2CSMNw"
+    "备用2号":"AIzaSyCMn1j3qGpyjBcqkW6X2Ng1cy4aNUPHMwQ"
 }
 
 selected_key = st.sidebar.selectbox("选择 API 密钥", list(api_keys.keys()), index=0) # 默认选择主密钥
