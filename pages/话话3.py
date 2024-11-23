@@ -21,6 +21,8 @@ api_key = api_keys[selected_key]
 if not api_key:
     st.error("请设置有效的API密钥。")
     st.stop()
+genai.configure(api_key=api_key)
+
 # 模型设置
 generation_config = {
     "temperature": 1,
