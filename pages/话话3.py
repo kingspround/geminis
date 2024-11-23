@@ -167,7 +167,7 @@ def getAnswer_text(prompt, token):
         
         比如：【注意，里面创作本体的格式是代码的格式，注意换行】
         3，【主人，这次的token是：（天金魔盗月卷蜻萝垮垂光矮翼心云）（1）（3，6）。
-        1指向“天”，也就是天使，是主要token，3指向“魔”，6是“卷”，好矛盾哦，再结合其他token，一个转头卷发的萝莉堕天使史莱姆娘。视角：close up , {from above} , [[pov]]。
+        1指向“天”，也就是天使，是主要token，3指向“魔”，6是“卷”，好矛盾哦，再结合其它次要token，一个转头卷发的萝莉堕天使史莱姆娘。视角：close up , {from above} , [[pov]]。
         主题：天使+恶魔——云端的堕天使——取题：爱你的形状——附件：粉色皮肤，金发，蓝色眼睛，钻头，光环，天使翅膀，恶魔尾巴（小小的，隐藏的），爱心尾巴，发光的身体，透明衣服，白色连衣裙，蕾丝，短裙，褶边，丝带，吊袜带，并拢的腿，坐着，爱心符号，粘液爱心，一只手放在脸颊上，看着观众，光和影，乳沟，云，天空，阳光.
         创作：
 
@@ -183,7 +183,7 @@ def getAnswer_text(prompt, token):
         
         2，【主人，这次的token是：（紫卫魅巷夜衣嬉桃捂隙桃影露臀翘匿）（2）（4）。
 
-        主要token是2，指向“卫”，也就是卫衣喽，4“巷”是在夜晚的小巷。这次我想写一个偷偷露出骆驼趾cameltoe和大屁股穿着卫衣的的史莱姆。视角就选【{dutch angle}, {{{{close up}}}}, {{{{from below}}}}, looking at viewer, {between legs}】。剔除关键词【桃桃影匿】。
+        主要token是2，指向“卫”，也就是卫衣喽，4“巷”是在夜晚的小巷。再结合其它次要token，这次我想写一个偷偷露出骆驼趾cameltoe和大屁股穿着卫衣的的史莱姆。视角就选【{dutch angle}, {{{{close up}}}}, {{{{from below}}}}, looking at viewer, {between legs}】。
         主题：卫衣——露出糟糕部位的卫衣设计——取题：卫衣女孩想要玩耍！！——附件：紫色皮肤，小巷，夜晚，捂嘴，坏笑，骆驼趾，特写，仰视。请欣赏：
 
         {purple skin}, {dutch angle}, {{{{close up}}}}, {{{{from below}}}}, looking at viewer, {between legs}, {{{cameltoe}}}, {black hoodie}, {black panties}, small breasts, {big ass}, broken_hart, {grin}, {hand over mouth}, mischievous expression, playful, {solo}, colored skin, monster girl, purple skin, purple eyes, short purple hair, {rim lighting}, {backlighting}, {shadow}, {face shadow} 
@@ -197,7 +197,7 @@ def getAnswer_text(prompt, token):
         
         3，【主人，这次的token是：（夜鹿睁筷嬉乳露臀闭静翘违肌桃问闯泳）（6，2）。
 
-        主要token2指向“鹿”，6指向“乳”，鹿和巨乳，这次我想试试鹿娘身体前倾巨乳下垂的姿势场景，视角就选face focus。剔除关键词【违睁筷肌问闯泳】。
+        主要token2指向“鹿”，6指向“乳”，鹿和巨乳，再结合其它次要token，这次我想试试鹿娘身体前倾巨乳下垂的姿势场景，视角就选face focus。
         主题：鹿——夜晚的爆乳鹿娘——取题：害羞的鹿娘——附件：绿色皮肤，巨乳，宽臀，长发，鹿角，鹿耳，鹿尾巴，裸体，乳沟，微笑，害羞，脸红，森林，河流，夜晚，阴影。请欣赏：
         face focus , {solo}, {green skin}, {{{{huge breasts}}}, breasts, arms_supporting_breasts,  lean forward, ass up , wide hips, closed eyes ,big ass ,  slightly turned head , smile ,innocent, looking down , slim waist, long hair ,{deer_horns ,deer_ears , deer_tail} , {nude} ,Cleavage ,colored skin, monster girl, green skin, green eyes, large breasts, soft breasts, drooping breasts 
 
