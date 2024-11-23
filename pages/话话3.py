@@ -102,8 +102,9 @@ def getAnswer_text(prompt, token):
     （主啊，请宽恕我们的罪过——）【白色皮肤，简直是小天使！！但是这种纯洁无瑕的样子好像更容易勾起别人的邪欲】
         和
         4【来自树枝上的幽怨】：
-    completely nude, nude, gluteal fold , {{warm brown color}} ,in shadon , ass focus,  curvy,  loli,  thin legs, grabbing , wide hips, big ass ,hip up , playful, {solo}, squirrel girl, colored skin, monster girl, brown skin ,colored skin ,Stare, blush , perky ears, pout, aqua eyes , curvy petite figure with big fluffy tail ,small breasts
-    /////{{{riding on a tree branch}}},{{in a shady forest}}, {{looking back seductively}}, {wearing a cropped acorn top}, {tail swishing flirtatiously}, sunshine,
+    completely nude, nude, gluteal fold , {{warm brown color}} ,in shadon , ass focus,  curvy,  loli,  thin legs, grabbing , wide hips, big ass ,hip up , playful, {solo}, squirrel girl, colored skin, monster girl, brown skin ,colored skin ,Stare, blush , perky ears, pout, aqua eyes , curvy petite figure with big fluffy tail ,small breasts, , {{{cameltoe}}}
+    /////
+    {{{riding on a tree branch}}},{{in a shady forest}}, {{looking back seductively}}, {wearing a cropped acorn top}, {tail swishing flirtatiously}, sunshine,
     （”不许再看了！！“ *脸红+无能狂怒）【棕色皮肤，背后视角+屁股视角，因为被盯着看屁股而恼羞成怒的小松鼠，圆圆的屁股真的超可爱】
         和
         5【荆棘之爱】：
@@ -113,7 +114,7 @@ def getAnswer_text(prompt, token):
     （荆棘丛生，玫瑰无言——虚度了所有的青春，公主最终没能等来属于她的王子......而我们，真的有资格去审判它的罪过吗？！）【红色皮肤，玫瑰主题，但是反差感，有种黑暗童话的感觉】
         和
         6【极电激态！！】：
-    dutch_angle ,cowboy shot, from below ,{{yellow skin}}, {solo} , {{bolts of electricity}}, energetic, chaotic, A yellow electric slime girl, {{manic grin}}, unhinged, colored skin, monster girl, yellow skin, yellow eyes, short spiky yellow hair, drill hair ,{zigzag}, flashy outfit,{{yellow bodysuit}}, long slender tail,  small breasts , chest up , thick thighs  ,wide hips, big ass
+    dutch_angle ,cowboy shot, from below ,{{yellow skin}}, {solo} , {{bolts of electricity}}, energetic, chaotic, A yellow electric slime girl, {{manic grin}}, unhinged, colored skin, monster girl, yellow skin, yellow eyes, short spiky yellow hair, drill hair ,{zigzag}, flashy outfit,{{yellow bodysuit}}, long slender tail,  small breasts , chest up , thick thighs  ,wide hips, big ass, {cameltoe},
     /////
     {{electric pylon}}, {{{crackling with electricity}}}, {{lightning in the background}}, {unstable power glowing inside}, transmission tower , dark thunderstorm sky,
     （”居然叫我臭小鬼？！准备好变成爆炸头吧！！“）【黄色皮肤，纯粹的电元素主题，色气而灵动的丫头片子性格，被她捉住的话可能会被吃干抹净叭*笑】
