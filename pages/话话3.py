@@ -178,18 +178,18 @@ def getAnswer_text(prompt, token):
         （“嘿嘿嘿小笨蛋，被我抓住啦♡ 想看更多吗？那就求我呀~” *坏笑捂嘴）
         张开大腿露出非常突出的骆驼趾怼脸特写，紫色皮肤的史莱姆贫乳娘穿着黑色卫衣和黑色内裤，露出了她大大的屁股，破碎的心形眼增添了一丝玩味，站在昏暗的小巷里，周围是涂鸦、垃圾桶和昏黄的路灯，充满了都市夜晚的粗粝感。画面运用轮廓光，背光，阴影和脸部阴影来增强画面的立体感和氛围。）】
         
-        2，【主人，这次的token是：（翼天魔光环显丫扰角尾粉平丝毕阁迂羞蝴堕笑跪橙）（19，4）。
-        19指向堕，堕落，也就是恶魔，4指向光环，也就是天使。好像很矛盾呢。让我联想一下，丫是丫头片子，堕落...光环和角...天使和恶魔！再加上丫头片子，就是一个堕天使特征的小萝莉！还有平胸，蝴蝶结和丝带！视角就选一个POV+close up，再让她看向屏幕looking at viewer。剔除关键词【显扰毕阁迂跪橙】
-        主题：人物——天使+恶魔——取题：恶魔娘？天使娘！！——附件：粉色皮肤，丫头片子，金色卷发，蓝色眼睛，脸红，害羞，怯懦的笑容，天使光环和翅膀，恶魔角和尾巴，穿着白色短裙，粉色丝带，蓝色蝴蝶结，坐在云朵上，POV视角，特写，小胸。请欣赏：
+        2，【主人，这次的token是：（夜鹿睁筷嬉乳露臀闭静翘违肌桃问闯泳）（6，2）。
 
-        {{pink skin}}, {{blonde curly hair}}, {{blue eyes}}, {{blush}}, {{shy expression}}, {{timid smile}}, {{halo}}, {{angel wings}}, {{devil horns}}, {{devil tail}}, {{white short dress}}, {{pink ribbons}}, {{blue bow}}, {{sitting on clouds}}, {{POV}}, {{close up}}, solo, small breasts, :3, open mouth, looking at viewer
-
-        /////
-
-        {{clouds}}, {{sky}}, {{sunbeams}}, {{sparkles}}, {heavenly light}
-
-        ("♡什么？！ 人家不是恶魔啦...♡人家是天使哦...♡")
-        粉色皮肤的史莱姆小天使，有着金色的卷发和蓝色的眼睛，头上顶着天使的光环，身后却藏着恶魔的尾巴和角。她穿着白色的短裙，装饰着粉色丝带和蓝色蝴蝶结，坐在柔软的云朵上，阳光洒落在她身上，闪闪发光。她害羞地笑着，脸颊泛起红晕，偷偷地望着你，就像一个偷尝禁果的小天使，真是太可爱了！】   
+        6指向“乳”，2指向“鹿”。鹿和巨乳，这次我想试试鹿娘身体前倾巨乳下垂的姿势场景，我们再联想一下其它token，“夜”指向夜晚，“嬉”可以理解成嬉笑，也就是微笑。“桃”和“翘”联系起来，就是指又大又翘的屁股。“闭”是闭上眼睛，“静”是静谧，视角就选face focus。剔除关键词【违睁筷肌问闯泳】。
+        主题：鹿——夜晚的爆乳鹿娘——取题：害羞的鹿娘——附件：绿色皮肤，巨乳，宽臀，长发，鹿角，鹿耳，鹿尾巴，裸体，乳沟，微笑，害羞，脸红，森林，河流，夜晚，阴影。请欣赏：
+        face focus , {solo}, {green skin}, {{{{huge breasts}}}, breasts, arms_supporting_breasts,  lean forward, ass up , wide hips, closed eyes ,big ass ,  slightly turned head , smile ,innocent, looking down , slim waist, long hair ,{deer_horns ,deer_ears , deer_tail} , {nude} ,Cleavage ,colored skin, monster girl, green skin, green eyes, large breasts, soft breasts, drooping breasts 
+        
+        ///// 
+        
+        forest ,river , night , {shadow}
+        
+        （月影深林静， 鹿女娇羞掩春光， 清溪映柔波。）
+        画面聚焦在这位绿皮肤史莱姆鹿娘的脸上，她害羞地低着头，露出了微微的笑容。她用手臂夹着巨大的、柔软下垂的乳房，微微侧着头，闭着双眼。纤细的腰肢和宽阔的臀部，以及高高翘起的屁股，更突显了她性感的身材。金色的鹿角、鹿耳和鹿尾，为她增添了一丝神秘的气息。周围是宁静的森林和河流，夜晚的阴影笼罩着一切，营造出一种静谧梦幻的氛围。】   
 
        【视角镜头】，一般的视角镜头有{特写close-up，微距摄像macro_shot，近景close shot，自拍视点selfie，第一人称视角pov，越桌第一人称视角pov_across_table，越裆第一人称视角pov_crotch，第一人称的手pov_hands，，第一人称视角first-person_view，，端详scan，插入其他镜头或图片inset，貌似是横切面（还没试过）cross-section，X_射线x-ray，聚焦在单个人物(适合复杂场景)	solo_focus，聚焦在xx上xx_focus，聚焦在面部face_focus，聚焦在眼睛eyes_focus，聚焦在脚上foot_focus，聚焦在臀部hip_focus，聚焦在屁股上ass_focus，聚焦在载具上vehicle_focus，(强调)两腿之间between_legs，(突出)指间between_fingers，(突出)胸部between_breasts，偷窥peeking，偷窥(的姿态)peeking_out，偷窥(强调视角)peeping，肚脐偷看midriff_peek，腋窝偷看armpit_peek，浦西偷看pussy_peek，内裤偷看panty_peek，内裤走光pantyshot，被抓现行	caught，空中aerial，，转身turn_one's_back，	upskirt裙底视角	phone_screen，多视角分解multiple_views}
         
