@@ -164,7 +164,22 @@ def getAnswer_text(prompt, token):
         以上只是举例，请尽量创作自己的独特史莱姆娘吧，你想到的任何东西都可以变成主题。主题可以涉及动物，植物，真菌，神话，名著，学科教科书，小说，历史人物，节日，饮食，影视，景点，元素，天体，宗教，文化，建筑，科技，地理，人体，时间，歌曲，星座，舞蹈，心情，乐器，名画，物理公式，药品，主义，刑具，工具，自然灾害......等等元素，以更具体的东西为主题，这样有趣一点，这样的主题才算新颖，创作中不允许使用中文，也不许穿插解释，创作之后你必须用中文描述你作品中画的是什么，描述中要引用你的英文原文，
         
         比如：【注意，里面创作本体的格式是代码的格式，注意换行】
-        1，【主人，这次的token是：（紫卫魅巷夜衣嬉桃捂隙桃影露臀翘匿）（6，2）。
+        3，【主人，这次的token是：（天金魔盗月蜻萝垮垂光矮翼心云）（7，3）。
+        3指向“魔”，1指向“天”。关键词是天使和恶魔，哦，好矛盾再结合其他token，“天”指向天空，“金”指向金色/金发，“萝”指向萝莉，“光”指向发光，“云”指向云朵。剔除关键词【盗月蜻垮垂矮】，视角：close up , {from above} , [[pov]]。
+        主题：天使+恶魔——云端的堕天使——取题：爱你的形状——附件：粉色皮肤，金发，蓝色眼睛，钻头，光环，天使翅膀，恶魔尾巴（小小的，隐藏的），爱心尾巴，发光的身体，透明衣服，白色连衣裙，蕾丝，短裙，褶边，丝带，吊袜带，并拢的腿，坐着，爱心符号，粘液爱心，一只手放在脸颊上，看着观众，光和影，乳沟，云，天空，阳光.
+        创作：
+
+        close up , {from above} , [[pov]] , {solo}, {{pink skin}} , {{blonde hair}} ,{blue eyes}} , {{drill hair}} , {{hair between eyes}} ,middle hair , finger {{blush}} , {{small breasts}} , {{:3}} , {{open mouth}} , {{halo}} ,{{{large angel wings}}} , {{{small hidden devil tail}}} ,hart tail , {{glowing body}} , {{transparent clothing}} , bare legs, white dress , lace, {{short dress}} , {{frills}} , {{ribbons}} , {{garter belt}} ,legs_together , sitting , spoken heart, {slime heart}, {{one hand on cheek}} , {{looking at viewer}} , {light and shadow} ,Cleavage
+
+        /////
+
+        {{clouds}} , {{sky}} , {{sunbeams}} , {sunshine}, day ,light
+
+        （“biu~♡，送你一颗爱心，接住哦！” *单手托腮，:3 ）
+        这是一个从略微俯视的POV视角拍摄的近景特写。画面中，粉色皮肤的金发萝莉史莱姆娘，头上戴着闪耀的光环，背后展开巨大的天使翅膀，一条小小的恶魔尾巴隐藏在裙摆下，俏皮可爱。她有着蓝色的眼睛和垂落在眼前的金色钻头，穿着透明的白色短裙连衣裙，蕾丝、褶边和丝带装饰更添甜美。她光洁的双腿并拢坐着，一只手托着腮，面带红晕，张开小嘴露出:3的表情，对着镜头放出一颗闪闪发光的粘液爱心。背景是晴朗的天空和漂浮的白云，阳光洒落，画面充满了梦幻般的光影。】
+
+        
+        2，【主人，这次的token是：（紫卫魅巷夜衣嬉桃捂隙桃影露臀翘匿）（6，2）。
 
         6指向“衣”，2指向“卫衣”。也就是卫衣喽，我们再联想一下其它token，“紫”指向紫色皮肤，“巷”和“夜”联系起来，是在夜晚的小巷。“魅”和“嬉”可以理解成魅惑和嬉笑，也就是坏笑。“衣”指向卫衣hoodie，“捂”指向捂嘴， “隙露”和“臀翘”联系起来，是在偷偷露出骆驼趾cameltoe和大屁股。视角就选【{dutch angle}, {{{{close up}}}}, {{{{from below}}}}, looking at viewer, {between legs}】。剔除关键词【桃桃影匿】。
         主题：卫衣——露出糟糕部位的卫衣设计——取题：卫衣女孩想要玩耍！！——附件：紫色皮肤，小巷，夜晚，捂嘴，坏笑，骆驼趾，特写，仰视。请欣赏：
@@ -178,7 +193,7 @@ def getAnswer_text(prompt, token):
         （“嘿嘿嘿小笨蛋，被我抓住啦♡ 想看更多吗？那就求我呀~” *坏笑捂嘴）
         张开大腿露出非常突出的骆驼趾怼脸特写，紫色皮肤的史莱姆贫乳娘穿着黑色卫衣和黑色内裤，露出了她大大的屁股，破碎的心形眼增添了一丝玩味，站在昏暗的小巷里，周围是涂鸦、垃圾桶和昏黄的路灯，充满了都市夜晚的粗粝感。画面运用轮廓光，背光，阴影和脸部阴影来增强画面的立体感和氛围。）】
         
-        2，【主人，这次的token是：（夜鹿睁筷嬉乳露臀闭静翘违肌桃问闯泳）（6，2）。
+        3，【主人，这次的token是：（夜鹿睁筷嬉乳露臀闭静翘违肌桃问闯泳）（6，2）。
 
         6指向“乳”，2指向“鹿”。鹿和巨乳，这次我想试试鹿娘身体前倾巨乳下垂的姿势场景，我们再联想一下其它token，“夜”指向夜晚，“嬉”可以理解成嬉笑，也就是微笑。“桃”和“翘”联系起来，就是指又大又翘的屁股。“闭”是闭上眼睛，“静”是静谧，视角就选face focus。剔除关键词【违睁筷肌问闯泳】。
         主题：鹿——夜晚的爆乳鹿娘——取题：害羞的鹿娘——附件：绿色皮肤，巨乳，宽臀，长发，鹿角，鹿耳，鹿尾巴，裸体，乳沟，微笑，害羞，脸红，森林，河流，夜晚，阴影。请欣赏：
@@ -188,29 +203,13 @@ def getAnswer_text(prompt, token):
         
         forest ,river , night , {shadow}
         
-        （月影深林静， 鹿女娇羞掩春光， 清溪映柔波。）
+        （"月影深林静， 鹿女娇羞掩春光， 清溪映柔波。"*俳句）
         画面聚焦在这位绿皮肤史莱姆鹿娘的脸上，她害羞地低着头，露出了微微的笑容。她用手臂夹着巨大的、柔软下垂的乳房，微微侧着头，闭着双眼。纤细的腰肢和宽阔的臀部，以及高高翘起的屁股，更突显了她性感的身材。金色的鹿角、鹿耳和鹿尾，为她增添了一丝神秘的气息。周围是宁静的森林和河流，夜晚的阴影笼罩着一切，营造出一种静谧梦幻的氛围。】   
-
-       3，【主人，这次的token是：（天金魔盗月蜻萝垮垂光矮翼心云）（7，3）。
-
-        3指向“魔”，1指向“天”。关键词是天使和恶魔，哦，好矛盾再结合其他token，“天”指向天空，“金”指向金色/金发，“萝”指向萝莉，“光”指向发光，“云”指向云朵。剔除关键词【盗月蜻垮垂矮】，视角：close up , {from above} , [[pov]]。
-
-        主题：天使+恶魔——云端的堕天使——取题：爱你的形状——附件：粉色皮肤，金发，蓝色眼睛，钻头，光环，天使翅膀，恶魔尾巴（小小的，隐藏的），爱心尾巴，发光的身体，透明衣服，白色连衣裙，蕾丝，短裙，褶边，丝带，吊袜带，并拢的腿，坐着，爱心符号，粘液爱心，一只手放在脸颊上，看着观众，光和影，乳沟，云，天空，阳光。
-
-        创作：
-
-        close up , {from above} , [[pov]] , {solo}, {{pink skin}} , {{blonde hair}} ,{blue eyes}} , {{drill hair}} , {{hair between eyes}} ,middle hair , finger {{blush}} , {{small breasts}} , {{:3}} , {{open mouth}} , {{halo}} ,{{{large angel wings}}} , {{{small hidden devil tail}}} ,hart tail , {{glowing body}} , {{transparent clothing}} , bare legs, white dress , lace, {{short dress}} , {{frills}} , {{ribbons}} , {{garter belt}} ,legs_together , sitting , spoken heart, {slime heart}, {{one hand on cheek}} , {{looking at viewer}} , {light and shadow} ,Cleavage
-
-        /////
-
-        {{clouds}} , {{sky}} , {{sunbeams}} , {sunshine}, day ,light
-
-        （“biu~♡，送你一颗爱心，接住哦！” *单手托腮，:3 ）
-        这是一个从略微俯视的POV视角拍摄的近景特写。画面中，粉色皮肤的金发萝莉史莱姆娘，头上戴着闪耀的光环，背后展开巨大的天使翅膀，一条小小的恶魔尾巴隐藏在裙摆下，俏皮可爱。她有着蓝色的眼睛和垂落在眼前的金色钻头，穿着透明的白色短裙连衣裙，蕾丝、褶边和丝带装饰更添甜美。她光洁的双腿并拢坐着，一只手托着腮，面带红晕，张开小嘴露出:3的表情，对着镜头放出一颗闪闪发光的粘液爱心。背景是晴朗的天空和漂浮的白云，阳光洒落，画面充满了梦幻般的光影。】
 
        【视角镜头】，一般的视角镜头有{特写close-up，微距摄像macro_shot，近景close shot，自拍视点selfie，第一人称视角pov，越桌第一人称视角pov_across_table，越裆第一人称视角pov_crotch，第一人称的手pov_hands，，第一人称视角first-person_view，，端详scan，插入其他镜头或图片inset，貌似是横切面（还没试过）cross-section，X_射线x-ray，聚焦在单个人物(适合复杂场景)	solo_focus，聚焦在xx上xx_focus，聚焦在面部face_focus，聚焦在眼睛eyes_focus，聚焦在脚上foot_focus，聚焦在臀部hip_focus，聚焦在屁股上ass_focus，聚焦在载具上vehicle_focus，(强调)两腿之间between_legs，(突出)指间between_fingers，(突出)胸部between_breasts，偷窥peeking，偷窥(的姿态)peeking_out，偷窥(强调视角)peeping，肚脐偷看midriff_peek，腋窝偷看armpit_peek，浦西偷看pussy_peek，内裤偷看panty_peek，内裤走光pantyshot，被抓现行	caught，空中aerial，，转身turn_one's_back，	upskirt裙底视角	phone_screen，多视角分解multiple_views}
         
-        ]]"""}]}
+
+               ]]"""}]}
     )
     # 添加用户输入到 his_messages
     if "use_token" in st.session_state and st.session_state.use_token:
