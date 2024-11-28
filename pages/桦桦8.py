@@ -700,7 +700,7 @@ if prompt := st.chat_input("输入你的消息:"):
     st.session_state.messages.append({"role": "user", "content": prompt})
     with st.chat_message("user"):
         st.markdown(prompt)
-     with st.chat_message("assistant"):
+    with st.chat_message("assistant"):
         message_placeholder = st.empty()  # 创建占位符
         full_response = getAnswer(prompt)  # 直接获取完整回复
         message_placeholder.markdown(full_response)  # 显示完整回复
