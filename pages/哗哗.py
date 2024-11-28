@@ -63,7 +63,7 @@ def getAnswer(prompt):
     for msg in st.session_state.messages[-20:]:
         if msg["role"] == "user":
             his_messages.append({"role": "user", "parts": [{"text": msg["content"]}]})
-        elif msg is not None and msg["content"] is not None:
+        elif msg.get("content"):  # 检查 content 是否存在
             his_messages.append({"role": "model", "parts": [{"text": msg["content"]}]})
 
     try:
@@ -72,10 +72,11 @@ def getAnswer(prompt):
         for chunk in response:
             full_response += chunk.text
             yield chunk.text
-        return full_response  # 返回完整的回复
+        return full_response
     except Exception as e:
-        st.error(f"An error occurred: {e}")
-        return ""  # 在发生错误时返回空字符串
+        st.error(f"Gemini API 调用失败: {e}")  # 更具体的错误信息
+        return ""
+
 
 
 # 获取文件名，并生成对应的文件名
