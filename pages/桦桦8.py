@@ -1,16 +1,11 @@
 # First
 import google.generativeai as genai
 import streamlit as st
-from dotenv import load_dotenv  
-import os
-from PIL import Image
-import numpy as np
-from io import BytesIO
-from io import StringIO
-import streamlit as st
-import pickle
-import glob
 from google.api_core.exceptions import InvalidArgument
+import json
+import pickle
+import os
+import glob
 
 
 # --- API 密钥设置 ---
@@ -610,10 +605,11 @@ def getAnswer(prompt, feedback):
     for msg in st.session_state.messages[-20:]:
         if msg["role"] == "user":
             his_messages.append({"role": "user", "parts": [{"text": msg["content"]}]})
-        elif msg is not None and msg["content"] is not None:
+        elif msg and msg["content"]:  # 简化条件
             his_messages.append({"role": "model", "parts": [{"text": msg["content"]}]})
 
-    his_messages = [msg for msg in his_messages if msg.get("parts") and msg["parts"][0].get("text")]
+    # 过滤空消息 (改进后的逻辑，避免潜在的 AttributeError)
+    his_messages = [msg for msg in his_messages if msg.get("parts") and any(part.get("text") for part in msg["parts"])]
 
     try:
         response = model.generate_content(contents=his_messages, stream=True)
@@ -622,14 +618,15 @@ def getAnswer(prompt, feedback):
             print("API 返回的片段:", chunk.text)
             print("_" * 80)
             ret += chunk.text
-            feedback(ret)
+            feedback(ret)  # 调用 feedback 函数
         return ret
     except InvalidArgument as e:
         st.error(f"Gemini API 参数无效: {e}")
         st.write(f"请求 JSON: {json.dumps(his_messages, indent=2)}")
         return ""
     except Exception as e:
-        st.error(f"发生意外错误: {e}")
+        st.error(f"发生意外错误: {e}")  # 保留此错误处理
+        #  可以在这里添加更详细的日志记录或其他错误处理逻辑
         return ""
 
 
@@ -709,10 +706,10 @@ if prompt := st.chat_input("输入你的消息:"):
         message_placeholder = st.empty()
         full_response = ""
 
-        def update_message(current_response):  # 定义 feedback 函数
+        def update_message(current_response):  # 定义feedback函数
             message_placeholder.markdown(current_response + "▌")
-
-        full_response = getAnswer(prompt, update_message)  # 传递 feedback 函数
+        
+        full_response = getAnswer(prompt, update_message)  # 传递 feedback 参数
         message_placeholder.markdown(full_response)
 
     st.session_state.messages.append({"role": "assistant", "content": full_response})
