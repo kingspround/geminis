@@ -1,27 +1,23 @@
-# First
 import google.generativeai as genai
 import streamlit as st
-from dotenv import load_dotenv  
+from dotenv import load_dotenv
 import os
 from PIL import Image
 import numpy as np
 from io import BytesIO
 from io import StringIO
-import streamlit as st
+import json
 
 if "key" not in st.session_state:
-    st.session_state.key = "AIzaSyC7vfMxqZQJVNq0rUhzpOKu1m84y737Tak"
-    
+    st.session_state.key = "AIzaSyC7vfMxqZQJVNq0rUhzpOKu1m84y737Tak"  # 请替换为你的实际密钥
+
 if not st.session_state.key:
-    st.info("请输入你的 API Key 以继续。")
+    st.info("Please add your key to continue.")
     st.stop()
 
-try:
-    genai.configure(api_key=st.session_state.key)
-except Exception as e:
-    st.error(f"API Key 配置失败: {e}")
-    st.stop()
+genai.configure(api_key=st.session_state.key)
 
+# Set up the model
 generation_config = {
     "temperature": 0.9,
     "top_p": 1,
@@ -35,50 +31,42 @@ safety_settings = [
     {"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_NONE"},
 ]
 
-try:
-    model = genai.GenerativeModel(
-        model_name="gemini-1.5-flash-latest",  # 或 "gemini-1.5-pro-latest"
-        generation_config=generation_config,
-        safety_settings=safety_settings,
-    )
-except Exception as e:
-    st.error(f"模型加载失败: {e}")
-    st.stop()
+model = genai.GenerativeModel(
+    model_name="gemini-1.5-flash-latest",
+    generation_config=generation_config,
+    safety_settings=safety_settings,
+)
 
 
-
-# LLM 函数
+# LLM
 def getAnswer(prompt, feedback):
-    his_messages = [{"role": "model", "parts": [{"text": ""}]}] # 初始化第一个消息
-
+    his_messages = []
     for msg in st.session_state.messages[-20:]:
         if msg["role"] == "user":
-            his_messages.append({"role": "user", "parts": [{"text": msg["content"]}]})  # 注意 parts 的格式
-        elif msg.get("content"): # 检查是否存在 content key
-            his_messages.append({"role": "model", "parts": [{"text": msg["content"]}]}) # 注意 parts 的格式
+            his_messages.append({"role": "user", "parts": msg["content"]})
+        elif msg is not None and msg["content"] is not None:
+            his_messages.append({"role": "model", "parts": msg["content"]})
 
+    print("发送给 API 的消息:", json.dumps(his_messages, indent=2))
 
     try:
-        print(json.dumps(his_messages, indent=2)) # 调试用，打印发送给 API 的数据
         response = model.generate_content(contents=his_messages, stream=True)
         ret = ""
         for chunk in response:
-            print(chunk.text)
+            print("API 返回的片段:", chunk.text)
             print("_" * 80)
             ret += chunk.text
             feedback(ret)
         return ret
     except google.api_core.exceptions.InvalidArgument as e:
         st.error(f"Gemini API 参数无效: {e}")
-        st.write(f"请求 JSON: {json.dumps(his_messages, indent=2)}")  # 显示 JSON 用于调试
+        st.write(f"请求 JSON: {json.dumps(his_messages, indent=2)}")
         return ""
     except Exception as e:
         st.error(f"发生意外错误: {e}")
         return ""
 
 
-
-# Streamlit 应用
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
@@ -86,8 +74,10 @@ for message in st.session_state.messages:
     with st.chat_message(message["role"]):
         st.markdown(message["content"])
 
+
 def writeReply(cont, msg):
     cont.write(msg)
+
 
 if prompt := st.chat_input():
     st.chat_message("user").write(prompt)
@@ -95,4 +85,5 @@ if prompt := st.chat_input():
     with st.chat_message("assistant"):
         p = st.empty()
         re = getAnswer(prompt, lambda x: writeReply(p, x))
-        st.session_state.messages.append({"role": "assistant", "content": re})
+        if re:  # 仅当 re 不为空字符串（即没有错误）时才追加消息
+            st.session_state.messages.append({"role": "assistant", "content": re})
