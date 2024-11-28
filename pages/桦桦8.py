@@ -610,9 +610,10 @@ def getAnswer(prompt):
     for msg in st.session_state.messages[-20:]:
         if msg["role"] == "user":
             his_messages.append({"role": "user", "parts": [{"text": msg["content"]}]})
-        elif msg is not None and msg["content"] is not None:
+        elif msg and msg["content"]:  # 简化条件
             his_messages.append({"role": "model", "parts": [{"text": msg["content"]}]})
 
+    # 过滤掉 parts 或 text 为空的 messages
     his_messages = [msg for msg in his_messages if msg.get("parts") and msg["parts"][0].get("text")]
 
     try:
@@ -622,7 +623,7 @@ def getAnswer(prompt):
             print("API 返回的片段:", chunk.text)
             print("_" * 80)
             ret += chunk.text
-            feedback(ret)
+            feedback(ret) # 调用 feedback 函数
         return ret
     except InvalidArgument as e:
         st.error(f"Gemini API 参数无效: {e}")
@@ -699,13 +700,17 @@ if prompt := st.chat_input("输入你的消息:"):
     st.session_state.messages.append({"role": "user", "content": prompt})
     with st.chat_message("user"):
         st.markdown(prompt)
+
     with st.chat_message("assistant"):
         message_placeholder = st.empty()
         full_response = ""
-        for chunk in getAnswer(prompt):
-            full_response += chunk
-            message_placeholder.markdown(full_response + "▌")
+
+        def update_message(current_response):
+            message_placeholder.markdown(current_response + "▌")
+
+        full_response = getAnswer(prompt, update_message)  # 传递 feedback 函数
         message_placeholder.markdown(full_response)
+
     st.session_state.messages.append({"role": "assistant", "content": full_response})
     with open(log_file, "wb") as f:
         pickle.dump(st.session_state.messages, f)
