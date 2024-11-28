@@ -62,7 +62,7 @@ model = genai.GenerativeModel(model_name="gemini-1.5-pro-latest",generation_conf
 # LLM
 
 
-def getAnswer(prompt):
+def getAnswer(prompt, feedback):
     his_messages = []
     his_messages.append(
         {"role": "model", "parts":[{"text": """
@@ -705,7 +705,7 @@ if prompt := st.chat_input("输入你的消息:"):
         message_placeholder = st.empty()
         full_response = ""
 
-        def update_message(current_response):
+        def update_message(current_response):  # 定义 feedback 函数
             message_placeholder.markdown(current_response + "▌")
 
         full_response = getAnswer(prompt, update_message)  # 传递 feedback 函数
