@@ -18,7 +18,7 @@ if not st.session_state.key:
 
 genai.configure(api_key=st.session_state.key)
 
-# Set up the model
+# 模型配置
 generation_config = {
     "temperature": 0.9,
     "top_p": 1,
@@ -39,16 +39,19 @@ model = genai.GenerativeModel(
 )
 
 
-# LLM
 def getAnswer(prompt, feedback):
     his_messages = []
     for msg in st.session_state.messages[-20:]:
-        if msg["role"] == "user":
-            his_messages.append({"role": "user", "parts": msg["content"]})
-        elif msg is not None and msg["content"] is not None:
-            his_messages.append({"role": "model", "parts": msg["content"]})
+        if msg["content"] and msg["content"].strip():
+            role = msg["role"]
+            content = msg["content"].strip()
+            his_messages.append({"role": role, "parts": content})
 
     print("发送给 API 的消息:", json.dumps(his_messages, indent=2))
+
+    if not his_messages or not any(msg.get("parts") for msg in his_messages if msg["role"] == "user"):
+        st.error("请输入有效内容。")
+        return ""
 
     try:
         response = model.generate_content(contents=his_messages, stream=True)
@@ -59,7 +62,7 @@ def getAnswer(prompt, feedback):
             ret += chunk.text
             feedback(ret)
         return ret
-    except InvalidArgument as e: #  修改这里
+    except InvalidArgument as e:
         st.error(f"Gemini API 参数无效: {e}")
         st.write(f"请求 JSON: {json.dumps(his_messages, indent=2)}")
         return ""
@@ -83,8 +86,9 @@ def writeReply(cont, msg):
 if prompt := st.chat_input():
     st.chat_message("user").write(prompt)
     st.session_state.messages.append({"role": "user", "content": prompt})
+
     with st.chat_message("assistant"):
         p = st.empty()
         re = getAnswer(prompt, lambda x: writeReply(p, x))
-        if re:  # 仅当 re 不为空字符串（即没有错误）时才追加消息
+        if re:
             st.session_state.messages.append({"role": "assistant", "content": re})
