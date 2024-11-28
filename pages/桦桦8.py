@@ -1,11 +1,17 @@
 # First
 import google.generativeai as genai
 import streamlit as st
-from google.api_core.exceptions import InvalidArgument
-import json
-import pickle
+from dotenv import load_dotenv  
 import os
+from PIL import Image
+import numpy as np
+from io import BytesIO
+from io import StringIO
+import streamlit as st
+import pickle
 import glob
+from google.api_core.exceptions import InvalidArgument
+
 
 
 # --- API 密钥设置 ---
@@ -16,6 +22,7 @@ api_keys = {
     "备用3号":"AIzaSyBVbA7tEyyy_ASp7l9P60qSh1xOM2CSMNw",
     "备用4号":"AIzaSyDezEpxvtY1AKN6JACMU9XHte5sxATNcUs"
 }
+
 
 selected_key = st.sidebar.selectbox("选择 API 密钥", list(api_keys.keys()), index=0) # 默认选择主密钥
 api_key = api_keys[selected_key]
