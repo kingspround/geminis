@@ -63,7 +63,7 @@ model = genai.GenerativeModel(model_name="gemini-1.5-pro-exp-0827",generation_co
 # LLM
 
 
-def getAnswer(prompt):
+def getAnswer(prompt,feedback):
     his_messages = []
     his_messages.append(
         {"role": "model", "parts":[{"text": """
