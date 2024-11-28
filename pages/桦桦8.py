@@ -610,10 +610,9 @@ def getAnswer(prompt, feedback):
     for msg in st.session_state.messages[-20:]:
         if msg["role"] == "user":
             his_messages.append({"role": "user", "parts": [{"text": msg["content"]}]})
-        elif msg and msg["content"]:  # 简化条件
+        elif msg is not None and msg["content"] is not None:
             his_messages.append({"role": "model", "parts": [{"text": msg["content"]}]})
 
-    # 过滤掉 parts 或 text 为空的 messages
     his_messages = [msg for msg in his_messages if msg.get("parts") and msg["parts"][0].get("text")]
 
     try:
@@ -623,7 +622,7 @@ def getAnswer(prompt, feedback):
             print("API 返回的片段:", chunk.text)
             print("_" * 80)
             ret += chunk.text
-            feedback(ret) # 调用 feedback 函数
+            feedback(ret)
         return ret
     except InvalidArgument as e:
         st.error(f"Gemini API 参数无效: {e}")
@@ -638,6 +637,10 @@ def getAnswer(prompt, feedback):
 filename = os.path.splitext(os.path.basename(__file__))[0] + ".pkl"
 log_file = os.path.join(os.path.dirname(__file__), filename)
 
+# --- 文件操作函数 ---
+filename = os.path.splitext(os.path.basename(__file__))[0] + ".pkl"
+log_file = os.path.join(os.path.dirname(__file__), filename)
+
 # 确保文件存在
 if not os.path.exists(log_file):
     with open(log_file, "wb") as f:
@@ -645,7 +648,8 @@ if not os.path.exists(log_file):
 
 # 初始化 session state
 if "messages" not in st.session_state:
-    load_history(log_file) #  直接调用load_history初始化
+    load_history(log_file)
+
 
 # ---  清除历史记录 ---
 def clear_history(log_file):
