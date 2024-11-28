@@ -52,12 +52,12 @@ safety_settings = [
    },
 ]
 
-model = genai.GenerativeModel(model_name="gemini-1.5-pro-exp-0827",generation_config=generation_config,safety_settings=safety_settings)
+model = genai.GenerativeModel(model_name="gemini-1.5-pro-002",generation_config=generation_config,safety_settings=safety_settings)
 
 # LLM
 
 
-def getAnswer(prompt, feedback):
+def getAnswer(prompt):
     his_messages = []
     his_messages.append(
         {"role": "model", "parts":[{"text": """
@@ -605,11 +605,10 @@ def getAnswer(prompt, feedback):
     for msg in st.session_state.messages[-20:]:
         if msg["role"] == "user":
             his_messages.append({"role": "user", "parts": [{"text": msg["content"]}]})
-        elif msg and msg["content"]:  # 简化条件
+        elif msg is not None and msg["content"] is not None:
             his_messages.append({"role": "model", "parts": [{"text": msg["content"]}]})
 
-    # 过滤空消息 (改进后的逻辑，避免潜在的 AttributeError)
-    his_messages = [msg for msg in his_messages if msg.get("parts") and any(part.get("text") for part in msg["parts"])]
+    his_messages = [msg for msg in his_messages if msg.get("parts") and msg["parts"][0].get("text")]
 
     try:
         response = model.generate_content(contents=his_messages, stream=True)
@@ -618,21 +617,16 @@ def getAnswer(prompt, feedback):
             print("API 返回的片段:", chunk.text)
             print("_" * 80)
             ret += chunk.text
-            feedback(ret)  # 调用 feedback 函数
+            feedback(ret)
         return ret
     except InvalidArgument as e:
         st.error(f"Gemini API 参数无效: {e}")
         st.write(f"请求 JSON: {json.dumps(his_messages, indent=2)}")
         return ""
     except Exception as e:
-        st.error(f"发生意外错误: {e}")  # 保留此错误处理
-        #  可以在这里添加更详细的日志记录或其他错误处理逻辑
+        st.error(f"发生意外错误: {e}")
         return ""
 
-
-# --- 文件操作函数 ---
-filename = os.path.splitext(os.path.basename(__file__))[0] + ".pkl"
-log_file = os.path.join(os.path.dirname(__file__), filename)
 
 # --- 文件操作函数 ---
 filename = os.path.splitext(os.path.basename(__file__))[0] + ".pkl"
@@ -645,8 +639,7 @@ if not os.path.exists(log_file):
 
 # 初始化 session state
 if "messages" not in st.session_state:
-    load_history(log_file)
-
+    load_history(log_file) #  直接调用load_history初始化
 
 # ---  清除历史记录 ---
 def clear_history(log_file):
@@ -701,17 +694,13 @@ if prompt := st.chat_input("输入你的消息:"):
     st.session_state.messages.append({"role": "user", "content": prompt})
     with st.chat_message("user"):
         st.markdown(prompt)
-
     with st.chat_message("assistant"):
         message_placeholder = st.empty()
         full_response = ""
-
-        def update_message(current_response):  # 定义feedback函数
-            message_placeholder.markdown(current_response + "▌")
-        
-        full_response = getAnswer(prompt, update_message)  # 传递 feedback 参数
+        for chunk in getAnswer(prompt):
+            full_response += chunk
+            message_placeholder.markdown(full_response + "▌")
         message_placeholder.markdown(full_response)
-
     st.session_state.messages.append({"role": "assistant", "content": full_response})
     with open(log_file, "wb") as f:
         pickle.dump(st.session_state.messages, f)
