@@ -10,6 +10,7 @@ from io import StringIO
 import streamlit as st
 import pickle
 import glob
+from google.api_core.exceptions import InvalidArgument
 
 
 
@@ -617,13 +618,19 @@ def getAnswer(prompt):
 
     try:
         response = model.generate_content(contents=his_messages, stream=True)
-        full_response = ""
+        ret = ""
         for chunk in response:
-            full_response += chunk.text
-            yield chunk.text
-        return full_response
+            print("API 返回的片段:", chunk.text)
+            print("_" * 80)
+            ret += chunk.text
+            feedback(ret)
+        return ret
+    except InvalidArgument as e:
+        st.error(f"Gemini API 参数无效: {e}")
+        st.write(f"请求 JSON: {json.dumps(his_messages, indent=2)}")
+        return ""
     except Exception as e:
-        st.error(f"发生错误: {e}. 请检查你的API密钥是否有效。")
+        st.error(f"发生意外错误: {e}")
         return ""
 
 
