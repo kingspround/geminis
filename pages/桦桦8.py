@@ -623,7 +623,7 @@ def getAnswer(prompt):
             print("API 返回的片段:", chunk.text)
             print("_" * 80)
             ret += chunk.text
-            feedback(ret)
+            feedback(ret) # 调用 feedback 函数
         return ret
     except InvalidArgument as e:
         st.error(f"Gemini API 参数无效: {e}")
@@ -700,17 +700,18 @@ if prompt := st.chat_input("输入你的消息:"):
     st.session_state.messages.append({"role": "user", "content": prompt})
     with st.chat_message("user"):
         st.markdown(prompt)
-    with st.chat_message("assistant"):
-        message_placeholder = st.empty()
-        full_response = ""
-        for chunk in getAnswer(prompt):
-            full_response += chunk
-            message_placeholder.markdown(full_response + "▌")
-        message_placeholder.markdown(full_response)
+     with st.chat_message("assistant"):
+        message_placeholder = st.empty()  # 创建占位符
+        full_response = getAnswer(prompt)  # 直接获取完整回复
+        message_placeholder.markdown(full_response)  # 显示完整回复
+
     st.session_state.messages.append({"role": "assistant", "content": full_response})
     with open(log_file, "wb") as f:
         pickle.dump(st.session_state.messages, f)
 
+
+def feedback(text):
+    message_placeholder.markdown(text + "▌")  # 使用占位符显示正在生成的文本
 
 
 
