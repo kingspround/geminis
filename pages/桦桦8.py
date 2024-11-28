@@ -7,10 +7,10 @@ from PIL import Image
 import numpy as np
 from io import BytesIO
 from io import StringIO
+import streamlit as st
 import pickle
 import glob
-from google.api_core.exceptions import InvalidArgument
-import json  # 导入 json 库
+
 
 
 # --- API 密钥设置 ---
@@ -617,19 +617,13 @@ def getAnswer(prompt):
 
     try:
         response = model.generate_content(contents=his_messages, stream=True)
-        ret = ""
+        full_response = ""
         for chunk in response:
-            print("API 返回的片段:", chunk.text)
-            print("_" * 80)
-            ret += chunk.text
-            callback(ret)
-        return ret
-    except InvalidArgument as e:
-        st.error(f"Gemini API 参数无效: {e}")
-        st.write(f"请求 JSON: {json.dumps(his_messages, indent=2)}")  # 使用 json.dumps 打印 JSON
-        return ""
+            full_response += chunk.text
+            yield chunk.text
+        return full_response
     except Exception as e:
-        st.error(f"发生意外错误: {e}")
+        st.error(f"发生错误: {e}. 请检查你的API密钥是否有效。")
         return ""
 
 
@@ -644,18 +638,7 @@ if not os.path.exists(log_file):
 
 # 初始化 session state
 if "messages" not in st.session_state:
-    # --- 读取历史记录 ---
-    def load_history(log_file):
-        try:
-            with open(log_file, "rb") as f:
-                st.session_state.messages = pickle.load(f)
-            st.success(f"成功从 {filename} 加载历史记录！")
-        except (FileNotFoundError, EOFError):
-            st.warning(f"{filename} 不存在或为空。")
-            st.session_state.messages = []
-
-    load_history(log_file)
-
+    load_history(log_file) #  直接调用load_history初始化
 
 # ---  清除历史记录 ---
 def clear_history(log_file):
@@ -665,7 +648,6 @@ def clear_history(log_file):
         st.success(f"成功清除 {filename} 的历史记录！")
     except FileNotFoundError:
         st.warning(f"{filename} 不存在。")
-
 
 # --- 读取历史记录 ---
 def load_history(log_file):
@@ -713,16 +695,15 @@ if prompt := st.chat_input("输入你的消息:"):
         st.markdown(prompt)
     with st.chat_message("assistant"):
         message_placeholder = st.empty()
-
-        def update_display(text):
-            message_placeholder.markdown(text + "▌")
-
-        full_response = getAnswer(prompt, update_display)
-        message_placeholder.markdown(full_response) #  最终显示完整回复
-
+        full_response = ""
+        for chunk in getAnswer(prompt):
+            full_response += chunk
+            message_placeholder.markdown(full_response + "▌")
+        message_placeholder.markdown(full_response)
     st.session_state.messages.append({"role": "assistant", "content": full_response})
     with open(log_file, "wb") as f:
         pickle.dump(st.session_state.messages, f)
+
 
 
 
