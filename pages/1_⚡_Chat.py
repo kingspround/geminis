@@ -7,6 +7,7 @@ import numpy as np
 from io import BytesIO
 from io import StringIO
 import json
+from google.api_core.exceptions import InvalidArgument
 
 if "key" not in st.session_state:
     st.session_state.key = "AIzaSyC7vfMxqZQJVNq0rUhzpOKu1m84y737Tak"  # 请替换为你的实际密钥
@@ -58,7 +59,7 @@ def getAnswer(prompt, feedback):
             ret += chunk.text
             feedback(ret)
         return ret
-    except google.api_core.exceptions.InvalidArgument as e:
+    except InvalidArgument as e: #  修改这里
         st.error(f"Gemini API 参数无效: {e}")
         st.write(f"请求 JSON: {json.dumps(his_messages, indent=2)}")
         return ""
