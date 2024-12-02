@@ -805,34 +805,26 @@ with st.sidebar.expander("角色设定"):
         # ... 添加更多预设设定
     }
 
-    for setting_name, setting_content in predefined_settings.items():
+    # 合并所有设定
+    all_settings = dict(predefined_settings, **st.session_state.character_settings)
+
+    for setting_name, setting_content in all_settings.items():
         container = st.container()
         with container:
             col1, col2 = st.columns([0.8, 0.2])
             with col1:
-                st.write(setting_name)  # 显示预设设定名称
-            with col2:
-                enabled = st.session_state.enabled_settings.get(setting_name, False)
-                enabled = st.checkbox("", value=enabled, key=f"enabled_{setting_name}")
-                st.session_state.enabled_settings[setting_name] = enabled
-
-                if enabled and setting_name not in st.session_state.character_settings:  # 如果启用且不在自定义设定中，则添加
-                    st.session_state.character_settings[setting_name] = setting_content
-
-
-    # 设定列表和启用/禁用
-    if not st.session_state.get("editing_setting"):
-        for setting_name in st.session_state.character_settings:
-            container = st.container()
-            with container:
-                col1, col2 = st.columns([0.8, 0.2])
-                with col1:
+                if setting_name in st.session_state.character_settings: #只对自定义设定显示编辑按钮
                     if st.button(setting_name, key=f"edit_{setting_name}", use_container_width=True):
                         st.session_state.editing_setting = setting_name
-                with col2:
-                    enabled = st.session_state.enabled_settings.get(setting_name, False)
-                    enabled = st.checkbox("", value=enabled, key=f"enabled_{setting_name}")
-                    st.session_state.enabled_settings[setting_name] = enabled
+                else:
+                    st.write(setting_name) # 显示预定义设定名称
+
+
+            with col2:
+                enabled = st.session_state.enabled_settings.get(setting_name, False)
+                key = f"enabled_predefined_{setting_name}" if setting_name in predefined_settings else f"enabled_custom_{setting_name}"
+                enabled = st.checkbox("", value=enabled, key=key)
+                st.session_state.enabled_settings[setting_name] = enabled
 
 
     # 设定编辑区域
@@ -852,10 +844,11 @@ with st.sidebar.expander("角色设定"):
             if st.button("删除设定"):
                 if new_name in st.session_state.character_settings:
                     del st.session_state.character_settings[new_name]
+                    if new_name in st.session_state.enabled_settings:  # 也要从 enabled_settings 中删除
+                        del st.session_state.enabled_settings[new_name]
                     st.session_state.editing_setting = None
                     st.success(f"设定 '{new_name}' 已删除!")
-                    if new_name in st.session_state.enabled_settings:
-                        del st.session_state.enabled_settings[new_name]
+
                 else:
                     st.warning(f"设定 '{new_name}' 不存在!")
 
