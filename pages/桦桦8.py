@@ -608,6 +608,18 @@ def getAnswer(prompt):
    )
 
 
+    # 获取启用的设定内容
+    enabled_settings = st.session_state.get("enabled_settings", {})
+    active_settings_content = ""
+    for setting_name, enabled in enabled_settings.items():
+        if enabled:
+            active_settings_content += st.session_state.character_settings.get(setting_name, "") + "\n"  # 获取设定内容并添加换行
+
+    # 将启用的设定添加到系统消息中
+    if active_settings_content:
+        his_messages[0]["parts"][0]["text"] += active_settings_content  # 将设定内容添加到系统消息
+
+
     for msg in st.session_state.messages[-20:]:
         if msg["role"] == "user":
             his_messages.append({"role": "user", "parts": [{"text": msg["content"]}]})
