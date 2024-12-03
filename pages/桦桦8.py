@@ -607,21 +607,6 @@ def getAnswer(prompt):
 ]"""}]}
    )
 
-    # 获取启用的设定内容
-    enabled_settings_content = ""
-    enabled_settings = st.session_state.get("enabled_settings", {})
-    for setting_name, enabled in enabled_settings.items():
-        if enabled:
-            setting_content = st.session_state.character_settings.get(setting_name) or predefined_settings.get(setting_name)
-            if setting_content:  # 检查设置内容是否为空
-                enabled_settings_content += f"{setting_name}:\n{setting_content}\n\n"
-
-
-    # 将启用的设定添加到系统消息中
-    if enabled_settings_content:
-        his_messages[0]["parts"][0]["text"] += f"[Enabled Settings]:\n{enabled_settings_content}"
-
-
 
     for msg in st.session_state.messages[-20:]:
         if msg["role"] == "user":
@@ -641,7 +626,6 @@ def getAnswer(prompt):
     except Exception as e:
         st.error(f"发生错误: {e}. 请检查你的API密钥是否有效。")
         return ""
-
 
 # --- 文件操作函数 ---
 filename = os.path.splitext(os.path.basename(__file__))[0] + ".pkl"
