@@ -85,13 +85,13 @@ def getAnswer(prompt):
     # 3. 启用的设定
     enabled_settings_text = ""
     enabled_settings = st.session_state.get("enabled_settings", {})
-    for setting_name, enabled in enabled_settings.items():  # 遍历所有设定
-        if enabled and setting_name in st.session_state.character_settings:  # 检查设定是否启用 *且* 存在于 character_settings 中
-            setting_content = st.session_state.character_settings[setting_name]
-            enabled_settings_text += setting_content + "\n"
+    active_settings = [name for name, enabled in enabled_settings.items() if enabled]
+    for setting_name in active_settings:
+        setting_content = st.session_state.character_settings.get(setting_name, "")
+        enabled_settings_text += setting_content + "\n"
+    enabled_settings_message = {"role": "model", "parts": [{"text": enabled_settings_text}]} if enabled_settings_text else None
 
-    if enabled_settings_text:
-        his_messages.append({"role": "model", "parts":[{"text": enabled_settings_text}]})
+
 
     # 4. function 部分
     his_messages.append({"role": "model", "parts":[{"text": """[function：色情小说创作：
@@ -626,13 +626,23 @@ def getAnswer(prompt):
 
 
     # 5. 历史消息
+    history_messages = []
     for msg in st.session_state.messages[-20:]:
         if msg["role"] == "user":
-            his_messages.append({"role": "user", "parts": [{"text": msg["content"]}]})
+            history_messages.append({"role": "user", "parts": [{"text": msg["content"]}]})
         elif msg is not None and msg["content"] is not None:
-            his_messages.append({"role": "model", "parts": [{"text": msg["content"]}]})
+            history_messages.append({"role": "model", "parts": [{"text": msg["content"]}]})
+    history_messages = [msg for msg in history_messages if msg.get("parts") and msg["parts"][0].get("text")]
 
-    his_messages = [msg for msg in his_messages if msg.get("parts") and msg["parts"][0].get("text")]
+
+    # 构建最终的 his_messages 列表 (按正确顺序)
+    his_messages.append(system_message)
+    his_messages.append(personality_message)
+    if enabled_settings_message:  # 仅当有启用的设定时才添加
+        his_messages.append(enabled_settings_message)
+    his_messages.append(function_message)
+    his_messages.extend(history_messages)
+
 
     try:
         response = model.generate_content(contents=his_messages, stream=True)
