@@ -611,15 +611,15 @@ def getAnswer(prompt):
 】
     ]"""
 
-    his_messages.append({"role": "model", "parts":[{"text": system_message}]})
+    his_messages = [msg for msg in his_messages if msg.get("parts") and msg["parts"][0].get("text")]
 
-    for msg in st.session_state.messages[-20:]:
+     recent_messages = st.session_state.messages[-20:]  # 使用切片获取最近的20条消息
+
+    for msg in recent_messages:
         if msg["role"] == "user":
             his_messages.append({"role": "user", "parts": [{"text": msg["content"]}]})
-        elif msg is not None and msg["content"] is not None:
+        elif msg is not None and msg["content"] is not None:  # 保持这个检查，防止错误
             his_messages.append({"role": "model", "parts": [{"text": msg["content"]}]})
-
-    his_messages = [msg for msg in his_messages if msg.get("parts") and msg["parts"][0].get("text")]
 
     try:
         response = model.generate_content(contents=his_messages, stream=True)
