@@ -820,12 +820,11 @@ with st.sidebar.expander("角色设定"):
                     st.write(setting_name) # 显示预定义设定名称
 
 
-      with col2:
-        #  关键修改：如果设定是预定义的，则使用 predefined_settings 的 key
-        key = f"enabled_predefined_{setting_name}" if setting_name in predefined_settings else f"enabled_custom_{setting_name}"
-        enabled = st.session_state.enabled_settings.get(setting_name, False)
-        enabled = st.checkbox("", value=enabled, key=key) # 使用不同的key
-        st.session_state.enabled_settings[setting_name] = enabled # 更新enabled_settings
+        with col2:  #  这个缩进，与 with col1: 相同
+            key = f"enabled_predefined_{setting_name}" if setting_name in predefined_settings else f"enabled_custom_{setting_name}"
+            enabled = st.session_state.enabled_settings.get(setting_name, False)
+            enabled = st.checkbox("", value=enabled, key=key)
+            st.session_state.enabled_settings[setting_name] = enabled
 
 
     # 设定编辑区域
