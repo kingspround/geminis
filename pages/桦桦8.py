@@ -761,10 +761,13 @@ with st.sidebar.expander("文件操作"):
 
 # 功能区 2: 角色设定
 with st.sidebar.expander("角色设定"):
+    # 初始化设定字典，确保即使没有读取到任何设定，也能正常工作
     if "character_settings" not in st.session_state:
         st.session_state.character_settings = {}
     if "enabled_settings" not in st.session_state:
         st.session_state.enabled_settings = {}
+    if "editing_setting" not in st.session_state: # 初始化编辑状态
+        st.session_state.editing_setting = None
 
     col1, col2 = st.columns([1, 0.7])
 
@@ -780,12 +783,14 @@ with st.sidebar.expander("角色设定"):
                 except Exception as e:
                     st.error(f"读取文件 {filepath} 失败: {e}")
             st.success("本地设定已读取!")
+            st.experimental_rerun() #  读取设定后刷新页面
 
     with col2:
         if st.button("新增设定", key="add_setting"):
-            st.session_state.editing_setting = "new_setting"
+            st.session_state.editing_setting = "new_setting"  # 使用一个特殊值表示新增
+            st.experimental_rerun()  # 新增设定后刷新页面
 
-    # 新增设定区域下方添加写死文本设定区域
+    # --- 预定义设定 ---
     st.markdown("---")  # 分隔线
     st.markdown("**内置设定:**")
     predefined_settings = {
@@ -827,8 +832,29 @@ with st.sidebar.expander("角色设定"):
             st.session_state.enabled_settings[setting_name] = enabled
 
 
-    # 设定编辑区域
-    if st.session_state.get("editing_setting"):
+    # --- 显示和启用/禁用设定 ---
+    for setting_name, setting_content in all_settings.items():
+        container = st.container()  # 使用 container 保持布局整洁
+        with container:
+            col1, col2 = st.columns([0.8, 0.2])
+            with col1:
+                if setting_name in st.session_state.character_settings:
+                    if st.button(setting_name, key=f"edit_{setting_name}"):
+                        st.session_state.editing_setting = setting_name
+                        st.experimental_rerun()  # 点击编辑按钮后刷新页面
+                else:
+                    st.write(setting_name)
+
+            with col2:
+                enabled = st.session_state.enabled_settings.get(setting_name, False)
+                key = f"enabled_{setting_name}"  # 简化 key
+                enabled = st.checkbox("", value=enabled, key=key)
+                st.session_state.enabled_settings[setting_name] = enabled
+
+
+
+    # --- 设定编辑区域 ---
+    if st.session_state.editing_setting:  #  检查编辑状态
         setting_name = st.session_state.editing_setting
         setting_content = st.session_state.character_settings.get(setting_name, "")
         new_name = st.text_input("设定名称:", setting_name)
