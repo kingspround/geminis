@@ -805,26 +805,33 @@ with st.sidebar.expander("角色设定"):
         # ... 添加更多预设设定
     }
 
-# 合并所有设定 (关键修改在这里，将预定义设定也加入到循环中)
-all_settings = dict(predefined_settings, **st.session_state.character_settings)
+# 合并所有设定 (这部分逻辑可以移除，不再需要合并)
+# all_settings = dict(predefined_settings, **st.session_state.character_settings)
 
-
-for setting_name, setting_content in all_settings.items():  # 现在循环包含了预设设定
+# 分别显示预定义设定和自定义设定
+for setting_name, setting_content in predefined_settings.items():  # 循环显示预定义设定
     container = st.container()
     with container:
         col1, col2 = st.columns([0.8, 0.2])
         with col1:
-            # 对预设设定和自定义设定都显示名称
-            st.write(setting_name) # 不再区分预定义和自定义，统一显示
-
+            st.write(setting_name)  #  直接显示预定义设定名称
 
         with col2:
             enabled = st.session_state.enabled_settings.get(setting_name, False)
+            enabled = st.checkbox("", value=enabled, key=f"enabled_predefined_{setting_name}") #  key值区分预定义和自定义
+            st.session_state.enabled_settings[setting_name] = enabled
 
-            # checkbox 的 key 需要保证唯一
-            key = f"enabled_{setting_name}" # 简化 key
+for setting_name, setting_content in st.session_state.character_settings.items(): # 循环显示自定义设定
+    container = st.container()
+    with container:
+        col1, col2 = st.columns([0.8, 0.2])
+        with col1:
+            if st.button(setting_name, key=f"edit_{setting_name}", use_container_width=True): # 保持自定义设定可编辑
+                st.session_state.editing_setting = setting_name
 
-            enabled = st.checkbox("", value=enabled, key=key)
+        with col2:
+            enabled = st.session_state.enabled_settings.get(setting_name, False)
+            enabled = st.checkbox("", value=enabled, key=f"enabled_custom_{setting_name}") # key值区分预定义和自定义
             st.session_state.enabled_settings[setting_name] = enabled
 
     # 设定编辑区域
