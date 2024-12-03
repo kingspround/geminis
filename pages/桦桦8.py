@@ -805,26 +805,24 @@ with st.sidebar.expander("角色设定"):
         # ... 添加更多预设设定
     }
 
-    # 合并所有设定
-    all_settings = dict(predefined_settings, **st.session_state.character_settings)
-
-    for setting_name, setting_content in all_settings.items():
-        container = st.container()
-        with container:
-            col1, col2 = st.columns([0.8, 0.2])
-            with col1:
-                if setting_name in st.session_state.character_settings: #只对自定义设定显示编辑按钮
-                    if st.button(setting_name, key=f"edit_{setting_name}", use_container_width=True):
-                        st.session_state.editing_setting = setting_name
-                else:
-                    st.write(setting_name) # 显示预定义设定名称
+# 合并所有设定
+all_settings = dict(predefined_settings, **st.session_state.character_settings)
 
 
-            with col2:
-                enabled = st.session_state.enabled_settings.get(setting_name, False)
-                key = f"enabled_predefined_{setting_name}" if setting_name in predefined_settings else f"enabled_custom_{setting_name}"
-                enabled = st.checkbox("", value=enabled, key=key)
-                st.session_state.enabled_settings[setting_name] = enabled
+for setting_name, setting_content in all_settings.items(): # 遍历所有设定
+    container = st.container()
+    with container:
+        col1, col2 = st.columns([0.8, 0.2])
+        with col1:
+            #  这里修改，不论是预定义还是自定义，都显示名称
+            st.write(setting_name)  #统一显示设定名称
+
+        with col2:
+            enabled = st.session_state.enabled_settings.get(setting_name, False)
+            # checkbox 的 key 也需要调整，避免冲突
+            key = f"enabled_{setting_name}"
+            enabled = st.checkbox("", value=enabled, key=key)
+            st.session_state.enabled_settings[setting_name] = enabled
 
 
     # 设定编辑区域
@@ -867,7 +865,10 @@ with st.sidebar.expander("角色设定"):
 enabled_settings = st.session_state.get("enabled_settings", {})
 active_settings = [name for name, enabled in enabled_settings.items() if enabled]
 if active_settings:
+    #  这里也要修改，从 all_settings 获取内容
+    active_settings_content = [all_settings[name] for name in active_settings]
     st.write(f"当前生效的设定：{', '.join(active_settings)}")
+    #  这里可以把 active_settings_content 传给你的 LLM
 else:
     st.write("当前未启用任何设定")
 
