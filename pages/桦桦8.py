@@ -613,7 +613,7 @@ def getAnswer(prompt):
 
     his_messages = [msg for msg in his_messages if msg.get("parts") and msg["parts"][0].get("text")]
 
-     recent_messages = st.session_state.messages[-20:]  # 使用切片获取最近的20条消息
+   recent_messages = st.session_state.messages[-20:]  
 
     for msg in recent_messages:
         if msg["role"] == "user":
