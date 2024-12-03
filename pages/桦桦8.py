@@ -609,15 +609,17 @@ def getAnswer(prompt):
 
 
     # 获取启用的设定内容
-    enabled_settings = st.session_state.get("enabled_settings", {})
-    active_settings_content = ""
-    for setting_name, enabled in enabled_settings.items():
+    enabled_settings_content = ""
+    for setting_name, enabled in st.session_state.enabled_settings.items():
         if enabled:
-            active_settings_content += st.session_state.character_settings.get(setting_name, "") + "\n"  # 获取设定内容并添加换行
+            setting_content = st.session_state.character_settings.get(setting_name) or predefined_settings.get(setting_name)
+            if setting_content:  # 检查设定内容是否为空
+                enabled_settings_content += f"{setting_name}:\n{setting_content}\n\n"  # 将设定名称和内容添加到字符串中
+
 
     # 将启用的设定添加到系统消息中
-    if active_settings_content:
-        his_messages[0]["parts"][0]["text"] += active_settings_content  # 将设定内容添加到系统消息
+    if enabled_settings_content:
+        his_messages[0]["parts"][0]["text"] += f"[Knowledge: {enabled_settings_content}]" #知识库
 
 
     for msg in st.session_state.messages[-20:]:
@@ -630,7 +632,6 @@ def getAnswer(prompt):
 
     try:
         response = model.generate_content(contents=his_messages, stream=True)
-        full_response = ""
         for chunk in response:
             full_response += chunk.text
             yield chunk.text
