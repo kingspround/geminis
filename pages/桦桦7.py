@@ -10,7 +10,6 @@ from io import StringIO
 import streamlit as st
 import pickle
 import glob
-from google.api_core.exceptions import InvalidArgument
 
 
 
@@ -20,7 +19,9 @@ api_keys = {
     "备用1号": "AIzaSyAWfFf6zqy1DizINOwPfxPD8EF2ACdwCaQ",  # 替换成你的备用 API 密钥
     "备用2号":"AIzaSyD4UdMp5wndOAKxtO1CWpzuZEGEf78YKUQ",
     "备用3号":"AIzaSyBVbA7tEyyy_ASp7l9P60qSh1xOM2CSMNw",
-    "备用4号":"AIzaSyDezEpxvtY1AKN6JACMU9XHte5sxATNcUs"
+    "备用4号":"AIzaSyDezEpxvtY1AKN6JACMU9XHte5sxATNcUs",
+    "备用5号":"AIzaSyBgyyy2kTTAdsLB53OCR2omEbj7zlx1mjw",
+    "备用6号":"AIzaSyDPFZ7gRba9mhKTqbXA_Y7fhAxS8IEu0bY"
 }
 
 selected_key = st.sidebar.selectbox("选择 API 密钥", list(api_keys.keys()), index=0) # 默认选择主密钥
@@ -58,7 +59,7 @@ safety_settings = [
    },
 ]
 
-model = genai.GenerativeModel(model_name="gemini-1.5-pro-latest",generation_config=generation_config,safety_settings=safety_settings)
+model = genai.GenerativeModel(model_name="gemini-1.5-pro-001",generation_config=generation_config,safety_settings=safety_settings)
 
 # LLM
 
@@ -618,19 +619,13 @@ def getAnswer(prompt):
 
     try:
         response = model.generate_content(contents=his_messages, stream=True)
-        ret = ""
+        full_response = ""
         for chunk in response:
-            print("API 返回的片段:", chunk.text)
-            print("_" * 80)
-            ret += chunk.text
-            feedback(ret)
-        return ret
-    except InvalidArgument as e:
-        st.error(f"Gemini API 参数无效: {e}")
-        st.write(f"请求 JSON: {json.dumps(his_messages, indent=2)}")
-        return ""
+            full_response += chunk.text
+            yield chunk.text
+        return full_response
     except Exception as e:
-        st.error(f"发生意外错误: {e}")
+        st.error(f"发生错误: {e}. 请检查你的API密钥是否有效。")
         return ""
 
 
@@ -638,10 +633,21 @@ def getAnswer(prompt):
 filename = os.path.splitext(os.path.basename(__file__))[0] + ".pkl"
 log_file = os.path.join(os.path.dirname(__file__), filename)
 
+# --- 读取历史记录 ---
+def load_history(log_file):  # 将函数定义移到这里
+    try:
+        with open(log_file, "rb") as f:
+            st.session_state.messages = pickle.load(f)
+        st.success(f"成功从 {filename} 加载历史记录！")
+    except (FileNotFoundError, EOFError):
+        st.warning(f"{filename} 不存在或为空。")
+        st.session_state.messages = []
+
 # 确保文件存在
 if not os.path.exists(log_file):
     with open(log_file, "wb") as f:
         pass
+
 
 # 初始化 session state
 if "messages" not in st.session_state:
@@ -779,22 +785,46 @@ with st.sidebar.expander("角色设定"):
         if st.button("新增设定", key="add_setting"):
             st.session_state.editing_setting = "new_setting"
 
+    # 新增设定区域下方添加写死文本设定区域
+    st.markdown("---")  # 分隔线
+    st.markdown("**内置设定:**")
+    predefined_settings = {
+        "淫化惧怖魔": """
+种族起源：一种由惧怖魔被高度浓缩的淫魔能量感染后诞生的全新种族。这种能量并非直接改变惧怖魔的身体，而是扭曲了它们的灵魂，使其充满了淫欲和渴望，并赋予了它们将这种扭曲传播给他人的能力。
 
-    # 设定列表和启用/禁用
-    if not st.session_state.get("editing_setting"):
-        for setting_name in st.session_state.character_settings:
-            container = st.container()
-            with container:
-                col1, col2 = st.columns([0.8, 0.2])
-                with col1:
+种族特点：
+
+亚种繁多: 淫化惧怖魔最大的特点就是亚种极其丰富，几乎涵盖了所有恐怖传说中的鬼怪形象，例如女鬼、付丧神、僵尸、吸血鬼、狼人等等。但无论原本的形象多么恐怖，淫化后的形象都会变得娇嫩可爱，充满诱惑力。 诅咒与精神污染: 淫化惧怖魔的主要传播方式是诅咒和精神污染。它们可以通过接触、言语、图像、梦境等各种途径，将淫魔能量注入到其他生物的体内，使其逐渐被侵蚀，最终转化为新的淫化惧怖魔。 实体与无实体: 淫化惧怖魔既可以拥有实体，也可以以无实体的形态存在。无实体的淫化惧怖魔通常以精神体的形式出现，可以穿梭于现实世界和精神世界之间，更加难以被察觉和抵御。 扭曲的欲望: 淫化惧怖魔的灵魂被淫魔能量彻底扭曲，充满了对性爱的渴望。它们会不择手段地引诱和侵犯其他生物，以此来满足自己的欲望，并传播淫魔能量。 保留部分原种族特征: 尽管外貌变得娇嫩可爱，但淫化惧怖魔依然会保留部分原种族的特征，例如尖牙、利爪、尾巴、翅膀等等。这些特征会与它们可爱的外表形成鲜明的对比，更增添了它们的魅力和危险性。 感染方式举例：
+
+一个上班族在夜里遇到一个G杯爆乳、裸露着嫩屁股的红衣小女孩，不受控制地侵犯了她。之后，他不断梦到与小女孩交媾的画面，身体也出现异样。实际上，这个小女孩就是无实体的淫化惧怖魔，通过精神污染的方式侵蚀了上班族。 一个玩家在玩游戏时，发现自己的角色变成了一个爆乳白衣女鬼御姐，并从屏幕中钻出来，对他进行侵犯。这实际上是附身于游戏中的淫化惧怖魔，通过电子设备传播诅咒。 一个旅行者在古墓中发现了一个美丽的木偶，被其吸引，带回了家。晚上，木偶活了过来，变成了一个娇艳的淫魔，对他进行侵犯。这实际上是寄宿于木偶中的淫化惧怖魔，通过诅咒物品进行传播。
+
+其他设定：
+
+繁殖方式: 淫化惧怖魔可以通过交媾、产卵、分裂等多种方式进行繁殖，并且可以跨种族繁殖，创造出更加奇特的亚种。 社会结构: 淫化惧怖魔没有固定的社会结构，有些会单独行动，有些会组成小群体，有些甚至会建立大型的淫魔帝国。 弱点: 淫化惧怖魔的弱点因亚种而异，有些惧怕圣光，有些惧怕特定的咒语，有些则会被强大的精神力所压制。""",
+        "设定2": "这是预设设定2的内容",
+        # ... 添加更多预设设定
+    }
+
+    # 合并所有设定
+    all_settings = dict(predefined_settings, **st.session_state.character_settings)
+
+    for setting_name, setting_content in all_settings.items():
+        container = st.container()
+        with container:
+            col1, col2 = st.columns([0.8, 0.2])
+            with col1:
+                if setting_name in st.session_state.character_settings: #只对自定义设定显示编辑按钮
                     if st.button(setting_name, key=f"edit_{setting_name}", use_container_width=True):
                         st.session_state.editing_setting = setting_name
-                with col2:
-                    enabled = st.session_state.enabled_settings.get(setting_name, False)
-                    enabled = st.checkbox("", value=enabled, key=f"enabled_{setting_name}")
-                    st.session_state.enabled_settings[setting_name] = enabled
+                else:
+                    st.write(setting_name) # 显示预定义设定名称
 
 
+            with col2:
+                enabled = st.session_state.enabled_settings.get(setting_name, False)
+                key = f"enabled_predefined_{setting_name}" if setting_name in predefined_settings else f"enabled_custom_{setting_name}"
+                enabled = st.checkbox("", value=enabled, key=key)
+                st.session_state.enabled_settings[setting_name] = enabled
 
 
     # 设定编辑区域
@@ -814,10 +844,11 @@ with st.sidebar.expander("角色设定"):
             if st.button("删除设定"):
                 if new_name in st.session_state.character_settings:
                     del st.session_state.character_settings[new_name]
+                    if new_name in st.session_state.enabled_settings:  # 也要从 enabled_settings 中删除
+                        del st.session_state.enabled_settings[new_name]
                     st.session_state.editing_setting = None
                     st.success(f"设定 '{new_name}' 已删除!")
-                    if new_name in st.session_state.enabled_settings:
-                        del st.session_state.enabled_settings[new_name]
+
                 else:
                     st.warning(f"设定 '{new_name}' 不存在!")
 
