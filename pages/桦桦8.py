@@ -607,6 +607,20 @@ def getAnswer(prompt):
 ]"""}]}
    )
 
+    # 获取启用的设定内容
+    enabled_settings_content = ""
+    enabled_settings = st.session_state.get("enabled_settings", {})
+    for setting_name, enabled in enabled_settings.items():
+        if enabled:
+            setting_content = st.session_state.character_settings.get(setting_name) or predefined_settings.get(setting_name)
+            if setting_content:  # 检查设置内容是否为空
+                enabled_settings_content += f"{setting_name}:\n{setting_content}\n\n"
+
+
+    # 将启用的设定添加到系统消息中
+    if enabled_settings_content:
+        his_messages[0]["parts"][0]["text"] += f"[Enabled Settings]:\n{enabled_settings_content}"
+
 
 
     for msg in st.session_state.messages[-20:]:
@@ -703,16 +717,19 @@ if st.session_state.get("editing"):
 
 # --- 聊天输入和响应 ---
 if prompt := st.chat_input("输入你的消息:"):
-    enabled_settings_content = ""
-    for setting_name, enabled in st.session_state.enabled_settings.items():
-        if enabled:
-            enabled_settings_content += st.session_state.character_settings.get(setting_name, "") + "\n"
-
-    prompt = enabled_settings_content + prompt # 将启用的设定内容添加到用户输入之前
-
-    st.session_state.messages.append({"role": "user", "content": prompt})  # 此处保存的是包含设定内容的prompt
+    st.session_state.messages.append({"role": "user", "content": prompt})
     with st.chat_message("user"):
-        st.markdown(prompt) #  显示包含设定内容的prompt
+        st.markdown(prompt)
+    with st.chat_message("assistant"):
+        message_placeholder = st.empty()
+        full_response = ""
+        for chunk in getAnswer(prompt):
+            full_response += chunk
+            message_placeholder.markdown(full_response + "▌")
+        message_placeholder.markdown(full_response)
+    st.session_state.messages.append({"role": "assistant", "content": full_response})
+    with open(log_file, "wb") as f:
+        pickle.dump(st.session_state.messages, f)
 
 
 
