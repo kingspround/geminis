@@ -61,10 +61,13 @@ safety_settings = [
 
 model = genai.GenerativeModel(model_name="gemini-1.5-pro-001",generation_config=generation_config,safety_settings=safety_settings)
 
-# LLM
-
-
+# --- LLM 函数 ---
 def getAnswer(prompt):
+    enabled_settings_content = ""  # 用于存储启用的设定内容
+    enabled_settings = st.session_state.get("enabled_settings", {})
+    for setting_name, enabled in enabled_settings.items():
+        if enabled:
+            enabled_settings_content += st.session_state.character_settings.get(setting_name, "") + "\n"  # 获取并添加设定内容
     his_messages = []
     his_messages.append(
         {"role": "model", "parts":[{"text": """
@@ -608,15 +611,6 @@ def getAnswer(prompt):
    )
 
 
-    #  注入启用的设定
-    enabled_settings = st.session_state.get("enabled_settings", {})
-    active_settings_content = ""
-    for setting_name, enabled in enabled_settings.items():
-        if enabled:
-             active_settings_content += st.session_state.character_settings.get(setting_name, "") + "\n"
-    if active_settings_content:
-        his_messages[0]["parts"][0]["text"] += f"[Instructions]\n{active_settings_content}"
-
 
     for msg in st.session_state.messages[-20:]:
         if msg["role"] == "user":
@@ -628,6 +622,7 @@ def getAnswer(prompt):
 
     try:
         response = model.generate_content(contents=his_messages, stream=True)
+        full_response = ""
         for chunk in response:
             full_response += chunk.text
             yield chunk.text
@@ -635,6 +630,7 @@ def getAnswer(prompt):
     except Exception as e:
         st.error(f"发生错误: {e}. 请检查你的API密钥是否有效。")
         return ""
+
 
 # --- 文件操作函数 ---
 filename = os.path.splitext(os.path.basename(__file__))[0] + ".pkl"
@@ -708,28 +704,19 @@ if st.session_state.get("editing"):
             if st.button("取消", key=f"cancel_{i}"):
                 st.session_state.editing = False
 
-
 # --- 聊天输入和响应 ---
 if prompt := st.chat_input("输入你的消息:"):
     st.session_state.messages.append({"role": "user", "content": prompt})
     with st.chat_message("user"):
         st.markdown(prompt)
-
-    # 获取当前启用的设定内容
-    enabled_settings_content = ""
-    for setting_name, enabled in st.session_state.enabled_settings.items():
-        if enabled:
-            enabled_settings_content += st.session_state.character_settings.get(setting_name, "") + "\n" #  获取并拼接设定的内容
-
     with st.chat_message("assistant"):
         message_placeholder = st.empty()
         full_response = ""
-        # 将 enabled_settings_content 传递给 getAnswer 函数
-        for chunk in getAnswer(prompt, enabled_settings_content):
+        for chunk in getAnswer(prompt):
             full_response += chunk
             message_placeholder.markdown(full_response + "▌")
         message_placeholder.markdown(full_response)
-        st.session_state.messages.append({"role": "assistant", "content": full_response})
+    st.session_state.messages.append({"role": "assistant", "content": full_response})
     with open(log_file, "wb") as f:
         pickle.dump(st.session_state.messages, f)
 
@@ -771,7 +758,6 @@ with st.sidebar.expander("文件操作"):
 
         except Exception as e:
             st.error(f"读取本地pkl文件失败：{e}")
-
 
 
 # 功能区 2: 角色设定
