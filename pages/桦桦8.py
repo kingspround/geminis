@@ -608,18 +608,14 @@ def getAnswer(prompt):
    )
 
 
-    # 获取启用的设定内容
-    enabled_settings_content = ""
-    for setting_name, enabled in st.session_state.enabled_settings.items():
+    #  注入启用的设定
+    enabled_settings = st.session_state.get("enabled_settings", {})
+    active_settings_content = ""
+    for setting_name, enabled in enabled_settings.items():
         if enabled:
-            setting_content = st.session_state.character_settings.get(setting_name) or predefined_settings.get(setting_name)
-            if setting_content:  # 检查设定内容是否为空
-                enabled_settings_content += f"{setting_name}:\n{setting_content}\n\n"  # 将设定名称和内容添加到字符串中
-
-
-    # 将启用的设定添加到系统消息中
-    if enabled_settings_content:
-        his_messages[0]["parts"][0]["text"] += f"[Knowledge: {enabled_settings_content}]" #知识库
+             active_settings_content += st.session_state.character_settings.get(setting_name, "") + "\n"
+    if active_settings_content:
+        his_messages[0]["parts"][0]["text"] += f"[Instructions]\n{active_settings_content}"
 
 
     for msg in st.session_state.messages[-20:]:
