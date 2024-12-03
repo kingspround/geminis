@@ -711,19 +711,28 @@ if st.session_state.get("editing"):
             if st.button("取消", key=f"cancel_{i}"):
                 st.session_state.editing = False
 
+
 # --- 聊天输入和响应 ---
 if prompt := st.chat_input("输入你的消息:"):
     st.session_state.messages.append({"role": "user", "content": prompt})
     with st.chat_message("user"):
         st.markdown(prompt)
+
+    # 获取当前启用的设定内容
+    enabled_settings_content = ""
+    for setting_name, enabled in st.session_state.enabled_settings.items():
+        if enabled:
+            enabled_settings_content += st.session_state.character_settings.get(setting_name, "") + "\n" #  获取并拼接设定的内容
+
     with st.chat_message("assistant"):
         message_placeholder = st.empty()
         full_response = ""
-        for chunk in getAnswer(prompt):
+        # 将 enabled_settings_content 传递给 getAnswer 函数
+        for chunk in getAnswer(prompt, enabled_settings_content):
             full_response += chunk
             message_placeholder.markdown(full_response + "▌")
         message_placeholder.markdown(full_response)
-    st.session_state.messages.append({"role": "assistant", "content": full_response})
+        st.session_state.messages.append({"role": "assistant", "content": full_response})
     with open(log_file, "wb") as f:
         pickle.dump(st.session_state.messages, f)
 
