@@ -624,6 +624,19 @@ def getAnswer(prompt):
 
     his_messages = [msg for msg in his_messages if msg.get("parts") and msg["parts"][0].get("text")]
 
+    # Add character settings to the prompt
+    enabled_settings = st.session_state.get("enabled_settings", {})
+    active_settings = [name for name, enabled in enabled_settings.items() if enabled]
+    setting_text = ""
+    if active_settings:
+        setting_text = "[Character Settings]:\n"
+        for setting_name in active_settings:
+            setting_content = st.session_state.character_settings.get(setting_name, "")
+            setting_text += f"{setting_name}:\n{setting_content}\n"
+        
+        his_messages.append({"role": "system", "parts": [{"text": setting_text}]})
+
+
     try:
         response = model.generate_content(contents=his_messages, stream=True)
         full_response = ""
