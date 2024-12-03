@@ -82,13 +82,13 @@ def getAnswer(prompt):
 """}]})
 
 
-    # 3.  启用的设定
+    # 3. 启用的设定
     enabled_settings_text = ""
     enabled_settings = st.session_state.get("enabled_settings", {})
-    active_settings = [name for name, enabled in enabled_settings.items() if enabled]
-    for setting_name in active_settings:
-        setting_content = st.session_state.character_settings.get(setting_name, "")
-        enabled_settings_text += setting_content + "\n"  # 将所有启用的设定内容连接起来
+    for setting_name, enabled in enabled_settings.items():  # 遍历所有设定
+        if enabled and setting_name in st.session_state.character_settings:  # 检查设定是否启用 *且* 存在于 character_settings 中
+            setting_content = st.session_state.character_settings[setting_name]
+            enabled_settings_text += setting_content + "\n"
 
     if enabled_settings_text:
         his_messages.append({"role": "model", "parts":[{"text": enabled_settings_text}]})
