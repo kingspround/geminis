@@ -620,7 +620,7 @@ def getAnswer(prompt):
 】
 ]"""
 
-   his_messages.append({"role": "model", "parts": [{"text": initial_message}]})
+    his_messages.append({"role": "model", "parts": [{"text": initial_message}]})
 
 
 
