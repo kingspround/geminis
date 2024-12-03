@@ -887,23 +887,4 @@ with st.sidebar.expander("角色设定"):
         if st.button("取消"):
             st.session_state.editing_setting = None
 
-# --- 聊天界面 ---
 
-# 显示当前生效的设定
-enabled_settings = st.session_state.get("enabled_settings", {})
-active_settings = [name for name, enabled in enabled_settings.items() if enabled]
-if active_settings:
-    st.write(f"当前生效的设定：{', '.join(active_settings)}")
-else:
-    st.write("当前未启用任何设定")
-
-
-# --- 页面初始化时加载设定 ---
-
-def clear_history(log_file):
-    st.session_state.messages = []
-    try:
-        os.remove(log_file)
-        st.success(f"成功清除 {filename} 的历史记录！")
-    except FileNotFoundError:
-        st.warning(f"{filename} 不存在。")
