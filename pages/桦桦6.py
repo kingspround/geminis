@@ -225,57 +225,46 @@ with st.sidebar.expander("文件操作"):
 
 
 # 功能区 2: 角色设定
-with st.sidebar.expander("角色设定", expanded=False):  # 默认收起
-    # --- 内置预设定 ---
+with st.sidebar.expander("角色设定"):
+
+    # 内置预设设定
     preset_settings = {
-        "预设1：乐天派": "总是保持乐观积极的态度，喜欢开玩笑。",
-        "预设2：严肃认真": "一丝不苟，注重细节，语气正式。",
-        "预设3：神秘莫测": "说话含糊其辞，充满谜语。",
+        "设定1：友善的助手": """我希望你扮演一个友善且乐于助人的AI助手。你会尽力回答我的问题，并提供有用的信息。""",
+        "设定2：严厉的导师": """我希望你扮演一个严厉的导师。你会严格评估我的想法，并指出其中的不足之处。""",
+        "设定3：创意作家": """我希望你扮演一个富有创意的作家。你会用生动的语言和丰富的想象力来创作故事和诗歌。""",
+        # ... 添加更多预设设定
     }
 
-    # 初始化 character_settings
+    # --- 处理角色设定 ---
     if "character_settings" not in st.session_state:
-        st.session_state.character_settings = preset_settings.copy()  # 使用副本避免修改原预设
-
-    # 初始化 enabled_settings
+        st.session_state.character_settings = preset_settings.copy()  # 初始化，包含预设设定
     if "enabled_settings" not in st.session_state:
-        st.session_state.enabled_settings = {setting_name: False for setting_name in st.session_state.character_settings}
-
-    # --- 读取本地设定 ---
-    setting_files = glob.glob("*.txt")  # 获取所有 .txt 文件
-    for filename in setting_files:
-        setting_name = os.path.splitext(filename)[0]
-        if setting_name not in st.session_state.character_settings:  # 避免覆盖预设和已加载的设定
-            try:
-                with open(filename, "r", encoding="utf-8") as f:
-                    setting_content = f.read()
-                    st.session_state.character_settings[setting_name] = setting_content
-                    st.session_state.enabled_settings[setting_name] = False # 默认不启用
-            except Exception as e:
-                st.error(f"读取设定文件 {filename} 失败: {e}")
+        st.session_state.enabled_settings = {name: False for name in preset_settings} # 初始化，所有预设设定都禁用
 
 
-    # --- 新增设定 ---
-    new_setting_name = st.text_input("新增设定名称")
-    new_setting_content = st.text_area("新增设定内容")
-    if st.button("添加设定"):
-        if new_setting_name and new_setting_content:
-            st.session_state.character_settings[new_setting_name] = new_setting_content
-            st.session_state.enabled_settings[new_setting_name] = False # 默认不启用
-            st.success(f"设定 '{new_setting_name}' 已添加！")
+    # 显示预设设定及其启用/禁用状态
+    for setting_name, setting_content in preset_settings.items():
+        st.checkbox(setting_name, key=setting_name, on_change=None, value=st.session_state.enabled_settings.get(setting_name, False))
+        st.session_state.enabled_settings[setting_name] = st.session_state[setting_name] # 更新启用状态
+
+
+    # 自定义设定输入框
+    custom_setting_name = st.text_input("自定义设定名称")
+    custom_setting_content = st.text_area("自定义设定内容")
+
+    if st.button("添加自定义设定"):
+        if custom_setting_name and custom_setting_content:
+            st.session_state.character_settings[custom_setting_name] = custom_setting_content
+            st.session_state.enabled_settings[custom_setting_name] = True  # 默认启用新添加的设定
+            st.experimental_rerun()  # 刷新页面以显示新的设定
         else:
-            st.warning("设定名称和内容不能为空！")
-
-    # --- 显示和编辑设定 ---
-    for setting_name, setting_content in st.session_state.character_settings.items():
-        enabled = st.session_state.enabled_settings.get(setting_name, False)
-        with st.expander(setting_name, expanded=enabled): # 已启用的设定展开显示
-            edited_content = st.text_area("设定内容", setting_content, key=f"setting_{setting_name}")
-            st.session_state.character_settings[setting_name] = edited_content # 更新设定内容
-            st.checkbox("启用", key=f"enable_{setting_name}") 
+            st.warning("请输入设定名称和内容")
 
 
-    # --- 在聊天界面显示已加载的设定 ---
-    active_settings = [name for name, enabled in st.session_state.enabled_settings.items() if enabled]
-    if active_settings:
-        st.write("已加载的设定：", ", ".join(active_settings))
+    # 删除自定义设定
+    settings_to_delete = st.multiselect("选择要删除的自定义设定", [name for name in st.session_state.character_settings if name not in preset_settings])
+    if st.button("删除"):
+        for setting_name in settings_to_delete:
+            del st.session_state.character_settings[setting_name]
+            del st.session_state.enabled_settings[setting_name]
+        st.experimental_rerun()
