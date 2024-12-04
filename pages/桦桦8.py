@@ -90,11 +90,33 @@ if "character_settings" not in st.session_state:
 if "enabled_settings" not in st.session_state:
     st.session_state.enabled_settings = {name: False for name in DEFAULT_FRAGMENTS}
 
-
-# --- LLM 函数 ---
-def getAnswer(prompt):
+# ---  构建设定消息 ---
+def build_settings_message():
     enabled_settings_content = ""
     enabled_settings = st.session_state.get("enabled_settings", {})
+
+    for setting_name, enabled in enabled_settings.items():
+        if enabled:
+            setting_content = st.session_state.character_settings.get(setting_name, "")
+            if setting_content:
+                enabled_settings_content += setting_content + "\n"
+
+    return enabled_settings_content  # 返回整合后的设定内容
+
+
+# ---  更新或创建系统设定消息 ---
+def update_settings_message():
+    settings_content = build_settings_message()
+    if "settings_message" not in st.session_state or st.session_state.settings_message["content"] != settings_content:
+        st.session_state.settings_message = {"role": "system", "content": settings_content}
+
+# --- getAnswer 函数完整代码 ---
+def getAnswer(prompt):
+    enabled_settings_content = ""  # 这行保留，为了清晰起见
+    enabled_settings = st.session_state.get("enabled_settings", {})
+
+    # （这里不需要循环添加设定，因为设定已经整合到 settings_message 中）
+
 
     his_messages = []
     his_messages.append(
@@ -641,24 +663,14 @@ def getAnswer(prompt):
 
 
     for msg in st.session_state.messages[-20:]:
-        if msg["role"] == "user":
-            his_messages.append({"role": "user", "parts": [{"text": msg["content"]}]})
-        elif msg is not None and msg["content"] is not None:
-            his_messages.append({"role": "model", "parts": [{"text": msg["content"]}]})
+        if msg["role"] in ("user", "model"):  # 过滤掉无效角色
+            his_messages.append({"role": msg["role"], "parts": [{"text": msg["content"]}]})
 
-    his_messages = [msg for msg in his_messages if msg.get("parts") and msg["parts"][0].get("text")]
+    update_settings_message()
+    settings_message_with_parts = {"role": "model", "parts": [{"text": st.session_state.settings_message["content"]}]}
+    his_messages.append(settings_message_with_parts)
 
-    enabled_settings_content = ""
-    enabled_settings = st.session_state.get("enabled_settings", {})
-
-    for setting_name, enabled in enabled_settings.items():
-        if enabled:
-            setting_content = st.session_state.character_settings.get(setting_name, "")
-            if setting_content:  # 检查设定内容是否为空
-                enabled_settings_content += setting_content + "\n"  # 获取并添加设定内容
-
-
-    his_messages.append({"role": "model", "parts": [{"text": enabled_settings_content}]}) #  追加碎片设定
+    print(his_messages)  # 打印 his_messages 进行调试
 
     try:
         response = model.generate_content(contents=his_messages, stream=True)
@@ -801,7 +813,6 @@ with st.sidebar.expander("角色设定"):
             new_content = st.text_area(f"编辑 {setting_name}:", setting_content, key=f"edit_{setting_name}")
             st.session_state.character_settings[setting_name] = new_content
 
-
     # --- 读取本地设定文件 (在设定列表之后) ---
     uploaded_settings_file = st.file_uploader("读取本地设定文件 (TXT)", type=["txt"])
     if uploaded_settings_file is not None:
@@ -819,14 +830,13 @@ with st.sidebar.expander("角色设定"):
             st.experimental_rerun() # 刷新页面
         except Exception as e:
             st.error(f"读取设定文件失败: {e}")
-        
+
+
 
 # --- 在聊天界面显示设定名称 ---
 enabled_settings_display = ", ".join(setting_name for setting_name, enabled in st.session_state.enabled_settings.items() if enabled)
 if enabled_settings_display:
     st.write(f"**当前设定:** {enabled_settings_display}")
-
-
 
 
 # 功能区 3: ... (其他功能区)
