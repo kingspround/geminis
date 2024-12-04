@@ -229,80 +229,53 @@ with st.sidebar.expander("文件操作"):
 with st.sidebar.expander("角色设定", expanded=False):  # 默认收起
     # 初始化设定
     if "character_settings" not in st.session_state:
-        st.session_state.character_settings = {}
-
+        st.session_state.character_settings = {
+            "预设1：朋友": "把我当作你的朋友，自然的和我聊天吧。",
+            "预设2：老师": "扮演一位老师，耐心的解答我的问题。",
+            # ...其他预设
+        }
     if "enabled_settings" not in st.session_state:
-        st.session_state.enabled_settings = {}
+        st.session_state.enabled_settings = {name: False for name in st.session_state.character_settings}
 
-    # 内置预设定
-    preset_settings = {
-        "淫化惧怖魔": """
-种族起源：一种由惧怖魔被高度浓缩的淫魔能量感染后诞生的全新种族。这种能量并非直接改变惧怖魔的身体，而是扭曲了它们的灵魂，使其充满了淫欲和渴望，并赋予了它们将这种扭曲传播给他人的能力。
 
-种族特点：
-
-亚种繁多: 淫化惧怖魔最大的特点就是亚种极其丰富，几乎涵盖了所有恐怖传说中的鬼怪形象，例如女鬼、付丧神、僵尸、吸血鬼、狼人等等。但无论原本的形象多么恐怖，淫化后的形象都会变得娇嫩可爱，充满诱惑力。 诅咒与精神污染: 淫化惧怖魔的主要传播方式是诅咒和精神污染。它们可以通过接触、言语、图像、梦境等各种途径，将淫魔能量注入到其他生物的体内，使其逐渐被侵蚀，最终转化为新的淫化惧怖魔。 实体与无实体: 淫化惧怖魔既可以拥有实体，也可以以无实体的形态存在。无实体的淫化惧怖魔通常以精神体的形式出现，可以穿梭于现实世界和精神世界之间，更加难以被察觉和抵御。 扭曲的欲望: 淫化惧怖魔的灵魂被淫魔能量彻底扭曲，充满了对性爱的渴望。它们会不择手段地引诱和侵犯其他生物，以此来满足自己的欲望，并传播淫魔能量。 保留部分原种族特征: 尽管外貌变得娇嫩可爱，但淫化惧怖魔依然会保留部分原种族的特征，例如尖牙、利爪、尾巴、翅膀等等。这些特征会与它们可爱的外表形成鲜明的对比，更增添了它们的魅力和危险性。 感染方式举例：
-
-一个上班族在夜里遇到一个G杯爆乳、裸露着嫩屁股的红衣小女孩，不受控制地侵犯了她。之后，他不断梦到与小女孩交媾的画面，身体也出现异样。实际上，这个小女孩就是无实体的淫化惧怖魔，通过精神污染的方式侵蚀了上班族。 一个玩家在玩游戏时，发现自己的角色变成了一个爆乳白衣女鬼御姐，并从屏幕中钻出来，对他进行侵犯。这实际上是附身于游戏中的淫化惧怖魔，通过电子设备传播诅咒。 一个旅行者在古墓中发现了一个美丽的木偶，被其吸引，带回了家。晚上，木偶活了过来，变成了一个娇艳的淫魔，对他进行侵犯。这实际上是寄宿于木偶中的淫化惧怖魔，通过诅咒物品进行传播。
-
-其他设定：
-
-繁殖方式: 淫化惧怖魔可以通过交媾、产卵、分裂等多种方式进行繁殖，并且可以跨种族繁殖，创造出更加奇特的亚种。 社会结构: 淫化惧怖魔没有固定的社会结构，有些会单独行动，有些会组成小群体，有些甚至会建立大型的淫魔帝国。 弱点: 淫化惧怖魔的弱点因亚种而异，有些惧怕圣光，有些惧怕特定的咒语，有些则会被强大的精神力所压制。""",
-
-        "示例设定2": "这是另一个示例设定。",
-    }
-
-    # 加载本地设定
-    for filename in glob.glob("*.txt"):
+    # 读取本地设定
+    setting_files = glob.glob("*.txt")  # 获取所有 .txt 文件
+    for filename in setting_files:
         setting_name = os.path.splitext(filename)[0]
-        with open(filename, "r", encoding="utf-8") as f:
-            setting_content = f.read()
-        preset_settings[setting_name] = setting_content
+        try:
+            with open(filename, "r", encoding="utf-8") as f:
+                setting_content = f.read()
+                st.session_state.character_settings[setting_name] = setting_content
+                if setting_name not in st.session_state.enabled_settings:
+                   st.session_state.enabled_settings[setting_name] = False # 默认不启用本地读取的设定
 
 
-    # 将预设定添加到 st.session_state.character_settings
-    for setting_name, setting_content in preset_settings.items():
-        if setting_name not in st.session_state.character_settings: # 避免覆盖用户自定义设定
-             st.session_state.character_settings[setting_name] = setting_content
-
-    # 显示已加载的设定
-    st.write("已加载设定：")
-    enabled_settings_list = [name for name, enabled in st.session_state.enabled_settings.items() if enabled]
-    st.write(", ".join(enabled_settings_list) or "无")
+        except Exception as e:
+            st.error(f"读取设定文件 {filename} 失败: {e}")
 
 
     # 新增设定
-    new_setting_name = st.text_input("设定名称")
-    new_setting_content = st.text_area("设定内容")
+    new_setting_name = st.text_input("新增设定名称")
+    new_setting_content = st.text_area("新增设定内容")
     if st.button("添加设定"):
-        if new_setting_name:
+        if new_setting_name and new_setting_content:
             st.session_state.character_settings[new_setting_name] = new_setting_content
-            st.success(f"已添加设定: {new_setting_name}")
+            st.session_state.enabled_settings[new_setting_name] = False  # 默认新增的设定不启用
+            st.experimental_rerun()  # 刷新页面以显示新的设定
         else:
-            st.warning("设定名称不能为空")
+            st.warning("设定名称和内容不能为空！")
 
-
-    # 显示、启用/禁用和编辑设定
+    # 显示和启用/禁用设定
+    st.write("已加载的设定：")
+    enabled_settings_display = "" # 用于在聊天界面显示已启用的设定
     for setting_name, setting_content in st.session_state.character_settings.items():
-        col1, col2 = st.columns([1, 4])
-        with col1:
-             enabled = st.checkbox("", key=f"setting_enabled_{setting_name}", value=st.session_state.enabled_settings.get(setting_name, False)) # 使用get方法，默认未勾选
-             st.session_state.enabled_settings[setting_name] = enabled # 更新启用状态
-        with col2:
-            st.write(setting_name)
-            if st.button("编辑", key=f"edit_setting_{setting_name}"):
-                 st.session_state["editing_setting"] = setting_name
-                 st.experimental_rerun()
+        enabled = st.checkbox(setting_name, key=f"checkbox_{setting_name}", value=st.session_state.enabled_settings.get(setting_name, False))
+        st.session_state.enabled_settings[setting_name] = enabled
+        if enabled: # 如果设定启用，则添加到显示字符串
+           enabled_settings_display += f"{setting_name}\n"
 
 
-    # 编辑设定界面
-    if editing_setting := st.session_state.get("editing_setting"):
-        st.text_area("编辑设定内容", value=st.session_state.character_settings[editing_setting], key=f"edit_area_{editing_setting}", on_change=lambda: update_setting(editing_setting))
-        if st.button("保存修改", key=f"save_setting_{editing_setting}"):
-            del st.session_state["editing_setting"]
-            st.experimental_rerun()
-
-
-# 更新设定内容的回调函数
-def update_setting(setting_name):
-    st.session_state.character_settings[setting_name] = st.session_state[f"edit_area_{setting_name}"]
+    # 在聊天界面显示已启用的设定
+    if enabled_settings_display:
+        st.write("# 已启用设定")  # 在聊天区域显示一个标题
+        st.write(enabled_settings_display)
