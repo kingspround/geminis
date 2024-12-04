@@ -234,72 +234,56 @@ with st.sidebar.expander("文件操作"):
 
 # 功能区 2: 角色设定
 with st.sidebar.expander("角色设定", expanded=False):  # 默认收起
+    # --- 内置预设定 ---
+    preset_settings = {
+        "预设1：乐天派": "总是保持乐观积极的态度，喜欢开玩笑。",
+        "预设2：严肃认真": "一丝不苟，注重细节，语气正式。",
+        "预设3：神秘莫测": "说话含糊其辞，充满谜语。",
+    }
+
     # 初始化 character_settings
     if "character_settings" not in st.session_state:
-        st.session_state.character_settings = {}
+        st.session_state.character_settings = preset_settings.copy()  # 使用副本避免修改原预设
 
     # 初始化 enabled_settings
     if "enabled_settings" not in st.session_state:
-        st.session_state.enabled_settings = {}
+        st.session_state.enabled_settings = {setting_name: False for setting_name in st.session_state.character_settings}
 
-    # 内置预设定
-    preset_settings = {
-        "示例设定1": "这是一个示例设定1的内容。",
-        "示例设定2": "这是一个示例设定2的内容，可以多行。\n第二行。",
-    }
-
-    # 从本地文件读取设定
-    setting_files = glob.glob("*.txt")
-    for file in setting_files:
-        setting_name = os.path.splitext(file)[0]
-        try:
-            with open(file, "r", encoding="utf-8") as f:
-                setting_content = f.read()
-                st.session_state.character_settings[setting_name] = setting_content
-        except Exception as e:
-            st.error(f"读取设定文件 {file} 失败: {e}")
-
-    # 合并预设和读取的设定
-    st.session_state.character_settings.update(preset_settings)
+    # --- 读取本地设定 ---
+    setting_files = glob.glob("*.txt")  # 获取所有 .txt 文件
+    for filename in setting_files:
+        setting_name = os.path.splitext(filename)[0]
+        if setting_name not in st.session_state.character_settings:  # 避免覆盖预设和已加载的设定
+            try:
+                with open(filename, "r", encoding="utf-8") as f:
+                    setting_content = f.read()
+                    st.session_state.character_settings[setting_name] = setting_content
+                    st.session_state.enabled_settings[setting_name] = False # 默认不启用
+            except Exception as e:
+                st.error(f"读取设定文件 {filename} 失败: {e}")
 
 
-    # 新增设定
-    new_setting_name = st.text_input("新设定名称:")
-    new_setting_content = st.text_area("新设定内容:")
+    # --- 新增设定 ---
+    new_setting_name = st.text_input("新增设定名称")
+    new_setting_content = st.text_area("新增设定内容")
     if st.button("添加设定"):
         if new_setting_name and new_setting_content:
             st.session_state.character_settings[new_setting_name] = new_setting_content
-            st.success(f"已添加设定: {new_setting_name}")
-            # 可选：将新设定保存到文件
-            try:
-                with open(f"{new_setting_name}.txt", "w", encoding="utf-8") as f:
-                    f.write(new_setting_content)
-            except Exception as e:
-                st.error(f"保存设定文件 {new_setting_name}.txt 失败: {e}")
-
-
+            st.session_state.enabled_settings[new_setting_name] = False # 默认不启用
+            st.success(f"设定 '{new_setting_name}' 已添加！")
         else:
-            st.warning("设定名称和内容不能为空。")
-        st.experimental_rerun() # 添加设定后刷新界面
+            st.warning("设定名称和内容不能为空！")
 
-
-    # 显示和启用/禁用设定
+    # --- 显示和编辑设定 ---
     for setting_name, setting_content in st.session_state.character_settings.items():
-        enabled = st.checkbox(setting_name, key=f"setting_{setting_name}", value=st.session_state.enabled_settings.get(setting_name, False))
-        st.session_state.enabled_settings[setting_name] = enabled # 更新 enabled_settings
-        if enabled:  # 仅当启用时显示编辑按钮和内容
-            if st.button("编辑", key=f"edit_setting_{setting_name}"):
-                 # ... (编辑逻辑,  可以参考聊天记录的编辑逻辑)
-                pass  # 这里需要补充编辑逻辑
-            st.text_area("内容:", setting_content, key=f"content_{setting_name}", disabled=True)
+        enabled = st.session_state.enabled_settings.get(setting_name, False)
+        with st.expander(setting_name, expanded=enabled): # 已启用的设定展开显示
+            edited_content = st.text_area("设定内容", setting_content, key=f"setting_{setting_name}")
+            st.session_state.character_settings[setting_name] = edited_content # 更新设定内容
+            st.checkbox("启用", key=f"enable_{setting_name}") 
 
 
-# ... (其他代码)
-
-# 聊天界面显示已经加载的设定
-enabled_settings = st.session_state.get("enabled_settings", {})
-active_settings = [name for name, enabled in enabled_settings.items() if enabled]
-if active_settings:
-    st.write("已加载的设定:")
-    for setting_name in active_settings:
-        st.write(f"- {setting_name}")
+    # --- 在聊天界面显示已加载的设定 ---
+    active_settings = [name for name, enabled in st.session_state.enabled_settings.items() if enabled]
+    if active_settings:
+        st.write("已加载的设定：", ", ".join(active_settings))
