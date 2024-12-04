@@ -67,11 +67,20 @@ model = genai.GenerativeModel(model_name="gemini-1.5-pro-001", generation_config
 
 # --- 碎片设定 ---
 DEFAULT_FRAGMENTS = {
-    "fragment1": "你是用户的好朋友，名叫桦桦",
-    "fragment2": "设定2的内容...",
-    "fragment3": "设定3的内容...",
-    # ... 添加更多预设碎片
+    "示例碎片1": "这是一个示例碎片，你可以在这里添加你的设定。",
+    "示例碎片2": "这是另一个示例碎片。",
+    "严肃认真": "AI 将以严肃认真的语气和风格进行回复，避免任何玩笑或轻松的表达。",
+    "幽默风趣": "AI 将尽可能以幽默风趣的方式回复，可能会使用笑话、双关语或其他幽默技巧。",
+    "科幻世界": "AI 的回复将基于科幻世界观，可能会使用科幻术语、设定和情节元素。",
+    "奇幻世界": "AI 的回复将基于奇幻世界观，可能会使用魔法、神话生物和其他奇幻元素。",
 }
+
+# 初始化角色设定
+if "character_settings" not in st.session_state:
+    st.session_state.character_settings = DEFAULT_FRAGMENTS.copy()
+
+if "enabled_settings" not in st.session_state:
+    st.session_state.enabled_settings = {name: False for name in DEFAULT_FRAGMENTS}
 
 
 # --- LLM 函数 ---
@@ -100,17 +109,17 @@ def getAnswer(prompt):
 
     his_messages = [msg for msg in his_messages if msg.get("parts") and msg["parts"][0].get("text")]
 
-    # 添加角色设定到提示 (修正后的代码)
+    enabled_settings_content = ""
     enabled_settings = st.session_state.get("enabled_settings", {})
-    active_settings = [name for name, enabled in enabled_settings.items() if enabled]
-    if active_settings:
-        settings_text = "[Character Settings]:\n"
-        for setting_name in active_settings:
-            setting_content = st.session_state.character_settings.get(setting_name, "")
-            settings_text += f"{setting_name}:\n{setting_content}\n"
 
-        #  正确地将设定文本添加到 his_messages
-        his_messages.append({"role": "system", "parts": [{"text": settings_text}]})
+    for setting_name, enabled in enabled_settings.items():
+        if enabled:
+            setting_content = st.session_state.character_settings.get(setting_name, "")
+            if setting_content:  # 检查设定内容是否为空
+                enabled_settings_content += setting_content + "\n"  # 获取并添加设定内容
+
+
+    his_messages.append({"role": "model", "parts": [{"text": enabled_settings_content}]}) #  追加碎片设定
 
     try:
         response = model.generate_content(contents=his_messages, stream=True)
@@ -248,10 +257,12 @@ with st.sidebar.expander("文件操作"):
 # 功能区 2: 角色设定
 with st.sidebar.expander("角色设定"):
     for setting_name, setting_content in st.session_state.character_settings.items():
-        st.checkbox(setting_name, key=f"enabled_{setting_name}", value=st.session_state.enabled_settings.get(setting_name, False))
-        if st.session_state["enabled_settings"].get(setting_name, False):
-            new_content = st.text_area(f"{setting_name} 内容:", setting_content, key=f"setting_content_{setting_name}")
+        enabled = st.checkbox(setting_name, key=f"setting_{setting_name}", value=st.session_state.enabled_settings.get(setting_name, False))
+        st.session_state.enabled_settings[setting_name] = enabled  # 更新启用状态
+        if enabled:
+            new_content = st.text_area(f"编辑 {setting_name}:", setting_content, key=f"edit_{setting_name}")
             st.session_state.character_settings[setting_name] = new_content
+
 
 
 
