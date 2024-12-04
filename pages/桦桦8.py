@@ -777,17 +777,17 @@ with st.sidebar.expander("文件操作"):
             st.error(f"读取本地pkl文件失败：{e}")
 
 
-# --- 功能区 2: 角色设定 ---
-if "character_settings" not in st.session_state:
-    st.session_state.character_settings = {}
-if "enabled_settings" not in st.session_state:
-    st.session_state.enabled_settings = {}
-
-
+# 功能区 2: 角色设定
 with st.sidebar.expander("角色设定"):
-    st.subheader("角色设定")
-    
-    # 内置预设
+    # 初始化 character_settings
+    if "character_settings" not in st.session_state:
+        st.session_state.character_settings = {}
+
+    # 初始化 enabled_settings
+    if "enabled_settings" not in st.session_state:
+        st.session_state.enabled_settings = {}
+
+    # 内置预设定
     preset_settings = {
         "淫化惧怖魔": """
 种族起源：一种由惧怖魔被高度浓缩的淫魔能量感染后诞生的全新种族。这种能量并非直接改变惧怖魔的身体，而是扭曲了它们的灵魂，使其充满了淫欲和渴望，并赋予了它们将这种扭曲传播给他人的能力。
@@ -801,67 +801,68 @@ with st.sidebar.expander("角色设定"):
 其他设定：
 
 繁殖方式: 淫化惧怖魔可以通过交媾、产卵、分裂等多种方式进行繁殖，并且可以跨种族繁殖，创造出更加奇特的亚种。 社会结构: 淫化惧怖魔没有固定的社会结构，有些会单独行动，有些会组成小群体，有些甚至会建立大型的淫魔帝国。 弱点: 淫化惧怖魔的弱点因亚种而异，有些惧怕圣光，有些惧怕特定的咒语，有些则会被强大的精神力所压制。""",
-        "专业且严谨": "我是一个专业且严谨的AI助手，我的回答基于事实和逻辑，力求准确无误。",
-        "专业的程序员": "我是一个专业的程序员，擅长各种编程语言和技术。我会尽力提供准确、高效的代码解决方案，并解释我的思路。",
-        "严谨的学者": "我是一个严谨的学者，对知识有着强烈的求知欲。我会尽力提供准确、详尽的答案，并引用相关的资料来源。",
+
+        "示例设定2": "设定2的内容...",
     }
 
-    # 将内置预设添加到角色设定
+    # 将预设定添加到 character_settings
     for name, content in preset_settings.items():
         if name not in st.session_state.character_settings:
             st.session_state.character_settings[name] = content
-            if name not in st.session_state.enabled_settings:
-                st.session_state.enabled_settings[name] = False
-
-
-    for setting_name in list(st.session_state.character_settings.keys()):
-        enabled = st.session_state.enabled_settings.get(setting_name, False)
-        col1, col2, col3 = st.columns([0.7, 0.2, 0.1])
-        with col1:
-            new_content = st.text_area(setting_name, st.session_state.character_settings[setting_name], key=f"setting_{setting_name}")
-            st.session_state.character_settings[setting_name] = new_content  # 更新设置内容
-
-        with col2:
-            if st.checkbox(f"启用 {setting_name}", value=enabled, key=f"enable_{setting_name}"):
-                st.session_state.enabled_settings[setting_name] = True
-            else:
-                st.session_state.enabled_settings[setting_name] = False
-
-        with col3:
-            if st.button("删除", key=f"delete_{setting_name}"):
-                del st.session_state.character_settings[setting_name]
-                del st.session_state.enabled_settings[setting_name]
-                st.experimental_rerun()
-
-
-    # 新增设定
-    new_setting_name = st.text_input("新增设定名称:")
-    if new_setting_name:
-        if new_setting_name not in st.session_state.character_settings:
-            st.session_state.character_settings[new_setting_name] = ""
-            st.session_state.enabled_settings[new_setting_name] = False
-            st.experimental_rerun()
 
 
     # 读取本地设定
-    uploaded_file = st.file_uploader("读取本地设定文件 (txt)", type=["txt"])
-    if uploaded_file is not None:
-        try:
-            setting_content = uploaded_file.read().decode("utf-8")
-            setting_name = uploaded_file.name[:-4]  # 去除 .txt 后缀
+    setting_files = glob.glob("*.txt")  # 获取所有 .txt 文件
+    for file in setting_files:
+        setting_name = file[:-4]  # 去掉 .txt 后缀
+        with open(file, "r", encoding="utf-8") as f:
+            setting_content = f.read()
+        if setting_name not in st.session_state.character_settings:
             st.session_state.character_settings[setting_name] = setting_content
-            st.session_state.enabled_settings[setting_name] = False
-            st.success(f"成功加载设定: {setting_name}")
-            st.experimental_rerun()
-        except Exception as e:
-            st.error(f"读取本地设定文件失败: {e}")
 
 
-    # 显示已加载设定（在聊天界面已显示，这里可选择性添加）
-    st.subheader("已加载设定:")
-    enabled_settings = [(name, content) for name, content in st.session_state.character_settings.items() if st.session_state.enabled_settings.get(name,False)]
-    if enabled_settings:
-        for name, content in enabled_settings:
-            st.markdown(f"**{name}:**\n{content}")
+    # 新增设定
+    new_setting_name = st.text_input("新增设定名称")
+    new_setting_content = st.text_area("新增设定内容")
+    if st.button("添加设定"):
+        if new_setting_name:
+            st.session_state.character_settings[new_setting_name] = new_setting_content
+            with open(f"{new_setting_name}.txt", "w", encoding="utf-8") as f: # 保存到本地文件
+                f.write(new_setting_content)
+            st.success(f"已添加设定: {new_setting_name}")
+            st.experimental_rerun() # 刷新以显示新的设定
+
+    # 显示、启用/禁用、编辑设定
+    for setting_name, setting_content in st.session_state.character_settings.items():
+        enabled = st.session_state.enabled_settings.get(setting_name, False)  # 默认禁用
+        col1, col2 = st.columns([1, 4]) # 调整布局，使复选框和名称更紧凑
+        with col1:
+            new_enabled = st.checkbox("", value=enabled, key=f"checkbox_{setting_name}")
+        with col2:
+            if new_enabled != enabled:  # 状态改变时更新
+                st.session_state.enabled_settings[setting_name] = new_enabled
+
+            if new_enabled:  # 如果启用，则可编辑
+                with st.expander(setting_name):
+                    new_content = st.text_area("编辑设定内容", setting_content, key=f"textarea_{setting_name}")
+                    if st.button("保存更改", key=f"save_setting_{setting_name}"):
+                        st.session_state.character_settings[setting_name] = new_content
+                        with open(f"{setting_name}.txt", "w", encoding="utf-8") as f:
+                            f.write(new_content)
+                        st.success("已保存更改！")
+                        st.experimental_rerun()
+                    if st.button("删除设定", key=f"delete_setting_{setting_name}"):
+                        del st.session_state.character_settings[setting_name]
+                        os.remove(f"{setting_name}.txt") # 删除本地文件
+                        del st.session_state.enabled_settings[setting_name] # 从enabled_settings中删除
+                        st.success("已删除设定！")
+                        st.experimental_rerun()
+
+    # 聊天界面显示已经加载的设定
+    st.write("已加载的设定:")
+    active_settings = [name for name, enabled in st.session_state.enabled_settings.items() if enabled]
+    if active_settings:
+        for setting_name in active_settings:
+           st.write(f"- {setting_name}")
     else:
-        st.markdown("当前无已启用设定")
+        st.write("无")
