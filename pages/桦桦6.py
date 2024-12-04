@@ -94,26 +94,38 @@ def getAnswer(prompt):
 
     his_messages = []
     his_messages.append(
-        {"role": "model", "parts":[{"text": """"""}]}
+        {"role": "model", "parts":[{"text": """
+[SYSTEM]
+  []
+   [Personality：
+        ]
+   [function：
+    
+
+]"""}]}
    )
 
-    # Add enabled character settings to the prompt
+
+
+    for msg in st.session_state.messages[-20:]: # 保留最近20条消息
+        if msg["role"] == "user":
+            his_messages.append({"role": "user", "parts": [{"text": msg["content"]}]})
+        elif msg is not None and msg["content"] is not None: # 防止空消息
+            his_messages.append({"role": "model", "parts": [{"text": msg["content"]}]})
+
+    his_messages = [msg for msg in his_messages if msg.get("parts") and msg["parts"][0].get("text")] # 清理空消息
+
+
+    # 添加角色设定到prompt
     active_settings = [name for name, enabled in enabled_settings.items() if enabled]
     setting_text = ""
     if active_settings:
-        setting_text = "[Character Settings]:\n"  # 使用更清晰的标签
+        setting_text = "[Character Settings]:\n" 
         for setting_name in active_settings:
             setting_content = st.session_state.character_settings.get(setting_name, "")
             setting_text += f"{setting_name}:\n{setting_content}\n"
-        his_messages.append({"role": "system", "parts": [{"text": setting_text}]}) # 将设定作为system message
+        his_messages.append({"role": "system", "parts": [{"text": setting_text}]}) # system message
 
-    for msg in st.session_state.messages[-20:]:
-        if msg["role"] == "user":
-            his_messages.append({"role": "user", "parts": [{"text": msg["content"]}]})
-        elif msg is not None and msg["content"] is not None:
-            his_messages.append({"role": "model", "parts": [{"text": msg["content"]}]})
-
-    his_messages = [msg for msg in his_messages if msg.get("parts") and msg["parts"][0].get("text")]
 
     try:
         response = model.generate_content(contents=his_messages, stream=True)
