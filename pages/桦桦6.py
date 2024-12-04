@@ -74,6 +74,7 @@ def getAnswer(prompt):
 
 
 
+
     for msg in st.session_state.messages[-20:]:
         if msg["role"] == "user":
             his_messages.append({"role": "user", "parts": [{"text": msg["content"]}]})
@@ -181,6 +182,7 @@ if prompt := st.chat_input("输入你的消息:"):
     st.session_state.messages.append({"role": "assistant", "content": full_response})
     with open(log_file, "wb") as f:
         pickle.dump(st.session_state.messages, f)
+
 
 
 
