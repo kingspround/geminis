@@ -13,7 +13,6 @@ import glob
 
 
 
-
 # --- API 密钥设置 ---
 api_keys = {
     "主密钥": "AIzaSyCBjZbA78bPusYmUNvfsmHpt6rPx6Ur0QE",  # 替换成你的主 API 密钥
@@ -62,17 +61,10 @@ safety_settings = [
 
 model = genai.GenerativeModel(model_name="gemini-1.5-pro-001",generation_config=generation_config,safety_settings=safety_settings)
 
-# --- LLM 函数 ---
+# LLM
+
+
 def getAnswer(prompt):
-    enabled_settings_content = ""
-    enabled_settings = st.session_state.get("enabled_settings", {})
-
-    for setting_name, enabled in enabled_settings.items():
-        if enabled:
-            setting_content = st.session_state.character_settings.get(setting_name, "")
-            if setting_content: # 检查设定内容是否为空
-                enabled_settings_content += setting_content + "\n"  # 获取并添加设定内容
-
     his_messages = []
     his_messages.append(
         {"role": "model", "parts":[{"text": """
@@ -624,19 +616,6 @@ def getAnswer(prompt):
             his_messages.append({"role": "model", "parts": [{"text": msg["content"]}]})
 
     his_messages = [msg for msg in his_messages if msg.get("parts") and msg["parts"][0].get("text")]
-
-    # Add character settings to the prompt
-    enabled_settings = st.session_state.get("enabled_settings", {})
-    active_settings = [name for name, enabled in enabled_settings.items() if enabled]
-    setting_text = ""
-    if active_settings:
-        setting_text = "[Character Settings]:\n"
-        for setting_name in active_settings:
-            setting_content = st.session_state.character_settings.get(setting_name, "")
-            setting_text += f"{setting_name}:\n{setting_content}\n"
-        
-        his_messages.append({"role": "system", "parts": [{"text": setting_text}]})
-
 
     try:
         response = model.generate_content(contents=his_messages, stream=True)
