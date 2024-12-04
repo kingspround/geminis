@@ -278,8 +278,8 @@ with st.sidebar.expander("角色设定"):
 
             st.success(f"成功加载设定: {setting_name}")
             st.experimental_rerun() # 刷新页面
-            except Exception as e:
-                st.error(f"读取设定文件失败: {e}")
+        except Exception as e:
+            st.error(f"读取设定文件失败: {e}")
         
 
 # --- 在聊天界面显示设定名称 ---
