@@ -61,6 +61,31 @@ safety_settings = [
 
 model = genai.GenerativeModel(model_name="gemini-1.5-pro-001",generation_config=generation_config,safety_settings=safety_settings)
 
+
+# --- 角色设定 ---
+character_settings = {
+    "示例设定1": "我是个友善的助手，乐于提供帮助。",
+    "示例设定2": "我是一个专业的程序员，擅长Python和JavaScript。",
+    "示例设定3": "我是一个富有创造力的作家，喜欢写奇幻故事。",
+    # ... 添加更多内置预设定
+}
+
+if "character_settings" not in st.session_state:
+    st.session_state.character_settings = character_settings  # 初始化角色设定
+
+if "enabled_settings" not in st.session_state:
+    st.session_state.enabled_settings = {name: False for name in character_settings} # 初始化启用状态
+
+
+# 功能区 2: 角色设定
+with st.sidebar.expander("角色设定"):
+    for setting_name, setting_content in st.session_state.character_settings.items():
+        st.checkbox(setting_name, key=f"setting_{setting_name}", value=st.session_state.enabled_settings.get(setting_name, False))
+        if st.session_state.enabled_settings.get(setting_name, False):  # 如果选中，则显示文本框
+            new_content = st.text_area(f"{setting_name} 内容:", setting_content, key=f"setting_content_{setting_name}")
+            st.session_state.character_settings[setting_name] = new_content # 更新设定内容
+
+
 # --- 角色设定数据 ---
 character_settings = {
     "默认设定": "", # 空字符串表示没有额外的设定
@@ -112,7 +137,18 @@ def getAnswer(prompt):
    )
 
 
-
+    # Add character settings to the prompt
+    enabled_settings = st.session_state.get("enabled_settings", {})
+    active_settings = [name for name, enabled in enabled_settings.items() if enabled]
+    setting_text = ""
+    if active_settings:
+        setting_text = "[Character Settings]:\n"
+        for setting_name in active_settings:
+            setting_content = st.session_state.character_settings.get(setting_name, "")
+            setting_text += f"{setting_name}:\n{setting_content}\n"
+        
+        # 将角色设定作为 system message 添加
+        his_messages.append({"role": "system", "parts": [{"text": setting_text}]})
 
     for msg in st.session_state.messages[-20:]:
         if msg["role"] == "user":
