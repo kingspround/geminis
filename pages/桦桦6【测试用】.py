@@ -102,26 +102,27 @@ def update_settings_message():
     if "settings_message" not in st.session_state or st.session_state.settings_message["content"] != settings_content:
         st.session_state.settings_message = {"role": "system", "content": settings_content}
 
-# --- getAnswer 函数完整代码 ---
+# --- getAnswer 函数修改 ---
 def getAnswer(prompt):
-    enabled_settings_content = ""  # 这行保留，为了清晰起见
-    enabled_settings = st.session_state.get("enabled_settings", {})
-
-    # （这里不需要循环添加设定，因为设定已经整合到 settings_message 中）
+    update_settings_message()  # 确保设定消息是最新的
+    settings_content = st.session_state.settings_message["content"]
 
 
     his_messages = []
     his_messages.append({"role": "model", "parts": [{"text": "Initial message"}]}) #  示例初始消息
 
     for msg in st.session_state.messages[-20:]:
-        if msg["role"] in ("user", "model"):  # 过滤掉无效角色
-            his_messages.append({"role": msg["role"], "parts": [{"text": msg["content"]}]})
+        if msg["role"] == "user":
+             # 将设定添加到用户消息的开头
+            combined_message = settings_content + msg["content"]
+            his_messages.append({"role": "user", "parts": [{"text": combined_message}]})  
+        elif msg is not None and msg["content"] is not None:
+            his_messages.append({"role": "model", "parts": [{"text": msg["content"]}]})
 
-    update_settings_message()
-    settings_message_with_parts = {"role": "model", "parts": [{"text": st.session_state.settings_message["content"]}]}
-    his_messages.append(settings_message_with_parts)
+    his_messages = [msg for msg in his_messages if msg.get("parts") and msg["parts"][0].get("text")]
 
-    print(his_messages)  # 打印 his_messages 进行调试
+
+
 
     try:
         response = model.generate_content(contents=his_messages, stream=True)
