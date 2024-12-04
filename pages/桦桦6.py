@@ -93,7 +93,9 @@ def getAnswer(prompt):
                 enabled_settings_content += setting_content + "\n"
 
     his_messages = []
-    # ... (Rest of the getAnswer function remains mostly the same)
+    his_messages.append(
+        {"role": "model", "parts":[{"text": """"""}]}
+   )
 
     # Add enabled character settings to the prompt
     active_settings = [name for name, enabled in enabled_settings.items() if enabled]
