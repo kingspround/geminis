@@ -87,9 +87,7 @@ def getAnswer(prompt):
 
     his_messages = []
     his_messages.append(
-        {
-            "role": "model",
-            "parts": [
+        {"role": "model", "parts": [
                 {
                     "text": """
 Use code with caution.
@@ -126,8 +124,23 @@ Use code with caution.
 
     his_messages.append({"role": "system", "parts": [{"text": setting_text}]})
 
+    # 清理 his_messages，移除无效消息
+    cleaned_messages = []
+    for msg in his_messages:
+        if "role" in msg and "parts" in msg and msg["parts"] and msg["parts"][0].get("text"):  # 检查所有必要的键和值
+            if msg["role"] in ["user", "model"]: # 只保留 "user" 和 "model" 角色
+                cleaned_messages.append(msg)
+
+    # 添加 system 消息 (如果需要) -  确保放在最前面
+    system_message = {"role": "system", "parts":[{"text": setting_text}]} # setting_text from your original code
+    if setting_text:
+        cleaned_messages.insert(0, system_message)
+
+    import json
+    print(json.dumps(cleaned_messages, indent=2))  # 打印 cleaned_messages
+
     try:
-        response = model.generate_content(contents=his_messages, stream=True)
+        response = model.generate_content(contents=cleaned_messages, stream=True)
         full_response = ""
         for chunk in response:
             full_response += chunk.text
