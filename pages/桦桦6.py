@@ -82,10 +82,6 @@ if "character_settings" not in st.session_state:
 if "enabled_settings" not in st.session_state:
     st.session_state.enabled_settings = {name: False for name in DEFAULT_FRAGMENTS}
 
-# --- 在聊天界面显示设定名称 ---
-enabled_settings_display = ", ".join(setting_name for setting_name, enabled in st.session_state.enabled_settings.items() if enabled)
-if enabled_settings_display:
-    st.write(f"**当前设定:** {enabled_settings_display}")
 
 # --- 读取本地设定文件 ---
 uploaded_settings_file = st.sidebar.file_uploader("读取本地设定文件 (TXT)", type=["txt"])
@@ -278,7 +274,7 @@ with st.sidebar.expander("文件操作"):
             st.error(f"读取本地pkl文件失败：{e}")
 
 
-# 功能区 2: 角色设定         
+# --- 功能区 2: 角色设定 ---
 with st.sidebar.expander("角色设定"):
     for setting_name, setting_content in st.session_state.character_settings.items():
         enabled = st.checkbox(setting_name, key=f"setting_{setting_name}", value=st.session_state.enabled_settings.get(setting_name, False))
@@ -286,6 +282,22 @@ with st.sidebar.expander("角色设定"):
         if enabled:
             new_content = st.text_area(f"编辑 {setting_name}:", setting_content, key=f"edit_{setting_name}")
             st.session_state.character_settings[setting_name] = new_content
+
+    # --- 读取本地设定文件 (在设定列表之后) ---
+    uploaded_settings_file = st.file_uploader("读取本地设定文件 (TXT)", type=["txt"])
+    if uploaded_settings_file is not None:
+        try:
+            # ... (与之前的版本相同)
+        except Exception as e:
+            st.error(f"读取设定文件失败: {e}")
+
+
+
+# --- 在聊天界面显示设定名称 ---
+enabled_settings_display = ", ".join(setting_name for setting_name, enabled in st.session_state.enabled_settings.items() if enabled)
+if enabled_settings_display:
+    st.write(f"**当前设定:** {enabled_settings_display}")
+
 
 
 
