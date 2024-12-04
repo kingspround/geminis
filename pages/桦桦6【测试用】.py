@@ -82,20 +82,23 @@ if "character_settings" not in st.session_state:
 if "enabled_settings" not in st.session_state:
     st.session_state.enabled_settings = {name: False for name in DEFAULT_FRAGMENTS}
 
-def assemble_settings_prompt():
-    """整合所有启用的设定内容到一个字符串."""
+# ---  整合设定内容 ---
+def get_enabled_settings_content():
     enabled_settings_content = ""
-    enabled_settings = st.session_state.get("enabled_settings", {})
-
-    for setting_name, enabled in enabled_settings.items():
+    for setting_name, enabled in st.session_state.enabled_settings.items():
         if enabled:
             setting_content = st.session_state.character_settings.get(setting_name, "")
             if setting_content:
                 enabled_settings_content += setting_content + "\n"
     return enabled_settings_content
 
-
-
+# --- 更新聊天记录第一条消息 ---
+def update_first_message():
+    settings_content = get_enabled_settings_content()
+    if "messages" not in st.session_state or not st.session_state.messages:
+        st.session_state.messages = [{"role": "system", "content": settings_content}]
+    else:
+        st.session_state.messages[0]["content"] = settings_content
 
 # --- LLM 函数 ---
 def getAnswer(prompt):
@@ -115,12 +118,6 @@ def getAnswer(prompt):
 ]"""}]}
     )
 
-    # 将设定插入到聊天记录的第一段
-    if settings_prompt:
-        if his_messages:  # 检查 his_messages 是否为空
-            his_messages[0]["parts"][0]["text"] += "\n" + settings_prompt  # 添加到第一段
-        else:
-            his_messages.append({"role": "system", "parts": [{"text": settings_prompt}]})
     
     for msg in st.session_state.messages[-20:]:
         if msg["role"] == "user":
