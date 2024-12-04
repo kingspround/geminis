@@ -72,7 +72,6 @@ def getAnswer(prompt):
             if setting_content: 
                 enabled_settings_content += setting_content + "\n"
 
-def getAnswer(prompt):
     his_messages = []
     his_messages.append(
         {"role": "model", "parts":[{"text": """
