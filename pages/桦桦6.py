@@ -82,6 +82,34 @@ if "character_settings" not in st.session_state:
 if "enabled_settings" not in st.session_state:
     st.session_state.enabled_settings = {name: False for name in DEFAULT_FRAGMENTS}
 
+# --- 新增设定 ---
+def add_setting():
+    new_setting_name = st.text_input("新设定名称:")
+    new_setting_content = st.text_area("新设定内容:")
+    if st.button("添加"):
+        if new_setting_name:
+            st.session_state.character_settings[new_setting_name] = new_setting_content
+            st.session_state.enabled_settings[new_setting_name] = False # 默认禁用新添加的设定
+            st.experimental_rerun()  # 刷新页面
+
+
+# --- 读取本地设定 ---
+def load_local_settings():
+    uploaded_files = st.file_uploader("选择设定文件 (txt)", type=["txt"], accept_multiple_files=True)
+    if uploaded_files:
+        for uploaded_file in uploaded_files:
+            try:
+                setting_name = os.path.splitext(uploaded_file.name)[0]
+                setting_content = uploaded_file.read().decode("utf-8")
+                st.session_state.character_settings[setting_name] = setting_content
+                st.session_state.enabled_settings[setting_name] = False # 默认禁用读取的设定
+                st.success(f"成功加载设定: {setting_name}")
+
+            except Exception as e:
+                st.error(f"加载设定 {uploaded_file.name} 失败: {e}")
+
+        st.experimental_rerun()
+
 
 # --- LLM 函数 ---
 def getAnswer(prompt):
@@ -254,42 +282,33 @@ with st.sidebar.expander("文件操作"):
             st.error(f"读取本地pkl文件失败：{e}")
 
 
-# --- 功能区 2: 角色设定 ---
+# 功能区 2: 角色设定
 with st.sidebar.expander("角色设定"):
 
     # 新增设定
-    new_setting_name = st.text_input("新增设定名称:")
-    new_setting_content = st.text_area("新增设定内容:")
-    if st.button("添加设定"):
-        if new_setting_name:
-            st.session_state.character_settings[new_setting_name] = new_setting_content
-            st.session_state.enabled_settings[new_setting_name] = False  # 默认禁用新设定
-            st.experimental_rerun()  # 刷新页面
+    add_setting()
 
     # 读取本地设定
-    with st.expander("读取本地设定", expanded=False):  # 默认收起
-        uploaded_settings_file = st.file_uploader("选择设定文件 (txt)", type=["txt"])
-        if uploaded_settings_file is not None:
-            try:
-                stringio = StringIO(uploaded_settings_file.getvalue().decode("utf-8"))
-                for line in stringio:
-                    name, content = line.strip().split(":", 1)  # 使用冒号分隔名称和内容
-                    st.session_state.character_settings[name] = content
-                    st.session_state.enabled_settings[name] = False # 默认禁用读取的设定
-                st.success("设定已加载！")
-                st.experimental_rerun()
-            except Exception as e:
-                st.error(f"读取设定文件失败: {e}")
+    with st.expander("读取本地设定"):
+        load_local_settings()
 
     # 显示和编辑设定
     for setting_name, setting_content in st.session_state.character_settings.items():
         enabled = st.checkbox(setting_name, key=f"setting_{setting_name}", value=st.session_state.enabled_settings.get(setting_name, False))
         st.session_state.enabled_settings[setting_name] = enabled
-        with st.expander(f"编辑 {setting_name}", expanded=enabled): # 仅当启用时才展开
+        with st.expander(f"编辑 {setting_name}"): # 默认收起编辑区域
             new_content = st.text_area("", setting_content, key=f"edit_{setting_name}")
-            if st.button("保存修改", key=f"save_{setting_name}"): # 添加保存按钮
-                st.session_state.character_settings[setting_name] = new_content
-                st.success(f"{setting_name} 已保存！")
+            st.session_state.character_settings[setting_name] = new_content
+
+
+
+
+# --- 聊天界面显示已加载的设定 ---
+if st.session_state.get("enabled_settings"):  # 检查是否有启用的设定
+    st.write("**已加载的设定:**")
+    for setting_name, enabled in st.session_state.enabled_settings.items():
+        if enabled:
+           st.write(f"- {setting_name}")
 
 
 
@@ -297,12 +316,6 @@ with st.sidebar.expander("角色设定"):
 # 功能区 3: ... (其他功能区)
 
 
-# --- 聊天界面显示已加载的设定 ---
-if st.session_state.get("enabled_settings"):
-    st.write("**已加载设定:**")
-    for setting_name, enabled in st.session_state.enabled_settings.items():
-        if enabled:
-            st.write(f"- {setting_name}")
 
 # --- 聊天输入和响应 ---
 if prompt := st.chat_input("输入你的消息:"):
