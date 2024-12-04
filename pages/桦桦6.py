@@ -32,53 +32,46 @@ if not api_key:
     st.stop()
 
 genai.configure(api_key=api_key)
+
+
 # Set up the model
 generation_config = {
-  "temperature": 1,
-  "top_p": 0,
-  "top_k": 0,
-  "max_output_tokens": 10000,
+    "temperature": 1,
+    "top_p": 0,
+    "top_k": 0,
+    "max_output_tokens": 10000,
 }
 
 safety_settings = [
-   {
-    "category": "HARM_CATEGORY_HARASSMENT",
-    "threshold": "BLOCK_NONE",
-   },
-   {
-    "category": "HARM_CATEGORY_HATE_SPEECH",
-    "threshold": "BLOCK_NONE",
-   },
-   {
-    "category": "HARM_CATEGORY_SEXUALLY_EXPLICIT",
-    "threshold": "BLOCK_NONE",
-   },
-   {
-    "category": "HARM_CATEGORY_DANGEROUS_CONTENT",
-    "threshold": "BLOCK_NONE",
-   },
+    {
+        "category": "HARM_CATEGORY_HARASSMENT",
+        "threshold": "BLOCK_NONE",
+    },
+    {
+        "category": "HARM_CATEGORY_HATE_SPEECH",
+        "threshold": "BLOCK_NONE",
+    },
+    {
+        "category": "HARM_CATEGORY_SEXUALLY_EXPLICIT",
+        "threshold": "BLOCK_NONE",
+    },
+    {
+        "category": "HARM_CATEGORY_DANGEROUS_CONTENT",
+        "threshold": "BLOCK_NONE",
+    },
 ]
 
-model = genai.GenerativeModel(model_name="gemini-1.5-pro-001",generation_config=generation_config,safety_settings=safety_settings)
+model = genai.GenerativeModel(model_name="gemini-1.5-pro-001", generation_config=generation_config, safety_settings=safety_settings)
 
 
-# --- 角色设定 ---
-character_settings = {
-    "设定1": "设定1的内容",
-    "设定2": "设定2的内容",
-    "设定3": "设定3的内容",
-    # ... 其他预设设定
-    "碎片1": "碎片1的内容",  # 碎片设定
-    "碎片2": "碎片2的内容",  # 碎片设定
-    "碎片3": "碎片3的内容",  # 碎片设定
-    # ... 其他碎片设定
+
+# --- 碎片设定 ---
+DEFAULT_FRAGMENTS = {
+    "fragment1": "设定1的内容...",
+    "fragment2": "设定2的内容...",
+    "fragment3": "设定3的内容...",
+    # ... 添加更多预设碎片
 }
-
-if "character_settings" not in st.session_state:
-    st.session_state.character_settings = character_settings
-
-if "enabled_settings" not in st.session_state:
-    st.session_state.enabled_settings = {name: False for name in character_settings}  # 默认关闭所有设定
 
 
 # --- LLM 函数 ---
@@ -86,36 +79,39 @@ def getAnswer(prompt):
     enabled_settings_content = ""
     enabled_settings = st.session_state.get("enabled_settings", {})
 
-    for setting_name, enabled in enabled_settings.items():
-        if enabled:
-            setting_content = st.session_state.character_settings.get(setting_name, "")
-            if setting_content:
-                enabled_settings_content += setting_content + "\n"
-
     his_messages = []
+    his_messages.append(
+        {"role": "model", "parts": [{"text": """
+ Use code with caution.
+[SYSTEM]
+[]
+[Personality：
+]
+[function：
 
-    #  构建初始 system message
-    his_messages.append({"role": "system", "parts": [{"text": "[SYSTEM]\n  []\n   [Personality：\n        ]\n   [function：\n    \n]"}]})
+]"""}]}
+    )
 
-
-    # 添加历史消息，过滤掉无效消息和不正确的角色
     for msg in st.session_state.messages[-20:]:
-        if "role" in msg and "content" in msg and msg["content"]: # 检查键和内容是否为空
-            valid_roles = ["user", "assistant"] #  只允许 "user" 和 "assistant" 角色
-            if msg["role"] in valid_roles:
-                his_messages.append({"role": msg["role"], "parts": [{"text": msg["content"]}]})
+        if msg["role"] == "user":
+            his_messages.append({"role": "user", "parts": [{"text": msg["content"]}]})
+        elif msg is not None and msg["content"] is not None:
+            his_messages.append({"role": "model", "parts": [{"text": msg["content"]}]})
 
+    his_messages = [msg for msg in his_messages if msg.get("parts") and msg["parts"][0].get("text")]
 
-    # 添加角色设定，使用 "system" 角色
+    # 添加角色设定到提示
+    enabled_settings = st.session_state.get("enabled_settings", {})
     active_settings = [name for name, enabled in enabled_settings.items() if enabled]
+
     if active_settings:
-        setting_text = "[Character Settings]:\n"
+        settings_text = "[Character Settings]:\n"
         for setting_name in active_settings:
             setting_content = st.session_state.character_settings.get(setting_name, "")
-            if setting_content: # 确保设定内容不为空
-                setting_text += f"{setting_name}:\n{setting_content}\n"
-        if setting_text: # 仅在有有效设定内容时添加
-           his_messages.append({"role": "system", "parts": [{"text": setting_text}]})
+            settings_text += f"{setting_name}:\n{setting_content}\n"
+
+        his_messages.append({"role": "system", "parts": [{"text": settings_text}]})
+
 
 
     try:
@@ -131,6 +127,7 @@ def getAnswer(prompt):
 
 
 
+# --- 文件操作函数 ---
 # --- 文件操作函数 ---
 filename = os.path.splitext(os.path.basename(__file__))[0] + ".pkl"
 log_file = os.path.join(os.path.dirname(__file__), filename)
@@ -203,26 +200,22 @@ if st.session_state.get("editing"):
             if st.button("取消", key=f"cancel_{i}"):
                 st.session_state.editing = False
 
-# --- 聊天输入和响应 ---
-if prompt := st.chat_input("输入你的消息:"):
-    st.session_state.messages.append({"role": "user", "content": prompt})
-    with st.chat_message("user"):
-        st.markdown(prompt)
-    with st.chat_message("assistant"):
-        message_placeholder = st.empty()
-        full_response = ""
-        for chunk in getAnswer(prompt):
-            full_response += chunk
-            message_placeholder.markdown(full_response + "▌")
-        message_placeholder.markdown(full_response)
-    st.session_state.messages.append({"role": "assistant", "content": full_response})
-    with open(log_file, "wb") as f:
-        pickle.dump(st.session_state.messages, f)
+
+
+# --- Streamlit 应用程序 ---
+
+# 初始化 session state
+if "messages" not in st.session_state:
+    st.session_state.messages = []
+
+if "character_settings" not in st.session_state:
+    st.session_state.character_settings = DEFAULT_FRAGMENTS.copy()
+
+if "enabled_settings" not in st.session_state:
+    st.session_state.enabled_settings = {name: False for name in DEFAULT_FRAGMENTS}
 
 
 # ---  三个功能区侧边栏 ---
-
-
 # 功能区 1: 文件操作
 with st.sidebar.expander("文件操作"):
     if len(st.session_state.messages) > 0:
@@ -258,8 +251,28 @@ with st.sidebar.expander("文件操作"):
 # 功能区 2: 角色设定
 with st.sidebar.expander("角色设定"):
     for setting_name, setting_content in st.session_state.character_settings.items():
-        st.checkbox(setting_name, key=f"setting_{setting_name}", value=st.session_state.enabled_settings.get(setting_name, False), on_change=lambda name=setting_name: st.session_state.enabled_settings.__setitem__(name, not st.session_state.enabled_settings.get(name, False)))
-        if st.session_state.enabled_settings.get(setting_name):  # 如果设定启用，显示其内容
-            st.write(setting_content)
+        st.checkbox(setting_name, key=f"enabled_{setting_name}", value=st.session_state.enabled_settings.get(setting_name, False))
+        if st.session_state["enabled_settings"].get(setting_name, False):
+            new_content = st.text_area(f"{setting_name} 内容:", setting_content, key=f"setting_content_{setting_name}")
+            st.session_state.character_settings[setting_name] = new_content
 
 
+
+# 功能区 3: ... (其他功能区)
+
+
+# --- 聊天输入和响应 ---
+if prompt := st.chat_input("输入你的消息:"):
+    st.session_state.messages.append({"role": "user", "content": prompt})
+    with st.chat_message("user"):
+        st.markdown(prompt)
+    with st.chat_message("assistant"):
+        message_placeholder = st.empty()
+        full_response = ""
+        for chunk in getAnswer(prompt):
+            full_response += chunk
+            message_placeholder.markdown(full_response + "▌")
+        message_placeholder.markdown(full_response)
+    st.session_state.messages.append({"role": "assistant", "content": full_response})
+    with open(log_file, "wb") as f:
+        pickle.dump(st.session_state.messages, f)
