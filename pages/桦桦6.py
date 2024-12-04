@@ -83,27 +83,6 @@ if "enabled_settings" not in st.session_state:
     st.session_state.enabled_settings = {name: False for name in DEFAULT_FRAGMENTS}
 
 
-# --- 读取本地设定文件 ---
-uploaded_settings_file = st.sidebar.file_uploader("读取本地设定文件 (TXT)", type=["txt"])
-if uploaded_settings_file is not None:
-    try:
-        setting_name = os.path.splitext(uploaded_settings_file.name)[0] # 文件名作为设定名
-        setting_content = uploaded_settings_file.read().decode("utf-8") # 读取内容
-
-        # 更新或添加设定
-        st.session_state.character_settings[setting_name] = setting_content
-
-        # 默认启用新读取的设定
-        st.session_state.enabled_settings[setting_name] = True
-
-        st.success(f"成功加载设定: {setting_name}")
-        st.experimental_rerun() # 刷新页面
-
-    except Exception as e:
-        st.error(f"读取设定文件失败: {e}")
-
-
-
 # --- LLM 函数 ---
 def getAnswer(prompt):
     enabled_settings_content = ""
@@ -283,15 +262,25 @@ with st.sidebar.expander("角色设定"):
             new_content = st.text_area(f"编辑 {setting_name}:", setting_content, key=f"edit_{setting_name}")
             st.session_state.character_settings[setting_name] = new_content
 
+
     # --- 读取本地设定文件 (在设定列表之后) ---
     uploaded_settings_file = st.file_uploader("读取本地设定文件 (TXT)", type=["txt"])
     if uploaded_settings_file is not None:
         try:
-            # ... (与之前的版本相同)
-        except Exception as e:
-            st.error(f"读取设定文件失败: {e}")
+            setting_name = os.path.splitext(uploaded_settings_file.name)[0] # 文件名作为设定名
+            setting_content = uploaded_settings_file.read().decode("utf-8") # 读取内容
 
+            # 更新或添加设定
+            st.session_state.character_settings[setting_name] = setting_content
 
+            # 默认启用新读取的设定
+            st.session_state.enabled_settings[setting_name] = True
+
+            st.success(f"成功加载设定: {setting_name}")
+            st.experimental_rerun() # 刷新页面
+            except Exception as e:
+                st.error(f"读取设定文件失败: {e}")
+        
 
 # --- 在聊天界面显示设定名称 ---
 enabled_settings_display = ", ".join(setting_name for setting_name, enabled in st.session_state.enabled_settings.items() if enabled)
