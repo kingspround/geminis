@@ -69,9 +69,10 @@ def getAnswer(prompt):
     for setting_name, enabled in enabled_settings.items():
         if enabled:
             setting_content = st.session_state.character_settings.get(setting_name, "")
-            if setting_content: 
-                enabled_settings_content += setting_content + "\n"
+            if setting_content: # 检查设定内容是否为空
+                enabled_settings_content += setting_content + "\n"  # 获取并添加设定内容
 
+def getAnswer(prompt):
     his_messages = []
     his_messages.append(
         {"role": "model", "parts":[{"text": """
@@ -236,62 +237,57 @@ with st.sidebar.expander("角色设定"):
     # 初始化设定
     if "character_settings" not in st.session_state:
         st.session_state.character_settings = {
-            "预设1：示例设定": "我是个乐于助人的AI助手。",
-            "预设2：另一个示例": "我喜欢用莎士比亚的风格说话。"
+            "预设1：朋友": "扮演我的朋友，和我轻松愉快的聊天。",
+            "预设2：老师": "扮演一位老师，用深入浅出的方式解释我提出的问题。",
         }
 
     if "enabled_settings" not in st.session_state:
-        st.session_state.enabled_settings = {k: False for k in st.session_state.character_settings}
+        st.session_state.enabled_settings = {setting_name: False for setting_name in st.session_state.character_settings}
+
+    # 读取本地设定
+    setting_files = glob.glob("*.txt")  # 获取所有 .txt 文件
+    for setting_file in setting_files:
+        setting_name = os.path.splitext(setting_file)[0]
+        if setting_name not in st.session_state.character_settings:
+            try:
+                with open(setting_file, "r", encoding="utf-8") as f:
+                    setting_content = f.read()
+                    st.session_state.character_settings[setting_name] = setting_content
+                    st.session_state.enabled_settings[setting_name] = False # 默认不启用
+            except Exception as e:
+                st.error(f"读取设定文件 {setting_file} 失败: {e}")
 
 
     # 新增设定
-    new_setting_name = st.text_input("新设定名称:")
-    new_setting_content = st.text_area("新设定内容:")
-    if st.button("添加设定"):
-        if new_setting_name and new_setting_content:  # 确保名称和内容都不为空
+    new_setting_name = st.text_input("设定名称")
+    new_setting_content = st.text_area("设定内容")
+    if st.button("新增设定"):
+        if new_setting_name and new_setting_content:
             st.session_state.character_settings[new_setting_name] = new_setting_content
-            st.session_state.enabled_settings[new_setting_name] = False  # 默认不启用新设定
-            st.experimental_rerun() # 刷新页面
+            st.session_state.enabled_settings[new_setting_name] = False # 新增的设定默认不启用
+            st.success(f"已添加设定: {new_setting_name}")
+        else:
+            st.warning("设定名称和内容不能为空。")
 
-    # 显示、编辑和启用/禁用设定
+    # 显示、启用/禁用和编辑设定
     for setting_name, setting_content in st.session_state.character_settings.items():
-        col1, col2 = st.columns([1, 4])
+        col1, col2 = st.columns([1, 3])  # 调整列的宽度比例
         with col1:
-            st.checkbox(setting_name, key=f"enable_{setting_name}", value=st.session_state.enabled_settings.get(setting_name, False))
-
+            enabled = st.checkbox(setting_name, key=f"enable_{setting_name}", value=st.session_state.enabled_settings.get(setting_name, False))
+            st.session_state.enabled_settings[setting_name] = enabled
         with col2:
-            with st.expander("查看/编辑"): # 默认收起设定内容
-                edited_content = st.text_area("", setting_content, key=f"edit_area_{setting_name}")
-                if st.button("保存修改", key=f"save_button_{setting_name}"):
-                    st.session_state.character_settings[setting_name] = edited_content
-                    st.experimental_rerun()
+            if st.button("编辑", key=f"edit_setting_{setting_name}"): # 为每个编辑按钮添加唯一的key
+               with st.expander("编辑设定"): # 用expander展开编辑区域
+                    edited_content = st.text_area("设定内容", setting_content, key=f"edit_area_{setting_name}")  # 为每个text_area添加唯一的key
+                    if st.button("保存修改", key=f"save_setting_{setting_name}"):
+                        st.session_state.character_settings[setting_name] = edited_content
+                        st.success("已保存修改！")
 
 
-    # 读取本地设定
-    with st.expander("读取本地设定"):  # 默认收起
-        uploaded_settings_file = st.file_uploader("选择设定文件 (txt)", type=["txt"])
-        if uploaded_settings_file is not None:
-            stringio = StringIO(uploaded_settings_file.getvalue().decode("utf-8"))
-            for line in stringio:
-                parts = line.strip().split(":", 1)  # 只分割一次，允许设定内容包含冒号
-                if len(parts) == 2:
-                   setting_name, setting_content = parts
-                   st.session_state.character_settings[setting_name.strip()] = setting_content.strip()
-                   st.session_state.enabled_settings[setting_name.strip()] = False # 默认不启用
-            st.success("设定已加载！")
-            st.experimental_rerun()
-
-
-
-# ... (Chat input and response section remains unchanged)
+# ... (rest of the code remains unchanged)
 
 
 # 聊天界面显示已经加载的设定
-enabled_settings = st.session_state.get("enabled_settings", {})
-active_settings = [name for name, enabled in enabled_settings.items() if enabled]
-
+active_settings = [name for name, enabled in st.session_state.enabled_settings.items() if enabled]
 if active_settings:
-    st.write("# First") # 这里可以根据你的需求修改显示方式
-    st.write("已加载设定:")
-    for setting_name in active_settings:
-        st.write(f"- {setting_name}")
+    st.write(f"已加载设定: {', '.join(active_settings)}")
