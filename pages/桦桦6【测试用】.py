@@ -82,26 +82,27 @@ if "character_settings" not in st.session_state:
 if "enabled_settings" not in st.session_state:
     st.session_state.enabled_settings = {name: False for name in DEFAULT_FRAGMENTS}
 
-# ---  整合设定信息 ---
-def get_settings_string():
+
+# --- LLM 函数 ---
+def getAnswer(prompt):
     enabled_settings_content = ""
     enabled_settings = st.session_state.get("enabled_settings", {})
     for setting_name, enabled in enabled_settings.items():
         if enabled:
             setting_content = st.session_state.character_settings.get(setting_name, "")
             if setting_content:
-                enabled_settings_content += setting_content + "\n"
-    return enabled_settings_content
+                enabled_settings_content += f"{setting_name}:\n{setting_content}\n\n"  # 添加设定名称和内容
 
-# --- LLM 函数 ---
-def getAnswer(prompt):
-    enabled_settings_content = ""
-    enabled_settings = st.session_state.get("enabled_settings", {})
 
-    his_messages = []
+    # --- 将设定作为系统消息添加到聊天记录 ---
+    if enabled_settings_content:
+        st.session_state.messages.append({"role": "system", "content": enabled_settings_content.strip()}) # strip() 去除末尾的换行
+
+
+    his_messages = [] #  清空 his_messages, 防止设定重复添加
     his_messages.append(
-        {"role": "model", "parts": [{"text": """
- Use code with caution.
+        {"role": "model", "parts":[{"text": """
+Use code with caution.
 [SYSTEM]
 []
 [Personality：
@@ -111,14 +112,13 @@ def getAnswer(prompt):
 ]"""}]}
     )
 
-    
     for msg in st.session_state.messages[-20:]:
         if msg["role"] == "user":
             his_messages.append({"role": "user", "parts": [{"text": msg["content"]}]})
-        elif msg is not None and msg["content"] is not None:
+        elif msg is not None and msg["content"] is not None:  #  确保消息和内容不为空
             his_messages.append({"role": "model", "parts": [{"text": msg["content"]}]})
 
-    his_messages = [msg for msg in his_messages if msg.get("parts") and msg["parts"][0].get("text")]
+    his_messages = [msg for msg in his_messages if msg.get("parts") and msg["parts"][0].get("text")]  #  过滤掉空消息
 
     try:
         response = model.generate_content(contents=his_messages, stream=True)
