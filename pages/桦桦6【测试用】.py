@@ -82,17 +82,17 @@ if "character_settings" not in st.session_state:
 if "enabled_settings" not in st.session_state:
     st.session_state.enabled_settings = {name: False for name in DEFAULT_FRAGMENTS}
 
-# ---  整合设定并添加到聊天记录 ---
-enabled_settings_content = ""
-enabled_settings = st.session_state.get("enabled_settings", {})
-for setting_name, enabled in enabled_settings.items():
-    if enabled:
-        setting_content = st.session_state.character_settings.get(setting_name, "")
-        if setting_content:
-            enabled_settings_content += f"{setting_name}:\n{setting_content}\n"
+# ---  整合设定信息 ---
+def get_settings_string():
+    enabled_settings_content = ""
+    enabled_settings = st.session_state.get("enabled_settings", {})
+    for setting_name, enabled in enabled_settings.items():
+        if enabled:
+            setting_content = st.session_state.character_settings.get(setting_name, "")
+            if setting_content:
+                enabled_settings_content += setting_content + "\n"
+    return enabled_settings_content
 
-if enabled_settings_content:  # 仅当有启用的设定时才添加
-    st.session_state.messages.insert(0, {"role": "system", "content": enabled_settings_content})  # 插入到开头
 # --- LLM 函数 ---
 def getAnswer(prompt):
     enabled_settings_content = ""
@@ -119,18 +119,6 @@ def getAnswer(prompt):
             his_messages.append({"role": "model", "parts": [{"text": msg["content"]}]})
 
     his_messages = [msg for msg in his_messages if msg.get("parts") and msg["parts"][0].get("text")]
-
-    enabled_settings_content = ""
-    enabled_settings = st.session_state.get("enabled_settings", {})
-
-    for setting_name, enabled in enabled_settings.items():
-        if enabled:
-            setting_content = st.session_state.character_settings.get(setting_name, "")
-            if setting_content:  # 检查设定内容是否为空
-                enabled_settings_content += setting_content + "\n"  # 获取并添加设定内容
-
-
-    his_messages.append({"role": "model", "parts": [{"text": enabled_settings_content}]}) #  追加碎片设定
 
     try:
         response = model.generate_content(contents=his_messages, stream=True)
@@ -311,13 +299,30 @@ if prompt := st.chat_input("输入你的消息:"):
     st.session_state.messages.append({"role": "user", "content": prompt})
     with st.chat_message("user"):
         st.markdown(prompt)
+
+    # --- 添加设定信息到 st.session_state.messages ---
+    settings_string = get_settings_string()
+    if settings_string:
+        st.session_state.messages.append({"role": "system", "content": settings_string, "display": False}) # 不显示设定信息
+
+
     with st.chat_message("assistant"):
         message_placeholder = st.empty()
         full_response = ""
-        for chunk in getAnswer(prompt):
+        for chunk in getAnswer(prompt): # getAnswer 不再处理设定
             full_response += chunk
             message_placeholder.markdown(full_response + "▌")
         message_placeholder.markdown(full_response)
-    st.session_state.messages.append({"role": "assistant", "content": full_response})
+        st.session_state.messages.append({"role": "assistant", "content": full_response})
+
+
     with open(log_file, "wb") as f:
         pickle.dump(st.session_state.messages, f)
+
+
+# --- 在聊天界面显示设定名称 (修改) ---
+# 只显示用户消息和助手回复，不显示设定信息
+for message in st.session_state.messages:
+    if message.get("display", True): #  默认显示，除非明确设置为 False
+        with st.chat_message(message["role"]):
+            st.write(message["content"])
