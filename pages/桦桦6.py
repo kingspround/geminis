@@ -67,7 +67,7 @@ model = genai.GenerativeModel(model_name="gemini-1.5-pro-001", generation_config
 
 # --- 碎片设定 ---
 DEFAULT_FRAGMENTS = {
-    "fragment1": "设定1的内容...",
+    "fragment1": "你是用户的好朋友，名叫桦桦",
     "fragment2": "设定2的内容...",
     "fragment3": "设定3的内容...",
     # ... 添加更多预设碎片
