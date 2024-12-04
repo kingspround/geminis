@@ -111,28 +111,18 @@ def getAnswer(prompt):
 
 
     his_messages = []
-    his_messages.append(
-        {"role": "model", "parts": [{"text": """
-Use code with caution.
-[SYSTEM]
-[]
-[Personality：
-]
-[function：
-
-]"""}]}
-    )
+    his_messages.append({"role": "model", "parts": [{"text": "Initial message"}]}) #  示例初始消息
 
     for msg in st.session_state.messages[-20:]:
-        his_messages.append({"role": msg["role"], "parts": [{"text": msg["content"]}]}) #  修正历史消息格式
+        if msg["role"] in ("user", "model"):  # 过滤掉无效角色
+            his_messages.append({"role": msg["role"], "parts": [{"text": msg["content"]}]})
 
-
-    # 添加系统设定消息到历史消息 (修正格式)
     update_settings_message()
     settings_message_with_parts = {"role": "model", "parts": [{"text": st.session_state.settings_message["content"]}]}
     his_messages.append(settings_message_with_parts)
 
-    
+    print(his_messages)  # 打印 his_messages 进行调试
+
     try:
         response = model.generate_content(contents=his_messages, stream=True)
         full_response = ""
