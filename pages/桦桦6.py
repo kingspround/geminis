@@ -63,16 +63,6 @@ model = genai.GenerativeModel(model_name="gemini-1.5-pro-001",generation_config=
 
 # --- LLM 函数 ---
 def getAnswer(prompt):
-    enabled_settings_content = ""
-    enabled_settings = st.session_state.get("enabled_settings", {})
-
-    for setting_name, enabled in enabled_settings.items():
-        if enabled:
-            setting_content = st.session_state.character_settings.get(setting_name, "")
-            if setting_content: # 检查设定内容是否为空
-                enabled_settings_content += setting_content + "\n"  # 获取并添加设定内容
-
-def getAnswer(prompt):
     his_messages = []
     his_messages.append(
         {"role": "model", "parts":[{"text": """
