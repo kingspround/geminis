@@ -124,17 +124,13 @@ Use code with caution.
     )
 
     for msg in st.session_state.messages[-20:]:
-        if msg["role"] == "user":
-            his_messages.append({"role": "user", "parts": [{"text": msg["content"]}]})
-        elif msg is not None and msg["content"] is not None:
-            his_messages.append({"role": "model", "parts": [{"text": msg["content"]}]})
-
-    his_messages = [msg for msg in his_messages if msg.get("parts") and msg["parts"][0].get("text")]
+        his_messages.append({"role": msg["role"], "parts": [{"text": msg["content"]}]}) #  修正历史消息格式
 
 
-    # 添加系统设定消息到历史消息
+    # 添加系统设定消息到历史消息 (修正格式)
     update_settings_message()  # 确保设定消息是最新的
-    his_messages.append(st.session_state.settings_message) # 在这里添加设定消息
+    settings_message_with_parts = {"role": "system", "parts": [{"text": st.session_state.settings_message["content"]}]}  # 添加 parts 键
+    his_messages.append(settings_message_with_parts) # 使用修正后的消息
 
 
     try:
