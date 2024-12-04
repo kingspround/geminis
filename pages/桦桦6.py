@@ -268,13 +268,14 @@ with st.sidebar.expander("角色设定", expanded=False):  # 默认收起
     st.session_state.character_settings = all_settings
 
     # 显示所有设定和启用/禁用选项
-    for setting_name, setting_content in st.session_state.character_settings.items():
-        enabled = st.checkbox(setting_name, key=f"setting_enabled_{setting_name}")
-        st.session_state.enabled_settings[setting_name] = enabled
-        if enabled: # 只有启用时才显示内容，默认收起
-            with st.expander("查看/编辑设定内容", expanded=False):
-                new_content = st.text_area("", setting_content, key=f"setting_content_{setting_name}")
-                if st.button("保存修改", key=f"save_setting_{setting_name}"):
+
+for setting_name, setting_content in st.session_state.character_settings.items():
+    enabled = st.checkbox(setting_name, key=f"setting_enabled_{setting_name}")
+    st.session_state.enabled_settings[setting_name] = enabled
+    if enabled:
+        with st.expander("查看/编辑设定内容", expanded=False, key=f"expander_{setting_name}"): #  <- 添加 key
+            new_content = st.text_area("", setting_content, key=f"setting_content_{setting_name}")
+            if st.button("保存修改", key=f"save_setting_{setting_name}"):
                     st.session_state.character_settings[setting_name] = new_content
                     if setting_name not in preset_settings:  # 只保存非预设的设定到文件
                         with open(f"{setting_name}.txt", "w", encoding="utf-8") as f:
