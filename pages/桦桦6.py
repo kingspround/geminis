@@ -61,6 +61,45 @@ safety_settings = [
 
 model = genai.GenerativeModel(model_name="gemini-1.5-pro-001",generation_config=generation_config,safety_settings=safety_settings)
 
+# --- 角色设定数据 ---
+character_settings = {
+    "默认设定": "", # 空字符串表示没有额外的设定
+    "设定1：未来科幻": """
+[设定]：故事发生在2345年的赛博朋克都市Neo-Kyoto。科技高度发达，人工智能已经融入生活的方方面面，但社会也充满了不平等和黑暗。
+[世界观]：这个世界由强大的科技巨头控制，他们利用先进的AI技术监控和操纵着人们的生活。反抗组织在暗中活动，试图推翻巨头的统治。
+[人物]：你是一个拥有特殊能力的改造人，在Neo-Kyoto的地下世界中挣扎求生。你将面临来自巨头和反抗组织的双重压力，需要做出艰难的抉择。
+""",
+    "设定2：奇幻冒险": """
+[设定]：故事发生在一个充满魔法和奇幻生物的世界。古老的预言即将应验，黑暗势力蠢蠢欲动。
+[世界观]：这个世界由各种不同的种族组成，人类、精灵、矮人、兽人等等。他们之间既有合作也有冲突，共同维护着世界的平衡。
+[人物]：你是一个勇敢的冒险者，踏上了寻找传说中的神器之旅。你将面临各种危险和挑战，需要运用你的智慧和勇气来克服它们。
+""",
+    "设定3：侦探推理": """
+[设定]：故事发生在一个充满谜团的城市。一起离奇的谋杀案打破了城市的宁静，你需要找出真正的凶手。
+[世界观]：这个世界充满了阴谋和背叛，每个人都有自己的秘密。你需要运用你的推理能力，抽丝剥茧，找出真相。
+[人物]：你是一位经验丰富的侦探，拥有敏锐的观察力和逻辑思维能力。你需要仔细收集线索，分析证据，最终揭开谜底。
+""",
+    # ... 添加更多预设
+    "自定义设定": ""  # 用于用户自定义的设定
+}
+
+
+# --- 初始化 Session State ---
+if "character_settings" not in st.session_state:
+    st.session_state.character_settings = character_settings
+
+if "enabled_settings" not in st.session_state:
+    st.session_state.enabled_settings = {name: False for name in character_settings}  # 默认所有设定都禁用
+
+
+# 功能区 2: 角色设定
+with st.sidebar.expander("角色设定"):
+    for setting_name in character_settings:
+        st.checkbox(setting_name, key=f"enabled_settings.{setting_name}")
+        if setting_name == "自定义设定":
+            st.text_area("自定义设定内容:", key=f"character_settings.{setting_name}")  # 使用 text_area
+
+
 # --- LLM 函数 ---
 def getAnswer(prompt):
     his_messages = []
@@ -224,47 +263,12 @@ with st.sidebar.expander("文件操作"):
             st.error(f"读取本地pkl文件失败：{e}")
 
 
-# 功能区 2: 角色设定
-with st.sidebar.expander("角色设定"):
-    # 内置预设设定
-    character_presets = {
-        "友善": "我是一个友善且乐于助人的AI助手。",
-        "专业": "我是一个专业的AI助手，专注于提供准确和简洁的信息。",
-        "幽默": "我是一个幽默的AI助手，喜欢用轻松的方式回答问题。",
-        "创意": "我是一个富有创意的AI助手，擅长生成各种文本格式，例如诗歌、代码、脚本、音乐作品、电子邮件、信件等。",
-        # ... 添加更多预设
-    }
+    setting_text = ""
+    for setting_name, enabled in st.session_state.enabled_settings.items():
+        if enabled:
+            setting_content = st.session_state.character_settings.get(setting_name, "")
+            if setting_content:  # 检查设定内容是否为空
+                setting_text += f"{setting_name}:\n{setting_content}\n"
 
-
-    if "character_settings" not in st.session_state:
-        st.session_state.character_settings = character_presets.copy() # 初始化，使用副本避免修改原预设
-
-    if "enabled_settings" not in st.session_state:
-        st.session_state.enabled_settings = {name: False for name in character_presets} # 初始化启用状态
-
-
-    # 显示预设设定和自定义设定
-    for setting_name, setting_content in st.session_state.character_settings.items():
-        enabled = st.checkbox(setting_name, key=f"setting_{setting_name}", value=st.session_state.enabled_settings.get(setting_name, False))
-        st.session_state.enabled_settings[setting_name] = enabled # 更新启用状态
-
-        if setting_name not in character_presets: # 如果是自定义设定，允许编辑
-             setting_content = st.text_area(f"编辑 {setting_name}:", setting_content, key=f"setting_edit_{setting_name}")
-             st.session_state.character_settings[setting_name] = setting_content
-        
-    # 添加自定义设定
-    new_setting_name = st.text_input("新的设定名称:")
-    if st.button("添加设定"):
-        if new_setting_name:
-            st.session_state.character_settings[new_setting_name] = ""  # 添加新的空设定
-            st.session_state.enabled_settings[new_setting_name] = False # 默认不启用
-            st.experimental_rerun()
-
-    # 删除自定义设定
-    settings_to_remove = [name for name in st.session_state.character_settings if name not in character_presets]
-    selected_setting_to_remove = st.selectbox("删除设定:", [""] + settings_to_remove) # 空字符串作为默认选项
-    if st.button("删除"):
-        if selected_setting_to_remove:
-            del st.session_state.character_settings[selected_setting_to_remove]
-            del st.session_state.enabled_settings[selected_setting_to_remove]
-            st.experimental_rerun()
+    if setting_text:  # 只有当有启用的设定时才添加到消息中
+        his_messages.append({"role": "system", "parts": [{"text": setting_text}]})
