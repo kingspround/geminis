@@ -82,24 +82,17 @@ if "character_settings" not in st.session_state:
 if "enabled_settings" not in st.session_state:
     st.session_state.enabled_settings = {name: False for name in DEFAULT_FRAGMENTS}
 
-# ---  整合设定内容 ---
-def get_enabled_settings_content():
-    enabled_settings_content = ""
-    for setting_name, enabled in st.session_state.enabled_settings.items():
-        if enabled:
-            setting_content = st.session_state.character_settings.get(setting_name, "")
-            if setting_content:
-                enabled_settings_content += setting_content + "\n"
-    return enabled_settings_content
+# ---  整合设定并添加到聊天记录 ---
+enabled_settings_content = ""
+enabled_settings = st.session_state.get("enabled_settings", {})
+for setting_name, enabled in enabled_settings.items():
+    if enabled:
+        setting_content = st.session_state.character_settings.get(setting_name, "")
+        if setting_content:
+            enabled_settings_content += f"{setting_name}:\n{setting_content}\n"
 
-# --- 更新聊天记录第一条消息 ---
-def update_first_message():
-    settings_content = get_enabled_settings_content()
-    if "messages" not in st.session_state or not st.session_state.messages:
-        st.session_state.messages = [{"role": "system", "content": settings_content}]
-    else:
-        st.session_state.messages[0]["content"] = settings_content
-
+if enabled_settings_content:  # 仅当有启用的设定时才添加
+    st.session_state.messages.insert(0, {"role": "system", "content": enabled_settings_content})  # 插入到开头
 # --- LLM 函数 ---
 def getAnswer(prompt):
     enabled_settings_content = ""
