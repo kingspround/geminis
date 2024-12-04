@@ -227,9 +227,10 @@ with st.sidebar.expander("文件操作"):
 
 # 功能区 2: 角色设定
 with st.sidebar.expander("角色设定", expanded=False):  # 默认收起
-    # 初始化 character_settings 和 enabled_settings
+    # 初始化角色设定
     if "character_settings" not in st.session_state:
         st.session_state.character_settings = {}
+
     if "enabled_settings" not in st.session_state:
         st.session_state.enabled_settings = {}
 
@@ -248,58 +249,53 @@ with st.sidebar.expander("角色设定", expanded=False):  # 默认收起
 
 繁殖方式: 淫化惧怖魔可以通过交媾、产卵、分裂等多种方式进行繁殖，并且可以跨种族繁殖，创造出更加奇特的亚种。 社会结构: 淫化惧怖魔没有固定的社会结构，有些会单独行动，有些会组成小群体，有些甚至会建立大型的淫魔帝国。 弱点: 淫化惧怖魔的弱点因亚种而异，有些惧怕圣光，有些惧怕特定的咒语，有些则会被强大的精神力所压制。""",
 
-        "示例设定2": "设定2的内容...",
-        # ... 添加更多预设定
+        "预设2：专业": "扮演一个专业的顾问，提供准确和有用的信息。",
     }
 
-    # 从本地文件读取设定
-    setting_files = glob.glob("*.txt")  # 获取所有 .txt 文件
-    for filename in setting_files:
-        setting_name = os.path.splitext(filename)[0]
-        try:
-            with open(filename, "r", encoding="utf-8") as f:
-                setting_content = f.read()
-                preset_settings[setting_name] = setting_content # 将读取的设定添加到预设定字典
-        except Exception as e:
-            st.error(f"读取设定文件 {filename} 失败: {e}")
+    # 加载本地设定文件
+    settings_files = glob.glob("*.txt")  # 获取所有 .txt 文件
+    for file in settings_files:
+        setting_name = os.path.splitext(file)[0]
+        with open(file, "r", encoding="utf-8") as f: # 添加编码设置
+            setting_content = f.read()
+            st.session_state.character_settings[setting_name] = setting_content
 
 
-    # 更新 session_state 中的设定
-    if not st.session_state.character_settings:  # 只有当 character_settings 为空时才更新
-        st.session_state.character_settings.update(preset_settings)
+    # 将预设和本地设定合并
+    all_settings = preset_settings.copy()
+    all_settings.update(st.session_state.character_settings)
+
+    st.session_state.character_settings = all_settings
+
+    # 显示所有设定和启用/禁用选项
+    for setting_name, setting_content in st.session_state.character_settings.items():
+        enabled = st.checkbox(setting_name, key=f"setting_enabled_{setting_name}")
+        st.session_state.enabled_settings[setting_name] = enabled
+        if enabled: # 只有启用时才显示内容，默认收起
+            with st.expander("查看/编辑设定内容", expanded=False):
+                new_content = st.text_area("", setting_content, key=f"setting_content_{setting_name}")
+                if st.button("保存修改", key=f"save_setting_{setting_name}"):
+                    st.session_state.character_settings[setting_name] = new_content
+                    if setting_name not in preset_settings:  # 只保存非预设的设定到文件
+                        with open(f"{setting_name}.txt", "w", encoding="utf-8") as f:
+                            f.write(new_content)
+                    st.success("设定已保存！")
 
 
-    # 新增设定
-    new_setting_name = st.text_input("新增设定名称")
-    new_setting_content = st.text_area("新增设定内容")
-    if st.button("添加设定"):
+
+    # 新建设定
+    new_setting_name = st.text_input("新建设定名称")
+    new_setting_content = st.text_area("新建设定内容")
+    if st.button("创建设定"):
         if new_setting_name and new_setting_content:
             st.session_state.character_settings[new_setting_name] = new_setting_content
-            st.success(f"已添加设定: {new_setting_name}")
-            # 可选择将新设定保存到文件
-            # with open(f"{new_setting_name}.txt", "w", encoding="utf-8") as f:
-            #     f.write(new_setting_content)
-        else:
-            st.warning("设定名称和内容不能为空！")
+            with open(f"{new_setting_name}.txt", "w", encoding="utf-8") as f:
+                f.write(new_setting_content)
+            st.success("设定已创建！")
+            st.experimental_rerun()  # 刷新以显示新的设定
 
 
-
-    # 显示和启用/禁用设定
-    for setting_name, setting_content in st.session_state.character_settings.items():
-        enabled = st.checkbox(setting_name, key=f"setting_{setting_name}", value=st.session_state.enabled_settings.get(setting_name, False))  # 使用 get 方法，默认未选中
-        st.session_state.enabled_settings[setting_name] = enabled
-        if enabled:  # 如果启用，则显示内容
-            st.text_area(f"{setting_name} 内容:", setting_content, key=f"setting_content_{setting_name}", disabled=True)
-            
-
-# ... (后面的代码保持不变)
-
-
-# 聊天界面显示已经加载的设定
-enabled_settings = st.session_state.get("enabled_settings", {})
-active_settings = [name for name, enabled in enabled_settings.items() if enabled]
-
+# 聊天界面显示已加载的设定
+active_settings = [name for name, enabled in st.session_state.enabled_settings.items() if enabled]
 if active_settings:
-    st.write("# 已加载的设定:") # 显示标题
-    for setting_name in active_settings:
-        st.write(f"- {setting_name}") # 显示已启用的设定名称
+    st.write("已加载的设定：", ", ".join(active_settings))
