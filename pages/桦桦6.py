@@ -94,7 +94,7 @@ def getAnswer(prompt):
 
     his_messages = []
     his_messages.append(
-        {"role": "model", "parts":[{"text": """
+        {"role": "assistant", "parts":[{"text": """
 [SYSTEM]
   []
    [Personality：
@@ -102,16 +102,14 @@ def getAnswer(prompt):
    [function：
     
 
-]"""}]}
+]"""}]} # assistant
    )
 
-
-
-    for msg in st.session_state.messages[-20:]: # 保留最近20条消息
+    for msg in st.session_state.messages[-20:]:
         if msg["role"] == "user":
             his_messages.append({"role": "user", "parts": [{"text": msg["content"]}]})
-        elif msg is not None and msg["content"] is not None: # 防止空消息
-            his_messages.append({"role": "model", "parts": [{"text": msg["content"]}]})
+        elif msg is not None and msg["content"] is not None:
+            his_messages.append({"role": "assistant", "parts": [{"text": msg["content"]}]}) # assistant
 
     his_messages = [msg for msg in his_messages if msg.get("parts") and msg["parts"][0].get("text")] # 清理空消息
 
