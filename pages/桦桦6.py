@@ -100,7 +100,7 @@ def getAnswer(prompt):
 
     his_messages = [msg for msg in his_messages if msg.get("parts") and msg["parts"][0].get("text")]
 
-    # 添加角色设定到提示
+    # 添加角色设定到提示 (修正后的代码)
     enabled_settings = st.session_state.get("enabled_settings", {})
     active_settings = [name for name, enabled in enabled_settings.items() if enabled]
 
@@ -111,7 +111,6 @@ def getAnswer(prompt):
             settings_text += f"{setting_name}:\n{setting_content}\n"
 
         his_messages.append({"role": "system", "parts": [{"text": settings_text}]})
-
 
 
     try:
@@ -127,7 +126,6 @@ def getAnswer(prompt):
 
 
 
-# --- 文件操作函数 ---
 # --- 文件操作函数 ---
 filename = os.path.splitext(os.path.basename(__file__))[0] + ".pkl"
 log_file = os.path.join(os.path.dirname(__file__), filename)
