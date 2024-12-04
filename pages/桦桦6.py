@@ -82,78 +82,27 @@ if "character_settings" not in st.session_state:
 if "enabled_settings" not in st.session_state:
     st.session_state.enabled_settings = {name: False for name in DEFAULT_FRAGMENTS}
 
+# ---  显示已加载设定 ---
+st.sidebar.markdown("**已加载设定:**")
+for setting_name, enabled in st.session_state.enabled_settings.items():
+    if enabled:
+        st.sidebar.markdown(f"- {setting_name}")
+
 # --- 读取本地设定文件 ---
-def load_local_settings(uploaded_file):
-    try:
-        filename = uploaded_file.name.split(".")[0]  # 获取文件名作为设定名称
-        setting_content = uploaded_file.read().decode("utf-8") # 读取文件内容
-        st.session_state.character_settings[filename] = setting_content # 更新设定
-        st.session_state.enabled_settings[filename] = True # 默认启用新加载的设定
-        st.success(f"成功加载设定: {filename}")
-        st.experimental_rerun() # 刷新界面
-    except Exception as e:
-        st.error(f"加载设定文件失败: {e}")
+with st.sidebar.expander("读取本地设定"):
+    uploaded_files = st.file_uploader("上传设定文件 (txt)", type=["txt"], accept_multiple_files=True)
+    if uploaded_files:
+        for uploaded_file in uploaded_files:
+            try:
+                setting_name = os.path.splitext(uploaded_file.name)[0]  # 使用文件名作为设定名称
+                setting_content = uploaded_file.read().decode("utf-8")  # 读取文件内容
+                st.session_state.character_settings[setting_name] = setting_content
+                st.session_state.enabled_settings[setting_name] = True #  默认启用新读取的设定
+                st.success(f"成功加载设定: {setting_name}")
+                st.experimental_rerun()  # 刷新页面以显示新的设定
+            except Exception as e:
+                st.error(f"加载设定文件 {uploaded_file.name} 失败: {e}")
 
-
-# ---  三个功能区侧边栏 ---
-# 功能区 1: 文件操作
-with st.sidebar.expander("文件操作"):
-    if len(st.session_state.messages) > 0:
-        st.button("重置上一个输出", on_click=lambda: st.session_state.messages.pop(-1))
-
-    st.button("读取历史记录", on_click=lambda: load_history(log_file))
-    st.button("清除历史记录", on_click=lambda: clear_history(log_file))
-    st.download_button(
-        label="下载聊天记录",
-        data=open(log_file, "rb").read(),
-        file_name=filename,
-        mime="application/octet-stream",
-    )
-
-    if "pkl_file_loaded" not in st.session_state:
-        st.session_state.pkl_file_loaded = False  # 初始化标志
-
-    uploaded_file = st.file_uploader("读取本地pkl文件", type=["pkl"])  # 只接受 .pkl 文件
-    if uploaded_file is not None and not st.session_state.pkl_file_loaded:
-        try:
-            loaded_messages = pickle.load(uploaded_file)
-            # 将加载的消息添加到现有的消息列表中 (或替换，取决于你的需求)
-            st.session_state.messages.extend(loaded_messages)  # 使用extend追加消息
-            # st.session_state.messages = loaded_messages  # 使用 = 替换现有消息
-
-            st.session_state.pkl_file_loaded = True  # 设置标志，防止重复读取
-            st.experimental_rerun() # 刷新页面以显示新的消息
-
-        except Exception as e:
-            st.error(f"读取本地pkl文件失败：{e}")
-
-
-# 功能区 2: 角色设定
-with st.sidebar.expander("角色设定"):
-
-    # 显示已加载的设定
-    st.markdown("**已加载的设定:**")
-    for setting_name, enabled in st.session_state.enabled_settings.items():
-        if enabled:
-             st.write(f"- {setting_name}")
-            
-with st.sidebar.expander("角色设定"):
-    for setting_name, setting_content in st.session_state.character_settings.items():
-        enabled = st.checkbox(setting_name, key=f"setting_{setting_name}", value=st.session_state.enabled_settings.get(setting_name, False))
-        st.session_state.enabled_settings[setting_name] = enabled  # 更新启用状态
-        if enabled:
-            new_content = st.text_area(f"编辑 {setting_name}:", setting_content, key=f"edit_{setting_name}")
-            st.session_state.character_settings[setting_name] = new_content
-
-    # 读取本地设定文件
-    with st.expander("读取本地设定 (txt)", expanded=False):  # 默认收起
-        uploaded_setting = st.file_uploader("选择设定文件 (txt)", type=["txt"])
-        if uploaded_setting is not None:
-            load_local_settings(uploaded_setting)
-
-
-
-# 功能区 3: ... (其他功能区)
 
 
 
@@ -294,6 +243,67 @@ if "character_settings" not in st.session_state:
 
 if "enabled_settings" not in st.session_state:
     st.session_state.enabled_settings = {name: False for name in DEFAULT_FRAGMENTS}
+
+# ---  三个功能区侧边栏 ---
+# 功能区 1: 文件操作
+with st.sidebar.expander("文件操作"):
+    if len(st.session_state.messages) > 0:
+        st.button("重置上一个输出", on_click=lambda: st.session_state.messages.pop(-1))
+
+    st.button("读取历史记录", on_click=lambda: load_history(log_file))
+    st.button("清除历史记录", on_click=lambda: clear_history(log_file))
+    st.download_button(
+        label="下载聊天记录",
+        data=open(log_file, "rb").read(),
+        file_name=filename,
+        mime="application/octet-stream",
+    )
+
+    if "pkl_file_loaded" not in st.session_state:
+        st.session_state.pkl_file_loaded = False  # 初始化标志
+
+    uploaded_file = st.file_uploader("读取本地pkl文件", type=["pkl"])  # 只接受 .pkl 文件
+    if uploaded_file is not None and not st.session_state.pkl_file_loaded:
+        try:
+            loaded_messages = pickle.load(uploaded_file)
+            # 将加载的消息添加到现有的消息列表中 (或替换，取决于你的需求)
+            st.session_state.messages.extend(loaded_messages)  # 使用extend追加消息
+            # st.session_state.messages = loaded_messages  # 使用 = 替换现有消息
+
+            st.session_state.pkl_file_loaded = True  # 设置标志，防止重复读取
+            st.experimental_rerun() # 刷新页面以显示新的消息
+
+        except Exception as e:
+            st.error(f"读取本地pkl文件失败：{e}")
+
+
+# 功能区 2: 角色设定
+with st.sidebar.expander("角色设定"):
+
+    # 显示已加载的设定
+    st.markdown("**已加载的设定:**")
+    for setting_name, enabled in st.session_state.enabled_settings.items():
+        if enabled:
+             st.write(f"- {setting_name}")
+            
+with st.sidebar.expander("角色设定"):
+    for setting_name, setting_content in st.session_state.character_settings.items():
+        enabled = st.checkbox(setting_name, key=f"setting_{setting_name}", value=st.session_state.enabled_settings.get(setting_name, False))
+        st.session_state.enabled_settings[setting_name] = enabled  # 更新启用状态
+        if enabled:
+            new_content = st.text_area(f"编辑 {setting_name}:", setting_content, key=f"edit_{setting_name}")
+            st.session_state.character_settings[setting_name] = new_content
+
+    # 读取本地设定文件
+    with st.expander("读取本地设定 (txt)", expanded=False):  # 默认收起
+        uploaded_setting = st.file_uploader("选择设定文件 (txt)", type=["txt"])
+        if uploaded_setting is not None:
+            load_local_settings(uploaded_setting)
+
+
+
+# 功能区 3: ... (其他功能区)
+
 
 
 
