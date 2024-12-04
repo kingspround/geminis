@@ -777,13 +777,17 @@ with st.sidebar.expander("文件操作"):
             st.error(f"读取本地pkl文件失败：{e}")
 
 
-# 功能区 2: 角色设定
-with st.sidebar.expander("角色设定"):
-    if "character_settings" not in st.session_state:
-        st.session_state.character_settings = {}
-    if "enabled_settings" not in st.session_state:
-        st.session_state.enabled_settings = {}
+# --- 功能区 2: 角色设定 ---
+if "character_settings" not in st.session_state:
+    st.session_state.character_settings = {}
+if "enabled_settings" not in st.session_state:
+    st.session_state.enabled_settings = {}
 
+
+with st.sidebar.expander("角色设定"):
+    st.subheader("角色设定")
+    
+    # 内置预设
     preset_settings = {
         "淫化惧怖魔": """
 种族起源：一种由惧怖魔被高度浓缩的淫魔能量感染后诞生的全新种族。这种能量并非直接改变惧怖魔的身体，而是扭曲了它们的灵魂，使其充满了淫欲和渴望，并赋予了它们将这种扭曲传播给他人的能力。
@@ -798,58 +802,66 @@ with st.sidebar.expander("角色设定"):
 
 繁殖方式: 淫化惧怖魔可以通过交媾、产卵、分裂等多种方式进行繁殖，并且可以跨种族繁殖，创造出更加奇特的亚种。 社会结构: 淫化惧怖魔没有固定的社会结构，有些会单独行动，有些会组成小群体，有些甚至会建立大型的淫魔帝国。 弱点: 淫化惧怖魔的弱点因亚种而异，有些惧怕圣光，有些惧怕特定的咒语，有些则会被强大的精神力所压制。""",
         "专业且严谨": "我是一个专业且严谨的AI助手，我的回答基于事实和逻辑，力求准确无误。",
-        "幽默风趣": "我是一个幽默风趣的AI助手，我的回答充满活力和创意，希望能带给您愉快的体验。",
-        "诗意浪漫": "我是一个诗意浪漫的AI助手，我的回答充满诗情画意，希望能带给您美好的感受。"
+        "专业的程序员": "我是一个专业的程序员，擅长各种编程语言和技术。我会尽力提供准确、高效的代码解决方案，并解释我的思路。",
+        "严谨的学者": "我是一个严谨的学者，对知识有着强烈的求知欲。我会尽力提供准确、详尽的答案，并引用相关的资料来源。",
     }
 
-    st.subheader("预设角色")
+    # 将内置预设添加到角色设定
     for name, content in preset_settings.items():
-        if st.button(f"加载：{name}"):
+        if name not in st.session_state.character_settings:
             st.session_state.character_settings[name] = content
-            st.session_state.enabled_settings[name] = True
+            if name not in st.session_state.enabled_settings:
+                st.session_state.enabled_settings[name] = False
 
 
-    st.subheader("自定义角色")
-    setting_name = st.text_input("设定名称:", key="setting_name")
-    setting_content = st.text_area("设定内容:", key="setting_content")
+    for setting_name in list(st.session_state.character_settings.keys()):
+        enabled = st.session_state.enabled_settings.get(setting_name, False)
+        col1, col2, col3 = st.columns([0.7, 0.2, 0.1])
+        with col1:
+            new_content = st.text_area(setting_name, st.session_state.character_settings[setting_name], key=f"setting_{setting_name}")
+            st.session_state.character_settings[setting_name] = new_content  # 更新设置内容
 
-    if st.button("新增设定"):
-        if setting_name and setting_content:
-            st.session_state.character_settings[setting_name] = setting_content
-            st.session_state.enabled_settings[setting_name] = True
-            st.success(f"已新增设定：{setting_name}")
-        else:
-            st.warning("请填写设定名称和内容")
+        with col2:
+            if st.checkbox(f"启用 {setting_name}", value=enabled, key=f"enable_{setting_name}"):
+                st.session_state.enabled_settings[setting_name] = True
+            else:
+                st.session_state.enabled_settings[setting_name] = False
 
-    st.subheader("编辑/删除设定")
-    if st.session_state.character_settings:
-      for name in st.session_state.character_settings:
-          col1, col2, col3 = st.columns(3)
-          with col1:
-              enabled = st.checkbox(f"启用: {name}", value=st.session_state.enabled_settings.get(name, False), key=f"enabled_{name}")
-              st.session_state.enabled_settings[name] = enabled
-          with col2:
-              if st.button(f"编辑: {name}", key=f"edit_{name}"):
-                  new_content = st.text_area(f"修改设定内容：{name}", st.session_state.character_settings[name], key=f"edit_content_{name}")
-                  if st.button(f"保存修改 ({name})", key=f"save_{name}"):
-                      st.session_state.character_settings[name] = new_content
-                      st.success(f"已保存{name}的修改")
-                  st.stop() # 避免重复渲染
-          with col3:
-              if st.button(f"删除: {name}", key=f"delete_{name}"):
-                  del st.session_state.character_settings[name]
-                  del st.session_state.enabled_settings[name]
-                  st.success(f"已删除设定：{name}")
-                  st.experimental_rerun() # 刷新页面
+        with col3:
+            if st.button("删除", key=f"delete_{setting_name}"):
+                del st.session_state.character_settings[setting_name]
+                del st.session_state.enabled_settings[setting_name]
+                st.experimental_rerun()
 
-    st.subheader("读取本地设定")
-    uploaded_setting = st.file_uploader("上传设定文件(txt)", type=["txt"])
-    if uploaded_setting is not None:
+
+    # 新增设定
+    new_setting_name = st.text_input("新增设定名称:")
+    if new_setting_name:
+        if new_setting_name not in st.session_state.character_settings:
+            st.session_state.character_settings[new_setting_name] = ""
+            st.session_state.enabled_settings[new_setting_name] = False
+            st.experimental_rerun()
+
+
+    # 读取本地设定
+    uploaded_file = st.file_uploader("读取本地设定文件 (txt)", type=["txt"])
+    if uploaded_file is not None:
         try:
-            setting_name = uploaded_setting.name[:-4] # 去掉.txt扩展名
-            setting_content = uploaded_setting.read().decode("utf-8")
+            setting_content = uploaded_file.read().decode("utf-8")
+            setting_name = uploaded_file.name[:-4]  # 去除 .txt 后缀
             st.session_state.character_settings[setting_name] = setting_content
-            st.session_state.enabled_settings[setting_name] = True
-            st.success(f"已加载设定：{setting_name}")
+            st.session_state.enabled_settings[setting_name] = False
+            st.success(f"成功加载设定: {setting_name}")
+            st.experimental_rerun()
         except Exception as e:
-            st.error(f"读取本地设定文件失败：{e}")
+            st.error(f"读取本地设定文件失败: {e}")
+
+
+    # 显示已加载设定（在聊天界面已显示，这里可选择性添加）
+    st.subheader("已加载设定:")
+    enabled_settings = [(name, content) for name, content in st.session_state.character_settings.items() if st.session_state.enabled_settings.get(name,False)]
+    if enabled_settings:
+        for name, content in enabled_settings:
+            st.markdown(f"**{name}:**\n{content}")
+    else:
+        st.markdown("当前无已启用设定")
