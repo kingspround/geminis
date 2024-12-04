@@ -103,15 +103,14 @@ def getAnswer(prompt):
     # 添加角色设定到提示 (修正后的代码)
     enabled_settings = st.session_state.get("enabled_settings", {})
     active_settings = [name for name, enabled in enabled_settings.items() if enabled]
-
     if active_settings:
         settings_text = "[Character Settings]:\n"
         for setting_name in active_settings:
             setting_content = st.session_state.character_settings.get(setting_name, "")
             settings_text += f"{setting_name}:\n{setting_content}\n"
 
+        #  正确地将设定文本添加到 his_messages
         his_messages.append({"role": "system", "parts": [{"text": settings_text}]})
-
 
     try:
         response = model.generate_content(contents=his_messages, stream=True)
