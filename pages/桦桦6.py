@@ -82,12 +82,10 @@ if "character_settings" not in st.session_state:
 if "enabled_settings" not in st.session_state:
     st.session_state.enabled_settings = {name: False for name in DEFAULT_FRAGMENTS}
 
-# --- 显示已加载设定 ---
-st.sidebar.markdown("**已加载设定：**")
-for setting_name, enabled in st.session_state.enabled_settings.items():
-    if enabled:
-        st.sidebar.markdown(f"- {setting_name}")
-
+# --- 在聊天界面显示设定名称 ---
+enabled_settings_display = ", ".join(setting_name for setting_name, enabled in st.session_state.enabled_settings.items() if enabled)
+if enabled_settings_display:
+    st.write(f"**当前设定:** {enabled_settings_display}")
 
 # --- 读取本地设定文件 ---
 uploaded_settings_file = st.sidebar.file_uploader("读取本地设定文件 (TXT)", type=["txt"])
