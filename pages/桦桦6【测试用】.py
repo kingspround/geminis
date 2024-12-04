@@ -87,10 +87,11 @@ def getAnswer(prompt):
 
     his_messages = []
     his_messages.append(
-        {"role": "model", "parts": [
+        {
+            "role": "model",  # or "system" if that's what you intended
+            "parts": [
                 {
-                    "text": """
-Use code with caution.
+                    "text": """Use code with caution.
 [SYSTEM]
 []
 [Personality：
@@ -104,10 +105,11 @@ Use code with caution.
     )
 
     for msg in st.session_state.messages[-20:]:
-        if msg["role"] == "user":
-            his_messages.append({"role": "user", "parts": [{"text": msg["content"]}]})
-        elif msg is not None and msg["content"] is not None:
-            his_messages.append({"role": "model", "parts": [{"text": msg["content"]}]})
+        if msg.get("role") and msg.get("content"): #  确保 role 和 content 都存在且不为空
+            if msg["role"] == "user":
+                his_messages.append({"role": "user", "parts": [{"text": msg["content"]}]})
+            elif msg["role"] == "assistant": #  明确指定 assistant 角色
+                his_messages.append({"role": "model", "parts": [{"text": msg["content"]}]})  # Gemini uses "model"
 
     his_messages = [msg for msg in his_messages if msg.get("parts") and msg["parts"][0].get("text")]
 
@@ -123,21 +125,6 @@ Use code with caution.
             setting_text += f"{setting_name}:\n{setting_content}\n"
 
     his_messages.append({"role": "system", "parts": [{"text": setting_text}]})
-
-    # 清理 his_messages，移除无效消息
-    cleaned_messages = []
-    for msg in his_messages:
-        if "role" in msg and "parts" in msg and msg["parts"] and msg["parts"][0].get("text"):  # 检查所有必要的键和值
-            if msg["role"] in ["user", "model"]: # 只保留 "user" 和 "model" 角色
-                cleaned_messages.append(msg)
-
-    # 添加 system 消息 (如果需要) -  确保放在最前面
-    system_message = {"role": "system", "parts":[{"text": setting_text}]} # setting_text from your original code
-    if setting_text:
-        cleaned_messages.insert(0, system_message)
-
-    import json
-    print(json.dumps(cleaned_messages, indent=2))  # 打印 cleaned_messages
 
     try:
         response = model.generate_content(contents=cleaned_messages, stream=True)
