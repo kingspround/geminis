@@ -226,14 +226,14 @@ with st.sidebar.expander("文件操作"):
 
 
 # 功能区 2: 角色设定
-with st.sidebar.expander("角色设定", expanded=False):  # 默认收起
-    # 初始化 character_settings 和 enabled_settings
+with st.sidebar.expander("角色设定", expanded=False):
+    # 初始化 character_settings 和 enabled_settings (保持不变)
     if "character_settings" not in st.session_state:
-        st.session_state.character_settings = {}
+        st.session_state.character_settings = {}  # 关键：初始化为空字典
     if "enabled_settings" not in st.session_state:
         st.session_state.enabled_settings = {}
 
-    # 内置预设定
+    # 内置预设定 (保持不变)
     preset_settings = {
         "淫化惧怖魔": """
 种族起源：一种由惧怖魔被高度浓缩的淫魔能量感染后诞生的全新种族。这种能量并非直接改变惧怖魔的身体，而是扭曲了它们的灵魂，使其充满了淫欲和渴望，并赋予了它们将这种扭曲传播给他人的能力。
@@ -247,26 +247,26 @@ with st.sidebar.expander("角色设定", expanded=False):  # 默认收起
 其他设定：
 
 繁殖方式: 淫化惧怖魔可以通过交媾、产卵、分裂等多种方式进行繁殖，并且可以跨种族繁殖，创造出更加奇特的亚种。 社会结构: 淫化惧怖魔没有固定的社会结构，有些会单独行动，有些会组成小群体，有些甚至会建立大型的淫魔帝国。 弱点: 淫化惧怖魔的弱点因亚种而异，有些惧怕圣光，有些惧怕特定的咒语，有些则会被强大的精神力所压制。""",
-
         "示例设定2": "设定2的内容...",
         # ... 添加更多预设定
     }
 
     # 从本地文件读取设定
-    setting_files = glob.glob("*.txt")  # 获取所有 .txt 文件
+    setting_files = glob.glob("*.txt")
+    loaded_settings = {} # 创建一个字典来存储从文件加载的设定
     for filename in setting_files:
         setting_name = os.path.splitext(filename)[0]
         try:
             with open(filename, "r", encoding="utf-8") as f:
                 setting_content = f.read()
-                preset_settings[setting_name] = setting_content # 将读取的设定添加到预设定字典
+                loaded_settings[setting_name] = setting_content 
         except Exception as e:
             st.error(f"读取设定文件 {filename} 失败: {e}")
 
 
-    # 更新 session_state 中的设定
-    st.session_state.character_settings.update(preset_settings)
-
+    # 合并预设和从文件加载的设定，更新到 session_state
+    all_settings = {**preset_settings, **loaded_settings} # 使用字典合并，文件设定会覆盖预设设定（如果名称相同）
+    st.session_state.character_settings.update(all_settings) # 更新到session_state
 
     # 新增设定
     new_setting_name = st.text_input("新增设定名称")
