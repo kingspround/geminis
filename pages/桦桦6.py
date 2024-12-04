@@ -93,36 +93,29 @@ def getAnswer(prompt):
                 enabled_settings_content += setting_content + "\n"
 
     his_messages = []
-    his_messages.append(
-        {"role": "assistant", "parts":[{"text": """
-[SYSTEM]
-  []
-   [Personality：
-        ]
-   [function：
-    
 
-]"""}]} # assistant
-   )
+    #  构建初始 system message
+    his_messages.append({"role": "system", "parts": [{"text": "[SYSTEM]\n  []\n   [Personality：\n        ]\n   [function：\n    \n]"}]})
 
+
+    # 添加历史消息，过滤掉无效消息和不正确的角色
     for msg in st.session_state.messages[-20:]:
-        if msg["role"] == "user":
-            his_messages.append({"role": "user", "parts": [{"text": msg["content"]}]})
-        elif msg is not None and msg["content"] is not None:
-            his_messages.append({"role": "assistant", "parts": [{"text": msg["content"]}]}) # assistant
-
-    his_messages = [msg for msg in his_messages if msg.get("parts") and msg["parts"][0].get("text")] # 清理空消息
+        if "role" in msg and "content" in msg and msg["content"]: # 检查键和内容是否为空
+            valid_roles = ["user", "assistant"] #  只允许 "user" 和 "assistant" 角色
+            if msg["role"] in valid_roles:
+                his_messages.append({"role": msg["role"], "parts": [{"text": msg["content"]}]})
 
 
-    # 添加角色设定到prompt
+    # 添加角色设定，使用 "system" 角色
     active_settings = [name for name, enabled in enabled_settings.items() if enabled]
-    setting_text = ""
     if active_settings:
-        setting_text = "[Character Settings]:\n" 
+        setting_text = "[Character Settings]:\n"
         for setting_name in active_settings:
             setting_content = st.session_state.character_settings.get(setting_name, "")
-            setting_text += f"{setting_name}:\n{setting_content}\n"
-        his_messages.append({"role": "system", "parts": [{"text": setting_text}]}) # system message
+            if setting_content: # 确保设定内容不为空
+                setting_text += f"{setting_name}:\n{setting_content}\n"
+        if setting_text: # 仅在有有效设定内容时添加
+           his_messages.append({"role": "system", "parts": [{"text": setting_text}]})
 
 
     try:
@@ -135,6 +128,7 @@ def getAnswer(prompt):
     except Exception as e:
         st.error(f"发生错误: {e}. 请检查你的API密钥是否有效。")
         return ""
+
 
 
 # --- 文件操作函数 ---
