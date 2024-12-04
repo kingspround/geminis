@@ -64,26 +64,18 @@ safety_settings = [
 model = genai.GenerativeModel(model_name="gemini-1.5-pro-001", generation_config=generation_config, safety_settings=safety_settings)
 
 
-
-# --- 碎片设定 ---
-DEFAULT_FRAGMENTS = {
-    "示例碎片1": "这是一个示例碎片，你可以在这里添加你的设定。",
-    "示例碎片2": "这是另一个示例碎片。",
-    "严肃认真": "AI 将以严肃认真的语气和风格进行回复，避免任何玩笑或轻松的表达。",
-    "幽默风趣": "AI 将尽可能以幽默风趣的方式回复，可能会使用笑话、双关语或其他幽默技巧。",
-    "科幻世界": "AI 的回复将基于科幻世界观，可能会使用科幻术语、设定和情节元素。",
-    "奇幻世界": "AI 的回复将基于奇幻世界观，可能会使用魔法、神话生物和其他奇幻元素。",
+# --- 预设角色设定 ---
+CHARACTER_SETTINGS = {
+    "设定1": "我是个友善且乐于助人的AI助手。",
+    "设定2": "我是一个富有创造力的故事讲述者。",
+    "设定3": "我是一个专业的代码审查员，擅长Python。",
+    "设定4": "我是一个喜欢玩游戏的角色扮演者。",
 }
 
-# 初始化角色设定
-if "character_settings" not in st.session_state:
-    st.session_state.character_settings = DEFAULT_FRAGMENTS.copy()
 
-if "enabled_settings" not in st.session_state:
-    st.session_state.enabled_settings = {name: False for name in DEFAULT_FRAGMENTS}
 
-# ---  构建设定消息 ---
-def build_settings_message():
+# --- LLM 函数 ---
+def getAnswer(prompt):
     enabled_settings_content = ""
     enabled_settings = st.session_state.get("enabled_settings", {})
 
@@ -93,36 +85,46 @@ def build_settings_message():
             if setting_content:
                 enabled_settings_content += setting_content + "\n"
 
-    return enabled_settings_content  # 返回整合后的设定内容
-
-
-# ---  更新或创建系统设定消息 ---
-def update_settings_message():
-    settings_content = build_settings_message()
-    if "settings_message" not in st.session_state or st.session_state.settings_message["content"] != settings_content:
-        st.session_state.settings_message = {"role": "system", "content": settings_content}
-
-# --- getAnswer 函数修改 ---
-def getAnswer(prompt):
-    update_settings_message()  # 确保设定消息是最新的
-    settings_content = st.session_state.settings_message["content"]
-
-
     his_messages = []
-    his_messages.append({"role": "model", "parts": [{"text": "Initial message"}]}) #  示例初始消息
+    his_messages.append(
+        {
+            "role": "model",
+            "parts": [
+                {
+                    "text": """
+Use code with caution.
+[SYSTEM]
+[]
+[Personality：
+]
+[function：
+
+]"""
+                }
+            ],
+        }
+    )
 
     for msg in st.session_state.messages[-20:]:
         if msg["role"] == "user":
-             # 将设定添加到用户消息的开头
-            combined_message = settings_content + msg["content"]
-            his_messages.append({"role": "user", "parts": [{"text": combined_message}]})  
+            his_messages.append({"role": "user", "parts": [{"text": msg["content"]}]})
         elif msg is not None and msg["content"] is not None:
             his_messages.append({"role": "model", "parts": [{"text": msg["content"]}]})
 
     his_messages = [msg for msg in his_messages if msg.get("parts") and msg["parts"][0].get("text")]
 
 
+    # 添加角色设定到 prompt
+    enabled_settings = st.session_state.get("enabled_settings", {})
+    active_settings = [name for name, enabled in enabled_settings.items() if enabled]
+    setting_text = ""
+    if active_settings:
+        setting_text = "[Character Settings]:\n"
+        for setting_name in active_settings:
+            setting_content = st.session_state.character_settings.get(setting_name, "")
+            setting_text += f"{setting_name}:\n{setting_content}\n"
 
+    his_messages.append({"role": "system", "parts": [{"text": setting_text}]})
 
     try:
         response = model.generate_content(contents=his_messages, stream=True)
@@ -134,8 +136,7 @@ def getAnswer(prompt):
     except Exception as e:
         st.error(f"发生错误: {e}. 请检查你的API密钥是否有效。")
         return ""
-
-
+        
 
 # --- 文件操作函数 ---
 filename = os.path.splitext(os.path.basename(__file__))[0] + ".pkl"
@@ -157,9 +158,15 @@ if not os.path.exists(log_file):
         pass
 
 
-# 初始化 session state
+# --- 初始化 session state ---
 if "messages" not in st.session_state:
-    load_history(log_file) #  直接调用load_history初始化
+    st.session_state.messages = []
+
+if "character_settings" not in st.session_state:
+    st.session_state.character_settings = CHARACTER_SETTINGS.copy()
+
+if "enabled_settings" not in st.session_state:
+    st.session_state.enabled_settings = {name: False for name in CHARACTER_SETTINGS}
 
 # ---  清除历史记录 ---
 def clear_history(log_file):
