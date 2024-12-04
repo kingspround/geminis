@@ -128,11 +128,11 @@ Use code with caution.
 
 
     # 添加系统设定消息到历史消息 (修正格式)
-    update_settings_message()  # 确保设定消息是最新的
-    settings_message_with_parts = {"role": "system", "parts": [{"text": st.session_state.settings_message["content"]}]}  # 添加 parts 键
-    his_messages.append(settings_message_with_parts) # 使用修正后的消息
+    update_settings_message()
+    settings_message_with_parts = {"role": "model", "parts": [{"text": st.session_state.settings_message["content"]}]}
+    his_messages.append(settings_message_with_parts)
 
-
+    
     try:
         response = model.generate_content(contents=his_messages, stream=True)
         full_response = ""
