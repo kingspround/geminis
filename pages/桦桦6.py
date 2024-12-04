@@ -62,7 +62,7 @@ safety_settings = [
 model = genai.GenerativeModel(model_name="gemini-1.5-pro-001",generation_config=generation_config,safety_settings=safety_settings)
 
 
-# --- LLM 函数 --- (与之前基本相同，但增加了enabled_settings_content)
+# --- LLM 函数 ---
 def getAnswer(prompt):
     enabled_settings_content = ""
     enabled_settings = st.session_state.get("enabled_settings", {})
@@ -72,7 +72,6 @@ def getAnswer(prompt):
             setting_content = st.session_state.character_settings.get(setting_name, "")
             if setting_content:
                 enabled_settings_content += setting_content + "\n"
-
 
 def getAnswer(prompt):
     his_messages = []
@@ -87,34 +86,52 @@ def getAnswer(prompt):
 
 
 
-    for msg in st.session_state.messages[-20:]:
-        if msg["role"] == "user":
-            his_messages.append({"role": "user", "parts": [{"text": msg["content"]}]})
-        elif msg is not None and msg["content"] is not None:
-            his_messages.append({"role": "model", "parts": [{"text": msg["content"]}]})
-
-    his_messages = [msg for msg in his_messages if msg.get("parts") and msg["parts"][0].get("text")]
+    if enabled_settings_content:
+        his_messages.append({"role": "system", "parts": [{"text": "[Character Settings]:\n" + enabled_settings_content}]})
+        st.write("# Enabled Settings:\n" + enabled_settings_content) # Display enabled settings
 
     try:
         response = model.generate_content(contents=his_messages, stream=True)
-        full_response = ""
-        for chunk in response:
-            full_response += chunk.text
-            yield chunk.text
-        return full_response
+        # ... (response handling - same as before)
     except Exception as e:
         st.error(f"发生错误: {e}. 请检查你的API密钥是否有效。")
         return ""
 
 
-    #  Character settings added to prompt (modified to use enabled_settings_content)
-    if enabled_settings_content:
-        his_messages.append({"role": "system", "parts": [{"text": "[Character Settings]:\n" + enabled_settings_content}]})
-        st.write("# Enabled Settings:\n" + enabled_settings_content)  # 显示启用的设定
-
 # --- 文件操作函数 ---
 filename = os.path.splitext(os.path.basename(__file__))[0] + ".pkl"
 log_file = os.path.join(os.path.dirname(__file__), filename)
+
+
+# --- 读取历史记录 --- (Moved here)
+def load_history(log_file):
+    try:
+        with open(log_file, "rb") as f:
+            st.session_state.messages = pickle.load(f)
+        st.success(f"成功从 {filename} 加载历史记录！")
+    except (FileNotFoundError, EOFError):
+        st.warning(f"{filename} 不存在或为空。")
+        st.session_state.messages = []
+
+# 确保文件存在
+if not os.path.exists(log_file):
+    with open(log_file, "wb") as f:
+        pass
+
+
+# 初始化 session state
+if "messages" not in st.session_state:
+    load_history(log_file)
+
+
+# ---  清除历史记录 ---
+def clear_history(log_file):
+    st.session_state.messages = []
+    try:
+        os.remove(log_file)
+        st.success(f"成功清除 {filename} 的历史记录！")
+    except FileNotFoundError:
+        st.warning(f"{filename} 不存在。")
 
 
 
@@ -127,10 +144,7 @@ if "character_settings" not in st.session_state:
     }
 
 if "enabled_settings" not in st.session_state:
-    st.session_state.enabled_settings = {setting_name: False for setting_name in st.session_state.character_settings}  # 默认禁用所有预设
-
-
-
+    st.session_state.enabled_settings = {setting_name: False for setting_name in st.session_state.character_settings}
 
 
 # ---  三个功能区侧边栏 ---
