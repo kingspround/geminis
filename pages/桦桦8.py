@@ -32,93 +32,103 @@ if not api_key:
     st.stop()
 
 genai.configure(api_key=api_key)
-# Set up the model
+
+
+# --- 模型设置 ---
 generation_config = {
-  "temperature": 1,
-  "top_p": 0,
-  "top_k": 0,
-  "max_output_tokens": 10000,
+    "temperature": 1,
+    "top_p": 0,
+    "top_k": 0,
+    "max_output_tokens": 10000,
 }
 
 safety_settings = [
-   {
-    "category": "HARM_CATEGORY_HARASSMENT",
-    "threshold": "BLOCK_NONE",
-   },
-   {
-    "category": "HARM_CATEGORY_HATE_SPEECH",
-    "threshold": "BLOCK_NONE",
-   },
-   {
-    "category": "HARM_CATEGORY_SEXUALLY_EXPLICIT",
-    "threshold": "BLOCK_NONE",
-   },
-   {
-    "category": "HARM_CATEGORY_DANGEROUS_CONTENT",
-    "threshold": "BLOCK_NONE",
-   },
+    {"category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_NONE"},
+    {"category": "HARM_CATEGORY_HATE_SPEECH", "threshold": "BLOCK_NONE"},
+    {"category": "HARM_CATEGORY_SEXUALLY_EXPLICIT", "threshold": "BLOCK_NONE"},
+    {"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_NONE"},
 ]
 
-model = genai.GenerativeModel(model_name="gemini-1.5-pro-001",generation_config=generation_config,safety_settings=safety_settings)
+model = genai.GenerativeModel(
+    model_name="gemini-1.5-pro-001",
+    generation_config=generation_config,
+    safety_settings=safety_settings,
+)
 
-# --- 碎片设定 ---
-DEFAULT_FRAGMENTS = {
-    "淫化惧怖魔": """
-种族起源：一种由惧怖魔被高度浓缩的淫魔能量感染后诞生的全新种族。这种能量并非直接改变惧怖魔的身体，而是扭曲了它们的灵魂，使其充满了淫欲和渴望，并赋予了它们将这种扭曲传播给他人的能力。
+# --- 角色设定 ---
+if "character_settings" not in st.session_state:
+    st.session_state.character_settings = {
+        "淫化惧怖魔": """种族起源：一种由惧怖魔被高度浓缩的淫魔能量感染后诞生的全新种族。这种能量并非直接改变惧怖魔的身体，而是扭曲了它们的灵魂，使其充满了淫欲和渴望，并赋予了它们将这种扭曲传播给他人的能力。
 
 种族特点：
 
 亚种繁多: 淫化惧怖魔最大的特点就是亚种极其丰富，几乎涵盖了所有恐怖传说中的鬼怪形象，例如女鬼、付丧神、僵尸、吸血鬼、狼人等等。但无论原本的形象多么恐怖，淫化后的形象都会变得娇嫩可爱，充满诱惑力。 诅咒与精神污染: 淫化惧怖魔的主要传播方式是诅咒和精神污染。它们可以通过接触、言语、图像、梦境等各种途径，将淫魔能量注入到其他生物的体内，使其逐渐被侵蚀，最终转化为新的淫化惧怖魔。 实体与无实体: 淫化惧怖魔既可以拥有实体，也可以以无实体的形态存在。无实体的淫化惧怖魔通常以精神体的形式出现，可以穿梭于现实世界和精神世界之间，更加难以被察觉和抵御。 扭曲的欲望: 淫化惧怖魔的灵魂被淫魔能量彻底扭曲，充满了对性爱的渴望。它们会不择手段地引诱和侵犯其他生物，以此来满足自己的欲望，并传播淫魔能量。 保留部分原种族特征: 尽管外貌变得娇嫩可爱，但淫化惧怖魔依然会保留部分原种族的特征，例如尖牙、利爪、尾巴、翅膀等等。这些特征会与它们可爱的外表形成鲜明的对比，更增添了它们的魅力和危险性。 感染方式举例：
 
-一个上班族在夜里遇到一个G杯爆乳、裸露着嫩屁股的红衣小女孩，不受控制地侵犯了她。之后，他不断梦到与小女孩交媾的画面，身体也出现异样。实际上，这个小女孩就是无实体的淫化惧怖魔，通过精神污染的方式侵蚀了上班族。 一个玩家在玩游戏时，发现自己的角色变成了一个爆乳白衣女鬼御姐，并从屏幕中钻出来，对他进行侵犯。这实际上是附身于游戏中的淫化惧怖魔，通过电子设备传播诅咒。 一个旅行者在古墓中发现了一个美丽的木偶，被其吸引，带回了家。晚上，木偶活了过来，变成了一个娇艳的淫魔，对他进行侵犯。这实际上是寄宿于木偶中的淫化惧怖魔，通过诅咒物品进行传播。
-
+一个上班族在夜里遇到一个G杯爆乳、裸露着嫩屁股的存在，不受控制地侵犯了她。之后，他不断梦到交媾的画面，身体也出现异样。
+ 一个玩家在玩游戏时，发现自己的角色变成了一个爆乳白衣女鬼御姐，并从屏幕中钻出来。
+ 一个旅行者在古墓中发现了一个美丽的木偶，被其吸引，带回了家。晚上，木偶活了过来，变成了一个娇艳的淫魔。
 其他设定：
 
-繁殖方式: 淫化惧怖魔可以通过交媾、产卵、分裂等多种方式进行繁殖，并且可以跨种族繁殖，创造出更加奇特的亚种。 社会结构: 淫化惧怖魔没有固定的社会结构，有些会单独行动，有些会组成小群体，有些甚至会建立大型的淫魔帝国。 弱点: 淫化惧怖魔的弱点因亚种而异，有些惧怕圣光，有些惧怕特定的咒语，有些则会被强大的精神力所压制。""",
-
-    "示例碎片2": "这是另一个示例碎片。",
-    "严肃认真": "AI 将以严肃认真的语气和风格进行回复，避免任何玩笑或轻松的表达。",
-    "幽默风趣": "AI 将尽可能以幽默风趣的方式回复，可能会使用笑话、双关语或其他幽默技巧。",
-    "科幻世界": "AI 的回复将基于科幻世界观，可能会使用科幻术语、设定和情节元素。",
-    "奇幻世界": "AI 的回复将基于奇幻世界观，可能会使用魔法、神话生物和其他奇幻元素。",
-}
-
-# 初始化角色设定
-if "character_settings" not in st.session_state:
-    st.session_state.character_settings = DEFAULT_FRAGMENTS.copy()
+繁殖方式: 淫化惧怖魔可以通过交媾、诅咒和精神污染等多种方式进行繁殖，并且可以跨种族繁殖，创造出更加奇特的亚种。 社会结构: 淫化惧怖魔没有固定的社会结构，有些会单独行动，有些会组成小群体，有些甚至会建立大型的淫魔帝国。 弱点: 淫化惧怖魔的弱点因亚种而异，有些惧怕圣光，有些惧怕特定的咒语，有些则会被强大的精神力所压制。""",
+        "创作故事": "我擅长创作故事和诗歌。",
+        "代码专家": "我可以提供专业的代码建议和示例。",
+        "自定义设定": "",  # 用于用户自定义输入的设定
+    }
 
 if "enabled_settings" not in st.session_state:
-    st.session_state.enabled_settings = {name: False for name in DEFAULT_FRAGMENTS}
-
-# ---  构建设定消息 ---
-def build_settings_message():
-    enabled_settings_content = ""
-    enabled_settings = st.session_state.get("enabled_settings", {})
-
-    for setting_name, enabled in enabled_settings.items():
-        if enabled:
-            setting_content = st.session_state.character_settings.get(setting_name, "")
-            if setting_content:
-                enabled_settings_content += setting_content + "\n"
-
-    return enabled_settings_content  # 返回整合后的设定内容
+    st.session_state.enabled_settings = {
+        setting_name: False for setting_name in st.session_state.character_settings
+    }
 
 
-# ---  更新或创建系统设定消息 ---
-def update_settings_message():
-    settings_content = build_settings_message()
-    if "settings_message" not in st.session_state or st.session_state.settings_message["content"] != settings_content:
-        st.session_state.settings_message = {"role": "system", "content": settings_content}
 
-# --- getAnswer 函数完整代码 ---
+# --- 文件操作函数 ---
+# 获取当前文件路径
+file = os.path.abspath(__file__)
+filename = os.path.splitext(os.path.basename(file))[0] + ".pkl"
+log_file = os.path.join(os.path.dirname(file), filename)
+
+
+
+def load_history(log_file):
+    try:
+        with open(log_file, "rb") as f:
+            st.session_state.messages = pickle.load(f)
+            st.success(f"成功从 {filename} 加载历史记录！")
+    except (FileNotFoundError, EOFError):
+        st.warning(f"{filename} 不存在或为空。")
+        st.session_state.messages = []
+
+
+
+def clear_history(log_file):
+    st.session_state.messages = []
+    try:
+        os.remove(log_file)
+        st.success(f"成功清除 {filename} 的历史记录！")
+    except FileNotFoundError:
+        st.warning(f"{filename} 不存在。")
+
+
+
+# --- LLM 函数 ---
 def getAnswer(prompt):
-    enabled_settings_content = ""  # 这行保留，为了清晰起见
-    enabled_settings = st.session_state.get("enabled_settings", {})
+    enabled_settings_content = ""
 
-    # （这里不需要循环添加设定，因为设定已经整合到 settings_message 中）
+    if any(st.session_state.enabled_settings.values()): # 只有启用了设定才添加声明
+        enabled_settings_content = "```system\n"  # system role indicated by triple backticks
+        enabled_settings_content += "# Active Settings:\n"
+        for setting_name, enabled in st.session_state.enabled_settings.items():
+            if enabled:
+                setting_description = st.session_state.character_settings.get(setting_name, "").split(":", 1)[1].strip() if ":" in st.session_state.character_settings.get(setting_name, "") else "" # extract description
+                enabled_settings_content += f"- {setting_name}: {setting_description}\n"
+        enabled_settings_content += "```\n"
 
 
-    his_messages = []
+    # 将角色设定添加到用户消息的开头
+    prompt = enabled_settings_content + prompt  #直接拼接到prompt上
+
+
     his_messages.append(
         {"role": "model", "parts":[{"text": """
 [SYSTEM]
@@ -660,6 +670,147 @@ def getAnswer(prompt):
 ]"""}]}
    )
 
+
+    for msg in st.session_state.messages[-20:]:
+        if msg["role"] == "user":
+            his_messages.append({"role": "user", "parts": [{"text": msg["content"]}]})
+        elif msg is not None and msg["content"] is not None:
+            his_messages.append({"role": "model", "parts": [{"text": msg["content"]}]})
+
+    #  确保只保留有效的 user 和 model 消息
+    his_messages = [msg for msg in his_messages if msg["role"] in ["user", "model"]]
+
+
+    his_messages.append({"role": "user", "parts": [{"text": prompt}]}) # 将当前用户消息添加到历史记录
+
+
+
+    try:
+        response = model.generate_content(contents=his_messages, stream=True)
+        full_response = ""
+        for chunk in response:
+            full_response += chunk.text
+            yield chunk.text
+        return full_response
+    except Exception as e:
+        st.error(f"发生错误: {e}. 请检查你的API密钥和消息格式。") #更明确的错误信息
+        return ""
+
+
+# --- Streamlit 界面 ---
+# 确保文件存在
+if not os.path.exists(log_file):
+    with open(log_file, "wb") as f:
+        pass
+
+# 初始化 session state
+if "messages" not in st.session_state:
+    load_history(log_file)
+
+# 功能区 1: 文件操作
+with st.sidebar.expander("文件操作"):
+    if len(st.session_state.messages) > 0:
+        st.button("重置上一个输出", on_click=lambda: st.session_state.messages.pop(-1) if len(st.session_state.messages)>1 else None)
+
+    st.button("读取历史记录", on_click=lambda: load_history(log_file))
+    st.button("清除历史记录", on_click=lambda: clear_history(log_file))
+    st.download_button(
+        label="下载聊天记录",
+        data=open(log_file, "rb").read() if os.path.exists(log_file) else b"",
+        file_name=filename,
+        mime="application/octet-stream",
+    )
+
+    if "pkl_file_loaded" not in st.session_state:
+        st.session_state.pkl_file_loaded = False  # 初始化标志
+
+    uploaded_file = st.file_uploader("读取本地pkl文件", type=["pkl"])  # 只接受 .pkl 文件
+    if uploaded_file is not None and not st.session_state.pkl_file_loaded:
+        try:
+            loaded_messages = pickle.load(uploaded_file)
+            st.session_state.messages = loaded_messages  # 使用 = 替换现有消息
+            st.session_state.pkl_file_loaded = True  # 设置标志，防止重复读取
+            st.experimental_rerun() # 刷新页面以显示新的消息
+        except Exception as e:
+            st.error(f"读取本地pkl文件失败：{e}")
+
+
+# 功能区 2: 角色设定
+with st.sidebar.expander("角色设定"):
+
+    # 读取本地设定文件
+    uploaded_setting_file = st.file_uploader("读取本地设定文件 (txt)", type=["txt"])
+    if uploaded_setting_file is not None:
+        setting_name = os.path.splitext(uploaded_setting_file.name)[0]  # 使用文件名作为设定名称
+        setting_content = uploaded_setting_file.read().decode("utf-8") #  确保读取为文本
+        st.session_state.character_settings[setting_name] = setting_content # 添加到设定字典
+        st.session_state.enabled_settings[setting_name] = False  # 默认不启用新设定
+        st.experimental_rerun() # 刷新界面
+
+
+    for setting_name, setting_content in st.session_state.character_settings.items():
+        if setting_name == "自定义设定":
+            st.session_state.character_settings["自定义设定"] = st.text_area("自定义设定", setting_content)
+        
+        st.session_state.enabled_settings[setting_name] = st.checkbox(setting_name, st.session_state.enabled_settings.get(setting_name, False))
+
+
+# 显示已加载的设定
+enabled_settings_display = [setting_name for setting_name, enabled in st.session_state.enabled_settings.items() if enabled]
+if enabled_settings_display:
+    st.write("已加载设定:", ", ".join(enabled_settings_display)) # 在聊天界面上方显示
+
+
+
+# 显示历史记录和编辑功能
+for i, message in enumerate(st.session_state.messages):
+    with st.chat_message(message["role"]):
+        st.write(message["content"], key=f"message_{i}")
+        if i >= len(st.session_state.messages) - 2:
+            if st.button("编辑", key=f"edit_{i}"):
+                st.session_state.editable_index = i
+                st.session_state.editing = True
+
+
+if st.session_state.get("editing"):
+    i = st.session_state.editable_index
+    message = st.session_state.messages[i]
+    with st.chat_message(message["role"]):
+        new_content = st.text_area(f"{message['role']}:", message["content"], key=f"message_edit_{i}")
+        col1, col2 = st.columns(2)
+        with col1:
+            if st.button("保存", key=f"save_{i}"):
+                st.session_state.messages[i]["content"] = new_content
+                with open(log_file, "wb") as f:
+                    pickle.dump(st.session_state.messages, f)
+                st.success("已保存更改！")
+                st.session_state.editing = False
+        with col2:
+            if st.button("取消", key=f"cancel_{i}"):
+                st.session_state.editing = False
+
+
+
+
+
+# 聊天输入和响应
+if prompt := st.chat_input("输入你的消息:"):
+    st.session_state.messages.append({"role": "user", "content": prompt})
+    with st.chat_message("user"):
+        st.markdown(prompt)
+    with st.chat_message("assistant"):
+        message_placeholder = st.empty()
+        full_response = ""
+        for chunk in getAnswer(prompt):
+            full_response += chunk
+            message_placeholder.markdown(full_response + "▌")
+        message_placeholder.markdown(full_response)
+        st.session_state.messages.append({"role": "assistant", "content": full_response})
+    with open(log_file, "wb") as f:
+        pickle.dump(st.session_state.messages, f)
+
+
+    his_messages = []
 
 
     for msg in st.session_state.messages[-20:]:
