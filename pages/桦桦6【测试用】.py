@@ -100,15 +100,19 @@ def clear_history(log_file):
 
 
 
-
 # --- LLM 函数 ---
 def getAnswer(prompt):
     enabled_settings_content = ""
-    for setting_name, enabled in st.session_state.enabled_settings.items():
-        if enabled:
-            setting_content = st.session_state.character_settings.get(setting_name, "")
-            if setting_content:
-                enabled_settings_content += setting_content + "\n"
+
+    if any(st.session_state.enabled_settings.values()): # 只有启用了设定才添加声明
+        enabled_settings_content = "```system\n"  # system role indicated by triple backticks
+        enabled_settings_content += "# Active Settings:\n"
+        for setting_name, enabled in st.session_state.enabled_settings.items():
+            if enabled:
+                setting_description = st.session_state.character_settings.get(setting_name, "").split(":", 1)[1].strip() if ":" in st.session_state.character_settings.get(setting_name, "") else "" # extract description
+                enabled_settings_content += f"- {setting_name}: {setting_description}\n"
+        enabled_settings_content += "```\n"
+
 
     # 将角色设定添加到用户消息的开头
     prompt = enabled_settings_content + prompt  #直接拼接到prompt上
@@ -150,9 +154,6 @@ if not os.path.exists(log_file):
 # 初始化 session state
 if "messages" not in st.session_state:
     load_history(log_file)
-
-
-st.title("Gemini Pro 聊天应用")
 
 # 功能区 1: 文件操作
 with st.sidebar.expander("文件操作"):
