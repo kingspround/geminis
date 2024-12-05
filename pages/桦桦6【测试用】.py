@@ -184,19 +184,28 @@ with st.sidebar.expander("文件操作"):
 
 # 功能区 2: 角色设定
 with st.sidebar.expander("角色设定"):
+
+    # 读取本地设定文件
+    uploaded_setting_file = st.file_uploader("读取本地设定文件 (txt)", type=["txt"])
+    if uploaded_setting_file is not None:
+        setting_name = os.path.splitext(uploaded_setting_file.name)[0]  # 使用文件名作为设定名称
+        setting_content = uploaded_setting_file.read().decode("utf-8") #  确保读取为文本
+        st.session_state.character_settings[setting_name] = setting_content # 添加到设定字典
+        st.session_state.enabled_settings[setting_name] = False  # 默认不启用新设定
+        st.experimental_rerun() # 刷新界面
+
+
     for setting_name, setting_content in st.session_state.character_settings.items():
         if setting_name == "自定义设定":
-            st.session_state.character_settings["自定义设定"] = st.text_area(
-                "自定义设定", setting_content
-            )
-            st.session_state.enabled_settings["自定义设定"] = st.checkbox(
-                "启用自定义设定",
-                st.session_state.enabled_settings.get("自定义设定", False),
-            )
-        else:
-            st.session_state.enabled_settings[setting_name] = st.checkbox(
-                setting_name, st.session_state.enabled_settings.get(setting_name, False)
-            )
+            st.session_state.character_settings["自定义设定"] = st.text_area("自定义设定", setting_content)
+        
+        st.session_state.enabled_settings[setting_name] = st.checkbox(setting_name, st.session_state.enabled_settings.get(setting_name, False))
+
+
+# 显示已加载的设定
+enabled_settings_display = [setting_name for setting_name, enabled in st.session_state.enabled_settings.items() if enabled]
+if enabled_settings_display:
+    st.write("已加载设定:", ", ".join(enabled_settings_display)) # 在聊天界面上方显示
 
 
 
