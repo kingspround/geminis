@@ -129,7 +129,7 @@ for msg in st.session_state.messages:
     his_messages.append({"role": "system", "parts": [{"text": setting_text}]})
 
     try:
-        response = model.generate_content(contents=cleaned_messages, stream=True)
+        response = model.generate_content(contents=his_messages, stream=True)
         full_response = ""
         for chunk in response:
             full_response += chunk.text
