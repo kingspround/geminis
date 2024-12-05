@@ -129,6 +129,8 @@ def getAnswer(prompt):
     prompt = enabled_settings_content + prompt  #直接拼接到prompt上
 
 
+    
+    his_messages = []
     his_messages.append(
         {"role": "model", "parts":[{"text": """
 [SYSTEM]
