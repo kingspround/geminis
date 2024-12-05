@@ -110,26 +110,35 @@ def getAnswer(prompt):
             if setting_content:
                 enabled_settings_content += setting_content + "\n"
 
+    # 将角色设定添加到用户消息的开头
+    prompt = enabled_settings_content + prompt  #直接拼接到prompt上
+
+
     his_messages = []
     for msg in st.session_state.messages[-20:]:
         if msg["role"] == "user":
             his_messages.append({"role": "user", "parts": [{"text": msg["content"]}]})
-        elif msg is not None and msg["content"] is not None:  # **更正：使用 "assistant"**
-            his_messages.append({"role": "assistant", "parts": [{"text": msg["content"]}]})
+        elif msg is not None and msg["content"] is not None:
+            his_messages.append({"role": "model", "parts": [{"text": msg["content"]}]})
 
-    his_messages = [
-        msg for msg in his_messages if msg.get("parts") and msg["parts"][0].get("text")
-    ]
-    his_messages.append({"role": "system", "parts": [{"text": enabled_settings_content}]})
+    #  确保只保留有效的 user 和 model 消息
+    his_messages = [msg for msg in his_messages if msg["role"] in ["user", "model"]]
+
+
+    his_messages.append({"role": "user", "parts": [{"text": prompt}]}) # 将当前用户消息添加到历史记录
+
+
 
     try:
         response = model.generate_content(contents=his_messages, stream=True)
-        # ... (处理回复的代码)
+        full_response = ""
+        for chunk in response:
+            full_response += chunk.text
+            yield chunk.text
+        return full_response
     except Exception as e:
-        st.error(f"发生错误: {e}. 请检查你的API密钥是否有效。")
+        st.error(f"发生错误: {e}. 请检查你的API密钥和消息格式。") #更明确的错误信息
         return ""
-
-
 
 
 # --- Streamlit 界面 ---
