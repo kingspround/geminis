@@ -114,22 +114,17 @@ def getAnswer(prompt):
     for msg in st.session_state.messages[-20:]:
         if msg["role"] == "user":
             his_messages.append({"role": "user", "parts": [{"text": msg["content"]}]})
-        elif msg is not None and msg["content"] is not None:
-            his_messages.append({"role": "model", "parts": [{"text": msg["content"]}]})
+        elif msg is not None and msg["content"] is not None:  # **更正：使用 "assistant"**
+            his_messages.append({"role": "assistant", "parts": [{"text": msg["content"]}]})
 
     his_messages = [
         msg for msg in his_messages if msg.get("parts") and msg["parts"][0].get("text")
     ]
-
     his_messages.append({"role": "system", "parts": [{"text": enabled_settings_content}]})
 
     try:
         response = model.generate_content(contents=his_messages, stream=True)
-        full_response = ""
-        for chunk in response:
-            full_response += chunk.text
-            yield chunk.text
-        return full_response
+        # ... (处理回复的代码)
     except Exception as e:
         st.error(f"发生错误: {e}. 请检查你的API密钥是否有效。")
         return ""
