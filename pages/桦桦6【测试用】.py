@@ -104,6 +104,13 @@ def getAnswer(prompt):
         }
     )
 
+cleaned_messages = [] # 或其他方式初始化 cleaned_messages
+for msg in st.session_state.messages:
+    if msg.get("role") and msg.get("content"):
+       cleaned_messages.append(msg)
+
+for msg in cleaned_messages: 
+    
     for msg in st.session_state.messages[-20:]:
         if msg.get("role") and msg.get("content"): #  确保 role 和 content 都存在且不为空
             if msg["role"] == "user":
