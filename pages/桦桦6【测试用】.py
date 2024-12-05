@@ -109,17 +109,12 @@ for msg in st.session_state.messages:
     if msg.get("role") and msg.get("content"):
        cleaned_messages.append(msg)
 
-for msg in cleaned_messages: 
-    
     for msg in st.session_state.messages[-20:]:
         if msg.get("role") and msg.get("content"): #  确保 role 和 content 都存在且不为空
             if msg["role"] == "user":
                 his_messages.append({"role": "user", "parts": [{"text": msg["content"]}]})
             elif msg["role"] == "assistant": #  明确指定 assistant 角色
                 his_messages.append({"role": "model", "parts": [{"text": msg["content"]}]})  # Gemini uses "model"
-
-    his_messages = [msg for msg in his_messages if msg.get("parts") and msg["parts"][0].get("text")]
-
 
     # 添加角色设定到 prompt
     enabled_settings = st.session_state.get("enabled_settings", {})
