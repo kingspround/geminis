@@ -111,8 +111,8 @@ def clear_history(log_file):
 
 
 
-# --- LLM 函数 ---
 def getAnswer(prompt):
+    prompt = prompt or ""  # 确保 prompt 始终有一个值
     enabled_settings_content = ""
 
     if any(st.session_state.enabled_settings.values()): # 只有启用了设定才添加声明
