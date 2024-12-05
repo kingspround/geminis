@@ -34,7 +34,7 @@ if not api_key:
 genai.configure(api_key=api_key)
 
 
-# Set up the model
+# --- 模型设置 ---
 generation_config = {
     "temperature": 1,
     "top_p": 0,
@@ -43,90 +43,85 @@ generation_config = {
 }
 
 safety_settings = [
-    {
-        "category": "HARM_CATEGORY_HARASSMENT",
-        "threshold": "BLOCK_NONE",
-    },
-    {
-        "category": "HARM_CATEGORY_HATE_SPEECH",
-        "threshold": "BLOCK_NONE",
-    },
-    {
-        "category": "HARM_CATEGORY_SEXUALLY_EXPLICIT",
-        "threshold": "BLOCK_NONE",
-    },
-    {
-        "category": "HARM_CATEGORY_DANGEROUS_CONTENT",
-        "threshold": "BLOCK_NONE",
-    },
+    {"category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_NONE"},
+    {"category": "HARM_CATEGORY_HATE_SPEECH", "threshold": "BLOCK_NONE"},
+    {"category": "HARM_CATEGORY_SEXUALLY_EXPLICIT", "threshold": "BLOCK_NONE"},
+    {"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_NONE"},
 ]
 
-model = genai.GenerativeModel(model_name="gemini-1.5-pro-001", generation_config=generation_config, safety_settings=safety_settings)
+model = genai.GenerativeModel(
+    model_name="gemini-1.5-pro-001",
+    generation_config=generation_config,
+    safety_settings=safety_settings,
+)
+
+# --- 角色设定 ---
+if "character_settings" not in st.session_state:
+    st.session_state.character_settings = {
+        "乐于助人": "我是乐于助人的AI助手。",
+        "创作故事": "我擅长创作故事和诗歌。",
+        "代码专家": "我可以提供专业的代码建议和示例。",
+        "自定义设定": "",  # 用于用户自定义输入的设定
+    }
+
+if "enabled_settings" not in st.session_state:
+    st.session_state.enabled_settings = {
+        setting_name: False for setting_name in st.session_state.character_settings
+    }
 
 
-# --- 预设角色设定 ---
-CHARACTER_SETTINGS = {
-    "设定1": "我是个友善且乐于助人的AI助手。",
-    "设定2": "我是一个富有创造力的故事讲述者。",
-    "设定3": "我是一个专业的代码审查员，擅长Python。",
-    "设定4": "我是一个喜欢玩游戏的角色扮演者。",
-}
+
+# --- 文件操作函数 ---
+# 获取当前文件路径
+file = os.path.abspath(__file__)
+filename = os.path.splitext(os.path.basename(file))[0] + ".pkl"
+log_file = os.path.join(os.path.dirname(file), filename)
+
+
+
+def load_history(log_file):
+    try:
+        with open(log_file, "rb") as f:
+            st.session_state.messages = pickle.load(f)
+            st.success(f"成功从 {filename} 加载历史记录！")
+    except (FileNotFoundError, EOFError):
+        st.warning(f"{filename} 不存在或为空。")
+        st.session_state.messages = []
+
+
+
+def clear_history(log_file):
+    st.session_state.messages = []
+    try:
+        os.remove(log_file)
+        st.success(f"成功清除 {filename} 的历史记录！")
+    except FileNotFoundError:
+        st.warning(f"{filename} 不存在。")
+
 
 
 
 # --- LLM 函数 ---
 def getAnswer(prompt):
     enabled_settings_content = ""
-    enabled_settings = st.session_state.get("enabled_settings", {})
-
-    for setting_name, enabled in enabled_settings.items():
+    for setting_name, enabled in st.session_state.enabled_settings.items():
         if enabled:
             setting_content = st.session_state.character_settings.get(setting_name, "")
             if setting_content:
                 enabled_settings_content += setting_content + "\n"
 
     his_messages = []
-    his_messages.append(
-        {
-            "role": "model",  # or "system" if that's what you intended
-            "parts": [
-                {
-                    "text": """Use code with caution.
-[SYSTEM]
-[]
-[Personality：
-]
-[function：
-
-]"""
-                }
-            ],
-        }
-    )
-
-cleaned_messages = [] # 或其他方式初始化 cleaned_messages
-for msg in st.session_state.messages:
-    if msg.get("role") and msg.get("content"):
-       cleaned_messages.append(msg)
-
     for msg in st.session_state.messages[-20:]:
-        if msg.get("role") and msg.get("content"): #  确保 role 和 content 都存在且不为空
-            if msg["role"] == "user":
-                his_messages.append({"role": "user", "parts": [{"text": msg["content"]}]})
-            elif msg["role"] == "assistant": #  明确指定 assistant 角色
-                his_messages.append({"role": "model", "parts": [{"text": msg["content"]}]})  # Gemini uses "model"
+        if msg["role"] == "user":
+            his_messages.append({"role": "user", "parts": [{"text": msg["content"]}]})
+        elif msg is not None and msg["content"] is not None:
+            his_messages.append({"role": "model", "parts": [{"text": msg["content"]}]})
 
-    # 添加角色设定到 prompt
-    enabled_settings = st.session_state.get("enabled_settings", {})
-    active_settings = [name for name, enabled in enabled_settings.items() if enabled]
-    setting_text = ""
-    if active_settings:
-        setting_text = "[Character Settings]:\n"
-        for setting_name in active_settings:
-            setting_content = st.session_state.character_settings.get(setting_name, "")
-            setting_text += f"{setting_name}:\n{setting_content}\n"
+    his_messages = [
+        msg for msg in his_messages if msg.get("parts") and msg["parts"][0].get("text")
+    ]
 
-    his_messages.append({"role": "system", "parts": [{"text": setting_text}]})
+    his_messages.append({"role": "system", "parts": [{"text": enabled_settings_content}]})
 
     try:
         response = model.generate_content(contents=his_messages, stream=True)
@@ -138,68 +133,78 @@ for msg in st.session_state.messages:
     except Exception as e:
         st.error(f"发生错误: {e}. 请检查你的API密钥是否有效。")
         return ""
-        
 
-# --- 文件操作函数 ---
-filename = os.path.splitext(os.path.basename(__file__))[0] + ".pkl"
-log_file = os.path.join(os.path.dirname(__file__), filename)
 
-# --- 读取历史记录 ---
-def load_history(log_file):  # 将函数定义移到这里
-    try:
-        with open(log_file, "rb") as f:
-            st.session_state.messages = pickle.load(f)
-        st.success(f"成功从 {filename} 加载历史记录！")
-    except (FileNotFoundError, EOFError):
-        st.warning(f"{filename} 不存在或为空。")
-        st.session_state.messages = []
 
+
+# --- Streamlit 界面 ---
 # 确保文件存在
 if not os.path.exists(log_file):
     with open(log_file, "wb") as f:
         pass
 
-
-# --- 初始化 session state ---
+# 初始化 session state
 if "messages" not in st.session_state:
-    st.session_state.messages = []
-
-if "character_settings" not in st.session_state:
-    st.session_state.character_settings = CHARACTER_SETTINGS.copy()
-
-if "enabled_settings" not in st.session_state:
-    st.session_state.enabled_settings = {name: False for name in CHARACTER_SETTINGS}
-
-# ---  清除历史记录 ---
-def clear_history(log_file):
-    st.session_state.messages = []
-    try:
-        os.remove(log_file)
-        st.success(f"成功清除 {filename} 的历史记录！")
-    except FileNotFoundError:
-        st.warning(f"{filename} 不存在。")
-
-# --- 读取历史记录 ---
-def load_history(log_file):
-    try:
-        with open(log_file, "rb") as f:
-            st.session_state.messages = pickle.load(f)
-        st.success(f"成功从 {filename} 加载历史记录！")
-    except (FileNotFoundError, EOFError):
-        st.warning(f"{filename} 不存在或为空。")
-        st.session_state.messages = []
+    load_history(log_file)
 
 
+st.title("Gemini Pro 聊天应用")
+
+# 功能区 1: 文件操作
+with st.sidebar.expander("文件操作"):
+    if len(st.session_state.messages) > 0:
+        st.button("重置上一个输出", on_click=lambda: st.session_state.messages.pop(-1) if len(st.session_state.messages)>1 else None)
+
+    st.button("读取历史记录", on_click=lambda: load_history(log_file))
+    st.button("清除历史记录", on_click=lambda: clear_history(log_file))
+    st.download_button(
+        label="下载聊天记录",
+        data=open(log_file, "rb").read() if os.path.exists(log_file) else b"",
+        file_name=filename,
+        mime="application/octet-stream",
+    )
+
+    if "pkl_file_loaded" not in st.session_state:
+        st.session_state.pkl_file_loaded = False  # 初始化标志
+
+    uploaded_file = st.file_uploader("读取本地pkl文件", type=["pkl"])  # 只接受 .pkl 文件
+    if uploaded_file is not None and not st.session_state.pkl_file_loaded:
+        try:
+            loaded_messages = pickle.load(uploaded_file)
+            st.session_state.messages = loaded_messages  # 使用 = 替换现有消息
+            st.session_state.pkl_file_loaded = True  # 设置标志，防止重复读取
+            st.experimental_rerun() # 刷新页面以显示新的消息
+        except Exception as e:
+            st.error(f"读取本地pkl文件失败：{e}")
 
 
-# 显示历史记录和编辑功能 (与之前相同，略作简化)
+# 功能区 2: 角色设定
+with st.sidebar.expander("角色设定"):
+    for setting_name, setting_content in st.session_state.character_settings.items():
+        if setting_name == "自定义设定":
+            st.session_state.character_settings["自定义设定"] = st.text_area(
+                "自定义设定", setting_content
+            )
+            st.session_state.enabled_settings["自定义设定"] = st.checkbox(
+                "启用自定义设定",
+                st.session_state.enabled_settings.get("自定义设定", False),
+            )
+        else:
+            st.session_state.enabled_settings[setting_name] = st.checkbox(
+                setting_name, st.session_state.enabled_settings.get(setting_name, False)
+            )
+
+
+
+# 显示历史记录和编辑功能
 for i, message in enumerate(st.session_state.messages):
     with st.chat_message(message["role"]):
         st.write(message["content"], key=f"message_{i}")
-    if i >= len(st.session_state.messages) - 2:
-        if st.button("编辑", key=f"edit_{i}"):
-            st.session_state.editable_index = i
-            st.session_state.editing = True
+        if i >= len(st.session_state.messages) - 2:
+            if st.button("编辑", key=f"edit_{i}"):
+                st.session_state.editable_index = i
+                st.session_state.editing = True
+
 
 if st.session_state.get("editing"):
     i = st.session_state.editable_index
@@ -220,92 +225,9 @@ if st.session_state.get("editing"):
 
 
 
-# --- Streamlit 应用程序 ---
-
-# 初始化 session state
-if "messages" not in st.session_state:
-    st.session_state.messages = []
-
-if "character_settings" not in st.session_state:
-    st.session_state.character_settings = DEFAULT_FRAGMENTS.copy()
-
-if "enabled_settings" not in st.session_state:
-    st.session_state.enabled_settings = {name: False for name in DEFAULT_FRAGMENTS}
-
-# ---  三个功能区侧边栏 ---
-# 功能区 1: 文件操作
-with st.sidebar.expander("文件操作"):
-    if len(st.session_state.messages) > 0:
-        st.button("重置上一个输出", on_click=lambda: st.session_state.messages.pop(-1))
-
-    st.button("读取历史记录", on_click=lambda: load_history(log_file))
-    st.button("清除历史记录", on_click=lambda: clear_history(log_file))
-    st.download_button(
-        label="下载聊天记录",
-        data=open(log_file, "rb").read(),
-        file_name=filename,
-        mime="application/octet-stream",
-    )
-
-    if "pkl_file_loaded" not in st.session_state:
-        st.session_state.pkl_file_loaded = False  # 初始化标志
-
-    uploaded_file = st.file_uploader("读取本地pkl文件", type=["pkl"])  # 只接受 .pkl 文件
-    if uploaded_file is not None and not st.session_state.pkl_file_loaded:
-        try:
-            loaded_messages = pickle.load(uploaded_file)
-            # 将加载的消息添加到现有的消息列表中 (或替换，取决于你的需求)
-            st.session_state.messages.extend(loaded_messages)  # 使用extend追加消息
-            # st.session_state.messages = loaded_messages  # 使用 = 替换现有消息
-
-            st.session_state.pkl_file_loaded = True  # 设置标志，防止重复读取
-            st.experimental_rerun() # 刷新页面以显示新的消息
-
-        except Exception as e:
-            st.error(f"读取本地pkl文件失败：{e}")
 
 
-# --- 功能区 2: 角色设定 ---
-with st.sidebar.expander("角色设定"):
-    for setting_name, setting_content in st.session_state.character_settings.items():
-        enabled = st.checkbox(setting_name, key=f"setting_{setting_name}", value=st.session_state.enabled_settings.get(setting_name, False))
-        st.session_state.enabled_settings[setting_name] = enabled  # 更新启用状态
-        if enabled:
-            new_content = st.text_area(f"编辑 {setting_name}:", setting_content, key=f"edit_{setting_name}")
-            st.session_state.character_settings[setting_name] = new_content
-
-    # --- 读取本地设定文件 (在设定列表之后) ---
-    uploaded_settings_file = st.file_uploader("读取本地设定文件 (TXT)", type=["txt"])
-    if uploaded_settings_file is not None:
-        try:
-            setting_name = os.path.splitext(uploaded_settings_file.name)[0] # 文件名作为设定名
-            setting_content = uploaded_settings_file.read().decode("utf-8") # 读取内容
-
-            # 更新或添加设定
-            st.session_state.character_settings[setting_name] = setting_content
-
-            # 默认启用新读取的设定
-            st.session_state.enabled_settings[setting_name] = True
-
-            st.success(f"成功加载设定: {setting_name}")
-            st.experimental_rerun() # 刷新页面
-        except Exception as e:
-            st.error(f"读取设定文件失败: {e}")
-
-
-
-# --- 在聊天界面显示设定名称 ---
-enabled_settings_display = ", ".join(setting_name for setting_name, enabled in st.session_state.enabled_settings.items() if enabled)
-if enabled_settings_display:
-    st.write(f"**当前设定:** {enabled_settings_display}")
-
-
-# 功能区 3: ... (其他功能区)
-
-
-
-
-# --- 聊天输入和响应 ---
+# 聊天输入和响应
 if prompt := st.chat_input("输入你的消息:"):
     st.session_state.messages.append({"role": "user", "content": prompt})
     with st.chat_message("user"):
@@ -317,6 +239,6 @@ if prompt := st.chat_input("输入你的消息:"):
             full_response += chunk
             message_placeholder.markdown(full_response + "▌")
         message_placeholder.markdown(full_response)
-    st.session_state.messages.append({"role": "assistant", "content": full_response})
+        st.session_state.messages.append({"role": "assistant", "content": full_response})
     with open(log_file, "wb") as f:
         pickle.dump(st.session_state.messages, f)
