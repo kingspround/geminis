@@ -62,15 +62,12 @@ model = genai.GenerativeModel(
 # --- 角色设定 ---
 if "character_settings" not in st.session_state:
     st.session_state.character_settings = {
-        "": """"""    }
-if "test_text" not in st.session_state:
-    st.session_state.test_text = ""
-
+        "默认设定": ""  # 默认设定，初始为空
+    }
 if "enabled_settings" not in st.session_state:
     st.session_state.enabled_settings = {
-        setting_name: False for setting_name in st.session_state.character_settings
+        setting_name: True for setting_name in st.session_state.character_settings # 默认开启
     }
-
 
 
 
@@ -391,18 +388,13 @@ with st.sidebar.expander("文件操作"):
 
 # 功能区 2: 角色设定
 with st.sidebar.expander("角色设定"):
-    st.session_state.character_settings = st.text_area("在此处输入角色设定:", st.session_state.character_settings)
+    default_setting = st.text_area("角色设定", st.session_state.character_settings.get("默认设定", ""))
+    st.session_state.character_settings["默认设定"] = default_setting
     if st.button("刷新页面"):
         st.experimental_rerun()
+    st.write("这是测试文本，用于测试违禁词。")  # 不可编辑的提示文本
+    st.write("测试文本加载完成")
 
-st.write("**这是测试文本**", unsafe_allow_html=True) #  使用unsafe_allow_html确保显示粗体
-st.write("测试文本加载完成")
-
-# 将角色设定注入到prompt
-def inject_character_setting(prompt):
-    if st.session_state.character_settings:
-        return f"```system\n{st.session_state.character_settings}\n```\n{prompt}"
-    return prompt
 
 
 
