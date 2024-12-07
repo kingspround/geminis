@@ -399,13 +399,18 @@ with st.sidebar.expander("文件操作"):
             st.error(f"读取本地pkl文件失败：{e}")
 
 
-# Remove 功能区 2: 角色设定 and replace with the following:
-st.sidebar.title("违禁词测试区")
-test_text = st.sidebar.text_area("输入测试文本:", "这是一段测试文本。")
-if st.sidebar.button("刷新页面"):
-    st.experimental_rerun()
+# 功能区 2: 测试文本输入和刷新
+with st.sidebar.expander("测试文本输入"):
+    test_text = st.text_area("输入测试文本:", value="", key="test_text_input")
+    if st.button("刷新页面"):
+        st.experimental_rerun()
 
-st.write("测试文本加载完成") # Indicate that the test text is loaded
+st.write("**这是测试文本（不可编辑）：**")  # 不可编辑的提示信息
+if "test_text_input" in st.session_state and st.session_state.test_text_input:
+    st.write(st.session_state.test_text_input) # 显示测试文本
+    st.write("测试文本加载完成")
+else:
+    st.write("请输入测试文本")
 
 
 
