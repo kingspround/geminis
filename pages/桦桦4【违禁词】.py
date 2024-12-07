@@ -403,12 +403,20 @@ with st.sidebar.expander("文件操作"):
             st.error(f"读取本地pkl文件失败：{e}")
 
 
-# 功能区 2: 角色设定 & 测试文本
-with st.sidebar.expander("角色设定 & 测试文本"):
-    st.write("这是测试文本（不可编辑）：")  # 不可编辑的提示信息
-    st.session_state.test_text = st.text_area("测试文本框", st.session_state.test_text)
+# 功能区 2: 角色设定
+with st.sidebar.expander("角色设定"):
+    st.session_state.character_settings = st.text_area("在此处输入角色设定:", st.session_state.character_settings)
     if st.button("刷新页面"):
         st.experimental_rerun()
+
+st.write("**这是测试文本**", unsafe_allow_html=True) #  使用unsafe_allow_html确保显示粗体
+st.write("测试文本加载完成")
+
+# 将角色设定注入到prompt
+def inject_character_setting(prompt):
+    if st.session_state.character_settings:
+        return f"```system\n{st.session_state.character_settings}\n```\n{prompt}"
+    return prompt
 
 
 
