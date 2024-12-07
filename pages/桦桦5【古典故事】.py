@@ -354,13 +354,16 @@ def getAnswer(prompt):
 ]"""}]}
    )
 
-    for msg in st.session_state.messages[-20:]:
+    for msg in st.session_state.messages[-20:]: #只取最近20条记录
         if msg["role"] == "user":
             his_messages.append({"role": "user", "parts": [{"text": msg["content"]}]})
         elif msg is not None and msg["content"] is not None:
             his_messages.append({"role": "model", "parts": [{"text": msg["content"]}]})
 
-    # 角色设定注入:  正确使用 parts 结构
+    his_messages = [msg for msg in his_messages if msg["role"] in ["user", "model"]]
+    his_messages.append({"role": "user", "parts": [{"text": prompt}]}) #用户输入在最后
+
+
     enabled_settings_content = ""
     if any(st.session_state.enabled_settings.values()):
         enabled_settings_content = "```system\n"
@@ -369,10 +372,7 @@ def getAnswer(prompt):
             if enabled:
                 enabled_settings_content += f"- {setting_name}: {st.session_state.character_settings[setting_name]}\n"
         enabled_settings_content += "```\n"
-        his_messages.append({"role": "system", "parts": [{"text": enabled_settings_content}]})
-
-    his_messages.append({"role": "user", "parts": [{"text": prompt}]})
-
+        his_messages.append({"role": "system", "parts":[{"text": enabled_settings_content}]}) #角色设定作为最后一条系统消息
 
     try:
         response = model.generate_content(contents=his_messages, stream=True)
