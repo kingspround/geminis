@@ -70,7 +70,9 @@ DEFAULT_CHARACTER_SETTINGS = {
 if "character_settings" not in st.session_state:
     st.session_state.character_settings = DEFAULT_CHARACTER_SETTINGS.copy()
 if "enabled_settings" not in st.session_state:
-    st.session_state.enabled_settings = {}
+    st.session_state.enabled_settings = {
+        setting_name: False for setting_name in DEFAULT_CHARACTER_SETTINGS
+    }
 
 
 def ensure_enabled_settings_exists():
@@ -209,21 +211,24 @@ with st.sidebar.expander("角色设定"):
     # 读取本地设定文件 (保留此功能)
     uploaded_setting_file = st.file_uploader("读取本地设定文件 (txt)", type=["txt"])
     if uploaded_setting_file is not None:
-        setting_name = os.path.splitext(uploaded_setting_file.name)[0]
-        setting_content = uploaded_setting_file.read().decode("utf-8")
-        st.session_state.character_settings[setting_name] = setting_content
-        ensure_enabled_settings_exists() # 上传后确保 enabled_settings 更新
-        st.experimental_rerun()
+        try:
+            setting_name = os.path.splitext(uploaded_setting_file.name)[0]
+            setting_content = uploaded_setting_file.read().decode("utf-8")
+            st.session_state.character_settings[setting_name] = setting_content
+            st.session_state.enabled_settings[setting_name] = False
+            st.experimental_rerun()
+        except Exception as e:
+            st.error(f"读取文件失败: {e}")
 
 
-    for setting_name in st.session_state.character_settings:
+    for setting_name in DEFAULT_CHARACTER_SETTINGS: # 这里迭代默认的设定
         if setting_name == "自定义设定":
             st.session_state.character_settings[setting_name] = st.text_area("自定义设定", st.session_state.character_settings.get(setting_name, ""), key=f"textarea_{setting_name}")
         else:
             st.session_state.enabled_settings[setting_name] = st.checkbox(setting_name, st.session_state.enabled_settings.get(setting_name, False), key=f"checkbox_{setting_name}")
 
-    st.session_state.test_text = st.text_area("System Message (Optional):", st.session_state.get("test_text", ""), key="system_message")
 
+    st.session_state.test_text = st.text_area("System Message (Optional):", st.session_state.get("test_text", ""), key="system_message")
 
 
 # 显示历史记录和编辑功能
