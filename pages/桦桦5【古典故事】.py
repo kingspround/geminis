@@ -356,9 +356,9 @@ def getAnswer(prompt):
 
     for msg in st.session_state.messages[-20:]:
         if msg["role"] == "user":
-            his_messages.append({"role": "user", "parts": [{"text": msg["content"]}]})
+            his_messages.append({"role": "user", "content": msg["content"]}) # 去掉parts
         elif msg is not None and msg["content"] is not None:
-            his_messages.append({"role": "model", "parts": [{"text": msg["content"]}]})
+            his_messages.append({"role": "model", "content": msg["content"]}) # 去掉parts
 
     his_messages = [msg for msg in his_messages if msg["role"] in ["user", "model"]]
 
@@ -373,14 +373,13 @@ def getAnswer(prompt):
                 enabled_settings_content += f"- {setting_name}: {st.session_state.character_settings[setting_name]}\n"
         enabled_settings_content += "```\n"
     if enabled_settings_content:
-        his_messages.append({"role": "system", "parts": [{"text": enabled_settings_content}]})
+        his_messages.append({"role": "system", "content": enabled_settings_content}) # 去掉parts
 
 
-    his_messages.append({"role": "user", "parts": [{"text": prompt}]})  # 用户提示放在最后
+    his_messages.append({"role": "user", "content": prompt})  # 用户提示放在最后
 
     try:
         response = model.generate_content(contents=his_messages, stream=True)
-        full_response = ""
         for chunk in response:
             full_response += chunk.text
             yield chunk.text
