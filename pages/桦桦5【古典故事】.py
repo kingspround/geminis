@@ -343,11 +343,9 @@ def getAnswer(prompt):
 
     for msg in st.session_state.messages[-20:]:
         if msg["role"] == "user":
-            his_messages.append({"role": "user", "parts": [{"text": msg["content"]}]})  # 修正格式
-        elif msg is not None and msg["content"] is not None:
-            his_messages.append({"role": "model", "parts": [{"text": msg["content"]}]})  # 修正格式
-    his_messages = [msg for msg in his_messages if msg["role"] in ["user", "model"]]
-    his_messages.append({"role": "user", "parts": [{"text": prompt}]})
+            his_messages.append({"role": "user", "parts": [{"text": msg["content"]}]})
+        elif msg["role"] == "assistant":  # 注意这里，如果你的历史消息中使用了 "assistant"，需要改为 "model" 或 "system"
+            his_messages.append({"role": "model", "parts": [{"text": msg["content"]}]}) # 将 "assistant" 改为 "model"
 
     # 在这里添加启用的角色设定作为最后一条消息
     enabled_settings_content = ""
@@ -358,11 +356,9 @@ def getAnswer(prompt):
             if enabled:
                 enabled_settings_content += f"- {setting_name}: {st.session_state.character_settings[setting_name]}\n"
         enabled_settings_content += "```\n"
-        his_messages.append({"role": "system", "parts": [{"text": enabled_settings_content}]})  # 修正格式
+        his_messages.append({"role": "system", "parts": [{"text": enabled_settings_content}]}) # 必须是 system 角色
 
-    # 特别注意这里也要修正格式！
-    his_messages.append({"role": "user", "parts": [{"text": prompt}]}) # 修正格式
-
+    his_messages.append({"role": "user", "parts": [{"text": prompt}]})
 
     try:
         response = model.generate_content(contents=his_messages, stream=True)
