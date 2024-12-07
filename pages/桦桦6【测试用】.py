@@ -124,24 +124,22 @@ def clear_history(log_file):
 def getAnswer(prompt):
     prompt = prompt or ""
 
+    # 处理 test_text (这个部分保持不变)
+    if "test_text" in st.session_state and st.session_state.test_text and not any(msg.get("content") == st.session_state.test_text for msg in st.session_state.messages if msg.get("role") == "system"):
+        st.session_state.messages.insert(0, {"role": "system", "content": st.session_state.test_text})
+
+    # 这里插入处理启用角色设定的代码
     enabled_settings_content = ""
     if any(st.session_state.enabled_settings.values()):
         enabled_settings_content = "```system\n"
         enabled_settings_content += "# Active Settings:\n"
         for setting_name, enabled in st.session_state.enabled_settings.items():
             if enabled:
-                setting_description = st.session_state.character_settings.get(setting_name, "").split(":", 1)[1].strip() if ":" in st.session_state.character_settings.get(setting_name, "") else ""
-                enabled_settings_content += f"- {setting_name}: {setting_description}\n"  # 只添加设定名称和描述
+                enabled_settings_content += f"- {setting_name}: {st.session_state.character_settings[setting_name]}\n"
         enabled_settings_content += "```\n"
 
-
-    if "test_text" in st.session_state and st.session_state.test_text and not any(msg.get("content") == st.session_state.test_text for msg in st.session_state.messages if msg.get("role") == "system"):  # 检查是否已存在
-        st.session_state.messages.insert(0, {"role": "system", "content": st.session_state.test_text})
-
-
-
     # 将角色设定和 test_text 添加到用户消息的开头
-    prompt = enabled_settings_content + prompt
+    prompt = enabled_settings_content + prompt #  <--  在这里添加 enabled_settings_content
 
     his_messages = []
     his_messages.append(
@@ -229,13 +227,17 @@ with st.sidebar.expander("角色设定"):
 
 
     for setting_name in DEFAULT_CHARACTER_SETTINGS:
-        if setting_name == "自定义设定":
-            st.session_state.character_settings[setting_name] = st.text_area("自定义设定", st.session_state.character_settings.get(setting_name, ""), key=f"textarea_{setting_name}")
-        else:
-            st.session_state.enabled_settings[setting_name] = st.checkbox(setting_name, st.session_state.enabled_settings.get(setting_name, False), key=f"checkbox_{setting_name}")
-
+        # 使用 text_area，允许用户输入多行文本，并保留原有内容
+        st.session_state.character_settings[setting_name] = st.text_area( #修改：使用text_area，允许用户输入多行文本
+            setting_name, st.session_state.character_settings.get(setting_name, ""), key=f"textarea_{setting_name}"
+        )
+        st.session_state.enabled_settings[setting_name] = st.checkbox(
+            setting_name, st.session_state.enabled_settings.get(setting_name, False), key=f"checkbox_{setting_name}"
+        )
 
     st.session_state.test_text = st.text_area("System Message (Optional):", st.session_state.get("test_text", ""), key="system_message")
+
+
 
 
 # 显示已加载的设定
