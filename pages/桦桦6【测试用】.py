@@ -227,16 +227,19 @@ with st.sidebar.expander("角色设定"):
 
 
     for setting_name in DEFAULT_CHARACTER_SETTINGS:
-        # 使用 text_area，允许用户输入多行文本，并保留原有内容
-        st.session_state.character_settings[setting_name] = st.text_area( #修改：使用text_area，允许用户输入多行文本
-            setting_name, st.session_state.character_settings.get(setting_name, ""), key=f"textarea_{setting_name}"
-        )
+        # 使用单一 text_area，一次性显示所有角色设定
+        if st.session_state.character_settings.get(setting_name):
+            st.session_state.character_settings[setting_name] = st.text_area(
+                setting_name, st.session_state.character_settings.get(setting_name, ""), key=f"textarea_{setting_name}"
+            )
+        else:
+            st.session_state.character_settings[setting_name] = st.text_area(
+                setting_name, "", key=f"textarea_{setting_name}"
+            )
+
         st.session_state.enabled_settings[setting_name] = st.checkbox(
             setting_name, st.session_state.enabled_settings.get(setting_name, False), key=f"checkbox_{setting_name}"
         )
-
-    st.session_state.test_text = st.text_area("System Message (Optional):", st.session_state.get("test_text", ""), key="system_message")
-
 
 
 
