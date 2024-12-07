@@ -219,7 +219,7 @@ with st.sidebar.expander("角色设定"):
         try:
             setting_name = os.path.splitext(uploaded_setting_file.name)[0]
             setting_content = uploaded_setting_file.read().decode("utf-8")
-            st.session_state.character_settings[setting_name] = setting_content  # 直接更新 session state
+            st.session_state.character_settings[setting_name] = setting_content
             st.session_state.enabled_settings[setting_name] = False
             st.experimental_rerun()
         except Exception as e:
@@ -227,25 +227,15 @@ with st.sidebar.expander("角色设定"):
 
     for setting_name in DEFAULT_CHARACTER_SETTINGS:
         if setting_name not in st.session_state.character_settings:
-            st.session_state.character_settings[setting_name] = DEFAULT_CHARACTER_SETTINGS[setting_name] # 初始化角色设定
+            st.session_state.character_settings[setting_name] = DEFAULT_CHARACTER_SETTINGS[setting_name]
 
-        # 使用 session state 来显示和编辑设定，避免重复创建文本框
-        if st.checkbox(setting_name, st.session_state.enabled_settings.get(setting_name, False), key=f"checkbox_{setting_name}"):
-            st.session_state.enabled_settings[setting_name] = True
-            if st.button(f"编辑 {setting_name}"):
-              #这里打开一个模态框编辑内容，而不是直接在侧边栏显示文本框
-              edited_text = st.text_area(f"编辑 {setting_name}", st.session_state.character_settings[setting_name])
-              if st.button("保存"):
-                st.session_state.character_settings[setting_name] = edited_text
-                st.experimental_rerun()
-              elif st.button("取消"):
-                st.experimental_rerun()  #刷新页面关闭模态编辑框
-        else:
-            st.session_state.enabled_settings[setting_name] = False #如果复选框未选中则设置为False
+        st.session_state.enabled_settings[setting_name] = st.checkbox(setting_name, st.session_state.enabled_settings.get(setting_name, False), key=f"checkbox_{setting_name}") #直接显示checkbox
 
 
     st.session_state.test_text = st.text_area("System Message (Optional):", st.session_state.get("test_text", ""), key="system_message")
 
+    if st.button("刷新"): # 添加刷新按钮
+        st.experimental_rerun()
 
 
 # 显示已加载的设定
