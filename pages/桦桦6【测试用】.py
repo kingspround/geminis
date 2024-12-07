@@ -57,6 +57,12 @@ model = genai.GenerativeModel(
 
 # --- 角色设定 ---
 if "character_settings" not in st.session_state:
+    st.session_state.character_settings = {}  # 初始化为空字典
+
+if "enabled_settings" not in st.session_state:
+    st.session_state.enabled_settings = {}  # 初始化为空字典
+
+if "character_settings" not in st.session_state:
     st.session_state.character_settings = {
         "乐于助人": "我是乐于助人的AI助手。",
         "创作故事": "我擅长创作故事和诗歌。",
@@ -192,19 +198,27 @@ with st.sidebar.expander("角色设定"):
     uploaded_setting_file = st.file_uploader("读取本地设定文件 (txt)", type=["txt"])
     if uploaded_setting_file is not None:
         try:
-            setting_name = os.path.splitext(uploaded_setting_file.name)[0]  # 使用文件名作为设定名称
-            setting_content = uploaded_setting_file.read().decode("utf-8")  # 确保读取为文本
-            st.session_state.character_settings[setting_name] = setting_content  # 添加到设定字典
-            st.session_state.enabled_settings[setting_name] = False  # 默认不启用新设定
-            st.experimental_rerun()  # 刷新界面
+            setting_name = os.path.splitext(uploaded_setting_file.name)[0]
+            setting_content = uploaded_setting_file.read().decode("utf-8")
+            st.session_state.character_settings[setting_name] = setting_content
+            # 确保 enabled_settings 也包含新的设定
+            if setting_name not in st.session_state.enabled_settings:
+                st.session_state.enabled_settings[setting_name] = False
+            st.experimental_rerun()
         except Exception as e:
             st.error(f"读取本地设定文件失败：{e}")
 
+    # 确保 enabled_settings 与 character_settings 同步
+    for setting_name in st.session_state.character_settings:
+        if setting_name not in st.session_state.enabled_settings:
+            st.session_state.enabled_settings[setting_name] = False
 
     for setting_name, setting_content in st.session_state.character_settings.items():
         if setting_name == "自定义设定":
             st.session_state.character_settings["自定义设定"] = st.text_area("自定义设定", setting_content)
         st.session_state.enabled_settings[setting_name] = st.checkbox(setting_name, st.session_state.enabled_settings.get(setting_name, False))
+
+
 
     st.session_state.test_text = st.text_area("System Message (Hidden)", value=st.session_state.get("test_text", ""), style={"display": "none"})
 
