@@ -60,13 +60,18 @@ model = genai.GenerativeModel(
 )
 
 # --- 角色设定 ---
+if "test_text" not in st.session_state:
+    st.session_state.test_text = ""
+
 if "character_settings" not in st.session_state:
     st.session_state.character_settings = {
-        "默认设定": ""  # 默认设定，初始为空
+       "默认设定": "这是一个默认开启的角色设定。" # 提供一个默认设定
     }
+
 if "enabled_settings" not in st.session_state:
     st.session_state.enabled_settings = {
-        setting_name: True for setting_name in st.session_state.character_settings # 默认开启
+        setting_name: True if setting_name == "默认设定" else False  # 默认开启"默认设定"
+        for setting_name in st.session_state.character_settings
     }
 
 
@@ -386,14 +391,14 @@ with st.sidebar.expander("文件操作"):
             st.error(f"读取本地pkl文件失败：{e}")
 
 
-# 功能区 2: 角色设定
-with st.sidebar.expander("角色设定"):
-    default_setting = st.text_area("角色设定", st.session_state.character_settings.get("默认设定", ""))
-    st.session_state.character_settings["默认设定"] = default_setting
+# 功能区 2: 角色设定和测试文本框
+with st.sidebar.expander("角色设定和测试"):
+    st.write("**这是测试文本，AI 将根据此文本进行回复。**") # 不可编辑的提示信息
+    test_text = st.text_area("测试文本", st.session_state.test_text)
+    st.session_state.test_text = test_text # 保存到session state
     if st.button("刷新页面"):
         st.experimental_rerun()
-    st.write("这是测试文本，用于测试违禁词。")  # 不可编辑的提示文本
-    st.write("测试文本加载完成")
+st.write("测试文本加载完成")
 
 
 
