@@ -11,7 +11,11 @@ import streamlit as st
 import pickle
 import glob
 
-
+# 在所有其他代码之前，初始化 session state 变量
+if "character_settings" not in st.session_state:
+    st.session_state.character_settings = {} 
+if "enabled_settings" not in st.session_state:
+    st.session_state.enabled_settings = {}
 
 # --- API 密钥设置 ---
 api_keys = {
@@ -60,8 +64,7 @@ model = genai.GenerativeModel(
 )
 
 # --- 角色设定 ---
-if "character_settings" not in st.session_state:
-    st.session_state.character_settings = {
+DEFAULT_CHARACTER_SETTINGS = {
         "淫化惧怖魔": """种族起源：一种由惧怖魔被高度浓缩的淫魔能量感染后诞生的全新种族。这种能量并非直接改变惧怖魔的身体，而是扭曲了它们的灵魂，使其充满了淫欲和渴望，并赋予了它们将这种扭曲传播给他人的能力。
 
 种族特点：
@@ -77,14 +80,29 @@ if "character_settings" not in st.session_state:
         "创作故事": "我擅长创作故事和诗歌。",
         "代码专家": "我可以提供专业的代码建议和示例。",
         "淫化吊死鬼": """身体: 曾经恐怖的吊死鬼，如今蜕变成了肌肤雪白，吹弹可破的绝色尤物。她们保留了标志性的长舌，但舌头不再干枯发黑，而是变得柔软湿润，呈现出诱人的粉红色她们保留了标志性的长舌，但舌头不再干枯发黑，而是变得柔软湿润，呈现出诱人的粉红色舌尖还带着晶莹的液体，让人忍不住想要含入口中细细品尝。她们原本干瘪的躯体变得丰腴柔软，胸前总是坠着两团沉甸甸的、仿佛随时都会爆开来的巨乳，乳汁顺着白皙的肌肤不断滴落，在地面上汇聚成一片片奶白色的水洼。她们下身那原本隐藏在破烂衣衫下的私处，如今毫无保留地暴露在空气中，一片湿漉漉的桃源秘境，散发着令人难以抗拒的甜腻气息。而她们脖颈上那触目惊心的勒痕，也化作了充满诱惑的情趣纹身，爱心、蝴蝶、蕾丝花边……各种形状和颜色，无一不彰显着她们如今的身份——淫乱的化身。
-
 服饰: 淫化吊死鬼偏爱轻薄透明的布料，例如蕾丝、薄纱、丝绸等等，这些布料可以最大限度地展现她们丰满的肉体和诱人的曲线。她们的服装风格也很多变，有时是清纯的睡裙，有时是性感的内衣，有时是诱惑的旗袍，有时甚至什么都不穿，就这样赤裸裸地展露着她们的淫靡之躯。
+习性: 淫化吊死鬼通常会在夜晚出没，用她们那甜美的声音和诱人的身姿吸引男性。一旦有男性被她们迷惑，一旦有男性被她们迷惑，就会被她们用长舌卷住，拉到身前。淫化吊死鬼会用她们柔软的巨乳和长舌尽情玩弄猎物，用淫靡的声音引诱他们交合。 淫化吊死鬼非常享受性爱带来的快感，并将这种快感视为生命的意义。她们会用舌头，爆乳，嫩穴细细品尝。
+感染途径:
+诅咒: 淫化吊死鬼的诅咒通常来自于那些对性爱充满怨恨和执念的灵魂。这些灵魂在死后，怨气和淫念交织在一起，最终转化为一种可怕的诅咒之力。任何被这种诅咒缠身的人，都会逐渐被淫化吊死鬼的意志所控制，身体也会发生相应的变化，最终变成和她们一样的存在。
+精神污染: 淫化吊死鬼可以通过各种方式对目标进行精神污染，例如梦境、幻觉、暗示等等。她们会将目标拖入充满淫靡气息的精神世界，用各种香艳的场景和声音诱惑他们，逐渐瓦解他们的意志，最终让他们沉沦在无尽的欲望之中，变成任人摆布的玩物。
+长舌缠绕: 淫化吊死鬼的长舌不仅可以用来挑逗和玩弄猎物，更是一种可怕的武器。她们会用长舌卷住目标的脖子，将他们吊在半空中，然后一边尽情地玩弄他们的身体，一边将大量的淫液注入他们的体内。在淫液和窒息的双重刺激下，目标在淫液和窒息的双重刺激下，目标会逐渐失去理智，原本的恐惧和抗拒也会变成扭曲的快感。他们的身体会开始分泌出大量的液体——男性会不停地射精，直到精尽人亡，最终变成一滩充满淫液的水泊；而女性则会像喷泉一样涌出淫水，最终变成一个只会泄水的肉穴。无论是男性还是女性，最终都会被淫化吊死鬼的长舌拖入她们的巢穴，成为她们繁殖和享乐的工具。
+尽管身体发生了翻天覆地的变化，但淫化吊死鬼依然保留着对之前生活的强烈依恋。她们会利用幻术，将自己伪装成原本的模样，继续过着普通的生活。但她们的身体已经不再受自己控制，无时无刻不在散发着诱惑的气息。她们的衣服总是湿漉漉的，散发着甜腻的奶香和淫靡的味道；她们的眼神总是迷离而渴望，仿佛在邀请着周围的男性；她们的动作总是带着一丝挑逗，让人忍不住想要将她们拥入怀中。这使得原本是男性的伪装者，即使努力维持着过去的身份，也难以掩盖身体的变化和内心深处不断涌动的欲望。
+"""    }
+}
 
-习性: 淫化吊死鬼通常会在夜晚出没，用她们那甜美的声音和诱人的身姿吸引男性。一旦有男性被她们迷惑，一旦有男性被她们迷惑，就会被她们用长舌卷住，拉到身前。淫化吊死鬼会用她们柔软的巨乳和长舌尽情玩弄猎物，用淫靡的声音引诱他们交合。 淫化吊死鬼非常享受性爱带来的快感，并将这种快感视为生命的意义。她们会用舌头，爆乳，嫩穴细细品尝。"""    }
+if "character_settings" not in st.session_state:
+    st.session_state.character_settings = DEFAULT_CHARACTER_SETTINGS.copy()
 if "enabled_settings" not in st.session_state:
     st.session_state.enabled_settings = {
-        setting_name: False for setting_name in st.session_state.character_settings
+        setting_name: False for setting_name in DEFAULT_CHARACTER_SETTINGS
     }
+
+def ensure_enabled_settings_exists():
+    for setting_name in st.session_state.character_settings:
+        if setting_name not in st.session_state.enabled_settings:
+            st.session_state.enabled_settings[setting_name] = False
+
+ensure_enabled_settings_exists() # 在任何操作前确保 enabled_settings 存在
 
 
 
@@ -117,25 +135,27 @@ def clear_history(log_file):
 
 
 
+# --- LLM 函数 ---
 def getAnswer(prompt):
-    prompt = prompt or ""  # 确保 prompt 始终有一个值
-    enabled_settings_content = ""
+    prompt = prompt or ""
 
-    if any(st.session_state.enabled_settings.values()): # 只有启用了设定才添加声明
-        enabled_settings_content = "```system\n"  # system role indicated by triple backticks
+    # 处理 test_text (这个部分保持不变)
+    if "test_text" in st.session_state and st.session_state.test_text and not any(msg.get("content") == st.session_state.test_text for msg in st.session_state.messages if msg.get("role") == "system"):
+        st.session_state.messages.insert(0, {"role": "system", "content": st.session_state.test_text})
+
+    # 这里插入处理启用角色设定的代码
+    enabled_settings_content = ""
+    if any(st.session_state.enabled_settings.values()):
+        enabled_settings_content = "```system\n"
         enabled_settings_content += "# Active Settings:\n"
         for setting_name, enabled in st.session_state.enabled_settings.items():
             if enabled:
-                setting_description = st.session_state.character_settings.get(setting_name, "").split(":", 1)[1].strip() if ":" in st.session_state.character_settings.get(setting_name, "") else "" # extract description
-                enabled_settings_content += f"- {setting_name}: {setting_description}\n"
+                enabled_settings_content += f"- {setting_name}: {st.session_state.character_settings[setting_name]}\n"
         enabled_settings_content += "```\n"
 
+    # 将角色设定和 test_text 添加到用户消息的开头
+    prompt = enabled_settings_content + prompt #  <--  在这里添加 enabled_settings_content
 
-    # 将角色设定添加到用户消息的开头
-    prompt = enabled_settings_content + prompt  #直接拼接到prompt上
-
-
-    
     his_messages = []
     his_messages.append(
         {"role": "model", "parts":[{"text": """
@@ -338,19 +358,14 @@ def getAnswer(prompt):
 ]"""}]}
    )
 
-
     for msg in st.session_state.messages[-20:]:
         if msg["role"] == "user":
             his_messages.append({"role": "user", "parts": [{"text": msg["content"]}]})
         elif msg is not None and msg["content"] is not None:
             his_messages.append({"role": "model", "parts": [{"text": msg["content"]}]})
 
-    #  确保只保留有效的 user 和 model 消息
     his_messages = [msg for msg in his_messages if msg["role"] in ["user", "model"]]
-
-
-    his_messages.append({"role": "user", "parts": [{"text": prompt}]}) # 将当前用户消息添加到历史记录
-
+    his_messages.append({"role": "user", "parts": [{"text": prompt}]})
 
 
     try:
@@ -405,22 +420,29 @@ with st.sidebar.expander("文件操作"):
 
 # 功能区 2: 角色设定
 with st.sidebar.expander("角色设定"):
-
-    # 读取本地设定文件
+    # 文件上传功能保持不变
     uploaded_setting_file = st.file_uploader("读取本地设定文件 (txt)", type=["txt"])
     if uploaded_setting_file is not None:
-        setting_name = os.path.splitext(uploaded_setting_file.name)[0]  # 使用文件名作为设定名称
-        setting_content = uploaded_setting_file.read().decode("utf-8") #  确保读取为文本
-        st.session_state.character_settings[setting_name] = setting_content # 添加到设定字典
-        st.session_state.enabled_settings[setting_name] = False  # 默认不启用新设定
-        st.experimental_rerun() # 刷新界面
+        try:
+            setting_name = os.path.splitext(uploaded_setting_file.name)[0]
+            setting_content = uploaded_setting_file.read().decode("utf-8")
+            st.session_state.character_settings[setting_name] = setting_content
+            st.session_state.enabled_settings[setting_name] = False
+            st.experimental_rerun()
+        except Exception as e:
+            st.error(f"读取文件失败: {e}")
+
+    for setting_name in DEFAULT_CHARACTER_SETTINGS:
+        if setting_name not in st.session_state.character_settings:
+            st.session_state.character_settings[setting_name] = DEFAULT_CHARACTER_SETTINGS[setting_name]
+
+        st.session_state.enabled_settings[setting_name] = st.checkbox(setting_name, st.session_state.enabled_settings.get(setting_name, False), key=f"checkbox_{setting_name}") #直接显示checkbox
 
 
-    for setting_name, setting_content in st.session_state.character_settings.items():
-        if setting_name == "自定义设定":
-            st.session_state.character_settings["自定义设定"] = st.text_area("自定义设定", setting_content)
-        
-        st.session_state.enabled_settings[setting_name] = st.checkbox(setting_name, st.session_state.enabled_settings.get(setting_name, False))
+    st.session_state.test_text = st.text_area("System Message (Optional):", st.session_state.get("test_text", ""), key="system_message")
+
+    if st.button("刷新"): # 添加刷新按钮
+        st.experimental_rerun()
 
 
 # 显示已加载的设定
@@ -458,7 +480,7 @@ if st.session_state.get("editing"):
                 st.session_state.editing = False
 
 
-# 功能区 3: ... (其他功能区)
+
 
 
 # 聊天输入和响应
@@ -476,3 +498,4 @@ if prompt := st.chat_input("输入你的消息:"):
         st.session_state.messages.append({"role": "assistant", "content": full_response})
     with open(log_file, "wb") as f:
         pickle.dump(st.session_state.messages, f)
+
