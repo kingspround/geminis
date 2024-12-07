@@ -210,15 +210,11 @@ with st.sidebar.expander("角色设定"):
 
     for setting_name, setting_content in st.session_state.character_settings.items():
         if setting_name == "自定义设定":
-            st.session_state.character_settings["自定义设定"] = st.text_area("自定义设定", setting_content, key=f"textarea_{setting_name}") # 为 text_area 添加 key
-        else:  # 使用 checkbox 显示预设设定
+            st.session_state.character_settings["自定义设定"] = st.text_area("自定义设定", setting_content, key=f"textarea_{setting_name}")
+        else: #  关键修改：其他预设设定使用 checkbox
             st.session_state.enabled_settings[setting_name] = st.checkbox(setting_name, st.session_state.enabled_settings.get(setting_name, False), key=f"checkbox_{setting_name}")
 
-    st.session_state.test_text = st.text_area("System Message (Optional):", st.session_state.get("test_text", ""), key="system_message") # 为 test_text 添加 key
-# 显示已加载的设定
-enabled_settings_display = [setting_name for setting_name, enabled in st.session_state.enabled_settings.items() if enabled]
-if enabled_settings_display:
-    st.write("已加载设定:", ", ".join(enabled_settings_display)) # 在聊天界面上方显示
+    st.session_state.test_text = st.text_area("System Message (Optional):", st.session_state.get("test_text", ""), key="system_message")
 
 
 
