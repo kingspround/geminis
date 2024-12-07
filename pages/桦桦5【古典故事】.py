@@ -136,20 +136,11 @@ def getAnswer(prompt):
 
     # 处理 test_text (这部分保持不变)
     if "test_text" in st.session_state and st.session_state.test_text and not any(msg.get("content") == st.session_state.test_text for msg in st.session_state.messages if msg.get("role") == "system"):
-        st.session_state.messages.insert(0, {"role": "system", "content": st.session_state.test_text})
-
-
-    # 构建启用角色设定的内容 (这部分也保持不变)
-    enabled_settings_content = ""
-    if any(st.session_state.enabled_settings.values()):
-        enabled_settings_content = "```system\n"
-        enabled_settings_content += "# Active Settings:\n"
-        for setting_name, enabled in st.session_state.enabled_settings.items():
-            if enabled:
-                enabled_settings_content += f"- {setting_name}: {st.session_state.character_settings[setting_name]}\n"
-        enabled_settings_content += "```\n"
-    
+        st.session_state.messages.insert(0, {"role": "system", "content": st.session_state.test_text})    
     # 将用户消息添加到历史记录
+
+
+    
     his_messages = []
     his_messages.append(
         {"role": "model", "parts":[{"text": """
@@ -358,11 +349,21 @@ def getAnswer(prompt):
             his_messages.append({"role": "model", "parts": [{"text": msg["content"]}]}) # 注意这里添加了 parts 列表
     his_messages = [msg for msg in his_messages if msg["role"] in ["user", "model"]] # 过滤掉其他角色的消息
 
-    # 在这里添加系统消息作为最后一条聊天记录
-    if enabled_settings_content:
-        his_messages.append({"role": "system", "parts": [{"text": enabled_settings_content}]}) #  注意 parts 列表
+    # 在这里添加启用角色设定的代码，作为最后一条消息
+    enabled_settings_content = ""
+    if any(st.session_state.enabled_settings.values()):
+        enabled_settings_content = "```system\n"  # 保持 system 格式
+        enabled_settings_content += "# Active Settings:\n"
+        for setting_name, enabled in st.session_state.enabled_settings.items():
+            if enabled:
+                enabled_settings_content += f"- {setting_name}: {st.session_state.character_settings[setting_name]}\n"
+        enabled_settings_content += "```\n"
 
-    his_messages.append({"role": "user", "parts": [{"text": prompt}]}) # 注意 parts 列表
+        # 将设定作为最后一条消息添加到 his_messages
+        his_messages.append({"role": "system", "content": enabled_settings_content}) # 注意这里 role 是 "system"
+
+
+    his_messages.append({"role": "user", "parts": [{"text": prompt}]}) # 用户的 prompt 仍然放在最后
 
 
     try:
