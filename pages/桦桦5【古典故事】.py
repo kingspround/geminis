@@ -354,7 +354,7 @@ def getAnswer(prompt):
 ]"""}]}
    )
 
-    for msg in st.session_state.messages[-20:]: # 保持历史消息数量不变
+    for msg in st.session_state.messages[-20:]:  # 保持最多 20 条消息的历史记录
         if msg["role"] == "user":
             his_messages.append({"role": "user", "parts": [{"text": msg["content"]}]})
         elif msg is not None and msg["content"] is not None:
@@ -362,6 +362,19 @@ def getAnswer(prompt):
 
     his_messages = [msg for msg in his_messages if msg["role"] in ["user", "model"]]
     his_messages.append({"role": "user", "parts": [{"text": prompt}]})
+
+
+    # 在这里添加角色设定，作为最后一条消息
+    enabled_settings_content = ""
+    if any(st.session_state.enabled_settings.values()):
+        enabled_settings_content = "```system\n"
+        enabled_settings_content += "# Active Settings:\n"
+        for setting_name, enabled in st.session_state.enabled_settings.items():
+            if enabled:
+                enabled_settings_content += f"- {setting_name}: {st.session_state.character_settings[setting_name]}\n"
+        enabled_settings_content += "```\n"
+    if enabled_settings_content:
+        his_messages.append({"role": "system", "parts": [{"text": enabled_settings_content}]})
 
 
     try:
