@@ -341,12 +341,11 @@ def getAnswer(prompt):
    )
 
 
-    for msg in st.session_state.messages[-20:]:  # 保留最近的20条消息
+    for msg in st.session_state.messages[-20:]:
         if msg["role"] == "user":
-            his_messages.append({"role": "user", "parts": [{"text": msg["content"]}]})
+            his_messages.append({"role": "user", "parts": [{"text": msg["content"]}]})  # 修正格式
         elif msg is not None and msg["content"] is not None:
-            his_messages.append({"role": "model", "parts": [{"text": msg["content"]}]})
-
+            his_messages.append({"role": "model", "parts": [{"text": msg["content"]}]})  # 修正格式
     his_messages = [msg for msg in his_messages if msg["role"] in ["user", "model"]]
     his_messages.append({"role": "user", "parts": [{"text": prompt}]})
 
@@ -359,8 +358,10 @@ def getAnswer(prompt):
             if enabled:
                 enabled_settings_content += f"- {setting_name}: {st.session_state.character_settings[setting_name]}\n"
         enabled_settings_content += "```\n"
-        his_messages.append({"role": "system", "content": enabled_settings_content})  # 添加到 his_messages 的末尾
+        his_messages.append({"role": "system", "parts": [{"text": enabled_settings_content}]})  # 修正格式
 
+    # 特别注意这里也要修正格式！
+    his_messages.append({"role": "user", "parts": [{"text": prompt}]}) # 修正格式
 
 
     try:
