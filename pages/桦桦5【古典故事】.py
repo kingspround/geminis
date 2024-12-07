@@ -134,23 +134,13 @@ def clear_history(log_file):
 def getAnswer(prompt):
     prompt = prompt or ""
 
-    # 处理 test_text (这个部分保持不变)
+    # 处理 test_text (这部分保持不变)
     if "test_text" in st.session_state and st.session_state.test_text and not any(msg.get("content") == st.session_state.test_text for msg in st.session_state.messages if msg.get("role") == "system"):
         st.session_state.messages.insert(0, {"role": "system", "content": st.session_state.test_text})
 
-    # 这里插入处理启用角色设定的代码
-    enabled_settings_content = ""
-    if any(st.session_state.enabled_settings.values()):
-        enabled_settings_content = "```system\n"
-        enabled_settings_content += "# Active Settings:\n"
-        for setting_name, enabled in st.session_state.enabled_settings.items():
-            if enabled:
-                enabled_settings_content += f"- {setting_name}: {st.session_state.character_settings[setting_name]}\n"
-        enabled_settings_content += "```\n"
 
-    # 将角色设定和 test_text 添加到用户消息的开头
-    prompt = enabled_settings_content + prompt #  <--  在这里添加 enabled_settings_content
-
+    # 将用户消息添加到历史记录
+    his_messages = []
     his_messages.append(
         {"role": "model", "parts":[{"text": """
 [SYSTEM]
@@ -351,14 +341,7 @@ def getAnswer(prompt):
    )
 
 
-    # 将系统消息作为最后一条消息添加到聊天记录
-    if enabled_settings_content:
-        his_messages.append({"role": "system", "content": enabled_settings_content})
-
-    his_messages.append({"role": "user", "parts": [{"text": prompt}]})
-
-    
-    for msg in st.session_state.messages[-20:]:
+    for msg in st.session_state.messages[-20:]:  # 保留最近的20条消息
         if msg["role"] == "user":
             his_messages.append({"role": "user", "parts": [{"text": msg["content"]}]})
         elif msg is not None and msg["content"] is not None:
@@ -366,6 +349,18 @@ def getAnswer(prompt):
 
     his_messages = [msg for msg in his_messages if msg["role"] in ["user", "model"]]
     his_messages.append({"role": "user", "parts": [{"text": prompt}]})
+
+    # 在这里添加启用的角色设定作为最后一条消息
+    enabled_settings_content = ""
+    if any(st.session_state.enabled_settings.values()):
+        enabled_settings_content = "```system\n"
+        enabled_settings_content += "# Active Settings:\n"
+        for setting_name, enabled in st.session_state.enabled_settings.items():
+            if enabled:
+                enabled_settings_content += f"- {setting_name}: {st.session_state.character_settings[setting_name]}\n"
+        enabled_settings_content += "```\n"
+        his_messages.append({"role": "system", "content": enabled_settings_content})  # 添加到 his_messages 的末尾
+
 
 
     try:
