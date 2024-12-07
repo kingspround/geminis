@@ -356,14 +356,11 @@ def getAnswer(prompt):
 
     for msg in st.session_state.messages[-20:]:
         if msg["role"] == "user":
-            his_messages.append({"role": "user", "content": msg["content"]}) # 去掉parts
+            his_messages.append({"role": "user", "content": msg["content"]}) # 简化结构
         elif msg is not None and msg["content"] is not None:
-            his_messages.append({"role": "model", "content": msg["content"]}) # 去掉parts
+            his_messages.append({"role": "model", "content": msg["content"]}) # 简化结构
 
-    his_messages = [msg for msg in his_messages if msg["role"] in ["user", "model"]]
-
-
-    # 角色设定注入：添加到 his_messages 的末尾
+    # 角色设定注入: 作为单独的系统消息添加
     enabled_settings_content = ""
     if any(st.session_state.enabled_settings.values()):
         enabled_settings_content = "```system\n"
@@ -372,11 +369,10 @@ def getAnswer(prompt):
             if enabled:
                 enabled_settings_content += f"- {setting_name}: {st.session_state.character_settings[setting_name]}\n"
         enabled_settings_content += "```\n"
-    if enabled_settings_content:
-        his_messages.append({"role": "system", "content": enabled_settings_content}) # 去掉parts
+        his_messages.append({"role": "system", "content": enabled_settings_content})
 
 
-    his_messages.append({"role": "user", "content": prompt})  # 用户提示放在最后
+    his_messages.append({"role": "user", "content": prompt})
 
     try:
         response = model.generate_content(contents=his_messages, stream=True)
