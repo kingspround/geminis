@@ -60,14 +60,18 @@ model = genai.GenerativeModel(
 )
 
 # --- 角色设定 ---
-# --- 角色设定 ---
+PRESET_SETTINGS = {  # 使用常量存储预设设定
+    "乐于助人": "我是乐于助人的AI助手。",
+    "创作故事": "我擅长创作故事和诗歌。",
+    "代码专家": "我可以提供专业的代码建议和示例。",
+}
+
+
 if "character_settings" not in st.session_state:
-    st.session_state.character_settings = {
-        "乐于助人": "我是乐于助人的AI助手。",
-        "创作故事": "我擅长创作故事和诗歌。",
-        "代码专家": "我可以提供专业的代码建议和示例。",
-        "自定义设定": "",  # 用于用户自定义输入的设定
-    }
+    st.session_state.character_settings = PRESET_SETTINGS.copy() # 使用 copy() 避免修改原始预设
+    st.session_state.character_settings["自定义设定"] = ""  # 添加自定义设定
+
+
 if "enabled_settings" not in st.session_state:
     st.session_state.enabled_settings = {
         setting_name: False for setting_name in st.session_state.character_settings
@@ -210,11 +214,13 @@ with st.sidebar.expander("角色设定"):
 
     for setting_name, setting_content in st.session_state.character_settings.items():
         if setting_name == "自定义设定":
-            st.session_state.character_settings["自定义设定"] = st.text_area("自定义设定", setting_content, key=f"textarea_{setting_name}")
-        else: #  关键修改：其他预设设定使用 checkbox
+            st.session_state.character_settings[setting_name] = st.text_area("自定义设定", setting_content, key=f"textarea_{setting_name}")
+        elif setting_name in PRESET_SETTINGS: # 只对预设设定使用 checkbox
             st.session_state.enabled_settings[setting_name] = st.checkbox(setting_name, st.session_state.enabled_settings.get(setting_name, False), key=f"checkbox_{setting_name}")
 
+
     st.session_state.test_text = st.text_area("System Message (Optional):", st.session_state.get("test_text", ""), key="system_message")
+
 
 
 
