@@ -399,14 +399,13 @@ with st.sidebar.expander("文件操作"):
             st.error(f"读取本地pkl文件失败：{e}")
 
 
-# 功能区 2: 测试文本框和刷新按钮
-test_text = st.text_area("测试文本:", "这是一段测试文本。") # 默认文本
-st.button("刷新页面", on_click=st.experimental_rerun) 
+# Remove 功能区 2: 角色设定 and replace with the following:
+st.sidebar.title("违禁词测试区")
+test_text = st.sidebar.text_area("输入测试文本:", "这是一段测试文本。")
+if st.sidebar.button("刷新页面"):
+    st.experimental_rerun()
 
-st.write("测试文本加载完成") # 显示加载完成信息
-
-# Tell the AI that this is test text.  This does NOT affect the model's response, it's for your information only.
-print("This is a test text: ", test_text)
+st.write("测试文本加载完成") # Indicate that the test text is loaded
 
 
 
