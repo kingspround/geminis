@@ -221,9 +221,9 @@ with st.sidebar.expander("角色设定"):
 
     for setting_name, setting_content in st.session_state.character_settings.items():
         if setting_name == "自定义设定":
-            st.session_state.character_settings["自定义设定"] = st.text_area("自定义设定", setting_content)
-        st.session_state.enabled_settings[setting_name] = st.checkbox(setting_name, st.session_state.enabled_settings.get(setting_name, False), key=f"checkbox_{setting_name}")
-
+            st.session_state.character_settings["自定义设定"] = st.text_area("自定义设定", setting_content)  # 自定义设定仍然使用 text_area
+        else: # 其他设定使用 checkbox
+            st.session_state.enabled_settings[setting_name] = st.checkbox(setting_name, st.session_state.enabled_settings.get(setting_name, False), key=f"checkbox_{setting_name}") 
 
     st.session_state.test_text = st.text_area("System Message (Optional):", st.session_state.get("test_text", ""))
 
