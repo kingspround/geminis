@@ -353,27 +353,20 @@ def getAnswer(prompt):
 
     for msg in st.session_state.messages[-20:]:
         if msg["role"] == "user":
-            his_messages.append({"role": "user", "parts": [{"text": msg["content"]}]})
-        elif msg["role"] == "assistant":  # 注意这里，如果你的历史消息中使用了 "assistant"，需要改为 "model" 或 "system"
-            his_messages.append({"role": "model", "parts": [{"text": msg["content"]}]}) # 将 "assistant" 改为 "model"
-
-    for msg in st.session_state.messages[-20:]:  # 获取最近的20条消息
-        if msg["role"] == "user":
-            his_messages.append({"role": "user", "parts": [{"text": msg["content"]}]})
-        elif msg is not None and msg["content"] is not None: # 检查消息和内容是否为空
-            his_messages.append({"role": "model", "parts": [{"text": msg["content"]}]})
-
+            his_messages.append({"role": "user", "parts": [{"text": msg["content"]}]})  # 注意这里添加了 parts 列表
+        elif msg is not None and msg["content"] is not None:
+            his_messages.append({"role": "model", "parts": [{"text": msg["content"]}]}) # 注意这里添加了 parts 列表
     his_messages = [msg for msg in his_messages if msg["role"] in ["user", "model"]] # 过滤掉其他角色的消息
 
     # 在这里添加系统消息作为最后一条聊天记录
     if enabled_settings_content:
-        his_messages.append({"role": "system", "content": enabled_settings_content})
+        his_messages.append({"role": "system", "parts": [{"text": enabled_settings_content}]}) #  注意 parts 列表
 
-    his_messages.append({"role": "user", "parts": [{"text": prompt}]})  # 用户的提示仍然放在最后
+    his_messages.append({"role": "user", "parts": [{"text": prompt}]}) # 注意 parts 列表
+
 
     try:
-        response = model.generate_content(contents=his_messages, stream=True)
-        full_response = ""
+        response = model.generate_content(contents=his_messages, stream=True)        full_response = ""
         for chunk in response:
             full_response += chunk.text
             yield chunk.text
