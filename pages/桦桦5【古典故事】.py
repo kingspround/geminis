@@ -139,6 +139,16 @@ def getAnswer(prompt):
         st.session_state.messages.insert(0, {"role": "system", "content": st.session_state.test_text})
 
 
+    # 构建启用角色设定的内容 (这部分也保持不变)
+    enabled_settings_content = ""
+    if any(st.session_state.enabled_settings.values()):
+        enabled_settings_content = "```system\n"
+        enabled_settings_content += "# Active Settings:\n"
+        for setting_name, enabled in st.session_state.enabled_settings.items():
+            if enabled:
+                enabled_settings_content += f"- {setting_name}: {st.session_state.character_settings[setting_name]}\n"
+        enabled_settings_content += "```\n"
+    
     # 将用户消息添加到历史记录
     his_messages = []
     his_messages.append(
@@ -347,18 +357,19 @@ def getAnswer(prompt):
         elif msg["role"] == "assistant":  # 注意这里，如果你的历史消息中使用了 "assistant"，需要改为 "model" 或 "system"
             his_messages.append({"role": "model", "parts": [{"text": msg["content"]}]}) # 将 "assistant" 改为 "model"
 
-    # 在这里添加启用的角色设定作为最后一条消息
-    enabled_settings_content = ""
-    if any(st.session_state.enabled_settings.values()):
-        enabled_settings_content = "```system\n"
-        enabled_settings_content += "# Active Settings:\n"
-        for setting_name, enabled in st.session_state.enabled_settings.items():
-            if enabled:
-                enabled_settings_content += f"- {setting_name}: {st.session_state.character_settings[setting_name]}\n"
-        enabled_settings_content += "```\n"
-        his_messages.append({"role": "system", "parts": [{"text": enabled_settings_content}]}) # 必须是 system 角色
+    for msg in st.session_state.messages[-20:]:  # 获取最近的20条消息
+        if msg["role"] == "user":
+            his_messages.append({"role": "user", "parts": [{"text": msg["content"]}]})
+        elif msg is not None and msg["content"] is not None: # 检查消息和内容是否为空
+            his_messages.append({"role": "model", "parts": [{"text": msg["content"]}]})
 
-    his_messages.append({"role": "user", "parts": [{"text": prompt}]})
+    his_messages = [msg for msg in his_messages if msg["role"] in ["user", "model"]] # 过滤掉其他角色的消息
+
+    # 在这里添加系统消息作为最后一条聊天记录
+    if enabled_settings_content:
+        his_messages.append({"role": "system", "content": enabled_settings_content})
+
+    his_messages.append({"role": "user", "parts": [{"text": prompt}]})  # 用户的提示仍然放在最后
 
     try:
         response = model.generate_content(contents=his_messages, stream=True)
