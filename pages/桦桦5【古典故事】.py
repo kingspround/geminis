@@ -140,6 +140,27 @@ def getAnswer(prompt):
 
 
     his_messages = []
+    for msg in st.session_state.messages[-20:]: # 保持之前的历史记录
+        if msg["role"] == "user":
+            his_messages.append({"role": "user", "parts": [{"text": msg["content"]}]})
+        elif msg is not None and msg["content"] is not None:
+            his_messages.append({"role": "model", "parts": [{"text": msg["content"]}]})
+
+    his_messages = [msg for msg in his_messages if msg["role"] in ["user", "model"]]
+
+
+    enabled_settings_content = ""
+    if any(st.session_state.enabled_settings.values()):
+        enabled_settings_content = "```system\n"
+        enabled_settings_content += "# Active Settings:\n"
+        for setting_name, enabled in st.session_state.enabled_settings.items():
+            if enabled:
+                enabled_settings_content += f"- {setting_name}: {st.session_state.character_settings[setting_name]}\n"
+        enabled_settings_content += "```\n"
+
+    # 将角色设定添加到最后，作为额外的聊天记录
+    his_messages.append({"role": "system", "parts": [{"text": enabled_settings_content}]})
+
     his_messages.append(
         {"role": "model", "parts":[{"text": """
 [SYSTEM]
@@ -336,43 +357,19 @@ def getAnswer(prompt):
 忆曰：“善恶终有报，天道好轮回。”陈生一念之仁，虽遇横祸，终得善果。然世间诡谲，切莫轻信于人，此事可为后世之鉴，天道循环，因果报应，非虚言也。
 
 
-
-
 ]"""}]}
    )
-
-    for msg in st.session_state.messages[-20:]: #只取最近20条记录
-        if msg["role"] == "user":
-            his_messages.append({"role": "user", "parts": [{"text": msg["content"]}]})
-        elif msg is not None and msg["content"] is not None:
-            his_messages.append({"role": "model", "parts": [{"text": msg["content"]}]})
-
-    his_messages = [msg for msg in his_messages if msg["role"] in ["user", "model"]]
-    his_messages.append({"role": "user", "parts": [{"text": prompt}]}) #用户输入在最后
-
-
-    enabled_settings_content = ""
-    if any(st.session_state.enabled_settings.values()):
-        enabled_settings_content = "```system\n"
-        enabled_settings_content += "# Active Settings:\n"
-        for setting_name, enabled in st.session_state.enabled_settings.items():
-            if enabled:
-                enabled_settings_content += f"- {setting_name}: {st.session_state.character_settings[setting_name]}\n"
-        enabled_settings_content += "```\n"
-        his_messages.append({"role": "system", "parts":[{"text": enabled_settings_content}]}) #角色设定作为最后一条系统消息
 
     try:
         response = model.generate_content(contents=his_messages, stream=True)
         full_response = ""
         for chunk in response:
             full_response += chunk.text
-            yield chunk.text # 用于Streamlit的流式输出
+            yield chunk.text
         return full_response
     except Exception as e:
         st.error(f"发生错误: {e}. 请检查你的API密钥和消息格式。")
         return ""
-
-
 
 
 # --- Streamlit 界面 ---
