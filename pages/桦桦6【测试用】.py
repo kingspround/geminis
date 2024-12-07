@@ -82,7 +82,6 @@ if "enabled_settings" not in st.session_state:
         setting_name: False for setting_name in DEFAULT_CHARACTER_SETTINGS
     }
 
-
 def ensure_enabled_settings_exists():
     for setting_name in st.session_state.character_settings:
         if setting_name not in st.session_state.enabled_settings:
@@ -233,8 +232,8 @@ with st.sidebar.expander("角色设定"):
         if setting_name == "自定义设定":
             st.session_state.character_settings[setting_name] = st.text_area("自定义设定", st.session_state.character_settings.get(setting_name, ""), key=f"textarea_{setting_name}")
         else:
-            st.session_state.character_settings[setting_name] = st.text_area(setting_name, st.session_state.character_settings.get(setting_name, ""), key=f"textarea_{setting_name}") # 使用text_area处理所有设定
             st.session_state.enabled_settings[setting_name] = st.checkbox(setting_name, st.session_state.enabled_settings.get(setting_name, False), key=f"checkbox_{setting_name}")
+
 
     st.session_state.test_text = st.text_area("System Message (Optional):", st.session_state.get("test_text", ""), key="system_message")
 
