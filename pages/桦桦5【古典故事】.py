@@ -131,14 +131,23 @@ def clear_history(log_file):
 
 
 
+# --- LLM 函数 ---
 def getAnswer(prompt):
     prompt = prompt or ""
 
-    # 处理 test_text (这部分保持不变)
+    # 处理 test_text (这个部分保持不变)
     if "test_text" in st.session_state and st.session_state.test_text and not any(msg.get("content") == st.session_state.test_text for msg in st.session_state.messages if msg.get("role") == "system"):
-        st.session_state.messages.insert(0, {"role": "system", "content": st.session_state.test_text})    
-    # 将用户消息添加到历史记录
+        st.session_state.messages.insert(0, {"role": "system", "content": st.session_state.test_text})
 
+    # 这里插入处理启用角色设定的代码
+    enabled_settings_content = ""
+    if any(st.session_state.enabled_settings.values()):
+        enabled_settings_content = "```system\n"
+        enabled_settings_content += "# Active Settings:\n"
+        for setting_name, enabled in st.session_state.enabled_settings.items():
+            if enabled:
+                enabled_settings_content += f"- {setting_name}: {st.session_state.character_settings[setting_name]}\n"
+        enabled_settings_content += "```\n"
 
     
     his_messages = []
@@ -344,28 +353,19 @@ def getAnswer(prompt):
 
     for msg in st.session_state.messages[-20:]:
         if msg["role"] == "user":
-            his_messages.append({"role": "user", "parts": [{"text": msg["content"]}]})  # 注意这里添加了 parts 列表
+            his_messages.append({"role": "user", "parts": [{"text": msg["content"]}]})
         elif msg is not None and msg["content"] is not None:
-            his_messages.append({"role": "model", "parts": [{"text": msg["content"]}]}) # 注意这里添加了 parts 列表
-    his_messages = [msg for msg in his_messages if msg["role"] in ["user", "model"]] # 过滤掉其他角色的消息
+            his_messages.append({"role": "model", "parts": [{"text": msg["content"]}]})
 
-    # 在这里添加启用角色设定的代码，作为最后一条消息
-    enabled_settings_content = ""
-    if any(st.session_state.enabled_settings.values()):
-        enabled_settings_content = "```system\n"  # 保持 system 格式
-        enabled_settings_content += "# Active Settings:\n"
-        for setting_name, enabled in st.session_state.enabled_settings.items():
-            if enabled:
-                enabled_settings_content += f"- {setting_name}: {st.session_state.character_settings[setting_name]}\n"
-        enabled_settings_content += "```\n"
-
-        # 将设定作为最后一条消息添加到 his_messages
-        his_messages.append({"role": "system", "content": enabled_settings_content}) # 注意这里 role 是 "system"
+    his_messages = [msg for msg in his_messages if msg["role"] in ["user", "model"]]
+    his_messages.append({"role": "user", "parts": [{"text": prompt}]})
 
 
-    his_messages.append({"role": "user", "parts": [{"text": prompt}]}) # 用户的 prompt 仍然放在最后
-
-
+    # 将 enabled_settings_content 移到最后一条消息之前
+    his_messages = his_messages[:-1]  # 移除最后一条用户消息
+    his_messages.append({"role": "user", "parts": [{"text": enabled_settings_content}]}) # 插入设定
+    his_messages.append({"role": "user", "parts": [{"text": prompt}]}) # 重新添加用户消息
+    
     try:
         response = model.generate_content(contents=his_messages, stream=True)
         full_response = ""
@@ -496,4 +496,3 @@ if prompt := st.chat_input("输入你的消息:"):
         st.session_state.messages.append({"role": "assistant", "content": full_response})
     with open(log_file, "wb") as f:
         pickle.dump(st.session_state.messages, f)
-
