@@ -198,7 +198,7 @@ with st.sidebar.expander("文件操作"):
 
 # 功能区 2: 角色设定
 with st.sidebar.expander("角色设定"):
-    # 读取本地设定文件
+    # 读取本地设定文件 (保留此功能)
     uploaded_setting_file = st.file_uploader("读取本地设定文件 (txt)", type=["txt"])
     if uploaded_setting_file is not None:
         setting_name = os.path.splitext(uploaded_setting_file.name)[0]
@@ -207,24 +207,14 @@ with st.sidebar.expander("角色设定"):
         st.session_state.enabled_settings[setting_name] = False
         st.experimental_rerun()
 
-    # 删除设定
-    if st.session_state.character_settings is not None and isinstance(st.session_state.character_settings, dict):
-        settings_to_delete = st.multiselect("选择要删除的设定", list(st.session_state.character_settings.keys()), key="delete_settings")
-        for setting_name in settings_to_delete:
-            del st.session_state.character_settings[setting_name]
-            del st.session_state.enabled_settings[setting_name]
-            st.experimental_rerun()
-    else:
-        st.error("角色设定数据错误！")
 
     for setting_name, setting_content in st.session_state.character_settings.items():
         if setting_name == "自定义设定":
-            st.session_state.character_settings["自定义设定"] = st.text_area("自定义设定", setting_content)
-        else: # 使用 checkbox 显示预设设定
+            st.session_state.character_settings["自定义设定"] = st.text_area("自定义设定", setting_content, key=f"textarea_{setting_name}") # 为 text_area 添加 key
+        else:  # 使用 checkbox 显示预设设定
             st.session_state.enabled_settings[setting_name] = st.checkbox(setting_name, st.session_state.enabled_settings.get(setting_name, False), key=f"checkbox_{setting_name}")
 
-    st.session_state.test_text = st.text_area("System Message (Optional):", st.session_state.get("test_text", ""))
-
+    st.session_state.test_text = st.text_area("System Message (Optional):", st.session_state.get("test_text", ""), key="system_message") # 为 test_text 添加 key
 # 显示已加载的设定
 enabled_settings_display = [setting_name for setting_name, enabled in st.session_state.enabled_settings.items() if enabled]
 if enabled_settings_display:
