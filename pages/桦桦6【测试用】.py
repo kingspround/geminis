@@ -213,33 +213,38 @@ with st.sidebar.expander("文件操作"):
 
 # 功能区 2: 角色设定
 with st.sidebar.expander("角色设定"):
-    # 读取本地设定文件 (保留此功能)
+    # 文件上传功能保持不变
     uploaded_setting_file = st.file_uploader("读取本地设定文件 (txt)", type=["txt"])
     if uploaded_setting_file is not None:
         try:
             setting_name = os.path.splitext(uploaded_setting_file.name)[0]
             setting_content = uploaded_setting_file.read().decode("utf-8")
-            st.session_state.character_settings[setting_name] = setting_content
+            st.session_state.character_settings[setting_name] = setting_content  # 直接更新 session state
             st.session_state.enabled_settings[setting_name] = False
             st.experimental_rerun()
         except Exception as e:
             st.error(f"读取文件失败: {e}")
 
-
     for setting_name in DEFAULT_CHARACTER_SETTINGS:
-        # 使用单一 text_area，一次性显示所有角色设定
-        if st.session_state.character_settings.get(setting_name):
-            st.session_state.character_settings[setting_name] = st.text_area(
-                setting_name, st.session_state.character_settings.get(setting_name, ""), key=f"textarea_{setting_name}"
-            )
-        else:
-            st.session_state.character_settings[setting_name] = st.text_area(
-                setting_name, "", key=f"textarea_{setting_name}"
-            )
+        if setting_name not in st.session_state.character_settings:
+            st.session_state.character_settings[setting_name] = DEFAULT_CHARACTER_SETTINGS[setting_name] # 初始化角色设定
 
-        st.session_state.enabled_settings[setting_name] = st.checkbox(
-            setting_name, st.session_state.enabled_settings.get(setting_name, False), key=f"checkbox_{setting_name}"
-        )
+        # 使用 session state 来显示和编辑设定，避免重复创建文本框
+        if st.checkbox(setting_name, st.session_state.enabled_settings.get(setting_name, False), key=f"checkbox_{setting_name}"):
+            st.session_state.enabled_settings[setting_name] = True
+            if st.button(f"编辑 {setting_name}"):
+              #这里打开一个模态框编辑内容，而不是直接在侧边栏显示文本框
+              edited_text = st.text_area(f"编辑 {setting_name}", st.session_state.character_settings[setting_name])
+              if st.button("保存"):
+                st.session_state.character_settings[setting_name] = edited_text
+                st.experimental_rerun()
+              elif st.button("取消"):
+                st.experimental_rerun()  #刷新页面关闭模态编辑框
+        else:
+            st.session_state.enabled_settings[setting_name] = False #如果复选框未选中则设置为False
+
+
+    st.session_state.test_text = st.text_area("System Message (Optional):", st.session_state.get("test_text", ""), key="system_message")
 
 
 
