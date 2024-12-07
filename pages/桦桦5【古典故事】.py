@@ -380,18 +380,6 @@ def getAnswer(prompt):
             full_response += chunk.text
             yield chunk.text
 
-        # 在这里添加角色设定，在生成回复之后
-        enabled_settings_content = ""
-        if any(st.session_state.enabled_settings.values()):
-            enabled_settings_content = "\n```system\n# Active Settings:\n"
-            for setting_name, enabled in st.session_state.enabled_settings.items():
-                if enabled:
-                    enabled_settings_content += f"- {setting_name}: {st.session_state.character_settings[setting_name]}\n"
-            enabled_settings_content += "```\n"
-
-        full_response += enabled_settings_content #添加到回复的最后
-
-        return full_response
     except Exception as e:
         st.error(f"发生错误: {e}. 请检查你的API密钥和消息格式。")
         return ""
