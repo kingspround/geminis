@@ -366,7 +366,8 @@ def getAnswer(prompt):
 
 
     try:
-        response = model.generate_content(contents=his_messages, stream=True)        full_response = ""
+        response = model.generate_content(contents=his_messages, stream=True)
+        full_response = ""
         for chunk in response:
             full_response += chunk.text
             yield chunk.text
