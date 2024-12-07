@@ -230,6 +230,12 @@ with st.sidebar.expander("角色设定"):
 
     st.session_state.test_text = st.text_area("System Message (Optional):", st.session_state.get("test_text", ""), key="system_message")
 
+# 显示已加载的设定
+enabled_settings_display = [setting_name for setting_name, enabled in st.session_state.enabled_settings.items() if enabled]
+if enabled_settings_display:
+    st.write("已加载设定:", ", ".join(enabled_settings_display)) # 在聊天界面上方显示
+
+
 
 # 显示历史记录和编辑功能
 for i, message in enumerate(st.session_state.messages):
