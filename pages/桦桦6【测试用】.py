@@ -60,18 +60,13 @@ model = genai.GenerativeModel(
 )
 
 # --- 角色设定 ---
-PRESET_SETTINGS = {  # 使用常量存储预设设定
-    "乐于助人": "我是乐于助人的AI助手。",
-    "创作故事": "我擅长创作故事和诗歌。",
-    "代码专家": "我可以提供专业的代码建议和示例。",
-}
-
-
 if "character_settings" not in st.session_state:
-    st.session_state.character_settings = PRESET_SETTINGS.copy() # 使用 copy() 避免修改原始预设
-    st.session_state.character_settings["自定义设定"] = ""  # 添加自定义设定
-
-
+    st.session_state.character_settings = {
+        "乐于助人": "我是乐于助人的AI助手。",
+        "创作故事": "我擅长创作故事和诗歌。",
+        "代码专家": "我可以提供专业的代码建议和示例。",
+        "自定义设定": "",  # 用于用户自定义输入的设定
+    }
 if "enabled_settings" not in st.session_state:
     st.session_state.enabled_settings = {
         setting_name: False for setting_name in st.session_state.character_settings
@@ -208,19 +203,19 @@ with st.sidebar.expander("角色设定"):
         setting_name = os.path.splitext(uploaded_setting_file.name)[0]
         setting_content = uploaded_setting_file.read().decode("utf-8")
         st.session_state.character_settings[setting_name] = setting_content
-        st.session_state.enabled_settings[setting_name] = False
+        st.session_state.enabled_settings[setting_name] = False #  确保新上传的设定对应的 enabled_settings 也被创建
         st.experimental_rerun()
 
 
-    for setting_name, setting_content in st.session_state.character_settings.items():
+    for setting_name in st.session_state.character_settings:  #  直接迭代 character_settings 的 key
         if setting_name == "自定义设定":
-            st.session_state.character_settings[setting_name] = st.text_area("自定义设定", setting_content, key=f"textarea_{setting_name}")
-        elif setting_name in PRESET_SETTINGS: # 只对预设设定使用 checkbox
-            st.session_state.enabled_settings[setting_name] = st.checkbox(setting_name, st.session_state.enabled_settings.get(setting_name, False), key=f"checkbox_{setting_name}")
+            st.session_state.character_settings[setting_name] = st.text_area("自定义设定", st.session_state.character_settings.get(setting_name, ""), key=f"textarea_{setting_name}")
+        else:  # 使用 checkbox 显示预设设定
+            st.session_state.enabled_settings[setting_name] = st.checkbox(setting_name, st.session_state.enabled_settings.get(setting_name, False), key=f"checkbox_{setting_name}")  # 使用 enabled_settings 控制 checkbox 状态
+
 
 
     st.session_state.test_text = st.text_area("System Message (Optional):", st.session_state.get("test_text", ""), key="system_message")
-
 
 
 
