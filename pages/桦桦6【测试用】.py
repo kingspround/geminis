@@ -56,12 +56,7 @@ model = genai.GenerativeModel(
 )
 
 # --- 角色设定 ---
-if "character_settings" not in st.session_state:
-    st.session_state.character_settings = {}  # 初始化为空字典
-
-if "enabled_settings" not in st.session_state:
-    st.session_state.enabled_settings = {}  # 初始化为空字典
-
+# --- 角色设定 ---
 if "character_settings" not in st.session_state:
     st.session_state.character_settings = {
         "乐于助人": "我是乐于助人的AI助手。",
@@ -107,19 +102,24 @@ def clear_history(log_file):
 # --- LLM 函数 ---
 def getAnswer(prompt):
     prompt = prompt or ""
-    enabled_settings_content = ""
 
+    enabled_settings_content = ""
     if any(st.session_state.enabled_settings.values()):
-        enabled_settings_content = "```system\n# Active Settings:\n"
+        enabled_settings_content = "```system\n"
+        enabled_settings_content += "# Active Settings:\n"
         for setting_name, enabled in st.session_state.enabled_settings.items():
             if enabled:
                 setting_description = st.session_state.character_settings.get(setting_name, "").split(":", 1)[1].strip() if ":" in st.session_state.character_settings.get(setting_name, "") else ""
-                enabled_settings_content += f"- {setting_name}: {setting_description}\n"
+                enabled_settings_content += f"- {setting_name}: {setting_description}\n"  # 只添加设定名称和描述
         enabled_settings_content += "```\n"
 
-    if "test_text" in st.session_state and st.session_state.test_text and st.session_state.messages and st.session_state.messages[0].get("content") != st.session_state.test_text:
+
+    if "test_text" in st.session_state and st.session_state.test_text and not any(msg.get("content") == st.session_state.test_text for msg in st.session_state.messages if msg.get("role") == "system"):  # 检查是否已存在
         st.session_state.messages.insert(0, {"role": "system", "content": st.session_state.test_text})
 
+
+
+    # 将角色设定和 test_text 添加到用户消息的开头
     prompt = enabled_settings_content + prompt
 
     his_messages = []
@@ -194,33 +194,30 @@ with st.sidebar.expander("文件操作"):
 
 # 功能区 2: 角色设定
 with st.sidebar.expander("角色设定"):
+
     # 读取本地设定文件
     uploaded_setting_file = st.file_uploader("读取本地设定文件 (txt)", type=["txt"])
     if uploaded_setting_file is not None:
-        try:
-            setting_name = os.path.splitext(uploaded_setting_file.name)[0]
-            setting_content = uploaded_setting_file.read().decode("utf-8")
-            st.session_state.character_settings[setting_name] = setting_content
-            # 确保 enabled_settings 也包含新的设定
-            if setting_name not in st.session_state.enabled_settings:
-                st.session_state.enabled_settings[setting_name] = False
-            st.experimental_rerun()
-        except Exception as e:
-            st.error(f"读取本地设定文件失败：{e}")
+        setting_name = os.path.splitext(uploaded_setting_file.name)[0]
+        setting_content = uploaded_setting_file.read().decode("utf-8")
+        st.session_state.character_settings[setting_name] = setting_content
+        st.session_state.enabled_settings[setting_name] = False
+        st.experimental_rerun()
 
-    # 确保 enabled_settings 与 character_settings 同步
-    for setting_name in st.session_state.character_settings:
-        if setting_name not in st.session_state.enabled_settings:
-            st.session_state.enabled_settings[setting_name] = False
+    # 删除设定
+    settings_to_delete = st.multiselect("选择要删除的设定", list(st.session_state.character_settings.keys()))
+    for setting_name in settings_to_delete:
+        del st.session_state.character_settings[setting_name]
+        del st.session_state.enabled_settings[setting_name]
+        st.experimental_rerun()
+
 
     for setting_name, setting_content in st.session_state.character_settings.items():
-        if setting_name == "自定义设定":
+        if setting_name == "自定义设定":  # 特殊处理自定义设定，允许编辑
             st.session_state.character_settings["自定义设定"] = st.text_area("自定义设定", setting_content)
         st.session_state.enabled_settings[setting_name] = st.checkbox(setting_name, st.session_state.enabled_settings.get(setting_name, False))
 
-
-
-    st.session_state.test_text = st.text_area("System Message (Hidden)", value=st.session_state.get("test_text", ""), style={"display": "none"})
+    st.session_state.test_text = st.text_area("System Message (Optional):", st.session_state.get("test_text", ""))
 
 
 # 显示已加载的设定
