@@ -11,7 +11,11 @@ import streamlit as st
 import pickle
 import glob
 
-
+# 在所有其他代码之前，初始化 session state 变量
+if "character_settings" not in st.session_state:
+    st.session_state.character_settings = {} 
+if "enabled_settings" not in st.session_state:
+    st.session_state.enabled_settings = {}
 
 # --- API 密钥设置 ---
 api_keys = {
@@ -204,12 +208,18 @@ with st.sidebar.expander("角色设定"):
         st.session_state.enabled_settings[setting_name] = False
         st.experimental_rerun()
 
+    # 添加检查
+    if st.session_state.character_settings is not None and isinstance(st.session_state.character_settings, dict):
+        settings_to_delete = st.multiselect("选择要删除的设定", list(st.session_state.character_settings.keys()))
+    
     # 删除设定
     settings_to_delete = st.multiselect("选择要删除的设定", list(st.session_state.character_settings.keys()))
     for setting_name in settings_to_delete:
         del st.session_state.character_settings[setting_name]
         del st.session_state.enabled_settings[setting_name]
         st.experimental_rerun()
+    else:
+        st.error("角色设定数据错误！")
 
 
     for setting_name, setting_content in st.session_state.character_settings.items():
