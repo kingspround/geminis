@@ -399,17 +399,14 @@ with st.sidebar.expander("文件操作"):
             st.error(f"读取本地pkl文件失败：{e}")
 
 
-# 功能区 2: 违禁词测试
-with st.sidebar.expander("违禁词测试"):
-    test_text = st.text_area("输入测试文本:")
-    if st.button("刷新页面"):
-        st.experimental_rerun()
+# 功能区 2: 测试文本框和刷新按钮
+test_text = st.text_area("测试文本:", "这是一段测试文本。") # 默认文本
+st.button("刷新页面", on_click=st.experimental_rerun) 
 
-if test_text:
-    st.write("测试文本加载完成")
-    # 在这里你可以添加你的违禁词测试逻辑，例如：
-    # if "违禁词" in test_text:
-    #     st.error("检测到违禁词!")
+st.write("测试文本加载完成") # 显示加载完成信息
+
+# Tell the AI that this is test text.  This does NOT affect the model's response, it's for your information only.
+print("This is a test text: ", test_text)
 
 
 
