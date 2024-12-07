@@ -212,21 +212,16 @@ with st.sidebar.expander("角色设定"):
         settings_to_delete = st.multiselect("选择要删除的设定", list(st.session_state.character_settings.keys()), key="delete_settings")
         for setting_name in settings_to_delete:
             del st.session_state.character_settings[setting_name]
-            del st.session_state.enabled_settings[setting_name]  # 也要从 enabled_settings 中删除
+            del st.session_state.enabled_settings[setting_name]
             st.experimental_rerun()
     else:
         st.error("角色设定数据错误！")
 
-
-
     for setting_name, setting_content in st.session_state.character_settings.items():
         if setting_name == "自定义设定":
-            st.session_state.character_settings["自定义设定"] = st.text_area("自定义设定", setting_content, key=f"textarea_{setting_name}") # 自定义设定仍然使用文本框
-
-        # 使用复选框来启用/禁用设定
-        st.session_state.enabled_settings[setting_name] = st.checkbox(setting_name, st.session_state.enabled_settings.get(setting_name, False), key=f"checkbox_{setting_name}")
-
-
+            st.session_state.character_settings["自定义设定"] = st.text_area("自定义设定", setting_content)
+        else: # 使用 checkbox 显示预设设定
+            st.session_state.enabled_settings[setting_name] = st.checkbox(setting_name, st.session_state.enabled_settings.get(setting_name, False), key=f"checkbox_{setting_name}")
 
     st.session_state.test_text = st.text_area("System Message (Optional):", st.session_state.get("test_text", ""))
 
