@@ -356,11 +356,11 @@ def getAnswer(prompt):
 
     for msg in st.session_state.messages[-20:]:
         if msg["role"] == "user":
-            his_messages.append({"role": "user", "content": msg["content"]}) # 简化结构
+            his_messages.append({"role": "user", "parts": [{"text": msg["content"]}]})
         elif msg is not None and msg["content"] is not None:
-            his_messages.append({"role": "model", "content": msg["content"]}) # 简化结构
+            his_messages.append({"role": "model", "parts": [{"text": msg["content"]}]})
 
-    # 角色设定注入: 作为单独的系统消息添加
+    # 角色设定注入:  正确使用 parts 结构
     enabled_settings_content = ""
     if any(st.session_state.enabled_settings.values()):
         enabled_settings_content = "```system\n"
@@ -369,20 +369,24 @@ def getAnswer(prompt):
             if enabled:
                 enabled_settings_content += f"- {setting_name}: {st.session_state.character_settings[setting_name]}\n"
         enabled_settings_content += "```\n"
-        his_messages.append({"role": "system", "content": enabled_settings_content})
+        his_messages.append({"role": "system", "parts": [{"text": enabled_settings_content}]})
 
+    his_messages.append({"role": "user", "parts": [{"text": prompt}]})
 
-    his_messages.append({"role": "user", "content": prompt})
 
     try:
         response = model.generate_content(contents=his_messages, stream=True)
+        full_response = ""
         for chunk in response:
             full_response += chunk.text
-            yield chunk.text
-
+            yield chunk.text # 用于Streamlit的流式输出
+        return full_response
     except Exception as e:
         st.error(f"发生错误: {e}. 请检查你的API密钥和消息格式。")
         return ""
+
+
+
 
 # --- Streamlit 界面 ---
 # 确保文件存在
