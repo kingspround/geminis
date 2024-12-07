@@ -400,6 +400,11 @@ with st.sidebar.expander("角色设定和测试"):
         st.experimental_rerun()
 st.write("测试文本加载完成")
 
+# 在每次对话开始前，将测试文本作为 system message 添加到历史记录中
+if st.session_state.test_text:
+    test_message = {"role": "system", "content": st.session_state.test_text}
+    if not any(msg.get("content") == test_message["content"] for msg in st.session_state.messages):  # 避免重复添加
+        st.session_state.messages.insert(0, test_message)  # 插入到历史记录的开头
 
 
 
