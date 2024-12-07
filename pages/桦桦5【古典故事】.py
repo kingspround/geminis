@@ -354,17 +354,16 @@ def getAnswer(prompt):
 ]"""}]}
    )
 
-    for msg in st.session_state.messages[-20:]:  # 保持最多 20 条消息的历史记录
+    for msg in st.session_state.messages[-20:]:
         if msg["role"] == "user":
             his_messages.append({"role": "user", "parts": [{"text": msg["content"]}]})
         elif msg is not None and msg["content"] is not None:
             his_messages.append({"role": "model", "parts": [{"text": msg["content"]}]})
 
     his_messages = [msg for msg in his_messages if msg["role"] in ["user", "model"]]
-    his_messages.append({"role": "user", "parts": [{"text": prompt}]})
 
 
-    # 在这里添加角色设定，作为最后一条消息
+    # 角色设定注入：添加到 his_messages 的末尾
     enabled_settings_content = ""
     if any(st.session_state.enabled_settings.values()):
         enabled_settings_content = "```system\n"
@@ -376,6 +375,8 @@ def getAnswer(prompt):
     if enabled_settings_content:
         his_messages.append({"role": "system", "parts": [{"text": enabled_settings_content}]})
 
+
+    his_messages.append({"role": "user", "parts": [{"text": prompt}]})  # 用户提示放在最后
 
     try:
         response = model.generate_content(contents=his_messages, stream=True)
