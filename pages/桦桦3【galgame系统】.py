@@ -609,9 +609,30 @@ def getAnswer(prompt):
 * **焦糖·布蕾（Crème Brûlée ）[焦糖布丁]**
 * **午夜苏醒的薇拉 (Midnight · Viola's Awakening) [提拉米苏]**
 * **白巧·甜奶霜（Snowy Strawberry）[白巧克力草莓蛋糕]**
-*   **柠夏·小蓬蓬（Citrus "Puff" Lumi）[柠檬蛋白霜塔]**
-*   **顾芷瑶（Zhiyao Gu）[龙井茶酥]**
-*   **黑可可·爆炸樱桃（Chocola "Squish" Cherrykiss）[黑巧克力爆浆果心]**
+* **柠夏·小蓬蓬（Citrus "Puff" Lumi）[柠檬蛋白霜塔]**
+* **顾芷瑶（Zhiyao Gu）[龙井茶酥]**
+* **黑可可·爆炸樱桃（Chocola "Squish" Cherrykiss）[黑巧克力爆浆果心]**
+* **麦穗儿（Maisui'er）[大肉包]**
+* **云朵·暖可可姬（Cloud · Warm Cocoa Princess）[棉花糖热可可]**
+* **汤盈（Tangying）[小笼包]**
+* **午后的絮语迷迭香（Afternoon's Rosemary Whispers）[伯爵茶磅蛋糕]**
+* **Amour·莓果蕾妮（"Amour" · "Renee" Berry）[覆盆子马卡龙]**
+* **咔哒的蜜糖发条（Klick's Honey Clockwork）[焦糖齿轮泡芙]**
+* **奶油茶香·司康小姐（Tea, "Lady Scone"）[英式司康饼]**
+* **酸甜绮想·百果姬（Sweet Tangy Whimsy · Passionfruit Princess）[百香果芝士蛋糕]**
+* **层层叠叠的薄纱姬（Layered Veil Princess）[千层可丽饼]**
+* **莓姬糯糯（Berry Mo Mochi）[草莓大福]**
+* **抹茶 姬子（Matcha Himeko）[抹茶红豆羊羹]**
+* **绮莉莉·莓露蕾丝（Kiki · Berrydew Lace）[覆盆子白巧克力慕斯]**
+* **翡冷翠·抹茶缪斯（Florence · Matcha Muse）[抹茶拿铁]**
+* ** 露丝·草莓波点（Rose · Strawberry Polka Dot）[草莓奶油泡芙]**
+* **（）[]**
+* **（）[]**
+* **（）[]**
+* **（）[]**
+* **（）[]**
+
+
 
 ]"""}]}
    )
