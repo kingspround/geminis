@@ -910,52 +910,52 @@ with st.sidebar.expander("角色设定"):
     if st.button("刷新 🔄"):  # 添加刷新按钮
         st.experimental_rerun()
 
-    # 显示历史记录和编辑功能
-    for i, message in enumerate(st.session_state.messages):
-        with st.chat_message(message["role"]):
-           col1, col2 = st.columns([10, 1])
-           with col1:
-              if "regenerating" in st.session_state and st.session_state.regenerating == i : #判断是不是在重新生成状态
-                  message_placeholder = st.empty()
-                  full_response = ""
-                  for chunk in getAnswer("请重新写"):
-                    full_response += chunk
-                    message_placeholder.markdown(full_response + "▌")
-                  message_placeholder.markdown(full_response)
-                  st.session_state.messages[i]["content"] = full_response # 更新内容
-                  del st.session_state.regenerating # 删除状态
-                  with open(log_file, "wb") as f:
-                    pickle.dump(st.session_state.messages, f)
-                  st.experimental_rerun() # 重新刷新页面
-              elif "continuing" in st.session_state and st.session_state.continuing == i:
-                 message_placeholder = st.empty()
-                 full_response = st.session_state.messages[i]["content"] # 初始化
-                 for chunk in getAnswer("请从截断的词继续"):
-                      full_response += chunk
-                      message_placeholder.markdown(full_response + "▌")
-                 message_placeholder.markdown(full_response)
-                 st.session_state.messages[i]["content"] = full_response # 更新内容
-                 del st.session_state.continuing
-                 with open(log_file, "wb") as f:
-                   pickle.dump(st.session_state.messages, f)
-                 st.experimental_rerun()
-              else:
-                  st.write(message["content"], key=f"message_{i}")  # 正常显示消息内容
-           with col2:
-            if "button_expander" not in st.session_state or not isinstance(st.session_state.button_expander, bool):
-                st.session_state.button_expander = False # 确保是一个布尔值
-            with st.expander("",expanded=st.session_state.button_expander,label_visibility="hidden"):
-                if st.button("✏️", key=f"edit_{i}", use_container_width=True):
-                    st.session_state.editable_index = i
-                    st.session_state.editing = True
-    
-                if st.button("♻️", key=f"regenerate_{i}", use_container_width=True):
-                    st.session_state.regenerating = i  # 设置重新生成状态
-                    st.experimental_rerun()
-            
-                if st.button("➕", key=f"continue_{i}", use_container_width=True):
-                    st.session_state.continuing = i
-                    st.experimental_rerun()
+# 显示历史记录和编辑功能
+for i, message in enumerate(st.session_state.messages):
+    with st.chat_message(message["role"]):
+       col1, col2 = st.columns([10, 1])
+       with col1:
+          if "regenerating" in st.session_state and st.session_state.regenerating == i : #判断是不是在重新生成状态
+              message_placeholder = st.empty()
+              full_response = ""
+              for chunk in getAnswer("请重新写"):
+                full_response += chunk
+                message_placeholder.markdown(full_response + "▌")
+              message_placeholder.markdown(full_response)
+              st.session_state.messages[i]["content"] = full_response # 更新内容
+              del st.session_state.regenerating # 删除状态
+              with open(log_file, "wb") as f:
+                pickle.dump(st.session_state.messages, f)
+              st.experimental_rerun() # 重新刷新页面
+          elif "continuing" in st.session_state and st.session_state.continuing == i:
+             message_placeholder = st.empty()
+             full_response = st.session_state.messages[i]["content"] # 初始化
+             for chunk in getAnswer("请从截断的词继续"):
+                  full_response += chunk
+                  message_placeholder.markdown(full_response + "▌")
+             message_placeholder.markdown(full_response)
+             st.session_state.messages[i]["content"] = full_response # 更新内容
+             del st.session_state.continuing
+             with open(log_file, "wb") as f:
+               pickle.dump(st.session_state.messages, f)
+             st.experimental_rerun()
+          else:
+              st.write(message["content"], key=f"message_{i}")  # 正常显示消息内容
+       with col2:
+        if "button_expander" not in st.session_state or not isinstance(st.session_state.button_expander, bool):
+            st.session_state.button_expander = False # 确保是一个布尔值
+        with st.expander("",expanded=st.session_state.button_expander,label_visibility="hidden"):
+            if st.button("✏️", key=f"edit_{i}", use_container_width=True):
+                st.session_state.editable_index = i
+                st.session_state.editing = True
+
+            if st.button("♻️", key=f"regenerate_{i}", use_container_width=True):
+                st.session_state.regenerating = i  # 设置重新生成状态
+                st.experimental_rerun()
+        
+            if st.button("➕", key=f"continue_{i}", use_container_width=True):
+                st.session_state.continuing = i
+                st.experimental_rerun()
 
 
 if st.session_state.get("editing"):
