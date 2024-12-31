@@ -28,7 +28,7 @@ generation_config = {
     "temperature": 1,
     "top_p": 0,
     "top_k": 1,
-    "max_output_tokens": 10000,
+    "max_output_tokens": 8000,
 }
 safety_settings = [
     {"category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_NONE"},
