@@ -275,7 +275,7 @@ def getAnswer(prompt):
     if "test_text" in st.session_state and st.session_state.test_text and not any(msg.get("content") == st.session_state.test_text for msg in st.session_state.messages if msg.get("role") == "system"):
         st.session_state.messages.insert(0, {"role": "system", "content": st.session_state.test_text})
 
-    # 这里插入处理启用角色设定的代码
+    # 处理启用角色设定的代码
     enabled_settings_content = ""
     if any(st.session_state.enabled_settings.values()):
         enabled_settings_content = "```system\n"
@@ -494,14 +494,14 @@ def getAnswer(prompt):
             his_messages.append({"role": "model", "parts": [{"text": msg["content"]}]})
 
     his_messages = [msg for msg in his_messages if msg["role"] in ["user", "model"]]
+    
+    # 在最后一条用户消息之前插入 enabled_settings_content (如果它不为空)
+    if enabled_settings_content:
+      his_messages.append({"role": "user", "parts": [{"text": enabled_settings_content}]})
+
     his_messages.append({"role": "user", "parts": [{"text": prompt}]})
 
 
-    # 将 enabled_settings_content 移到最后一条消息之前
-    his_messages = his_messages[:-1]  # 移除最后一条用户消息
-    his_messages.append({"role": "user", "parts": [{"text": enabled_settings_content}]}) # 插入设定
-    his_messages.append({"role": "user", "parts": [{"text": prompt}]}) # 重新添加用户消息
-    
     try:
         response = model.generate_content(contents=his_messages, stream=True)
         full_response = ""
