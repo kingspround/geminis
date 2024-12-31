@@ -1,13 +1,11 @@
-# First
 import google.generativeai as genai
 import streamlit as st
-from dotenv import load_dotenv  
+from dotenv import load_dotenv
 import os
 from PIL import Image
 import numpy as np
 from io import BytesIO
 from io import StringIO
-import streamlit as st
 import pickle
 import glob
 
@@ -41,7 +39,6 @@ if not api_key:
 
 genai.configure(api_key=api_key)
 
-
 # --- 模型设置 ---
 generation_config = {
     "temperature": 1,
@@ -62,6 +59,7 @@ model = genai.GenerativeModel(
     generation_config=generation_config,
     safety_settings=safety_settings,
 )
+
 
 # --- 角色设定 ---
 DEFAULT_CHARACTER_SETTINGS = {
