@@ -851,34 +851,36 @@ def regenerate_message(index):
     if 0 <= index < len(st.session_state.messages):
         original_prompt = st.session_state.messages[index]["content"]
         st.session_state.messages = st.session_state.messages[:index]  # 删除当前消息以及后面的消息
-
-        message_placeholder = st.empty()
+        
+        new_prompt = f"请重新生成以下内容：\n{original_prompt}"  # 添加prompt
+        message_placeholder = st.empty() # 创建一个空的占位符
         full_response = ""
-        for chunk in getAnswer(original_prompt, mode="regenerate"):
+        for chunk in getAnswer(new_prompt):
             full_response += chunk
             message_placeholder.markdown(full_response + "▌")
         message_placeholder.markdown(full_response)
         st.session_state.messages.append({"role": "assistant", "content": full_response}) #新增一行，将新的消息加入到message中
-            
+        
         with open(log_file, "wb") as f:
             pickle.dump(st.session_state.messages, f)
         st.experimental_rerun()
     else:
         st.error("无效的消息索引")
-        
+
 def continue_message(index):
     """继续生成指定索引的消息"""
     if 0 <= index < len(st.session_state.messages):
       original_prompt = st.session_state.messages[index]["content"]
+      new_prompt = f"请在以下内容的基础上继续写下去：\n{original_prompt}"  # 添加prompt
       message_placeholder = st.empty() # 创建一个空的占位符
       full_response = ""
-      for chunk in getAnswer(original_prompt, mode="continue"):
+      for chunk in getAnswer(new_prompt):
           full_response += chunk
           message_placeholder.markdown(full_response + "▌")
       full_response = st.session_state.messages[index]["content"] + full_response # 将原来的内容加上新的内容
       message_placeholder.markdown(full_response)
       st.session_state.messages[index]["content"] = full_response #更新内容
-      st.experimental_rerun() # 重新刷新页面
+      st.experimental_rerun()
       with open(log_file, "wb") as f:
           pickle.dump(st.session_state.messages, f)
     else:
