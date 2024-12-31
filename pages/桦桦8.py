@@ -680,16 +680,20 @@ def getAnswer(prompt):
 
 
     for msg in st.session_state.messages[-20:]:
-        if msg["role"] == "user":
+      if msg and msg.get("role") and msg.get("content"): # 只有当msg不为空，并且有 role 和 content 属性的时候才去处理
+          if msg["role"] == "user":
             his_messages.append({"role": "user", "parts": [{"text": msg["content"]}]})
-        elif msg is not None and msg["content"] is not None:
+          elif msg["role"] == "assistant" and msg["content"] is not None:  # 使用 elif 确保只添加 role 为 assistant 的消息
             his_messages.append({"role": "model", "parts": [{"text": msg["content"]}]})
 
-    #  确保只保留有效的 user 和 model 消息
+
     his_messages = [msg for msg in his_messages if msg["role"] in ["user", "model"]]
 
-
-    his_messages.append({"role": "user", "parts": [{"text": prompt}]}) # 将当前用户消息添加到历史记录
+    if enabled_settings_content:
+        his_messages.append({"role": "user", "parts": [{"text": enabled_settings_content}]})
+    
+    if prompt:
+        his_messages.append({"role": "user", "parts": [{"text": prompt}]})
 
 
 
@@ -701,9 +705,8 @@ def getAnswer(prompt):
             yield chunk.text
         return full_response
     except Exception as e:
-        st.error(f"发生错误: {e}. 请检查你的API密钥和消息格式。") #更明确的错误信息
+        st.error(f"发生错误: {e}. 请检查你的API密钥和消息格式。")  # 更明确的错误信息
         return ""
-
 
 # --- Streamlit 界面 ---
 # 确保文件存在
