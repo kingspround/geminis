@@ -814,6 +814,34 @@ def getAnswer(prompt):
    )
 
 
+    for msg in st.session_state.messages[-20:]:
+      if msg and msg.get("role") and msg.get("content"): # 只有当msg不为空，并且有 role 和 content 属性的时候才去处理
+          if msg["role"] == "user":
+            his_messages.append({"role": "user", "parts": [{"text": msg["content"]}]})
+          elif msg["role"] == "assistant" and msg["content"] is not None:  # 使用 elif 确保只添加 role 为 assistant 的消息
+            his_messages.append({"role": "model", "parts": [{"text": msg["content"]}]})
+
+
+    his_messages = [msg for msg in his_messages if msg["role"] in ["user", "model"]]
+
+    if enabled_settings_content:
+        his_messages.append({"role": "user", "parts": [{"text": enabled_settings_content}]})
+
+    if prompt:
+        his_messages.append({"role": "user", "parts": [{"text": prompt}]})
+
+    try:
+        response = model.generate_content(contents=his_messages, stream=True)
+        full_response = ""
+        for chunk in response:
+            full_response += chunk.text
+            yield chunk.text
+        return full_response
+    except Exception as e:
+        st.error(f"发生错误: {e}. 请检查你的API密钥和消息格式。")  # 更明确的错误信息
+        return ""
+
+
 def regenerate_message(index):
     """重新生成指定索引的消息"""
     if 0 <= index < len(st.session_state.messages):
@@ -849,6 +877,7 @@ def continue_message(index):
           pickle.dump(st.session_state.messages, f)
     else:
         st.error("无效的消息索引")
+
 
 # --- Streamlit 界面 ---
 # 确保文件存在
@@ -921,7 +950,6 @@ with st.sidebar.expander("角色设定"):
         st.experimental_rerun()
 
 # 显示历史记录和编辑功能
-# 显示历史记录和编辑功能
 for i, message in enumerate(st.session_state.messages):
     with st.chat_message(message["role"]):
         col1, col2 = st.columns([10, 1])  # 使用 columns 来划分比例，确保消息和按钮之间有固定的位置
@@ -936,7 +964,6 @@ for i, message in enumerate(st.session_state.messages):
             if st.button("➕", key=f"continue_{i}", use_container_width=True):
                 continue_message(i)
 
-
 if st.session_state.get("editing"):
     i = st.session_state.editable_index
     message = st.session_state.messages[i]
@@ -944,14 +971,14 @@ if st.session_state.get("editing"):
         new_content = st.text_area(f"{message['role']}:", message["content"], key=f"message_edit_{i}")
         col1, col2 = st.columns(2)
         with col1:
-            if st.button("✅", key=f"save_{i}"):
+            if st.button("保存 ✅", key=f"save_{i}"):
                 st.session_state.messages[i]["content"] = new_content
                 with open(log_file, "wb") as f:
                     pickle.dump(st.session_state.messages, f)
                 st.success("已保存更改！")
                 st.session_state.editing = False
         with col2:
-            if st.button("❌", key=f"cancel_{i}"):
+            if st.button("取消 ❌", key=f"cancel_{i}"):
                 st.session_state.editing = False
 
 # 聊天输入和响应
