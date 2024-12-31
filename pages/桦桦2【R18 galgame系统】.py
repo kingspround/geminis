@@ -879,7 +879,7 @@ def continue_message(index):
       st.error("无效的消息索引")
 
 
-# --- Streamlit 界面 ---
+ # --- Streamlit 界面 ---
  # 确保文件存在
  if not os.path.exists(log_file):
      with open(log_file, "wb") as f:
@@ -939,14 +939,14 @@ def continue_message(index):
          new_content = st.text_area(f"{message['role']}:", message["content"], key=f"message_edit_{i}")
          col1, col2 = st.columns(2)
          with col1:
-             if st.button("✅", key=f"save_{i}"):
+             if st.button("保存 ✅", key=f"save_{i}"):
                  st.session_state.messages[i]["content"] = new_content
                  with open(log_file, "wb") as f:
                      pickle.dump(st.session_state.messages, f)
                  st.success("已保存更改！")
                  st.session_state.editing = False
          with col2:
-             if st.button("❌", key=f"cancel_{i}"):
+             if st.button("取消 ❌", key=f"cancel_{i}"):
                  st.session_state.editing = False
  
  
