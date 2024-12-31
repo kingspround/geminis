@@ -880,124 +880,106 @@ def continue_message(index):
 
 
 # --- Streamlit 界面 ---
-# 确保文件存在
-if not os.path.exists(log_file):
-    with open(log_file, "wb") as f:
-        pass
-
-# 初始化 session state
-if "messages" not in st.session_state:
-    load_history(log_file)
-
-# 功能区 1: 文件操作
-with st.sidebar.expander("文件操作"):
-    if len(st.session_state.messages) > 0:
-        st.button("重置上一个输出 ⏪",
-                  on_click=lambda: st.session_state.messages.pop(-1) if len(st.session_state.messages) > 1 else None)
-
-    st.button("读取历史记录 📖", on_click=lambda: load_history(log_file))
-
-    if st.button("清除历史记录 🗑️"):
-        st.session_state.clear_confirmation = True  # 清除历史记录弹窗标志
-
-    if "clear_confirmation" in st.session_state and st.session_state.clear_confirmation:
-       if st.sidebar.button("确认清除", key="clear_history_confirm"):
-         clear_history(log_file)
-         st.session_state.clear_confirmation = False
-         st.experimental_rerun()
-       if st.sidebar.button("取消", key="clear_history_cancel"):
-         st.session_state.clear_confirmation = False
-
-    st.download_button(
-        label="下载聊天记录 ⬇️",
-        data=open(log_file, "rb").read() if os.path.exists(log_file) else b"",
-        file_name=filename,
-        mime="application/octet-stream",
-    )
-    uploaded_file = st.file_uploader("读取本地pkl文件 📁", type=["pkl"])
-    if uploaded_file is not None:
-        try:
-            loaded_messages = pickle.load(uploaded_file)
-            st.session_state.messages = loaded_messages  # 使用 = 替换现有消息
-            st.success("成功读取本地pkl文件！")
-            st.experimental_rerun()
-        except Exception as e:
-            st.error(f"读取本地pkl文件失败：{e}")
-
-# 功能区 2: 角色设定
-with st.sidebar.expander("角色设定"):
-    # 文件上传功能保持不变
-    uploaded_setting_file = st.file_uploader("读取本地设定文件 (txt) 📝", type=["txt"])
-    if uploaded_setting_file is not None:
-        try:
-            setting_name = os.path.splitext(uploaded_setting_file.name)[0]
-            setting_content = uploaded_setting_file.read().decode("utf-8")
-            st.session_state.character_settings[setting_name] = setting_content
-            st.session_state.enabled_settings[setting_name] = False
-            st.experimental_rerun()
-        except Exception as e:
-            st.error(f"读取文件失败: {e}")
-
-    for setting_name in DEFAULT_CHARACTER_SETTINGS:
-        if setting_name not in st.session_state.character_settings:
-            st.session_state.character_settings[setting_name] = DEFAULT_CHARACTER_SETTINGS[setting_name]
-        st.session_state.enabled_settings[setting_name] = st.checkbox(setting_name, st.session_state.enabled_settings.get(setting_name, False),key=f"checkbox_{setting_name}") #直接显示checkbox
-
-
-    st.session_state.test_text = st.text_area("System Message (Optional):", st.session_state.get("test_text", ""), key="system_message")
-
-    if st.button("刷新 🔄"):  # 添加刷新按钮
-        st.experimental_rerun()
-
-# 显示历史记录和编辑功能
-for i, message in enumerate(st.session_state.messages):
-    with st.chat_message(message["role"]):
-        col1, col2 = st.columns([10, 1])  # 使用 columns 来划分比例，确保消息和按钮之间有固定的位置
-        with col1:
-            st.write(message["content"], key=f"message_{i}")
-        with col2:
-            if st.button("✏️", key=f"edit_{i}", use_container_width=True):
-                st.session_state.editable_index = i
-                st.session_state.editing = True
-            if st.button("♻️", key=f"regenerate_{i}", use_container_width=True):
-                regenerate_message(i)
-            if st.button("➕", key=f"continue_{i}", use_container_width=True):
-                continue_message(i)
-
-if st.session_state.get("editing"):
-    i = st.session_state.editable_index
-    message = st.session_state.messages[i]
-    with st.chat_message(message["role"]):
-        new_content = st.text_area(f"{message['role']}:", message["content"], key=f"message_edit_{i}")
-        col1, col2 = st.columns(2)
-        with col1:
-            if st.button("保存 ✅", key=f"save_{i}"):
-                st.session_state.messages[i]["content"] = new_content
-                with open(log_file, "wb") as f:
-                    pickle.dump(st.session_state.messages, f)
-                st.success("已保存更改！")
-                st.session_state.editing = False
-        with col2:
-            if st.button("取消 ❌", key=f"cancel_{i}"):
-                st.session_state.editing = False
-
-# 聊天输入和响应
-if prompt := st.chat_input("输入你的消息:"):
-    st.session_state.messages.append({"role": "user", "content": prompt})
-    with st.chat_message("user"):
-        st.markdown(prompt)
-    with st.chat_message("assistant"):
-        message_placeholder = st.empty()
-        full_response = ""
-        for chunk in getAnswer(prompt):
-            full_response += chunk
-            message_placeholder.markdown(full_response + "▌")
-        message_placeholder.markdown(full_response)
-        st.session_state.messages.append({"role": "assistant", "content": full_response})
-    with open(log_file, "wb") as f:
-        pickle.dump(st.session_state.messages, f)
-
-# 显示已加载的设定
-enabled_settings_display = [setting_name for setting_name, enabled in st.session_state.enabled_settings.items() if enabled]
-if enabled_settings_display:
-    st.write("已加载设定:", ", ".join(enabled_settings_display))  # 在聊天界面下方显示
+ # 确保文件存在
+ if not os.path.exists(log_file):
+     with open(log_file, "wb") as f:
+         pass
+ 
+ # 初始化 session state
+ if "messages" not in st.session_state:
+     load_history(log_file)
+ 
+ # 功能区 1: 文件操作
+ with st.sidebar.expander("文件操作"):
+     if len(st.session_state.messages) > 0:
+         st.button("重置上一个输出 ⏪",
+                     on_click=lambda: st.session_state.messages.pop(-1) if len(st.session_state.messages) > 1 else None)
+ 
+     st.button("读取历史记录 📖", on_click=lambda: load_history(log_file))
+     
+     if st.button("清除历史记录 🗑️"):
+         st.session_state.clear_confirmation = True  # 清除历史记录弹窗标志
+ 
+     st.download_button(
+         label="下载聊天记录 ⬇️",
+         data=open(log_file, "rb").read() if os.path.exists(log_file) else b"",
+         file_name=filename,
+         mime="application/octet-stream",
+     )
+     uploaded_file = st.file_uploader("读取本地pkl文件 📁", type=["pkl"])
+     if uploaded_file is not None:
+         try:
+             loaded_messages = pickle.load(uploaded_file)
+             st.session_state.messages = loaded_messages  # 使用 = 替换现有消息
+             st.success("成功读取本地pkl文件！")
+             st.experimental_rerun()
+         except Exception as e:
+             st.error(f"读取本地pkl文件失败：{e}")
+ 
+ # 显示历史记录和编辑功能
+ for i, message in enumerate(st.session_state.messages):
+     with st.chat_message(message["role"]):
+         col1, col2 = st.columns([10, 1])  # 使用 columns 来划分比例，确保消息和按钮之间有固定的位置
+         with col1:
+             st.write(message["content"], key=f"message_{i}")
+         with col2:
+             if st.button("✏️", key=f"edit_{i}", use_container_width=True):
+                 st.session_state.editable_index = i
+                 st.session_state.editing = True
+             if st.button("♻️", key=f"regenerate_{i}", use_container_width=True):
+                 regenerate_message(i)
+             if st.button("➕", key=f"continue_{i}", use_container_width=True):
+                 continue_message(i)
+ 
+ 
+ if st.session_state.get("editing"):
+     i = st.session_state.editable_index
+     message = st.session_state.messages[i]
+     with st.chat_message(message["role"]):
+         new_content = st.text_area(f"{message['role']}:", message["content"], key=f"message_edit_{i}")
+         col1, col2 = st.columns(2)
+         with col1:
+             if st.button("✅", key=f"save_{i}"):
+                 st.session_state.messages[i]["content"] = new_content
+                 with open(log_file, "wb") as f:
+                     pickle.dump(st.session_state.messages, f)
+                 st.success("已保存更改！")
+                 st.session_state.editing = False
+         with col2:
+             if st.button("❌", key=f"cancel_{i}"):
+                 st.session_state.editing = False
+ 
+ 
+ # 聊天输入和响应
+ if prompt := st.chat_input("输入你的消息:"):
+     st.session_state.messages.append({"role": "user", "content": prompt})
+     with st.chat_message("user"):
+         st.markdown(prompt)
+     with st.chat_message("assistant"):
+         message_placeholder = st.empty()
+         full_response = ""
+         for chunk in getAnswer(prompt):
+             full_response += chunk
+             message_placeholder.markdown(full_response + "▌")
+         message_placeholder.markdown(full_response)
+         st.session_state.messages.append({"role": "assistant", "content": full_response})
+     with open(log_file, "wb") as f:
+         pickle.dump(st.session_state.messages, f)
+         
+ 
+ # 显示已加载的设定
+ enabled_settings_display = [setting_name for setting_name, enabled in st.session_state.enabled_settings.items() if enabled]
+ if enabled_settings_display:
+     st.write("已加载设定:", ", ".join(enabled_settings_display))
+ 
+ # 在聊天页面下方显示确认/取消按钮
+ if "clear_confirmation" in st.session_state and st.session_state.clear_confirmation:
+     col1, col2 = st.columns(2)
+     with col1:
+         if st.button("确认清除", key="clear_history_confirm"):
+             clear_history(log_file)
+             st.session_state.clear_confirmation = False
+             st.experimental_rerun()
+     with col2:
+         if st.button("取消", key="clear_history_cancel"):
+             st.session_state.clear_confirmation = False
