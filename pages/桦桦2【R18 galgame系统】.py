@@ -922,21 +922,20 @@ with st.sidebar.expander("角色设定"):
         st.experimental_rerun()
 
 # 显示历史记录和编辑功能
+# 显示历史记录和编辑功能
 for i, message in enumerate(st.session_state.messages):
     with st.chat_message(message["role"]):
-        st.write(message["content"], key=f"message_{i}")
-        col1, col2, col3 = st.columns(3)
+        col1, col2 = st.columns([10, 1])  # 使用 columns 来划分比例，确保消息和按钮之间有固定的位置
         with col1:
-            if st.button("编辑 ✏️", key=f"edit_{i}"):
+            st.write(message["content"], key=f"message_{i}")
+        with col2:
+            if st.button("✏️", key=f"edit_{i}", use_container_width=True):
                 st.session_state.editable_index = i
                 st.session_state.editing = True
-        with col2:
-          if st.button("重新生成 ♻️", key=f"regenerate_{i}"):
-            regenerate_message(i)
-
-        with col3:
-          if st.button("继续 ➕", key = f"continue_{i}"):
-            continue_message(i)
+            if st.button("♻️", key=f"regenerate_{i}", use_container_width=True):
+                regenerate_message(i)
+            if st.button("➕", key=f"continue_{i}", use_container_width=True):
+                continue_message(i)
 
 
 if st.session_state.get("editing"):
@@ -946,14 +945,14 @@ if st.session_state.get("editing"):
         new_content = st.text_area(f"{message['role']}:", message["content"], key=f"message_edit_{i}")
         col1, col2 = st.columns(2)
         with col1:
-            if st.button("保存 ✅", key=f"save_{i}"):
+            if st.button("✅", key=f"save_{i}"):
                 st.session_state.messages[i]["content"] = new_content
                 with open(log_file, "wb") as f:
                     pickle.dump(st.session_state.messages, f)
                 st.success("已保存更改！")
                 st.session_state.editing = False
         with col2:
-            if st.button("取消 ❌", key=f"cancel_{i}"):
+            if st.button("❌", key=f"cancel_{i}"):
                 st.session_state.editing = False
 
 # 聊天输入和响应
