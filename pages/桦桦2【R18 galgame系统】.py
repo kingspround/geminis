@@ -846,45 +846,6 @@ def getAnswer(prompt, mode="normal"):
         return ""
 
 
-def regenerate_message(index):
-    """重新生成指定索引的消息"""
-    if 0 <= index < len(st.session_state.messages):
-        st.session_state.messages = st.session_state.messages[:index]  # 删除当前消息以及后面的消息
-        
-        new_prompt = "请重新写"  # 修改 prompt 为 "请重新写"
-        
-        message_placeholder = st.empty() # 创建一个占位符
-        full_response = ""
-        for chunk in getAnswer(new_prompt):
-            full_response += chunk
-            message_placeholder.markdown(full_response + "▌")
-        message_placeholder.markdown(full_response)
-        st.session_state.messages.append({"role": "assistant", "content": full_response}) #加入消息列表
-        with open(log_file, "wb") as f:
-          pickle.dump(st.session_state.messages, f)
-        st.experimental_rerun()
-    else:
-        st.error("无效的消息索引")
-    
-def continue_message(index):
-    """继续生成指定索引的消息"""
-    if 0 <= index < len(st.session_state.messages):
-        original_message = st.session_state.messages[index]["content"]
-        new_prompt = "请从截断的词继续"  # 修改 prompt 为 "请从截断的词继续"
-            
-        message_placeholder = st.empty()
-        full_response = original_message # 初始化full_response
-        for chunk in getAnswer(new_prompt):
-          full_response += chunk
-          message_placeholder.markdown(full_response + "▌")
-        message_placeholder.markdown(full_response)
-    
-        st.session_state.messages[index]["content"] = full_response  # 将更新后的内容写入消息列表中
-        with open(log_file, "wb") as f:
-           pickle.dump(st.session_state.messages, f)
-        st.experimental_rerun()
-    else:
-        st.error("无效的消息索引")
 
 
 # --- Streamlit 界面 ---
@@ -949,20 +910,51 @@ with st.sidebar.expander("角色设定"):
     if st.button("刷新 🔄"):  # 添加刷新按钮
         st.experimental_rerun()
 
-# 显示历史记录和编辑功能
-for i, message in enumerate(st.session_state.messages):
-    with st.chat_message(message["role"]):
-        col1, col2 = st.columns([20, 1])  # 使用 columns 来划分比例，确保消息和按钮之间有固定的位置
-        with col1:
-            st.write(message["content"], key=f"message_{i}")
-        with col2:
-            if st.button("✏️", key=f"edit_{i}", use_container_width=True):
-                st.session_state.editable_index = i
-                st.session_state.editing = True
+ # 显示历史记录和编辑功能
+    for i, message in enumerate(st.session_state.messages):
+      with st.chat_message(message["role"]):
+         col1, col2 = st.columns([10, 1])
+         with col1:
+            if "regenerating" in st.session_state and st.session_state.regenerating == i : #判断是不是在重新生成状态
+                message_placeholder = st.empty()
+                full_response = ""
+                for chunk in getAnswer("请重新写"):
+                  full_response += chunk
+                  message_placeholder.markdown(full_response + "▌")
+                message_placeholder.markdown(full_response)
+                st.session_state.messages[i]["content"] = full_response # 更新内容
+                del st.session_state.regenerating # 删除状态
+                with open(log_file, "wb") as f:
+                  pickle.dump(st.session_state.messages, f)
+                st.experimental_rerun() # 重新刷新页面
+            elif "continuing" in st.session_state and st.session_state.continuing == i:
+                message_placeholder = st.empty()
+                full_response = st.session_state.messages[i]["content"] # 初始化
+                for chunk in getAnswer("请从截断的词继续"):
+                     full_response += chunk
+                     message_placeholder.markdown(full_response + "▌")
+                message_placeholder.markdown(full_response)
+                st.session_state.messages[i]["content"] = full_response # 更新内容
+                del st.session_state.continuing
+                with open(log_file, "wb") as f:
+                  pickle.dump(st.session_state.messages, f)
+                st.experimental_rerun()
+            else:
+                st.write(message["content"], key=f"message_{i}")  # 正常显示消息内容
+         with col2:
+            button_col = st.columns([1])  # 将按钮区域设置为单列
+            with button_col[0]:
+                 if st.button("✏️", key=f"edit_{i}", use_container_width=True):
+                     st.session_state.editable_index = i
+                     st.session_state.editing = True
+    
             if st.button("♻️", key=f"regenerate_{i}", use_container_width=True):
-                regenerate_message(i)
+                st.session_state.regenerating = i #设置重新生成状态
+                st.experimental_rerun()
+    
             if st.button("➕", key=f"continue_{i}", use_container_width=True):
-                continue_message(i)
+                st.session_state.continuing = i
+                st.experimental_rerun()
 
 
 if st.session_state.get("editing"):
