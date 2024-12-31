@@ -944,7 +944,7 @@ with st.sidebar.expander("角色设定"):
 # 显示历史记录和编辑功能
 for i, message in enumerate(st.session_state.messages):
     with st.chat_message(message["role"]):
-        col1, col2 = st.columns([10, 1])  # 使用 columns 来划分比例，确保消息和按钮之间有固定的位置
+        col1, col2 = st.columns([20, 1])  # 使用 columns 来划分比例，确保消息和按钮之间有固定的位置
         with col1:
             st.write(message["content"], key=f"message_{i}")
         with col2:
