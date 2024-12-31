@@ -843,22 +843,22 @@ def getAnswer(prompt):
 
 
 def regenerate_message(index):
-    """重新生成指定索引的消息"""
-    if 0 <= index < len(st.session_state.messages):
-        original_prompt = st.session_state.messages[index]["content"]
-        st.session_state.messages = st.session_state.messages[:index] # 删除当前消息以及后面的消息
-        with st.chat_message("assistant"):
-            message_placeholder = st.empty()
-            full_response = ""
-            for chunk in getAnswer(original_prompt):
-                full_response += chunk
-                message_placeholder.markdown(full_response + "▌")
-            message_placeholder.markdown(full_response)
-            st.session_state.messages.append({"role": "assistant", "content": full_response})
-        with open(log_file, "wb") as f:
-            pickle.dump(st.session_state.messages, f)
-    else:
-        st.error("无效的消息索引")
+   """重新生成指定索引的消息"""
+   if 0 <= index < len(st.session_state.messages):
+       original_prompt = st.session_state.messages[index]["content"]
+       st.session_state.messages = st.session_state.messages[:index] # 删除当前消息以及后面的消息
+       message_placeholder = st.empty()
+       full_response = ""
+       for chunk in getAnswer(original_prompt):
+           full_response += chunk
+           message_placeholder.markdown(full_response + "▌")
+       message_placeholder.markdown(full_response)
+       st.session_state.messages.append({"role": "assistant", "content": full_response})
+       with open(log_file, "wb") as f:
+           pickle.dump(st.session_state.messages, f)
+       st.experimental_rerun()
+   else:
+       st.error("无效的消息索引")
 
 def continue_message(index):
   """继续生成指定索引的消息"""
