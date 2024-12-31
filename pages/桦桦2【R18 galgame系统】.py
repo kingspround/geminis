@@ -833,23 +833,21 @@ def regenerate_message(index):
         st.error("无效的消息索引")
 
 def continue_message(index):
-    """继续生成指定索引的消息"""
-    if 0 <= index < len(st.session_state.messages):
-      original_prompt = st.session_state.messages[index]["content"]
-      with st.chat_message("assistant"):
-          message_placeholder = st.empty()
-          full_response = ""
-          for chunk in getAnswer(original_prompt):
-              full_response += chunk
-              message_placeholder.markdown(full_response + "▌")
-          full_response = st.session_state.messages[index]["content"] + full_response # 将原来的内容加上新的内容
-          message_placeholder.markdown(full_response)
-          st.session_state.messages[index]["content"] = full_response #更新内容
-      with open(log_file, "wb") as f:
-          pickle.dump(st.session_state.messages, f)
-    else:
-        st.error("无效的消息索引")
-
+   """继续生成指定索引的消息"""
+   if 0 <= index < len(st.session_state.messages):
+     original_prompt = st.session_state.messages[index]["content"]
+     message_placeholder = st.empty()
+     full_response = ""
+     for chunk in getAnswer(original_prompt):
+         full_response += chunk
+         message_placeholder.markdown(full_response + "▌")
+     full_response = st.session_state.messages[index]["content"] + full_response # 将原来的内容加上新的内容
+     message_placeholder.markdown(full_response)
+     st.session_state.messages[index]["content"] = full_response #更新内容
+     with open(log_file, "wb") as f:
+         pickle.dump(st.session_state.messages, f)
+   else:
+       st.error("无效的消息索引")
 
 # --- Streamlit 界面 ---
 # 确保文件存在
