@@ -861,21 +861,22 @@ def regenerate_message(index):
         st.error("无效的消息索引")
 
 def continue_message(index):
-   """继续生成指定索引的消息"""
-   if 0 <= index < len(st.session_state.messages):
-     original_prompt = st.session_state.messages[index]["content"]
-     message_placeholder = st.empty()
-     full_response = ""
-     for chunk in getAnswer(original_prompt):
-         full_response += chunk
-         message_placeholder.markdown(full_response + "▌")
-     full_response = st.session_state.messages[index]["content"] + full_response # 将原来的内容加上新的内容
-     message_placeholder.markdown(full_response)
-     st.session_state.messages[index]["content"] = full_response #更新内容
-     with open(log_file, "wb") as f:
-         pickle.dump(st.session_state.messages, f)
-   else:
-       st.error("无效的消息索引")
+  """继续生成指定索引的消息"""
+  if 0 <= index < len(st.session_state.messages):
+    original_prompt = st.session_state.messages[index]["content"]
+    message_placeholder = st.empty() # 创建一个空的占位符
+    full_response = ""
+    for chunk in getAnswer(original_prompt):
+        full_response += chunk
+        message_placeholder.markdown(full_response + "▌")
+    full_response = st.session_state.messages[index]["content"] + full_response # 将原来的内容加上新的内容
+    message_placeholder.markdown(full_response)
+    st.session_state.messages[index]["content"] = full_response #更新内容
+    st.experimental_rerun() # 重新刷新页面
+    with open(log_file, "wb") as f:
+        pickle.dump(st.session_state.messages, f)
+  else:
+      st.error("无效的消息索引")
 
 
 # --- Streamlit 界面 ---
@@ -891,21 +892,21 @@ if "messages" not in st.session_state:
 # 功能区 1: 文件操作
 with st.sidebar.expander("文件操作"):
     if len(st.session_state.messages) > 0:
-        st.button("重置上一个输出 ⏪", on_click=lambda: st.session_state.messages.pop(-1) if len(st.session_state.messages) > 1 else None)
+        st.button("重置上一个输出 ⏪",
+                  on_click=lambda: st.session_state.messages.pop(-1) if len(st.session_state.messages) > 1 else None)
 
     st.button("读取历史记录 📖", on_click=lambda: load_history(log_file))
 
     if st.button("清除历史记录 🗑️"):
-      st.session_state.clear_confirmation = True # 清除历史记录弹窗标志
+        st.session_state.clear_confirmation = True  # 清除历史记录弹窗标志
 
-    if "clear_confirmation" in st.session_state:
-      if st.session_state.clear_confirmation:
-        if st.sidebar.button("确认清除", key = "clear_history_confirm"):
-          clear_history(log_file)
-          st.session_state.clear_confirmation = False
-          st.experimental_rerun()
-        if st.sidebar.button("取消",key = "clear_history_cancel"):
-            st.session_state.clear_confirmation = False
+    if "clear_confirmation" in st.session_state and st.session_state.clear_confirmation:
+       if st.sidebar.button("确认清除", key="clear_history_confirm"):
+         clear_history(log_file)
+         st.session_state.clear_confirmation = False
+         st.experimental_rerun()
+       if st.sidebar.button("取消", key="clear_history_cancel"):
+         st.session_state.clear_confirmation = False
 
     st.download_button(
         label="下载聊天记录 ⬇️",
