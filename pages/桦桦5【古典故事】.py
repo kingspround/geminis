@@ -538,7 +538,7 @@ def continue_message(index):
     """继续生成指定索引的消息"""
     if 0 <= index < len(st.session_state.messages):
         original_prompt = st.session_state.messages[index]["content"]
-        new_prompt = "请从截断的词继续"  # 修改 prompt 为 "请从截断的词继续"
+        new_prompt = "请从截断的词继续写"  # 修改 prompt 为 "请从截断的词继续写"
         
         full_response = original_prompt  # 初始化 full_response
         for chunk in getAnswer(new_prompt):
