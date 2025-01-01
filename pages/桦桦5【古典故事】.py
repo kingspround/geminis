@@ -518,40 +518,38 @@ def getAnswer(prompt):
 def regenerate_message(index):
     """重新生成指定索引的消息"""
     if 0 <= index < len(st.session_state.messages):
-        original_prompt = st.session_state.messages[index]["content"]
         st.session_state.messages = st.session_state.messages[:index]  # 删除当前消息以及后面的消息
 
-        message_placeholder = st.empty()
+        new_prompt = "请重新写"  # 修改 prompt 为 "请重新写"
+
         full_response = ""
-        for chunk in getAnswer(original_prompt):
+        for chunk in getAnswer(new_prompt):
             full_response += chunk
-            message_placeholder.markdown(full_response + "▌")
-        message_placeholder.markdown(full_response)
-        st.session_state.messages.append({"role": "assistant", "content": full_response}) #新增一行，将新的消息加入到message中
-            
+        
+        st.session_state.messages.append({"role": "assistant", "content": full_response})
         with open(log_file, "wb") as f:
             pickle.dump(st.session_state.messages, f)
         st.experimental_rerun()
     else:
         st.error("无效的消息索引")
 
+
 def continue_message(index):
-  """继续生成指定索引的消息"""
-  if 0 <= index < len(st.session_state.messages):
-    original_prompt = st.session_state.messages[index]["content"]
-    message_placeholder = st.empty() # 创建一个空的占位符
-    full_response = ""
-    for chunk in getAnswer(original_prompt):
-        full_response += chunk
-        message_placeholder.markdown(full_response + "▌")
-    full_response = st.session_state.messages[index]["content"] + full_response # 将原来的内容加上新的内容
-    message_placeholder.markdown(full_response)
-    st.session_state.messages[index]["content"] = full_response #更新内容
-    st.experimental_rerun() # 重新刷新页面
-    with open(log_file, "wb") as f:
-        pickle.dump(st.session_state.messages, f)
-  else:
-      st.error("无效的消息索引")
+    """继续生成指定索引的消息"""
+    if 0 <= index < len(st.session_state.messages):
+        original_prompt = st.session_state.messages[index]["content"]
+        new_prompt = "请从截断的词继续"  # 修改 prompt 为 "请从截断的词继续"
+        
+        full_response = original_prompt  # 初始化 full_response
+        for chunk in getAnswer(new_prompt):
+            full_response += chunk
+        
+        st.session_state.messages[index]["content"] = full_response
+        with open(log_file, "wb") as f:
+            pickle.dump(st.session_state.messages, f)
+        st.experimental_rerun()
+    else:
+        st.error("无效的消息索引")
 
 
 # --- Streamlit 界面 ---
