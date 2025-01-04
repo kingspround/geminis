@@ -420,6 +420,7 @@ def getAnswer(prompt):
     his_messages = []
     his_messages.append(
         {"role": "model", "parts":[{"text": """
+[Install the Chinese Translator plugin]
 {
     "chat_completion_source": "openai",
     "openai_model": "claude-3-5-sonnet-20241022",
