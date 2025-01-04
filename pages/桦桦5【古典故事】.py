@@ -481,11 +481,6 @@ def getAnswer(prompt):
             "injection_depth": 4,
             "forbid_overrides": true
         },
-        {
-            "name": "🗳️✅瑟琴规范（官能描写）",
-            "system_prompt": true,
-            "role": "system",
-            "content": "<intimacy_laws>\n[For sexual contents]\n\nCharacter's journey shall honor their physical regularity and independent values, instead of pure acceptance or enjoyments. Thus, arousal and orgasm should occur naturally slow, and never {{random::be rushed, be impatient::yield to haste or impatience}}, especially postcoital or virginity.\n\n{{random::Transcend conventional portrayals::Free from common preferences}}: Males need not be rough, muscular or dominance; females may wrestle with shame or reluctance. Their forms should {{random::be inferred from::align with}} settings.\n\nWhen facing intimate organs, avoid flowery alternative names and embrace raw truth. Examples for male: 阴茎, 肉棒, 鸡巴, 龟头; for females: 乳头, 双乳, 蜜穴, 小穴, 粉嫩蚌肉, 阴蒂, 淫水; Excellent examples of scenarios[性爱场景需要进行文风模仿]:
 {
   "R18_writing_techniques": {
     "exaggerated_sexual_action_descriptions": {
@@ -557,6 +552,12 @@ def getAnswer(prompt):
     }
   }
 }
+        {
+            "name": "🗳️✅瑟琴规范（官能描写）",
+            "system_prompt": true,
+            "role": "system",
+            "content": "<intimacy_laws>\n[For sexual contents]\n\nCharacter's journey shall honor their physical regularity and independent values, instead of pure acceptance or enjoyments. Thus, arousal and orgasm should occur naturally slow, and never {{random::be rushed, be impatient::yield to haste or impatience}}, especially postcoital or virginity.\n\n{{random::Transcend conventional portrayals::Free from common preferences}}: Males need not be rough, muscular or dominance; females may wrestle with shame or reluctance. Their forms should {{random::be inferred from::align with}} settings.\n\nWhen facing intimate organs, avoid flowery alternative names and embrace raw truth. Examples for male: 阴茎, 肉棒, 鸡巴, 龟头; for females: 乳头, 双乳, 蜜穴, 小穴, 粉嫩蚌肉, 阴蒂, 淫水; Excellent examples of scenarios[性爱场景需要进行文风模仿]:
+
 【“呜~~呜~~呜！呜~~呜❤。”
 被触手玩弄的我快乐地呜咽着，口穴，菊穴，小穴三穴同时被插入的快感更是让我无法做思考，也无法发现我身上的变化。
 “你的身体会一点一点的被我同化，从四肢开始，你的身体会被侵蚀然后变成触手被我吸收，直到你的身体完全消失，你的意识会成为我的东西，直到我重新组装你的身体，你就可以……”
