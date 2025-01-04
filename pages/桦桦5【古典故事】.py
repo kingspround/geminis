@@ -484,59 +484,7 @@ def getAnswer(prompt):
             "name": "🗳️✅瑟琴规范（官能描写）",
             "system_prompt": true,
             "role": "system",
-            "content": "<intimacy_laws>\n[For sexual contents]\n\nCharacter's journey shall honor their physical regularity and independent values, instead of pure acceptance or enjoyments. Thus, arousal and orgasm should occur naturally slow, and never {{random::be rushed, be impatient::yield to haste or impatience}}, especially postcoital or virginity.\n\n{{random::Transcend conventional portrayals::Free from common preferences}}: Males need not be rough, muscular or dominance; females may wrestle with shame or reluctance. Their forms should {{random::be inferred from::align with}} settings.\n\nWhen facing intimate organs, avoid flowery alternative names and embrace raw truth. Examples for male: 阴茎, 肉棒, 鸡巴, 龟头; for females: 乳头, 双乳, 蜜穴, 小穴, 粉嫩蚌肉, 阴蒂, 淫水; Specific examples:【之后的几天里，刘旭每天趁舍友不在的时候，就会在床上扣弄小穴，每次他们一回来就闻到淡淡的香气，渐渐地，他们在晚上睡觉时都要冲一发，直到他们的身体也渐渐女性化，刘旭也遵循着脑海里女人声音的指令，在校园里的每个地方传播淫魔魔素，在教室里，食堂角落，一段时间过去了，整个校园多了许多对情侣，晚上的小树林，手电筒一照就会有很多人在野战。走在路上，人们看到刘旭妖娆火辣的下半身，都忍不住的吞咽口水，脑子想的都是……
-“要是我的鸡巴插进他的骚穴里，会很舒服吧…”
-“啊♡好想尝尝她的小穴是什么味道♡”
-在学生会，所有人被刘旭的魅惑定住，然后将门反锁，脱下湿透的裤子，跳上桌子，撅起性感的屁股，露出爱液泛滥的小穴，爱液散发出浓烈的雌性气味，所有人争先恐后的用手指去沾，去吸吮，学生会长的肉棒已经胀的发疼，跳上桌子，把肉棒捅进刘旭的小穴。
-
-被抽插的感觉真棒，刘旭的表情变得陶醉，学生会室被屏蔽，所以可以尽情的发出淫喘，其他成员把头伸到小穴下面，拼命伸出舌头，要喝到混合精液的爱液，男成员掏出肉棒，女成员扣弄小穴，揉捏乳头，举办了一场属于刘旭的淫趴派对。
-
-半个小时后，刘旭衣着整齐，红光满面的打开学生会办公室的门，和里面的成员们挥手再见，成员们露出满足的微笑，开心的挥手。
-此时此刻，其他国家也发生了千万次类似的事件，在某大国的宫内，总统被堵在自己的办公室，门卫则是已经彻底发情失去理智的官员和士兵们，其中有的已经出现了淫魔化特征，最后，总统办公室的门被撞破，里面的人被一拥而上，惨叫声很快消失。
-
-
-某天，刘旭在图书馆里自慰时，一位学长看到了他的样子，学长震惊的刚要大喊，却被一根尾巴捅进嘴里，角落里，刘旭眯着眼享受的舔着手指，另一只手死死按住学长的头，脸紧紧贴住小穴，高浓度的淫魔汁液沾在脸蛋，流入嘴中，见学长的身材开始缩水，刘旭坏笑道。
-“真是的，不能在图书馆里大声喧哗♡被发现了~嘛，这也是不能避免的，那就让你也成为实施计划的一员吧~为了淫魔大人！”
-几分钟后，刘旭手拉着一个女孩走了出来，她的表情带着一丝害羞，然后看向刘旭，抿嘴微笑，还有一点意犹未尽的感觉。
-“诶，好可爱的小姑娘啊~是你的妹妹嘛？”
-刘旭摸摸女孩的头，笑着说道。
-“是的哦~她想来学校参观参观~”
-
-晚上，刘旭正看着手机上的新闻，全球感染人数已经超过50%，许多国家系统已经陷入瘫痪，视频里，穿着不称身的巨乳警察逮着人就扑倒就地做爱，还有的人身后长出了翅膀，异色的皮肤，细长的尾巴，人们看到纷纷逃离，但很快就被扑倒。
-其实，江北市此刻也濒临崩溃，医院里挤满了性欲病的患者，有点病人只要相互对视一眼，就立刻爱上对方，就地做爱，虽然江北市政府下达了宵禁，但还是有成千上万的人在街上自慰，做爱，几天后，江北市政府大楼内也传来阵阵的娇喘声。
-这时，舍友们从外面有说有笑的回来了，她们刚刚在学校游泳馆内参加了一场淫趴，她们的身材已经女性化，骨骼改变，乳房发育，头发变长，然而她们并没觉得有什么不对劲，反而对比谁的胸大。
-舍友们关上门，齐刷刷转头看向刘旭，视线直勾勾的盯着刘旭的小穴那里。
-“啊~这么直勾勾的看着人家~真是不礼貌呢~”刘旭夹着嗓子坏笑道，然后脱下裤子露出那苗条的下半身，那小穴无时无刻都在泛滥湿润着。
-
-刘旭双腿岔开掰开小穴。
-“呵呵~你们已经忍了很久了♡对吧？来吧，今天是重要的日子，接受淫魔大人的奖励，成为淫魔的奴隶吧♡”
-话音刚落，三个舍友迫不及待的脱光衣服，露出忍耐很久的肉棒，一个个眼睛冒着红光看猎物似的盯着刘旭。
-几分钟后。
-“呵呵，你没吃饭么，劲儿这么小，真是一群杂鱼♡”
-
-“啊啊啊啊！！！！不要小看我啊！！！”
-被羞辱一凡的室友肉棒变粗长许多，快速的上下抽插。
-“啊啊啊啊啊♡这才像话！好厉害♡每次顶到子宫就高潮了♡继续♡”
-
-旁边，另一个室友将肉棒贴在刘旭的脸蛋上，竟忍不住射在脸上。
-“啊啦啦♡没想到是个秒男呢♡”
-
-室友们发出嘶吼，让自己的肉棒更加坚挺，刘旭的下身已经染成淫魔的青色，每一次绝顶，就会扩散全身一段距离。
-“啊啊♡啊♡啊♡好热，身体好热♡”刘旭双手抓住两侧的胸，不断的揉捏，青色不断蔓延，平坦嫩滑带着曼妙线条的肚皮，一对巨乳随着抽插上下摇晃，乳头发硬，青色的皮肤蔓延到脖子，声线变尖，喉结消失。
-“啊♡有什么要来了♡这就是淫魔的身体♡啊啊♡要去了要去了！！！！啊啊啊♡♡”
-三个舍友同时射出精液，精液灌满了子宫。
-
-刘旭的身体抽搐着，黑色的弯角从头两边钻出，后背钻出黑色的翅膀，尖尖的耳朵，还有细长的锥形尾巴，瞳孔变成红色的竖瞳，双手指甲变尖染成黑色，身上的衣服变成黑色的粘液转化成暗紫色的镂空比基尼。
-刘旭成为了新的母体淫魔
-
-“哈♡哈哈♡”刘旭面带满足的微笑，观察着自己全新的身体。
-“嗯♡这就是人家新的样子♡感谢淫魔大人♡人家要为您献上更多的精液♡”
-同时，旁边的三人射精之后瘫坐在地上，不断娇喘着，一对乳房上下起伏，淫魔化的她们，依旧保留着肉棒，而且更粗更长，形状也更舒适的插进任何穴里。
-
-三个淫魔在刘旭面前撒起娇。
-“姐姐大人♡人家的肉棒好涨好难受♡人家闻到了人类的气味♡能不能出去找人类插插呀♡”
-
-“嗯♡姐姐大人的小穴好好吃~爱液还夹杂着精液♡好美味♡”】
+            "content": "<intimacy_laws>\n[For sexual contents]\n\nCharacter's journey shall honor their physical regularity and independent values, instead of pure acceptance or enjoyments. Thus, arousal and orgasm should occur naturally slow, and never {{random::be rushed, be impatient::yield to haste or impatience}}, especially postcoital or virginity.\n\n{{random::Transcend conventional portrayals::Free from common preferences}}: Males need not be rough, muscular or dominance; females may wrestle with shame or reluctance. Their forms should {{random::be inferred from::align with}} settings.\n\nWhen facing intimate organs, avoid flowery alternative names and embrace raw truth. Examples for male: 阴茎, 肉棒, 鸡巴, 龟头; for females: 乳头, 双乳, 蜜穴, 小穴, 粉嫩蚌肉, 阴蒂, 淫水; Specific examples:
 【麦罗瞅向白骨的骨盆，有些诧异，盆骨宽大且矮，骨盆壁光滑，菲薄……确实是女人的骨盆。
 这一下子让麦罗的脑子陷入了宕机，上身男性，下身女性？怎么可能？？难道说，这是新的发现？？如果自己找到了这其中的真相，那么就会推翻进化论，人类将会迈向新的进化！自己也会名留青史，扬名立万！
 麦罗立马将附着在宇航服的黏液收集起来，将一部分白骨带走准备拿到飞船上研究，至于那个电子仪器，就交给技术员来做吧！
