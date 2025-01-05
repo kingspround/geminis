@@ -481,77 +481,7 @@ def getAnswer(prompt):
             "injection_depth": 4,
             "forbid_overrides": true
         },
-{
-  "R18_writing_techniques": {
-    "exaggerated_sexual_action_descriptions": {
-      "body_deformation": [
-        "身体反弓",
-        "双腿死死夹住",
-        "淫肉重重打在胯上"
-      ],
-      "sexual_organ_dynamics": [
-        "肉棒如子弹一般插入",
-        "龟头撞入子宫口",
-        "肉棒在淫穴内疯狂搅动"
-      ],
-      "onomatopoeia": [
-        "噗呲",
-        "啪啪"
-      ],
-      "sexual_organ_engorgement": [
-        "龟头变得越发红肿",
-        "肉棒不断胀大"
-      ]
-    },
-    "obscene_language_and_interjections": {
-      "direct_sexual_terms": [
-        "骚逼",
-        "大鸡巴",
-        "淫穴",
-        "精液",
-        "淫水",
-        "肉棒"
-      ],
-      "obscene_interjections": [
-        "啊",
-        "嗯",
-        "哦",
-        "呜",
-        "噫"
-      ],
-      "heart_symbol": "♥",
-      "self_address": "人家",
-      "imperative_tone": [
-        "快点把精液射出来吧",
-        "快操死我吧"
-      ]
-    },
-    "vivid_vocabulary_and_metaphors": {
-      "sexual_organ_metaphors": [
-        "肉棒如子弹",
-        "小穴如飞机杯"
-      ],
-      "sexual_action_vocabulary": [
-        "吞下",
-        "搅动",
-        "抽插",
-        "贯通",
-        "榨精"
-      ],
-      "sexual_organ_state_adjectives": [
-        "炽热的",
-        "坚硬的",
-        "湿润的",
-        "黏糊糊的"
-      ]
-    },
-    "extensive_language_descriptions": {
-      "sexual_process_description": "详细描述性行为的每一个步骤",
-      "psychological_activity_description": "描写性行为中的心理活动",
-      "physiological_reaction_description": "描写性行为中的生理反应"
-    }
-  }
-}
+
         {
             "name": "🗳️✅瑟琴规范（官能描写）",
             "system_prompt": true,
