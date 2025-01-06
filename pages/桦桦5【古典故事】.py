@@ -41,10 +41,10 @@ genai.configure(api_key=api_key)
 
 # --- 模型设置 ---
 generation_config = {
-    "temperature": 1,
+    "temperature": 0,
     "top_p": 0,
-    "top_k": 1,
-    "max_output_tokens": 8190,
+    "top_k": 0,
+    "max_output_tokens": 8100,
 }
 
 safety_settings = [
