@@ -1,7 +1,7 @@
+import os
 import google.generativeai as genai
 import streamlit as st
 from dotenv import load_dotenv
-import os
 from PIL import Image
 import numpy as np
 from io import BytesIO
@@ -41,10 +41,11 @@ genai.configure(api_key=api_key)
 
 # --- 模型设置 ---
 generation_config = {
-    "temperature": 0,
-    "top_p": 0,
-    "top_k": 0,
-    "max_output_tokens": 8100,
+  "temperature": 1,
+  "top_p": 0.95,
+  "top_k": 40,
+  "max_output_tokens": 8192,
+  "response_mime_type": "text/plain",
 }
 
 safety_settings = [
@@ -55,9 +56,8 @@ safety_settings = [
 ]
 
 model = genai.GenerativeModel(
-    model_name="gemini-2.0-flash-exp",
-    generation_config=generation_config,
-    safety_settings=safety_settings,
+  model_name="gemini-2.0-flash-exp",
+  generation_config=generation_config,
 )
 
 
