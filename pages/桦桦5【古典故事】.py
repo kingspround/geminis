@@ -2044,10 +2044,18 @@ def regenerate_message(index):
 def continue_message(index):
     """继续生成指定索引的消息"""
     if 0 <= index < len(st.session_state.messages):
-        original_prompt = st.session_state.messages[index]["content"]
-        new_prompt = "请从截断的词继续写"  # 修改 prompt 为 "请从截断的词继续写"
+        original_message = st.session_state.messages[index]["content"]
         
-        full_response = original_prompt  # 初始化 full_response
+        # 提取最后几个字符
+        last_chars_length = 10  # 可以根据需求调整截取的字符数
+        if len(original_message) > last_chars_length:
+          last_chars = original_message[-last_chars_length:] + "..."
+        else:
+          last_chars = original_message
+
+        new_prompt = f"请从 '{last_chars}' 继续写" # 使用 f-string 格式化
+        
+        full_response = original_message  # 初始化 full_response
         for chunk in getAnswer(new_prompt):
             full_response += chunk
         
