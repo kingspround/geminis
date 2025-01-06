@@ -2053,7 +2053,7 @@ def continue_message(index):
         else:
           last_chars = original_message
 
-        new_prompt = f"请从 '{last_chars}' 继续写" # 使用 f-string 格式化
+        new_prompt = f"请务必从 '{last_chars}' 无缝衔接自然地继续写，不要重复，不要输出任何思考过程" # 使用更强有力的提示词
         
         full_response = original_message  # 初始化 full_response
         for chunk in getAnswer(new_prompt):
