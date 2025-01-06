@@ -353,12 +353,14 @@ DEFAULT_CHARACTER_SETTINGS = {
 }
 
 
-if "character_settings" not in st.session_state:
-    st.session_state.character_settings = DEFAULT_CHARACTER_SETTINGS.copy()
-if "enabled_settings" not in st.session_state:
-    st.session_state.enabled_settings = {
-        setting_name: False for setting_name in DEFAULT_CHARACTER_SETTINGS
-    }
+if "test_text" in st.session_state and st.session_state.test_text:
+        system_message_exists = False
+        for msg in st.session_state.messages:
+          if msg.get("role") == "system" and msg.get("content") == st.session_state.test_text:
+            system_message_exists = True
+            break
+        if not system_message_exists:
+            st.session_state.messages.insert(0, {"role": "system", "content": st.session_state.test_text})
 
 def ensure_enabled_settings_exists():
     for setting_name in st.session_state.character_settings:
