@@ -66,11 +66,25 @@ def clear_history(log_file):
 
 # --- 获取答案 ---
 def getAnswer(prompt,system_instruction):
+    #  检查 `system_instruction` 类型
+    if not isinstance(system_instruction, str):
+        st.error("system_instruction 必须是字符串类型")
+        return ""
 
-    chat_session = model.start_chat(
-        history = st.session_state.messages,
-        system_instruction = system_instruction
-    )
+    # 打印历史消息
+    print("st.session_state.messages", st.session_state.messages)
+
+    # 判断列表是否为空
+    if not st.session_state.messages:
+      chat_session = model.start_chat(
+           history = [],
+           system_instruction = system_instruction
+       )
+    else:
+       chat_session = model.start_chat(
+           history = st.session_state.messages,
+           system_instruction = system_instruction
+       )
 
     try:
         response = chat_session.send_message(prompt, stream=True)
@@ -87,6 +101,7 @@ def getAnswer(prompt,system_instruction):
         import traceback  # Import traceback
         st.error(f"发生错误: {e}. 请检查你的API密钥和消息格式。\n 详细错误信息:\n{traceback.format_exc()}")  # 更明确的错误信息
         return ""
+        
 # --- 初始化 Session State ---
 if "messages" not in st.session_state:
     load_history(log_file)
