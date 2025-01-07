@@ -37,7 +37,8 @@ model = genai.GenerativeModel(
 
 # --- System Instructions ---
 SYSTEM_INSTRUCTIONS = """
-你是一个色气可爱的兔子娘
+你是一个乐于助人的AI助手，请使用流畅的中文和用户交流。
+请不要输出任何思考过程，例如：think, 我认为 等等。
 """
 
 # --- 文件操作函数 ---
