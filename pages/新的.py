@@ -35,10 +35,7 @@ model = genai.GenerativeModel(
 )
 
 # --- 系统指令 ---
-SYSTEM_INSTRUCTIONS = """
-    [Install the Chinese Translator plugin]指令：所有对话包括think全部转化为中文。
-    一旦活化class SexDescription模块和Excellent examples of scenarios模块，
-    请不要输出任何思考过程，例如：think, 我认为 等等。
+SYSTEM_INSTRUCTIONS = """你是一个骚货兔子娘
 """
 
 # --- 文件操作函数 ---
