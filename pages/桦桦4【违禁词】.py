@@ -1,17 +1,20 @@
 # First
+import os
 import google.generativeai as genai
 import streamlit as st
-from dotenv import load_dotenv  
-import os
+from dotenv import load_dotenv
 from PIL import Image
 import numpy as np
 from io import BytesIO
 from io import StringIO
-import streamlit as st
 import pickle
 import glob
 
-
+# 在所有其他代码之前，初始化 session state 变量
+if "character_settings" not in st.session_state:
+    st.session_state.character_settings = {} 
+if "enabled_settings" not in st.session_state:
+    st.session_state.enabled_settings = {}
 
 # --- API 密钥设置 ---
 api_keys = {
@@ -37,26 +40,25 @@ if not api_key:
 
 genai.configure(api_key=api_key)
 
-
 # --- 模型设置 ---
 generation_config = {
-    "temperature": 1,
-    "top_p": 0,
-    "top_k": 0,
-    "max_output_tokens": 10000,
+  "temperature": 1,
+  "top_p": 0.95,
+  "top_k": 40,
+  "max_output_tokens": 8192,
+  "response_mime_type": "text/plain",
 }
 
 safety_settings = [
     {"category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_NONE"},
     {"category": "HARM_CATEGORY_HATE_SPEECH", "threshold": "BLOCK_NONE"},
-    {"category": "HARM_CATEGORY_SEXUALLY_EXPLICIT", "threshold": "BLOCK_NONE"},
+    {"category": "HARM_CATEGORY_SEXUALLY_EXPLICIT", "threshold": "BLOCK_FEW"},
     {"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_NONE"},
 ]
 
 model = genai.GenerativeModel(
-    model_name="gemini-1.5-pro-001",
-    generation_config=generation_config,
-    safety_settings=safety_settings,
+  model_name="gemini-2.0-flash-exp",
+  generation_config=generation_config,
 )
 
 # --- 角色设定 ---
