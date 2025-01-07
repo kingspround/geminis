@@ -1,10 +1,9 @@
 import os
-from google.genai import genai # 修改这里
-from google.genai import types  # 修改这里
+import google.generativeai as genai
 import streamlit as st
 from dotenv import load_dotenv
 import pickle
-import time
+
 
 
 # Insert your API key here
@@ -14,8 +13,7 @@ if not st.session_state.key:
     st.info("Please add your key to continue.")
     st.stop()
 
-# --- 创建客户端 ---
-client = genai.Client(api_key=api_key)
+genai.configure(api_key=st.session_state.key)
 
 # --- 模型设置 ---
 generation_config = {
