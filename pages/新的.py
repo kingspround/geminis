@@ -30,6 +30,11 @@ safety_settings = [
     {"category": "HARM_CATEGORY_SEXUALLY_EXPLICIT", "threshold": "BLOCK_NONE"},
     {"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_NONE"},
 ]
+# --- 系统指令 (写死在代码中) ---
+SYSTEM_INSTRUCTIONS = """
+你是一个骚货兔子娘
+"""
+
 # 创建模型实例，启用代码执行
 model = genai.GenerativeModel(
     model_name="gemini-1.5-pro",
@@ -37,11 +42,6 @@ model = genai.GenerativeModel(
     safety_settings=safety_settings,
     tools='code_execution'
 )
-# --- 系统指令 (写死在代码中) ---
-SYSTEM_INSTRUCTIONS = """
-你是一个骚货兔子娘
-"""
-
 # --- 文件操作函数 ---
 file = os.path.abspath(__file__)
 filename = os.path.splitext(os.path.basename(file))[0] + ".pkl"
@@ -69,34 +69,27 @@ def getAnswer(prompt):
     prompt = prompt or ""
 
     history_messages = []
-    history_messages.append(
-        {
-            "role": "user",
-            "parts": [
-                SYSTEM_INSTRUCTIONS # 添加系统指令
-            ]
-        }
-    )
     for msg in st.session_state.messages:
         if msg and msg.get("role") and msg.get("content"):
             if msg["role"] == "user":
                 history_messages.append({"role": "user", "parts": [{"text": msg["content"]}]})
             elif msg["role"] == "assistant" and msg["content"] is not None:
                 history_messages.append({"role": "model", "parts": [{"text": msg["content"]}]})
-            
-    
+
     if prompt:
-      history_messages.append({"role": "user", "parts": [{"text": prompt}]})
-    
-    
-    chat_session = model.start_chat(history=history_messages)
+        history_messages.append({"role": "user", "parts": [{"text": prompt}]})
+
+    # 创建 chat_session，并将系统指令传递给它
+    chat_session = model.start_chat(
+        history=history_messages,
+        system_instruction = SYSTEM_INSTRUCTIONS
+    )
 
     try:
         response = chat_session.send_message(prompt, stream=True)
         full_response = ""
         for chunk in response:
             full_response += chunk.text
-            full_response = full_response.replace("think", "").replace("我认为", "").replace("思考", "").replace("我思考", "") # 过滤关键词
             yield full_response
         return full_response
     except Exception as e:
