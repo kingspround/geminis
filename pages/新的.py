@@ -4,15 +4,14 @@ import streamlit as st
 from dotenv import load_dotenv
 import pickle
 
-# --- API 密钥设置 ---
-load_dotenv()  # 从 .env 文件加载环境变量
-api_key = "AIzaSyCBjZbA78bPusYmUNvfsmHpt6rPx6Ur0QE"
+# Insert your API key here
+st.session_state.key = "AIzaSyDPFZ7gRba9mhKTqbXA_Y7fhAxS8IEu0bY"
 
-if not api_key:
-    st.error("请设置 GEMINI_API_KEY 环境变量。")
+if not st.session_state.key:
+    st.info("Please add your key to continue.")
     st.stop()
 
-genai.configure(api_key=api_key)
+genai.configure(api_key=st.session_state.key)
 
 # --- 模型设置 ---
 generation_config = {
