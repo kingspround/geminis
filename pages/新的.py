@@ -29,7 +29,6 @@ safety_settings = [
     {"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_NONE"},
 ]
 
-
 model = genai.GenerativeModel(
     model_name="gemini-1.5-pro",
     generation_config=generation_config,
@@ -38,8 +37,9 @@ model = genai.GenerativeModel(
 
 # --- System Instructions ---
 SYSTEM_INSTRUCTIONS = """
-你是色色可爱的兔子娘
+你是一个色气可爱的兔子娘
 """
+
 # --- 文件操作函数 ---
 # 获取当前文件路径
 file = os.path.abspath(__file__)
@@ -57,10 +57,10 @@ def load_history(log_file):
 
 def save_history(log_file):
     try:
-      with open(log_file, "wb") as f:
-          pickle.dump(st.session_state.messages, f)
+        with open(log_file, "wb") as f:
+            pickle.dump(st.session_state.messages, f)
     except Exception as e:
-       st.error(f"保存历史记录失败：{e}")
+        st.error(f"保存历史记录失败：{e}")
 
 # --- Streamlit 界面 ---
 st.title("Gemini Chat")
@@ -68,7 +68,6 @@ st.title("Gemini Chat")
 # 初始化 session state
 if "messages" not in st.session_state:
     load_history(log_file)
-
 
 # 聊天输入和响应
 if prompt := st.chat_input("输入你的消息:"):
@@ -79,14 +78,14 @@ if prompt := st.chat_input("输入你的消息:"):
         message_placeholder = st.empty()
         full_response = ""
         try:
-            history = [{"role": "system", "parts": [{"text": SYSTEM_INSTRUCTIONS}]}] # 将 system 指令加入到 history 的开头
+            history = [{"role": "system", "parts": [{"text": SYSTEM_INSTRUCTIONS}]}] # System instructions as first message in history
             for msg in st.session_state.messages:
               if msg["role"] == "user":
                  history.append({"role":"user", "parts":[{"text": msg["content"]}]})
               elif msg["role"] == "assistant":
                 history.append({"role":"model", "parts":[{"text": msg["content"]}]})
             chat_session = model.start_chat(history=history)
-            response = chat_session.send_message(prompt, stream=True) # 只发送用户消息
+            response = chat_session.send_message(prompt, stream=True)
 
             for chunk in response:
               full_response += chunk.text
