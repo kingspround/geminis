@@ -1,6 +1,6 @@
 import os
-from google import genai
-from google.genai import types
+from google.genai import genai # 修改这里
+from google.genai import types  # 修改这里
 import streamlit as st
 from dotenv import load_dotenv
 import pickle
