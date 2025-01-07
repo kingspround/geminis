@@ -1691,8 +1691,13 @@ def getAnswer(prompt):
 
     # 第二次请求：获取主要内容
     content_prompt = prompt
+    print("Content Prompt:", content_prompt) # 打印 content_prompt 的值
+
+    if not content_prompt:
+        st.warning("请输入内容")
+        return ""
+
     try:
-        content_chat_session = model.start_chat(history=history_messages) # 为 content_prompt 创建新的 chat_session
         content_response = content_chat_session.send_message(content_prompt)
         content = content_response.text
     except Exception as e:
