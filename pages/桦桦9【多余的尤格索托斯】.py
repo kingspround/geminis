@@ -402,7 +402,7 @@ def clear_history(log_file):
 def getAnswer(prompt):
     prompt = prompt or ""
 
-    # 处理 test_text (这个部分保持不变)
+    # 处理 test_text
     if "test_text" in st.session_state and st.session_state.test_text and not any(msg.get("content") == st.session_state.test_text for msg in st.session_state.messages if msg.get("role") == "system"):
         st.session_state.messages.insert(0, {"role": "system", "content": st.session_state.test_text})
 
@@ -415,7 +415,6 @@ def getAnswer(prompt):
             if enabled:
                 enabled_settings_content += f"- {setting_name}: {st.session_state.character_settings[setting_name]}\n"
         enabled_settings_content += "```\n"
-
     
     # 构建历史消息列表
     history_messages = []
