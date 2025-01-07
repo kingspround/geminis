@@ -55,7 +55,6 @@ def load_history(log_file):
         st.warning(f"{filename} 不存在或为空。")
         st.session_state.messages = []
 
-
 def save_history(log_file):
     try:
       with open(log_file, "wb") as f:
@@ -65,7 +64,6 @@ def save_history(log_file):
 
 # --- Streamlit 界面 ---
 st.title("Gemini Chat")
-
 
 # 初始化 session state
 if "messages" not in st.session_state:
@@ -81,15 +79,14 @@ if prompt := st.chat_input("输入你的消息:"):
         message_placeholder = st.empty()
         full_response = ""
         try:
-            history = []
-            history.append({"role": "system", "parts": [{"text": SYSTEM_INSTRUCTIONS}]})
+            history = [{"role": "system", "parts": [{"text": SYSTEM_INSTRUCTIONS}]}] # 将 system 指令加入到 history 的开头
             for msg in st.session_state.messages:
               if msg["role"] == "user":
                  history.append({"role":"user", "parts":[{"text": msg["content"]}]})
               elif msg["role"] == "assistant":
                 history.append({"role":"model", "parts":[{"text": msg["content"]}]})
             chat_session = model.start_chat(history=history)
-            response = chat_session.send_message(prompt, stream=True)
+            response = chat_session.send_message(prompt, stream=True) # 只发送用户消息
 
             for chunk in response:
               full_response += chunk.text
@@ -98,5 +95,7 @@ if prompt := st.chat_input("输入你的消息:"):
             st.session_state.messages.append({"role": "assistant", "content": full_response})
             save_history(log_file)
         except Exception as e:
+            import traceback
+            st.error(f"发生错误: {e}. 请检查你的API密钥和消息格式。\n 详细错误信息:\n{traceback.format_exc()}")
           import traceback
           st.error(f"发生错误: {e}. 请检查你的API密钥和消息格式。\n 详细错误信息:\n{traceback.format_exc()}")
