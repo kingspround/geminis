@@ -55,26 +55,27 @@ if prompt := st.chat_input("输入你的消息:"):
         message_placeholder = st.empty()
         full_response = ""
         try:
-            history = []
-            if system_instruction:
-               history.append({"role": "system", "parts": [{"text": system_instruction}]})
-               
-            # 添加历史消息 (不包括system消息)
-            for msg in st.session_state.messages:
-              if msg["role"] == "user":
-                 history.append({"role":"user", "parts":[{"text": msg["content"]}]})
-              elif msg["role"] == "assistant":
-                history.append({"role":"model", "parts":[{"text": msg["content"]}]})
+           history = []
+           if system_instruction:
+              history.append({"role": "system", "parts": [{"text": system_instruction}]})
 
-            chat_session = model.start_chat(history=history)
+           for msg in st.session_state.messages:
+               if msg["role"] == "user":
+                   history.append({"role":"user", "parts":[{"text": msg["content"]}]})
+               elif msg["role"] == "assistant":
+                  history.append({"role":"model", "parts":[{"text": msg["content"]}]})
+           chat_session = model.start_chat(history=history)
+           # 将 prompt 包装成 user role
+           response = chat_session.send_message(parts=[{"text": prompt}], stream=True)
 
-            response = chat_session.send_message(prompt, stream=True) # 直接传递 prompt
-           
-            for chunk in response:
-                full_response += chunk.text
-                message_placeholder.markdown(full_response + "▌")
-            message_placeholder.markdown(full_response)
-            st.session_state.messages.append({"role": "assistant", "content": full_response})
+           for chunk in response:
+               full_response += chunk.text
+               message_placeholder.markdown(full_response + "▌")
+           message_placeholder.markdown(full_response)
+           st.session_state.messages.append({"role": "assistant", "content": full_response})
+        except Exception as e:
+             import traceback
+             st.error(f"发生错误: {e}. 请检查你的API密钥和消息格式。\n 详细错误信息:\n{traceback.format_exc()}")nse})
         except Exception as e:
           import traceback
           st.error(f"发生错误: {e}. 请检查你的API密钥和消息格式。\n 详细错误信息:\n{traceback.format_exc()}")
