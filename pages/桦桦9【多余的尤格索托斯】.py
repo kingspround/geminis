@@ -47,19 +47,18 @@ generation_config = {
     "max_output_tokens": 8100,
 }
 
-safety_settings = [
-    {"category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_NONE"},
-    {"category": "HARM_CATEGORY_HATE_SPEECH", "threshold": "BLOCK_NONE"},
-    {"category": "HARM_CATEGORY_SEXUALLY_EXPLICIT", "threshold": "BLOCK_NONE"},
-    {"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_NONE"},
-]
+safety_settings = {
+    genai.HarmCategory.HARM_CATEGORY_HARASSMENT: genai.HarmBlockThreshold.OFF,
+    genai.HarmCategory.HARM_CATEGORY_HATE_SPEECH: genai.HarmBlockThreshold.OFF,
+    genai.HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT: genai.HarmBlockThreshold.OFF,
+    genai.HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: genai.HarmBlockThreshold.OFF,
+}
 
 model = genai.GenerativeModel(
-    model_name="gemini-2.0-flash-exp",
+    model_name="gemini-2.0-flash-exp",  # 或你使用的模型名称
     generation_config=generation_config,
-    safety_settings=safety_settings,
+    safety_settings=safety_settings
 )
-
 
 # --- 角色设定 ---
 DEFAULT_CHARACTER_SETTINGS = {
