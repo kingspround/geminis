@@ -1,14 +1,14 @@
-import os
 import google.generativeai as genai
-import re
 import streamlit as st
 from dotenv import load_dotenv
+import os
 from PIL import Image
 import numpy as np
 from io import BytesIO
 from io import StringIO
 import pickle
 import glob
+import re
 
 # 在所有其他代码之前，初始化 session state 变量
 if "character_settings" not in st.session_state:
@@ -1658,52 +1658,54 @@ def getAnswer(prompt):
         }
     )
     for msg in st.session_state.messages[-20:]:
-        if msg and msg.get("role") and msg.get("content"):  # 只有当msg不为空，并且有 role 和 content 属性的时候才去处理
+        if msg and msg.get("role") and msg.get("content"):
             if msg["role"] == "user":
                 history_messages.append({"role": "user", "parts": [{"text": msg["content"]}]})
-            elif msg["role"] == "assistant" and msg["content"] is not None:  # 使用 elif 确保只添加 role 为 assistant 的消息
+            elif msg["role"] == "assistant" and msg["content"] is not None:
                 history_messages.append({"role": "model", "parts": [{"text": msg["content"]}]})
 
     history_messages = [msg for msg in history_messages if msg["role"] in ["user", "model"]]
     if enabled_settings_content:
         history_messages.append({"role": "user", "parts": [{"text": enabled_settings_content}]})
-        
 
-    # 第一次请求：获取思考内容
-    thinking_prompt = "<thinking>" + prompt + "</thinking>"
+
+    # 第一次请求：只获取 thinking 内容
+    thinking_prompt = f"{prompt}\n<thinking>" #  在 prompt 后面添加 <thinking> 标签
+    thinking_chat_session = model.start_chat(history=history_messages)
     try:
-
-        thinking_chat_session = model.start_chat(history=history_messages) # 为 thinking_prompt 创建新的 chat_session
         thinking_response = thinking_chat_session.send_message(thinking_prompt)
         thinking_content = thinking_response.text
+        thinking_content = re.search(r"<thinking>(.*?)</thinking>", thinking_content, re.DOTALL).group(1) if re.search(r"<thinking>(.*?)</thinking>", thinking_content, re.DOTALL) else ""
 
-        thinking_content = re.search(r"<thinking>(.*?)</thinking>", thinking_content, re.DOTALL).group(1).strip() if re.search(r"<thinking>(.*?)</thinking>", thinking_content, re.DOTALL) else "" # 提取 <thinking> 标签中的内容，如果找不到则返回空字符串
-       
+
+
     except Exception as e:
-        st.error(f"获取思考内容时发生错误: {e}")
         import traceback
-        st.write(traceback.format_exc())
+        st.error(f"获取 thinking 内容时发生错误: {e}\n 详细错误信息:\n{traceback.format_exc()}")
         return ""
 
-    # 将 thinking_response 添加到 history_messages，为第二次请求提供上下文
-    history_messages.append({"role": "assistant", "parts": [{"text": thinking_content}]})
 
+    # 第二次请求：只获取 content 内容
+    content_prompt = f"{prompt}\n<content>" # 在 prompt 后面添加 <content> 标签
 
-    # 第二次请求：获取主要内容
-    content_prompt = prompt
-    print("Content Prompt:", content_prompt) # 打印 content_prompt 的值
+    # 将 thinking 内容添加到历史消息中
+    history_messages.append({"role": "assistant", "parts": [{"text": f"<thinking>{thinking_content}</thinking>"}]}) # 将 thinking 内容添加到历史消息
 
-    if not content_prompt:
-        st.warning("请输入内容")
-        return ""
-
+    content_chat_session = model.start_chat(history=history_messages)
     try:
-        content_response = content_chat_session.send_message(content_prompt)
-        content = content_response.text
+        content_response = content_chat_session.send_message(content_prompt, stream=True)
+        full_response = ""
+        for chunk in content_response:
+            full_response += chunk.text
+            yield chunk.text
+
+        # 结合 thinking 和 content 内容
+        full_response = f"<thinking>{thinking_content}</thinking>\n{full_response}"
+        return full_response
+
     except Exception as e:
-        st.error(f"获取主要内容时发生错误: {e}")
         import traceback
-        st.write(traceback.format_exc())
+        st.error(f"获取 content 内容时发生错误: {e}\n 详细错误信息:\n{traceback.format_exc()}")
         return ""
 
 
