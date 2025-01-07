@@ -19,13 +19,14 @@ if not st.session_state.key:
 
 genai.configure(api_key=st.session_state.key)
 
-# 模型配置
+# --- 模型设置 ---
 generation_config = {
-    "temperature": 0.9,
-    "top_p": 1,
+    "temperature": 1,
+    "top_p": 0,
     "top_k": 1,
-    "max_output_tokens": 2048,
+    "max_output_tokens": 8190,
 }
+
 safety_settings = [
     {"category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_NONE"},
     {"category": "HARM_CATEGORY_HATE_SPEECH", "threshold": "BLOCK_NONE"},
@@ -33,7 +34,11 @@ safety_settings = [
     {"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_NONE"},
 ]
 
-model = genai.GenerativeModel(model_name="gemini-1.5-pro",generation_config=generation_config,safety_settings=safety_settings)
+model = genai.GenerativeModel(
+    model_name="gemini-2.0-flash-exp",
+    generation_config=generation_config,
+    safety_settings=safety_settings,
+)
 
 
 
