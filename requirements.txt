@@ -8,4 +8,4 @@ promise
 asyncio
 python-dotenv
 streamlit==1.24
-google-genai
+google-generativeai
