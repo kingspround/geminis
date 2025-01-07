@@ -97,5 +97,3 @@ if prompt := st.chat_input("输入你的消息:"):
         except Exception as e:
             import traceback
             st.error(f"发生错误: {e}. 请检查你的API密钥和消息格式。\n 详细错误信息:\n{traceback.format_exc()}")
-          import traceback
-          st.error(f"发生错误: {e}. 请检查你的API密钥和消息格式。\n 详细错误信息:\n{traceback.format_exc()}")
