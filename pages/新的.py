@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 
 # --- API 密钥设置 ---
 load_dotenv()  # 从 .env 文件加载环境变量
-api_key = os.environ.get("GEMINI_API_KEY")
+api_key = "AIzaSyCBjZbA78bPusYmUNvfsmHpt6rPx6Ur0QE"
 
 if not api_key:
     st.error("请设置 GEMINI_API_KEY 环境变量。")
@@ -31,7 +31,7 @@ safety_settings = [
 
 
 model = genai.GenerativeModel(
-    model_name="gemini-1.5-pro",
+    model_name="gemini-2.0-flash-exp",
     generation_config=generation_config,
     safety_settings=safety_settings,
 )
