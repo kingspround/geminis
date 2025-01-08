@@ -728,7 +728,7 @@ def create_slime_prompt(token, style_perspective, slime_color, breasts):
      /////
      {main_theme}`
        '''
-       return 
+       return f"{{ \\n   \"theme\":\"{creative_title}\",\\n  \"style_and_view\":\"{style_perspective}\",\\n   \"color\":\"{{{slime_color}}}\",\\n  \"character\":\"A {slime_color} slime girl, {additional_keywords}\",\\n    \"environment\":\"{main_theme}\",\\n   \"output_description\":\"{description}\"\\n  }}` \n {code_block}" 
      
 def interpret_token(token):
     # In a real system, this would involve more complex logic
