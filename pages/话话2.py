@@ -72,7 +72,7 @@ def getAnswer_text(prompt, token):
     his_messages = []  # 存储最近的 20 条聊天记录
     # 添加预设信息到 his_messages
     his_messages.append(
-        {"role": "model", "parts": [{"text": """
+        {"role": "model", "parts": [{"text": """[
 
 ```json
 {
