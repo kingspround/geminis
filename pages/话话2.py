@@ -72,7 +72,7 @@ def getAnswer_text(prompt, token):
     his_messages = []  # 存储最近的 20 条聊天记录
     # 添加预设信息到 his_messages
     his_messages.append(
-        {"role": "model", "parts": [{"text": """[
+        {"role": "model", "parts": [{"text": """
 
 ```json
 {
@@ -937,7 +937,7 @@ def define_random_theme(main_theme_number, sub_theme_number, theme_keywords):
 ```
 
             
-        ]]"""}]}
+        ]"""}]}
     )
     # 添加用户输入到 his_messages
     if "use_token" in st.session_state and st.session_state.use_token:
