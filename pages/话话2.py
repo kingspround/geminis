@@ -710,7 +710,7 @@ def create_slime_prompt(token, style_perspective, slime_color, breasts):
    
      code_block =f'''
   `{prompt}
-     /////
+     "/////"
       {main_theme}`
         '''
      return f"thinks：主人！小爱已经为你准备好了！ \n {output} \n {code_block}"
@@ -854,7 +854,7 @@ def random_slime_prompt(token):
     
    code_block =f'''
   `{prompt}
-     /////
+     "/////"
       {main_theme}`
        '''
 
