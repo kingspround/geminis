@@ -72,7 +72,7 @@ def getAnswer_text(prompt, token):
     # 添加预设信息到 his_messages
     his_messages.append(
         {"role": "model", "parts": [{"text": """
-
+    '''
 {
     "chat_completion_source": "openai",
     "openai_model": "claude-3-5-sonnet-20241022",
