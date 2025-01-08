@@ -2,57 +2,45 @@ import google.generativeai as genai
 import streamlit as st
 from dotenv import load_dotenv
 import os
-from PIL import Image
-import numpy as np
-from io import BytesIO
-from io import StringIO
 import random
+import string
 import pickle
-import re  # 导入正则表达式库
-import streamlit as st
-import pickle
+import re
 
 
-# API Key 设置
-st.session_state.key = "AIzaSyBgyyy2kTTAdsLB53OCR2omEbj7zlx1mjw"  # 请勿将您的API Key 泄露在公开场合
-if "key" not in st.session_state:
-    st.session_state.key = None
-if not st.session_state.key:
-    st.info("Please add your key to continue.")
+# --- API 密钥设置 ---
+api_keys = {
+    "主密钥": "AIzaSyDezEpxvtY1AKN6JACMU9XHte5sxATNcUs",  # 替换成你的主 API 密钥
+    "备用1号": "AIzaSyBgyyy2kTTAdsLB53OCR2omEbj7zlx1mjw",  # 替换成你的备用 API 密钥
+    "备用2号":"AIzaSyCMn1j3qGpyjBcqkW6X2Ng1cy4aNUPHMwQ"
+}
+
+selected_key = st.sidebar.selectbox("选择 API 密钥", list(api_keys.keys()), index=0) # 默认选择主密钥
+api_key = api_keys[selected_key]
+
+if not api_key:
+    st.error("请设置有效的API密钥。")
     st.stop()
-genai.configure(api_key=st.session_state.key)
+genai.configure(api_key=api_key)
 
 # 模型设置
 generation_config = {
     "temperature": 1,
     "top_p": 0,
     "top_k": 1,
-    "max_output_tokens": 10000,
+    "max_output_tokens": 8000,
 }
 safety_settings = [
-    {
-        "category": "HARM_CATEGORY_HARASSMENT",
-        "threshold": "BLOCK_NONE",
-    },
-    {
-        "category": "HARM_CATEGORY_HATE_SPEECH",
-        "threshold": "BLOCK_NONE",
-    },
-    {
-        "category": "HARM_CATEGORY_SEXUALLY_EXPLICIT",
-        "threshold": "BLOCK_NONE",
-    },
-    {
-        "category": "HARM_CATEGORY_DANGEROUS_CONTENT",
-        "threshold": "BLOCK_NONE",
-    },
+    {"category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_NONE"},
+    {"category": "HARM_CATEGORY_HATE_SPEECH", "threshold": "BLOCK_NONE"},
+    {"category": "HARM_CATEGORY_SEXUALLY_EXPLICIT", "threshold": "BLOCK_NONE"},
+    {"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_NONE"},
 ]
 model = genai.GenerativeModel(
-    model_name="gemini-exp-1206",
+    model_name="gemini-2.0-flash-exp",
     generation_config=generation_config,
     safety_settings=safety_settings,
 )
-model_v = genai.GenerativeModel(model_name='gemini-pro-vision', generation_config=generation_config)  # 添加 gemini-pro-vision 模型
 
 # LLM
 
