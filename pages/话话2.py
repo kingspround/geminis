@@ -728,6 +728,7 @@ def create_slime_prompt(token, style_perspective, slime_color, breasts):
      /////
      {main_theme}`
        '''
+       return 
      
 def interpret_token(token):
     # In a real system, this would involve more complex logic
