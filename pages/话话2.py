@@ -75,20 +75,7 @@ def getAnswer_text(prompt, token):
         {"role": "model", "parts": [{"text": """
 
 ```json
-
-
-
-def interpret_token(token):
-    # In a real system, this would involve more complex logic
-    # Here, I'm extracting theme and numerical cues
-    theme_keywords = {}
-    if token:
-     theme_keywords["main_tokens"]= token[0]
-     theme_keywords["second_token"]=token[1]
-    
-    return theme_keywords
-
-    
+{
     "chat_completion_source": "openai",
     "openai_model": "claude-3-5-sonnet-20241022",
     "claude_model": "claude-3-5-sonnet-20241022",
@@ -728,8 +715,8 @@ def create_slime_prompt(token, style_perspective, slime_color, breasts):
      /////
      {main_theme}`
        '''
-       return f"{{ \\n   \"theme\":\"{creative_title}\",\\n  \"style_and_view\":\"{style_perspective}\",\\n   \"color\":\"{{{slime_color}}}\",\\n  \"character\":\"A {slime_color} slime girl, {additional_keywords}\",\\n    \"environment\":\"{main_theme}\",\\n   \"output_description\":\"{description}\"\\n  }}` \n {code_block}" 
-     
+       return 
+       
 def interpret_token(token):
     # In a real system, this would involve more complex logic
     # Here, I'm extracting theme and numerical cues
@@ -872,8 +859,8 @@ def random_slime_prompt(token):
      /////
       {main_theme}`
        '''
-   return f"{{ \\n   \"theme\":\"{creative_title}\",\\n  \"style_and_view\":\"{style_perspective}\",\\n   \"color\":\"{{{slime_color}}}\",\\n  \"character\":\"A {slime_color} slime girl, {additional_keywords}\",\\n    \"environment\":\"{main_theme}\",\\n   \"output_description\":\"{description}\"\\n  }}` \n {code_block}"
-    
+   return 
+   
 def interpret_random_token(token):
   if not token:
      return 0,0,{}
