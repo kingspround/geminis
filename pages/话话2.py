@@ -75,7 +75,10 @@ def getAnswer_text(prompt, token):
         {"role": "model", "parts": [{"text": """
 
 ```json
-{【注意】创作完成后追加添加便利化组件，将style_and_view，color，character，environment组合到一起【格式类似于例子】，额外追加输出一个代码框，方便主人直接复制】
+
+【额外mod】∶
+【便利化组件】∶创作完成后追加添加便利化组件，将style_and_view，color，character，environment组合到一起【格式类似于例子】，额外追加输出一个代码框，方便主人直接复制
+{
 output= f'''
  {prompt}
     
