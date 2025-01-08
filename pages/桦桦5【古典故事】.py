@@ -2087,35 +2087,31 @@ def getAnswer(prompt):
 } 
 """}]}
    )
-
-
-    for msg in st.session_state.messages[-20:]:
-        if msg and msg.get("role") and msg.get("content"):  # 只有当msg不为空，并且有 role 和 content 属性的时候才去处理
-            if msg["role"] == "user":
-                history_messages.append({"role": "user", "parts": [{"text": msg["content"]}]})
-            elif msg["role"] == "assistant" and msg["content"] is not None:  # 使用 elif 确保只添加 role 为 assistant 的消息
-                history_messages.append({"role": "model", "parts": [{"text": msg["content"]}]})
-
-    history_messages = [msg for msg in history_messages if msg["role"] in ["user", "model"]]
-    if enabled_settings_content:
-        history_messages.append({"role": "user", "parts": [{"text": enabled_settings_content}]})
-    if prompt:
-        history_messages.append({"role": "user", "parts": [{"text": prompt}]})
-        
+  
     
-    # 创建 chat_session
-    chat_session = model.start_chat(history=history_messages)
+    for msg in st.session_state.messages[-20:]:
+        if msg["role"] == "user":
+            history_messages.append({"role": "user", "parts": [{"text": msg["content"]}]})
+        elif msg is not None and msg["content"] is not None:
+            history_messages.append({"role": "model", "parts": [{"text": msg["content"]}]})
+
+    #  确保只保留有效的 user 和 model 消息
+    history_messages = [msg for msg in history_messages if msg["role"] in ["user", "model"]]
+
+
+    history_messages.append({"role": "user", "parts": [{"text": prompt}]}) # 将当前用户消息添加到历史记录
+
+
 
     try:
-        response = chat_session.send_message(prompt, stream=True)
+        response = model.generate_content(contents=history_messages, stream=True)
         full_response = ""
         for chunk in response:
             full_response += chunk.text
             yield chunk.text
         return full_response
     except Exception as e:
-        import traceback  # Import traceback
-        st.error(f"发生错误: {e}. 请检查你的API密钥和消息格式。\n 详细错误信息:\n{traceback.format_exc()}")  # 更明确的错误信息
+        st.error(f"发生错误: {e}. 请检查你的API密钥和消息格式。") #更明确的错误信息
         return ""
 
 def regenerate_message(index):
