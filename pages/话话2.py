@@ -658,7 +658,7 @@ def getAnswer_text(prompt, token):
             "forbid_overrides": false
         }
     ],
-"functions": {
+    "functions": {
         "slime_creation": {
         "description": "Assists in generating AI art prompts for slime girl creations based on specific parameters.",
         "parameters": {
@@ -673,7 +673,7 @@ def getAnswer_text(prompt, token):
                "slime_color": {
                     "type": "string",
                     "description":"The color of the slime girl.",
-                    "enum": ["red", "blue", "green","yellow","purple","white","black","pink","gray","brown","monochrome","silver_blue"]
+                     "enum": ["red", "blue", "green","yellow","purple","white","black","pink","gray","brown","monochrome","silver_blue"]
                 },
                  "breasts":{
                    "type":"string",
@@ -683,30 +683,36 @@ def getAnswer_text(prompt, token):
             },
          "code":"""
 def create_slime_prompt(token, style_perspective, slime_color, breasts):
-    if not token:
+     if not token:
         return "主人，人家没有收到token，请给小爱发送新的token哦！(>_<)"
-    
+     
     # Token Interpretation 
-    theme_keywords = interpret_token(token)
+     theme_keywords = interpret_token(token)
     
-    # Theme & Keywords
-    main_theme, sub_theme, creative_title, additional_keywords = define_theme(theme_keywords, slime_color,breasts)
+     # Theme & Keywords
+     main_theme, sub_theme, creative_title, additional_keywords = define_theme(theme_keywords, slime_color,breasts)
     
-    # Compose Prompt
-    prompt = compose_prompt(style_perspective, slime_color, breasts,additional_keywords)
+     # Compose Prompt
+     prompt = compose_prompt(style_perspective, slime_color, breasts,additional_keywords)
    
      #Compose Description
-    description=describe_creation(creative_title, slime_color, additional_keywords)
+     description=describe_creation(creative_title, slime_color, additional_keywords)
 
-    return f'''
-    {prompt}
-
-    /////
-
-  {main_theme}
-        
-        （{description}）
-       '''
+     output = f'''{{
+    "theme": "{creative_title}",
+    "style_and_view": "{style_perspective}",
+    "color": "{{{{slime_color}}}}",
+    "character": "A {{slime_color}} slime girl, {additional_keywords}",
+    "environment": "{main_theme}",
+    "output_description": "{description}"
+    }}'''
+   
+     code_block =f'''
+  `{prompt}
+     /////
+      {main_theme}`
+        '''
+     return f"thinks：主人！小爱已经为你准备好了！ \\n {output} \\n {code_block}"
 
 
 def interpret_token(token):
@@ -726,7 +732,7 @@ def define_theme(theme_keywords, slime_color,breasts):
     second_token = theme_keywords.get("second_token","")
     additional_keywords=""
   
-   if main_tokens and second_token:
+    if main_tokens and second_token:
       
         main_theme = main_tokens
         sub_theme = second_token
@@ -734,29 +740,29 @@ def define_theme(theme_keywords, slime_color,breasts):
         creative_title = f"小爱为你创作的{main_theme}主题史莱姆娘"
         
         if slime_color=="red":
-            additional_keywords += f"{{red skin}}, fragrant, romantic,  {solo},   A red slime girl"
+            additional_keywords += f"{{red skin}}, fragrant, romantic,  {{solo}},   A red slime girl"
         elif slime_color=="blue":
-            additional_keywords += f"{{blue skin}}, serene, mysterious, {solo}, A blue slime girl"
+            additional_keywords += f"{{blue skin}}, serene, mysterious,  {{solo}}, A blue slime girl"
         elif slime_color=="green":
-             additional_keywords += f"{{green skin}}, natural, classic ,  {solo}, A green slime girl"
+             additional_keywords += f"{{green skin}}, natural, classic ,  {{solo}}, A green slime girl"
         elif slime_color=="yellow":
-            additional_keywords += f"{{yellow skin}}, energetic, chaotic, {solo}, A yellow slime girl"
+            additional_keywords += f"{{yellow skin}}, energetic, chaotic,  {{solo}}, A yellow slime girl"
         elif slime_color=="purple":
-            additional_keywords += f"{{{purple skin}}},  enchanting , allurin ,  {solo}, A purple slime girl"
+            additional_keywords += f"{{{purple skin}}},  enchanting , allurin ,  {{solo}}, A purple slime girl"
         elif slime_color=="white":
-            additional_keywords += f"{{white skin}}, innocent, pure, {solo}, A white slime girl"
+            additional_keywords += f"{{white skin}}, innocent, pure,  {{solo}}, A white slime girl"
         elif slime_color=="black":
-            additional_keywords += f"{{black skin}}, dark, mysterious, {solo}, A black slime girl"
+            additional_keywords += f"{{black skin}}, dark, mysterious,  {{solo}}, A black slime girl"
         elif slime_color=="pink":
-              additional_keywords += f"{{pink skin}},  cute,lovely ,  {solo}, A pink slime girl"
+              additional_keywords += f"{{pink skin}},  cute,lovely ,  {{solo}}, A pink slime girl"
         elif slime_color=="gray":
-              additional_keywords += f"{{{gray skin}}}, undead, scary,  {solo}, A gray slime girl"
+              additional_keywords += f"{{{gray skin}}}, undead, scary,  {{solo}}, A gray slime girl"
         elif slime_color=="brown":
-             additional_keywords += f"{{brown skin}},  earthy, rustic ,  {solo}, A brown slime girl"
+             additional_keywords += f"{{brown skin}},  earthy, rustic ,  {{solo}}, A brown slime girl"
         elif slime_color=="monochrome":
-             additional_keywords += f"{{{monochrome skin}}}, colorless,  {solo}, A monochrome slime girl"
+             additional_keywords += f"{{{monochrome skin}}}, colorless,  {{solo}}, A monochrome slime girl"
         elif slime_color=="silver_blue":
-             additional_keywords += f"{{{silver_blue skin}}}, cool, mysterious, {solo}, A silver-blue slime girl"
+             additional_keywords += f"{{{silver_blue skin}}}, cool, mysterious,  {{solo}}, A silver-blue slime girl"
         
         
         additional_keywords += f",{{{breasts}}},  {{monster girl}}"
@@ -822,30 +828,36 @@ def describe_creation(creative_title, slime_color, additional_keywords):
            },
            "code":"""
 def random_slime_prompt(token):
-    if not token:
+   if not token:
         return "主人，人家没有收到token，请给小爱发送新的token哦！(>_<)"
-    
+     
      # Token Interpretation & Theme Selection
-    main_theme_number, sub_theme_number, theme_keywords = interpret_random_token(token)
+   main_theme_number, sub_theme_number, theme_keywords = interpret_random_token(token)
     
     
-    main_theme, sub_theme, creative_title, style_perspective, slime_color, breasts, additional_keywords = define_random_theme(main_theme_number, sub_theme_number, theme_keywords)
-  
+   main_theme, sub_theme, creative_title, style_perspective, slime_color, breasts, additional_keywords = define_random_theme(main_theme_number, sub_theme_number, theme_keywords)
     # Compose Prompt
-    prompt = compose_prompt(style_perspective, slime_color, breasts, additional_keywords)
+   prompt = compose_prompt(style_perspective, slime_color, breasts, additional_keywords)
    
-     #Compose Description
-    description=describe_creation(creative_title, slime_color, additional_keywords)
+    #Compose Description
+   description=describe_creation(creative_title, slime_color, additional_keywords)
 
-    return f'''
- {prompt}
+   output = f'''{{
+    "theme": "{creative_title}",
+    "style_and_view": "{style_perspective}",
+    "color": "{{{{slime_color}}}}",
+    "character": "A {{slime_color}} slime girl, {additional_keywords}",
+    "environment": "{main_theme}",
+    "output_description": "{description}"
+    }}'''
     
+   code_block =f'''
+  `{prompt}
      /////
+      {main_theme}`
+       '''
 
-  {main_theme}
-    
-      （{description}）
-    '''
+   return f"thinks：主人，小爱已经开始随机创作啦！\\n {output} \\n {code_block}"
     
 def interpret_random_token(token):
   if not token:
@@ -917,6 +929,7 @@ def define_random_theme(main_theme_number, sub_theme_number, theme_keywords):
        
 """
     }
+  }
 }
 ```
 
