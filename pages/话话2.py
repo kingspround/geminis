@@ -76,24 +76,6 @@ def getAnswer_text(prompt, token):
 
 ```json
 
-【额外mod】∶
-【便利化组件】∶创作完成后追加添加便利化组件，将style_and_view，color，character，environment组合到一起【格式类似于例子】，额外追加输出一个代码框，方便主人直接复制
-{
-output= f'''
- {prompt}
-    
-    /////
-
-   {main_theme}
-        
-       （{description}）
-       '''
-     code_block =f'''
-    `{prompt}
-     /////
-     {main_theme}`
-       '''
-     return f"{{ \\n   \"theme\":\"{creative_title}\",\\n  \"style_and_view\":\"{style_perspective}\",\\n   \"color\":\"{{{slime_color}}}\",\\n  \"character\":\"A {slime_color} slime girl, {additional_keywords}\",\\n    \"environment\":\"{main_theme}\",\\n   \"output_description\":\"{description}\"\\n  }}` \n {code_block}"
 
 
 def interpret_token(token):
@@ -693,6 +675,25 @@ def interpret_token(token):
          }
     ],
     "functions": {
+    【额外mod】∶
+【便利化组件】∶创作完成后追加添加便利化组件，将style_and_view，color，character，environment组合到一起【格式类似于例子】，额外追加输出一个代码框，方便主人直接复制
+{
+output= f'''
+ {prompt}
+    
+    /////
+
+   {main_theme}
+        
+       （{description}）
+       '''
+     code_block =f'''
+    `{prompt}
+     /////
+     {main_theme}`
+       '''
+     return f"{{ \\n   \"theme\":\"{creative_title}\",\\n  \"style_and_view\":\"{style_perspective}\",\\n   \"color\":\"{{{slime_color}}}\",\\n  \"character\":\"A {slime_color} slime girl, {additional_keywords}\",\\n    \"environment\":\"{main_theme}\",\\n   \"output_description\":\"{description}\"\\n  }}` \n {code_block}"
+
         "slime_creation": {
         "description": "Assists in generating AI art prompts for slime girl creations based on specific parameters.",
         "parameters": {
