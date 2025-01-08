@@ -932,6 +932,7 @@ def define_random_theme(main_theme_number, sub_theme_number, theme_keywords):
     }
   }
 }
+}
 ```
 
         
