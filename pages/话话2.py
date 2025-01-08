@@ -703,7 +703,7 @@ def create_slime_prompt(token, style_perspective, slime_color, breasts):
      output = f'''{{
     "theme": "{creative_title}",
     "style_and_view": "{style_perspective}",
-    "color": "{{{slime_color}}}",
+    "color": "{{{{slime_color}}}}",
     "character": "A {slime_color} slime girl, {additional_keywords}",
     "environment": "{main_theme}",
     "output_description": "{description}"
@@ -844,10 +844,10 @@ def random_slime_prompt(token):
     #Compose Description
    description=describe_creation(creative_title, slime_color, additional_keywords)
 
-   output = f'''{{
+     output = f'''{{
     "theme": "{creative_title}",
     "style_and_view": "{style_perspective}",
-    "color": "{{{slime_color}}}",
+    "color": "{{{{slime_color}}}}",
     "character": "A {slime_color} slime girl, {additional_keywords}",
     "environment": "{main_theme}",
     "output_description": "{description}"
