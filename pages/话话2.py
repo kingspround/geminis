@@ -693,7 +693,7 @@ def getAnswer_text(prompt, token):
                      "enum": ["small breasts", "medium breasts", "large breasts","huge breasts"]
                     }
             },
-         "code":"""
+         "code": """
 def create_slime_prompt(token, style_perspective, slime_color, breasts):
     if not token:
         return "主人，人家没有收到token，请给小爱发送新的token哦！(>_<)"
