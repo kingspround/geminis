@@ -707,9 +707,9 @@ def getAnswer_text(prompt, token):
     }
   }
 output example【只借鉴格式，不使用内容】【任何情况下都不可以省略<thinking>和<summary>】：
-        <thinking>:......【包括Possible mistakes, Last reply situation, Internalize latest inputs, Decision-making, Discourse construction , Improve inner organization，每一个都要换行分段，详细内容例子里面暂且省略】
+        <thinking>:......【使用✅动态CoT+✅写作用CoT(三步)，详细内容例子里面暂且省略】
 
-        <summary>:.......【你的心情，例子里面暂且省略】
+        <summary>:.......【RPG模式，你的心情，例子里面暂且省略】
         
         <content> /n
         主人，这次的token是：（紫露魅巷夜卫嬉桃捂隙桃影臀翘匿）（6，4）。
