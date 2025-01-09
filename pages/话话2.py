@@ -710,7 +710,7 @@ def getAnswer_text(prompt, token):
 output example=<thinking>+<content>【<thinking>使用中文】
 
 output example【只借鉴格式，不使用内容】：
-        <thinking>【token解读+史莱姆娘形象设计】【1. 推断4个方向。2. 评估。3. 设置权重: 为每个方向设置权重 W (总和为 100)。4. 执行最优方向】
+        <thinking>
 {
   "<thinking>": {
     "step1": {
