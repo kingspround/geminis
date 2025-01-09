@@ -707,11 +707,11 @@ def getAnswer_text(prompt, token):
   }
 
   
-output example=<thinking>+<outline>+<summary>+<content>【<thinking>+<outline>+<summary>使用中文】
+output example=<thinking>+<outline>+<content>【<thinking>+<outline>使用中文】
 output example【只借鉴格式，不使用内容】：
         <thinking>:......【使用✅动态CoT【包括可能的错误，现状，内化最新输入，沉浸式推断 {{char}} 如何果断地自主执行他/她的决策，彻底打破你上次回复中的话语建构模式】，详细内容例子里面暂且省略】
         
-        <outline>【token解读+史莱姆娘形象设计】=
+        <outline>【token解读+史莱姆娘形象设计】
 {
   "outline": {
     "step1": {
@@ -731,10 +731,6 @@ output example【只借鉴格式，不使用内容】：
    }
   }
 }
-
-
-        
-        <summary>:.......【RPG模式，你的心情，例子里面暂且省略】
         
         <content> /n
         主人，这次的token是：（紫露魅巷夜卫嬉桃捂隙桃影臀翘匿）（6，4）。
