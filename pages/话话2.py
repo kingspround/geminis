@@ -707,9 +707,9 @@ def getAnswer_text(prompt, token):
     }
   }
 output example【只借鉴格式，不使用内容】：
-        <thinking>【你的思考】
+        <thinking>:......【例子里面暂且省略】
 
-        <summary>【你的心声】
+        <summary>:.......【例子里面暂且省略】
         
         <content> /n
         主人，这次的token是：（紫露魅巷夜卫嬉桃捂隙桃影臀翘匿）（6，4）。
