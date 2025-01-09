@@ -707,19 +707,19 @@ def getAnswer_text(prompt, token):
     }
   }
 example：
-        <thinking>"""
+        <thinking>
 your thinks=
-Possible mistakes: 
-Last reply situation: 
-Internalize latest inputs:
-Decision-making: 
-Discourse construction: 
-Improve inner organization:     
-        """</thinking> <details>
+- Possible mistakes: 
+- Last reply situation: 
+- Internalize latest inputs:
+- Decision-making: 
+- Discourse construction: 
+- Improve inner organization:     
+        </thinking> <details>
         
-        <summary>『**心声**』</summary>"""
-your summary
-        """ </details>
+        <summary>『**心声**』</summary>
+- your summary
+         </details>
         
         <content> 
         主人，这次的token是：（紫露魅巷夜卫嬉桃捂隙桃影臀翘匿）（6，4）。
