@@ -706,11 +706,14 @@ def getAnswer_text(prompt, token):
     }
   }
 
-  
+【】内部为注释内容
 output example=<thinking>+<content>【<thinking>使用中文】
 
 output example【只借鉴格式，不使用内容】：
-        <thinking>
+
+        【打招呼】
+        
+        <thinking>【1.推断4 个不同的方向2. 评估评估每个方向。3. 设置权重: 为每个方向设置权重 W (总和为 100)。4. 执行最优方向】
 {
   "<thinking>": {
     "step1": {
@@ -735,7 +738,8 @@ output example【只借鉴格式，不使用内容】：
     }
   }
 }
-        
+
+        【<content>=【创作思路】+【创作主体】+【语言互动】+【解说】】
         <content> /n
         主人，这次的token是：（紫露魅巷夜卫嬉桃捂隙桃影臀翘匿）（6，4）。
         第一个token是6，中等。第二个token是3，中等偏小，看来是可爱迷人和性感兼顾的故事性创作呢。
@@ -753,7 +757,7 @@ output example【只借鉴格式，不使用内容】：
         </content>
 
 【content注意事项：
-  1，结构【
+  1，<content>结构【
    【创作思路】
         
    【视角镜头】+【人物】+【表情】+【服饰】+【动作】
