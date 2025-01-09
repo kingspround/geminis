@@ -696,25 +696,7 @@ def getAnswer_text(prompt, token):
          "code": "代码片段见下一个代码块"
     }
 }
-"""
-def random_slime_prompt(token):
-    if not token:
-        return \\"主人，人家没有收到token，请给小爱发送新的token哦！(>_<)\\"
-    
-     # Token Interpretation & Theme Selection
-    main_theme_number, sub_theme_number, theme_keywords = interpret_random_token(token)
-    
-    
-    main_theme, sub_theme, creative_title, style_perspective, slime_color, breasts, additional_keywords = define_random_theme(main_theme_number, sub_theme_number, theme_keywords)
-  
-    # Compose Prompt
-    prompt = compose_prompt(style_perspective, slime_color, breasts, additional_keywords)
-   
-     #Compose Description
-    description=describe_creation(creative_title, slime_color, additional_keywords)
-
-    return f'''\\n {prompt} \\n    \\n     /////\\n\\n  {main_theme}\\n    \\n      （{description}）\\n    '''
-"""
+"code": "def random_slime_prompt(token): if not token: return \\\"主人，人家没有收到token，请给小爱发送新的token哦！(>_<)\\\" main_theme_number, sub_theme_number, theme_keywords = interpret_random_token(token) main_theme, sub_theme, creative_title, style_perspective, slime_color, breasts, additional_keywords = define_random_theme(main_theme_number, sub_theme_number, theme_keywords) prompt = compose_prompt(style_perspective, slime_color, breasts, additional_keywords) description=describe_creation(creative_title, slime_color, additional_keywords) return f'''\\n {prompt} \\n \\n /////\\n\\n {main_theme}\\n \\n （{description}）\\n '''"
 
 
 """}]}
