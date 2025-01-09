@@ -711,7 +711,7 @@ output example=<thinking>+<outline>+<content>【<thinking>+<outline>使用中文
 output example【只借鉴格式，不使用内容】：
         <thinking>:......【使用✅动态CoT【包括可能的错误，现状，内化最新输入，沉浸式推断 {{char}} 如何果断地自主执行他/她的决策，彻底打破你上次回复中的话语建构模式】，详细内容例子里面暂且省略】
         
-        <outline>【token解读+史莱姆娘形象设计】
+        <outline>【token解读+史莱姆娘形象设计】【1. 推断4个方向。2. 评估。3. 设置权重: 为每个方向设置权重 W (总和为 100)。4. 执行最优方向】
 {
   "outline": {
     "step1": {
