@@ -711,7 +711,6 @@ output example=<thinking>+<outline>+<content>【<thinking>+<outline>使用中文
 
 output example【只借鉴格式，不使用内容】：
 
-        【打招呼】
         <thinking>【使用✅动态CoT】
         {
             "identifier": "37c87e16-deef-4f2b-901c-788316f2256a",
