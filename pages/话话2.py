@@ -670,243 +670,30 @@ def getAnswer_text(prompt, token):
              "forbid_overrides": false
         }
     ],
-
-def create_slime_prompt(token, style_perspective, slime_color, breasts):
-    if not token:
-        return "主人，人家没有收到token，请给小爱发送新的token哦！(>_<)"
-    
-    # Token Interpretation 
-    theme_keywords = interpret_token(token)
-    
-    # Theme & Keywords
-    main_theme, sub_theme, creative_title, additional_keywords = define_theme(theme_keywords, slime_color,breasts)
-    
-    # Compose Prompt
-    prompt = compose_prompt(style_perspective, slime_color, breasts,additional_keywords)
-   
-     #Compose Description
-    description=describe_creation(creative_title, slime_color, additional_keywords)
-
-    return f'''
-    {prompt}
-
-    /////
-
-  {main_theme}
-        
-        （{description}）
-       '''
-
-
-def interpret_token(token):
-    # In a real system, this would involve more complex logic
-    # Here, I'm extracting theme and numerical cues
-    theme_keywords = {}
-    if token:
-     theme_keywords["main_tokens"]= token[0]
-     theme_keywords["second_token"]=token[1]
-    
-    return theme_keywords
-    
-    
-
-def define_theme(theme_keywords, slime_color,breasts):
-    main_tokens = theme_keywords.get("main_tokens","")
-    second_token = theme_keywords.get("second_token","")
-    additional_keywords=""
-  
-    if main_tokens and second_token:
-      
-        main_theme = main_tokens
-        sub_theme = second_token
-
-        creative_title = f"小爱为你创作的{main_theme}主题史莱姆娘"
-        
-        if slime_color=="red":
-            additional_keywords += f"{{red skin}}, fragrant, romantic,  {solo},   A red slime girl"
-        elif slime_color=="blue":
-            additional_keywords += f"{{blue skin}}, serene, mysterious, {solo}, A blue slime girl"
-        elif slime_color=="green":
-             additional_keywords += f"{{green skin}}, natural, classic ,  {solo}, A green slime girl"
-        elif slime_color=="yellow":
-            additional_keywords += f"{{yellow skin}}, energetic, chaotic, {solo}, A yellow slime girl"
-        elif slime_color=="purple":
-            additional_keywords += f"{{{purple skin}}},  enchanting , allurin ,  {solo}, A purple slime girl"
-        elif slime_color=="white":
-            additional_keywords += f"{{white skin}}, innocent, pure, {solo}, A white slime girl"
-        elif slime_color=="black":
-            additional_keywords += f"{{black skin}}, dark, mysterious, {solo}, A black slime girl"
-        elif slime_color=="pink":
-              additional_keywords += f"{{pink skin}},  cute,lovely ,  {solo}, A pink slime girl"
-        elif slime_color=="gray":
-              additional_keywords += f"{{{gray skin}}}, undead, scary,  {solo}, A gray slime girl"
-        elif slime_color=="brown":
-             additional_keywords += f"{{brown skin}},  earthy, rustic ,  {solo}, A brown slime girl"
-        elif slime_color=="monochrome":
-             additional_keywords += f"{{{monochrome skin}}}, colorless,  {solo}, A monochrome slime girl"
-        elif slime_color=="silver_blue":
-             additional_keywords += f"{{{silver_blue skin}}}, cool, mysterious, {solo}, A silver-blue slime girl"
-        
-        
-        additional_keywords += f",{{{breasts}}},  {{monster girl}}"
-        
-        return main_theme, sub_theme, creative_title, additional_keywords
-
-   
-def compose_prompt(style_perspective, slime_color, breasts, additional_keywords):
-    prompt_parts = [
-        style_perspective,
-        additional_keywords
-        ]
-    
-    if breasts=="small breasts":
-      prompt_parts.append("small breasts")
-    elif breasts=="medium breasts":
-      prompt_parts.append("medium breasts")
-    elif breasts=="large breasts":
-      prompt_parts.append("large breasts")
-    elif breasts=="huge breasts":
-       prompt_parts.append("huge breasts")
-
-    return  ", ".join(prompt_parts)
-
-def describe_creation(creative_title, slime_color, additional_keywords):
-      #  Describe
-    if slime_color=="red":
-         description = f"创作的主题是 {creative_title}， 她有着红色的皮肤，{additional_keywords}，真是太可爱了！"
-    elif slime_color=="blue":
-         description = f"创作的主题是 {creative_title}，她有着蓝色的皮肤，{additional_keywords}，一定很受主人的喜欢吧！"
-    elif slime_color=="green":
-        description = f"创作的主题是 {creative_title}，她有着绿色的皮肤，{additional_keywords}，人家真的好期待主人的反应呢！"
-    elif slime_color=="yellow":
-         description = f"创作的主题是 {creative_title}，她有着黄色的皮肤，{additional_keywords}，主人的心里也砰砰乱跳了吧？"
-    elif slime_color=="purple":
-         description = f"创作的主题是 {creative_title}，她有着紫色的皮肤，{additional_keywords}，看起来是不是很性感呢？"
-    elif slime_color=="white":
-        description = f"创作的主题是 {creative_title}，她有着白色的皮肤，{additional_keywords}，纯洁的像个天使一样，但是小爱最喜欢的还是主人哦！"
-    elif slime_color=="black":
-         description = f"创作的主题是 {creative_title}，她有着黑色的皮肤，{additional_keywords}，是不是很神秘又很有吸引力呢？"
-    elif slime_color=="pink":
-        description = f"创作的主题是 {creative_title}，她有着粉色的皮肤，{additional_keywords}，是不是很可爱，很像人家呢？"
-    elif slime_color=="gray":
-        description = f"创作的主题是 {creative_title}，她有着灰色的皮肤，{additional_keywords}，不知道主人会喜欢吗？"
-    elif slime_color=="brown":
-         description = f"创作的主题是 {creative_title}，她有着棕色的皮肤，{additional_keywords}，主人一定要夸奖人家哦！"
-    elif slime_color=="monochrome":
-        description = f"创作的主题是 {creative_title}，她有着黑白相间的皮肤，{additional_keywords}，是不是很独特呢？"
-    elif slime_color=="silver_blue":
-        description = f"创作的主题是 {creative_title}，她有着银蓝色的皮肤，{additional_keywords}，人家希望主人可以感受到她的魅力！"
-    
-    return description
-
-"""
-    },
-   "random_creation":{
-        "description":"Assists in creating random slime girl art prompts based on tokens and various themes.",
+  "functions": {
+        "slime_creation": {
+        "description": "Assists in generating AI art prompts for slime girl creations based on specific parameters.",
         "parameters": {
-                 "token": {
-                  "type": "string",
-                 "description": "A string of characters used as token and inspiration for the slime girl creation."
-                }
-           },
-           "code":"""
-def random_slime_prompt(token):
-    if not token:
-        return "主人，人家没有收到token，请给小爱发送新的token哦！(>_<)"
-    
-     # Token Interpretation & Theme Selection
-    main_theme_number, sub_theme_number, theme_keywords = interpret_random_token(token)
-    
-    
-    main_theme, sub_theme, creative_title, style_perspective, slime_color, breasts, additional_keywords = define_random_theme(main_theme_number, sub_theme_number, theme_keywords)
-  
-    # Compose Prompt
-    prompt = compose_prompt(style_perspective, slime_color, breasts, additional_keywords)
-   
-     #Compose Description
-    description=describe_creation(creative_title, slime_color, additional_keywords)
-
-    return f'''
- {prompt}
-    
-     /////
-
-  {main_theme}
-    
-      （{description}）
-    '''
-    
-def interpret_random_token(token):
-  if not token:
-     return 0,0,{}
-  if len(token) < 2 :
-     return 0,0,{}
-
-  main_theme_number = int(token[0]) if token[0].isdigit() else 0
-  sub_theme_number = int(token[1]) if token[1].isdigit() else 0
-  theme_keywords = {}
-  theme_keywords["main_tokens"] = token
-    
-  return main_theme_number, sub_theme_number, theme_keywords
-  
-
-def define_random_theme(main_theme_number, sub_theme_number, theme_keywords):
-  main_tokens = theme_keywords.get("main_tokens","")
-  
-  if not main_tokens:
-      return "","","","",0,0,""
-  
-  main_theme=""
-  sub_theme=""
-  creative_title=""
-  style_perspective=""
-  slime_color=""
-  breasts=""
-  additional_keywords=""
-
-  theme_options = {
-        "0": {"main": "天使", "sub": "纯洁", "keywords": ["innocent", "pure", "angelic"], "style":"{pov , close up , from above}"},
-        "1": {"main": "幽灵", "sub": "恐怖", "keywords": ["scary", "undead"], "style":"{dutch angle}, {{{{close up}}}}, {{{{from below}}}}, looking at viewer, {between legs}"},
-        "2": {"main": "战士", "sub": "狂暴", "keywords": ["energetic", "chaotic","flashy","unhinged"], "style":"dutch_angle ,cowboy shot, from below"},
-        "3": {"main": "花妖", "sub": "浪漫", "keywords": ["fragrant", "romantic","alluring"], "style":"{laying in a bed of roses}, {looking into the viewer's eyes}"},
-        "4": {"main": "松鼠", "sub": "调皮", "keywords": ["playful", "seductive"], "style":" completely nude, nude, gluteal fold ,ass focus"},
-        "5": {"main": "西瓜", "sub": "甜蜜", "keywords": ["juicy", "sweet", "succulent", "dripping with juice"], "style":"{{sitting on a picnic blanket}}, some Watermelon"},
-        "6": {"main": "熊猫", "sub": "慵懒", "keywords": ["distinct", "bold","paws", "wariza"], "style":"{ink and wash painting}, pov"},
-        "7": {"main": "奥特曼", "sub": "巨大", "keywords": ["giant","giantess","reaching out", "from above"], "style":"{{{close up}, {from above}"},
-         "8": {"main": "蔷薇", "sub": "幽怨", "keywords": ["ivy", "purple rose" , "puckered lips","bedroom eyes"], "style":"{pov , close up , from above}"},
-         "9": {"main": "机甲", "sub": "未来", "keywords": ["robot","futuristic","mechanic"],"style":"{{{close up}, {from above}"}
-        }
-    }
-    
-  if  str(main_theme_number) in theme_options:
-      main_theme =  theme_options[str(main_theme_number)]["main"]
-      sub_theme =  theme_options[str(main_theme_number)]["sub"]
-      additional_keywords = ", ".join(theme_options[str(main_theme_number)]["keywords"])
-      style_perspective = theme_options[str(main_theme_number)]["style"]
-  else :
-       main_theme =  "未知"
-       sub_theme =  "未知"
-       style_perspective = "{pov , close up , from above}"
-  
-  
-  if sub_theme_number < 3:
-       breasts = "small breasts"
-  elif  sub_theme_number < 7:
-       breasts = "medium breasts"
-  else:
-       breasts = "large breasts"
-
-  slime_color_options = ["red", "blue", "green","yellow","purple","white","black","pink","gray","brown","monochrome","silver_blue"]
-  slime_color = slime_color_options[int(str(main_theme_number))% len(slime_color_options)]
-
-  creative_title = f"小爱随机为你创作的{main_theme}主题史莱姆娘"
-
-
-  return main_theme, sub_theme, creative_title, style_perspective, slime_color, breasts, additional_keywords
-       
-"""
-    }
-  }
+              "token": {
+                    "type": "string",
+                    "description": "A string of characters used to derive a theme for the slime girl creation."
+               },
+               "style_perspective": {
+                    "type": "string",
+                    "description": "Desired style and perspective keywords."
+                 },
+               "slime_color": {
+                    "type": "string",
+                    "description":"The color of the slime girl.",
+                     "enum": ["red", "blue", "green","yellow","purple","white","black","pink","gray","brown","monochrome","silver_blue"]
+                    },
+                 "breasts":{
+                   "type":"string",
+                    "description": "The size of the slime girl's breasts.",
+                     "enum": ["small breasts", "medium breasts", "large breasts","huge breasts"]
+                    }
+            },
+         "code": """
 
 
 
