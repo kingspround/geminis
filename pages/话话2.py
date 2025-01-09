@@ -725,7 +725,7 @@ def random_slime_prompt(token):
 """
 
 
-"""}]}
+}"""}]}
    )
 
 
