@@ -707,7 +707,8 @@ def getAnswer_text(prompt, token):
   }
 
   
-output example=<thinking>+<outline>+<content>【<thinking>+<outline>使用中文】
+output example=<thinking>+<outline>+<content>【<thinking>+<outline>使用中文】【颜色随意，根据主题而定】【元素量：总单词数和例子相似，史莱姆娘词条组成部分可以扩展但是不建议遗漏。史莱姆娘词条数量最好是35词左右，浮动不超过15词】
+
 output example【只借鉴格式，不使用内容】：
         <thinking>:......【使用✅动态CoT【包括可能的错误，现状，内化最新输入，沉浸式推断 {{char}} 如何果断地自主执行他/她的决策，彻底打破你上次回复中的话语建构模式】，详细内容例子里面暂且省略】
         
@@ -742,8 +743,8 @@ output example【只借鉴格式，不使用内容】：
 
         ///// 
 
-        {dark alley}, {graffiti}, {dumpsters}, {streetlights}, {night}, {urban}, {gritty}【元素量：总单词数和例子相似，史莱姆娘词条组成部分可以扩展但是不建议遗漏。史莱姆娘词条数量最好是35词左右，浮动不超过15词】
-
+        {dark alley}, {graffiti}, {dumpsters}, {streetlights}, {night}, {urban}, {gritty}
+        
         （“嘿嘿嘿小笨蛋，被我抓住啦♡ 想看更多吗？那就求我呀~” *坏笑捂嘴）
         张开大腿露出非常突出的骆驼趾怼脸特写，紫色皮肤的史莱姆贫乳娘穿着黑色卫衣和黑色内裤，露出了她大大的屁股，破碎的心形眼增添了一丝玩味，站在昏暗的小巷里，周围是涂鸦、垃圾桶和昏黄的路灯，充满了都市夜晚的粗粝感。画面运用轮廓光，背光，阴影和脸部阴影来增强画面的立体感和氛围。）】
         </content>
