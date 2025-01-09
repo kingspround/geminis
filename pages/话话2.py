@@ -707,9 +707,9 @@ def getAnswer_text(prompt, token):
     }
   }
 example：
-        <thinking>"omit"</thinking> <details>
+        <thinking>"your thinks"</thinking> <details>
         
-        <summary>『**心声**』</summary>"omit" </details>
+        <summary>『**心声**』</summary>"your summary" </details>
         
         <content> 
         主人，这次的token是：（紫露魅巷夜卫嬉桃捂隙桃影臀翘匿）（6，4）。
