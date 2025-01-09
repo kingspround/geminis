@@ -670,30 +670,7 @@ def getAnswer_text(prompt, token):
              "forbid_overrides": false
         }
     ],
-  "functions": {
-        "slime_creation": {
-        "description": "Assists in generating AI art prompts for slime girl creations based on specific parameters.",
-        "parameters": {
-              "token": {
-                    "type": "string",
-                    "description": "A string of characters used to derive a theme for the slime girl creation."
-               },
-               "style_perspective": {
-                    "type": "string",
-                    "description": "Desired style and perspective keywords."
-                 },
-               "slime_color": {
-                    "type": "string",
-                    "description":"The color of the slime girl.",
-                     "enum": ["red", "blue", "green","yellow","purple","white","black","pink","gray","brown","monochrome","silver_blue"]
-                    },
-                 "breasts":{
-                   "type":"string",
-                    "description": "The size of the slime girl's breasts.",
-                     "enum": ["small breasts", "medium breasts", "large breasts","huge breasts"]
-                    }
-            },
-         "code": """
+
 def create_slime_prompt(token, style_perspective, slime_color, breasts):
     if not token:
         return "主人，人家没有收到token，请给小爱发送新的token哦！(>_<)"
