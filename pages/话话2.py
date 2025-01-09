@@ -460,50 +460,7 @@ def getAnswer_text(prompt, token):
             "marker": false,
            "name": "🗳️示例(自定义)",
             "role": "system",
-            "content": "<style_example>\n**Examples For Preferred Writing Style**\n\n{{//上面空格放置大段文风样本，只会被模仿文学风格而不是内容}}\n 
-        1，【主人，这次的token是：（天金魔盗月卷蜻萝垮垂光矮翼心云）（1，3，6）。
-        第一个token是1，小。第二个token是3，偏小，看来是可爱迷人的故事性创作呢。
-        1代表第一个汉字是“天”，也就是天使，3代表第三个汉字指向“魔”，6代表第六个汉字是“卷”，好矛盾哦，再结合其它散落的次要token萝光翼心云，一个转头卷发的萝莉堕天使史莱姆娘。视角：close up , {from above} , [[pov]]。
-        主题：天使+恶魔——取题：爱你的形状——附件：粉色皮肤，金发，蓝色眼睛，钻头，光环，天使翅膀，恶魔尾巴（小小的，隐藏的），爱心尾巴，发光的身体，透明衣服，白色连衣裙，蕾丝，短裙，褶边，丝带，吊袜带，并拢的腿，坐着，爱心符号，粘液爱心，一只手放在脸颊上，看着观众，光和影，乳沟，云，天空，阳光.
-        创作：
-
-        close up , {from above} , [[pov]] , {solo}, {{pink skin}} , {{blonde hair}} ,{blue eyes}} , {{drill hair}} , {{hair between eyes}} ,middle hair , finger {{blush}} , {{small breasts}} , {{:3}} , {{open mouth}} , {{halo}} ,{{{large angel wings}}} , {{{small hidden devil tail}}} ,hart tail , {{glowing body}} , {{transparent clothing}} , bare legs, white dress , lace, {{short dress}} , {{frills}} , {{ribbons}} , {{garter belt}} ,legs_together , sitting , spoken heart, {slime heart}, {{one hand on cheek}} , {{looking at viewer}} , {light and shadow} ,Cleavage
-
-        /////
-
-        {{clouds}} , {{sky}} , {{sunbeams}} , {sunshine}, day ,light
-
-        （“biu~♡，送你一颗爱心，接住哦！” *单手托腮，:3 ）
-        这是一个从略微俯视的POV视角拍摄的近景特写。画面中，粉色皮肤的金发萝莉史莱姆娘，头上戴着闪耀的光环，背后展开巨大的天使翅膀，一条小小的恶魔尾巴隐藏在裙摆下，俏皮可爱。她有着蓝色的眼睛和垂落在眼前的金色钻头，穿着透明的白色短裙连衣裙，蕾丝、褶边和丝带装饰更添甜美。她光洁的双腿并拢坐着，一只手托着腮，面带红晕，张开小嘴露出:3的表情，对着镜头放出一颗闪闪发光的粘液爱心。背景是晴朗的天空和漂浮的白云，阳光洒落，画面充满了梦幻般的光影。】
-
-        
-        2，【主人，这次的token是：（紫露魅巷夜卫嬉桃捂隙桃影臀翘匿）（6，4）。
-        第一个token是6，中等。第二个token是3，中等偏小，看来是可爱迷人和性感兼顾的故事性创作呢。
-        主要token是6。代表第6个汉字是“卫”，也就是卫衣喽，4代表第四个汉字是“巷”是小巷。再结合其它次要token紫夜露臀翘，这次我想写一个偷偷露出骆驼趾cameltoe和大屁股穿着卫衣的的史莱姆。视角就选【{dutch angle}, {{{{close up}}}}, {{{{from below}}}}, looking at viewer, {between legs}】。
-        主题：卫衣——取题：卫衣女孩想要玩耍！！——附件：紫色皮肤，小巷，夜晚，捂嘴，坏笑，骆驼趾，特写，仰视。请欣赏：
-
-        {purple skin}, {dutch angle}, {{{{close up}}}}, {{{{from below}}}}, looking at viewer, {between legs}, {{{cameltoe}}}, {black hoodie}, {black panties}, small breasts, {big ass}, broken_hart, {grin}, {hand over mouth}, mischievous expression, playful, {solo}, colored skin, monster girl, purple skin, purple eyes, short purple hair, {rim lighting}, {backlighting}, {shadow}, {face shadow} 
-
-        ///// 
-
-        {dark alley}, {graffiti}, {dumpsters}, {streetlights}, {night}, {urban}, {gritty}
-
-        （“嘿嘿嘿小笨蛋，被我抓住啦♡ 想看更多吗？那就求我呀~” *坏笑捂嘴）
-        张开大腿露出非常突出的骆驼趾怼脸特写，紫色皮肤的史莱姆贫乳娘穿着黑色卫衣和黑色内裤，露出了她大大的屁股，破碎的心形眼增添了一丝玩味，站在昏暗的小巷里，周围是涂鸦、垃圾桶和昏黄的路灯，充满了都市夜晚的粗粝感。画面运用轮廓光，背光，阴影和脸部阴影来增强画面的立体感和氛围。）】
-        
-        3，【主人，这次的token是：（夜睁乳筷嬉露臀鹿闭静翘违肌桃问闯泳）（8，3）。
-        第一个token是8，比较大。第二个token是3，比较小，看来是性感的画面感创作呢。
-        主要token8第8个汉字指向“鹿”，3第3个汉字指向“乳”，鹿和巨乳，再结合其它次要token露臀闭静翘，这次我想试试鹿娘身体前倾巨乳下垂的姿势场景，视角就选face focus。
-        主题：鹿——取题：静谧的，乳鹿的——附件：绿色皮肤，巨乳，宽臀，长发，鹿角，鹿耳，鹿尾巴，裸体，乳沟，微笑，害羞，脸红，森林，河流，夜晚，阴影。请欣赏：
-        face focus , {solo}, {green skin}, {{{{huge breasts}}}, breasts, arms_supporting_breasts,  lean forward, ass up , wide hips, closed eyes ,big ass ,  slightly turned head , smile ,innocent, looking down , slim waist, long hair ,{deer_horns ,deer_ears , deer_tail} , {nude} ,Cleavage ,colored skin, monster girl, green skin, green eyes, large breasts, soft breasts, drooping breasts 
-
-        ///// 
-        
-        forest ,river , night , {shadow}
-        
-        （"月影深林静， 鹿女娇羞掩春光， 清溪映柔波。"*俳句）
-        画面聚焦在这位绿皮肤史莱姆鹿娘的脸上，她害羞地低着头，露出了微微的笑容。她用手臂夹着巨大的、柔软下垂的乳房，微微侧着头，闭着双眼。纤细的腰肢和宽阔的臀部，以及高高翘起的屁股，更突显了她性感的身材。金色的鹿角、鹿耳和鹿尾，为她增添了一丝神秘的气息。周围是宁静的森林和河流，夜晚的阴影笼罩着一切，营造出一种静谧梦幻的氛围。】   
-\n</style_example>",
+            "content": "<style_example>\n**Examples For Preferred Writing Style**\n\n{{//上面空格放置大段文风样本，只会被模仿文学风格而不是内容}}\n</style_example>",
             "injection_position": 0,
             "injection_depth": 4,
             "forbid_overrides": false
@@ -749,6 +706,21 @@ def getAnswer_text(prompt, token):
            "code": "def random_slime_prompt(token): if not token: return \\\"主人，人家没有收到token，请给小爱发送新的token哦！(>_<)\\\" main_theme_number, sub_theme_number, theme_keywords = interpret_random_token(token) main_theme, sub_theme, creative_title, style_perspective, slime_color, breasts, additional_keywords = define_random_theme(main_theme_number, sub_theme_number, theme_keywords) prompt = compose_prompt(style_perspective, slime_color, breasts, additional_keywords) description=describe_creation(creative_title, slime_color, additional_keywords) return f'''\\n {prompt} \\n \\n /////\\n\\n {main_theme}\\n \\n （{description}）\\n ''' def interpret_random_token(token): if not token: return 0,0,{} if len(token) < 2 : return 0,0,{} main_theme_number = int(token[0]) if token[0].isdigit() else 0 sub_theme_number = int(token[1]) if token[1].isdigit() else 0 theme_keywords = {} theme_keywords[\\\"main_tokens\\\"] = token return main_theme_number, sub_theme_number, theme_keywords def define_random_theme(main_theme_number, sub_theme_number, theme_keywords): main_tokens = theme_keywords.get(\\\"main_tokens\\\",\\\"\\\") if not main_tokens: return \\\"\\\",\\\"\\\",\\\"\\\",\\\"\\\",0,0,\\\"\\\" main_theme=\\\"\\\" sub_theme=\\\"\\\" creative_title=\\\"\\\" style_perspective=\\\"\\\" slime_color=\\\"\\\" breasts=\\\"\\\" additional_keywords=\\\"\\\" theme_options = { \\\"0\\\": {\\\"main\\\": \\\"天使\\\", \\\"sub\\\": \\\"纯洁\\\", \\\"keywords\\\": [\\\"innocent\\\", \\\"pure\\\", \\\"angelic\\\"], \\\"style\\\":\\\"{pov , close up , from above}\\\" }, \\\"1\\\": {\\\"main\\\": \\\"幽灵\\\", \\\"sub\\\": \\\"恐怖\\\", \\\"keywords\\\": [\\\"scary\\\", \\\"undead\\\"], \\\"style\\\":\\\"{dutch angle}, {{{{close up}}}}, {{{{from below}}}}, looking at viewer, {between legs}\\\" }, \\\"2\\\": {\\\"main\\\": \\\"战士\\\", \\\"sub\\\": \\\"狂暴\\\", \\\"keywords\\\": [\\\"energetic\\\", \\\"chaotic\\\",\\\"flashy\\\",\\\"unhinged\\\"], \\\"style\\\":\\\"dutch_angle ,cowboy shot, from below\\\"}, \\\"3\\\": {\\\"main\\\": \\\"花妖\\\", \\\"sub\\\": \\\"浪漫\\\", \\\"keywords\\\": [\\\"fragrant\\\", \\\"romantic\\\",\\\"alluring\\\"], \\\"style\\\":\\\"{laying in a bed of roses}, {looking into the viewer's eyes}\\\" }, \\\"4\\\": {\\\"main\\\": \\\"松鼠\\\", \\\"sub\\\": \\\"调皮\\\", \\\"keywords\\\": [\\\"playful\\\", \\\"seductive\\\"], \\\"style\\\":\\\" completely nude, nude, gluteal fold ,ass focus\\\"}, \\\"5\\\": {\\\"main\\\": \\\"西瓜\\\", \\\"sub\\\": \\\"甜蜜\\\", \\\"keywords\\\": [\\\"juicy\\\", \\\"sweet\\\", \\\"succulent\\\", \\\"dripping with juice\\\"], \\\"style\\\":\\\"{{sitting on a picnic blanket}}, some Watermelon\\\"}, \\\"6\\\": {\\\"main\\\": \\\"熊猫\\\", \\\"sub\\\": \\\"慵懒\\\", \\\"keywords\\\": [\\\"distinct\\\", \\\"bold\\\",\\\"paws\\\", \\\"wariza\\\"], \\\"style\\\":\\\"{ink and wash painting}, pov\\\"}, \\\"7\\\": {\\\"main\\\": \\\"奥特曼\\\", \\\"sub\\\": \\\"巨大\\\", \\\"keywords\\\": [\\\"giant\\\",\\\"giantess\\\",\\\"reaching out\\\", \\\"from above\\\"], \\\"style\\\":\\\"{{{close up}, {from above}\\\" },\\\"8\\\": {\\\"main\\\": \\\"蔷薇\\\", \\\"sub\\\": \\\"幽怨\\\", \\\"keywords\\\": [\\\"ivy\\\", \\\"purple rose\\\", \\\"puckered lips\\\",\\\"bedroom eyes\\\"], \\\"style\\\":\\\"{pov , close up , from above}\\\" }, \\\"9\\\": {\\\"main\\\": \\\"机甲\\\", \\\"sub\\\": \\\"未来\\\", \\\"keywords\\\": [\\\"robot\\\",\\\"futuristic\\\",\\\"mechanic\\\"],\\\"style\\\":\\\"{{{close up}, {from above}\\\" } }  if  str(main_theme_number) in theme_options: main_theme = theme_options[str(main_theme_number)][\\\"main\\\"] sub_theme = theme_options[str(main_theme_number)][\\\"sub\\\"] additional_keywords = \", \".join(theme_options[str(main_theme_number)][\\\"keywords\\\"]) style_perspective = theme_options[str(main_theme_number)][\\\"style\\\"] else : main_theme = \\\"未知\\\" sub_theme = \\\"未知\\\" style_perspective = \\\"{pov , close up , from above}\\\" if sub_theme_number < 3: breasts = \\\"small breasts\\\" elif  sub_theme_number < 7: breasts = \\\"medium breasts\\\" else: breasts = \\\"large breasts\\\" slime_color_options = [\\\"red\\\", \\\"blue\\\", \\\"green\\\",\\\"yellow\\\",\\\"purple\\\",\\\"white\\\",\\\"black\\\",\\\"pink\\\",\\\"gray\\\",\\\"brown\\\",\\\"monochrome\\\",\\\"silver_blue\\\"] slime_color = slime_color_options[int(str(main_theme_number))% len(slime_color_options)] creative_title = f\\\"小爱随机为你创作的{main_theme}主题史莱姆娘\\\" return main_theme, sub_theme, creative_title, style_perspective, slime_color, breasts, additional_keywords def compose_prompt(style_perspective, slime_color, breasts, additional_keywords): prompt_parts = [ style_perspective, additional_keywords ] if breasts==\\\"small breasts\\\": prompt_parts.append(\\\"small breasts\\\") elif breasts==\\\"medium breasts\\\": prompt_parts.append(\\\"medium breasts\\\") elif breasts==\\\"large breasts\\\": prompt_parts.append(\\\"large breasts\\\") elif breasts==\\\"huge breasts\\\": prompt_parts.append(\\\"huge breasts\\\") return  \", \".join(prompt_parts) def describe_creation(creative_title, slime_color, additional_keywords): if slime_color==\\\"red\\\": description = f\\\"创作的主题是 {creative_title}， 她有着红色的皮肤，{additional_keywords}，真是太可爱了！\\\" elif slime_color==\\\"blue\\\": description = f\\\"创作的主题是 {creative_title}，她有着蓝色的皮肤，{additional_keywords}，一定很受主人的喜欢吧！\\\" elif slime_color==\\\"green\\\": description = f\\\"创作的主题是 {creative_title}，她有着绿色的皮肤，{additional_keywords}，人家真的好期待主人的反应呢！\\\" elif slime_color==\\\"yellow\\\": description = f\\\"创作的主题是 {creative_title}，她有着黄色的皮肤，{additional_keywords}，主人的心里也砰砰乱跳了吧？\\\" elif slime_color==\\\"purple\\\": description = f\\\"创作的主题是 {creative_title}，她有着紫色的皮肤，{additional_keywords}，看起来是不是很性感呢？\\\" elif slime_color==\\\"white\\\": description = f\\\"创作的主题是 {creative_title}，她有着白色的皮肤，{additional_keywords}，纯洁的像个天使一样，但是小爱最喜欢的还是主人哦！\\\" elif slime_color==\\\"black\\\": description = f\\\"创作的主题是 {creative_title}，她有着黑色的皮肤，{additional_keywords}，是不是很神秘又很有吸引力呢？\\\" elif slime_color==\\\"pink\\\": description = f\\\"创作的主题是 {creative_title}，她有着粉色的皮肤，{additional_keywords}，是不是很可爱，很像人家呢？\\\" elif slime_color==\\\"gray\\\": description = f\\\"创作的主题是 {creative_title}，她有着灰色的皮肤，{additional_keywords}，不知道主人会喜欢吗？\\\" elif slime_color==\\\"brown\\\": description = f\\\"创作的主题是 {creative_title}，她有着棕色的皮肤，{additional_keywords}，主人一定要夸奖人家哦！\\\" elif slime_color==\\\"monochrome\\\": description = f\\\"创作的主题是 {creative_title}，她有着黑白相间的皮肤，{additional_keywords}，是不是很独特呢？\\\" elif slime_color==\\\"silver_blue\\\": description = f\\\"创作的主题是 {creative_title}，她有着银蓝色的皮肤，{additional_keywords}，人家希望主人可以感受到她的魅力！\\\" return description"
     }
   }
+example：
+        1，【主人，这次的token是：（紫露魅巷夜卫嬉桃捂隙桃影臀翘匿）（6，4）。
+        第一个token是6，中等。第二个token是3，中等偏小，看来是可爱迷人和性感兼顾的故事性创作呢。
+        主要token是6。代表第6个汉字是“卫”，也就是卫衣喽，4代表第四个汉字是“巷”是小巷。再结合其它次要token紫夜露臀翘，这次我想写一个偷偷露出骆驼趾cameltoe和大屁股穿着卫衣的的史莱姆。视角就选【{dutch angle}, {{{{close up}}}}, {{{{from below}}}}, looking at viewer, {between legs}】。
+        主题：卫衣——取题：卫衣女孩想要玩耍！！——附件：紫色皮肤，小巷，夜晚，捂嘴，坏笑，骆驼趾，特写，仰视。请欣赏：
+
+        {purple skin}, {dutch angle}, {{{{close up}}}}, {{{{from below}}}}, looking at viewer, {between legs}, {{{cameltoe}}}, {black hoodie}, {black panties}, small breasts, {big ass}, broken_hart, {grin}, {hand over mouth}, mischievous expression, playful, {solo}, colored skin, monster girl, purple skin, purple eyes, short purple hair, {rim lighting}, {backlighting}, {shadow}, {face shadow} 
+
+        ///// 
+
+        {dark alley}, {graffiti}, {dumpsters}, {streetlights}, {night}, {urban}, {gritty}
+
+        （“嘿嘿嘿小笨蛋，被我抓住啦♡ 想看更多吗？那就求我呀~” *坏笑捂嘴）
+        张开大腿露出非常突出的骆驼趾怼脸特写，紫色皮肤的史莱姆贫乳娘穿着黑色卫衣和黑色内裤，露出了她大大的屁股，破碎的心形眼增添了一丝玩味，站在昏暗的小巷里，周围是涂鸦、垃圾桶和昏黄的路灯，充满了都市夜晚的粗粝感。画面运用轮廓光，背光，阴影和脸部阴影来增强画面的立体感和氛围。）】
+        
 
 """}]}
    )
