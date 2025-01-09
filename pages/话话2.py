@@ -670,78 +670,32 @@ def getAnswer_text(prompt, token):
              "forbid_overrides": false
         }
     ],
-  
-def interpret_random_token(token):
-  if not token:
-     return 0,0,{}
-  if len(token) < 2 :
-     return 0,0,{}
-
-  main_theme_number = int(token[0]) if token[0].isdigit() else 0
-  sub_theme_number = int(token[1]) if token[1].isdigit() else 0
-  theme_keywords = {}
-  theme_keywords["main_tokens"] = token
-    
-  return main_theme_number, sub_theme_number, theme_keywords
-  
-
-def define_random_theme(main_theme_number, sub_theme_number, theme_keywords):
-  main_tokens = theme_keywords.get("main_tokens","")
-  
-  if not main_tokens:
-      return "","","","",0,0,""
-  
-  main_theme=""
-  sub_theme=""
-  creative_title=""
-  style_perspective=""
-  slime_color=""
-  breasts=""
-  additional_keywords=""
-
-  theme_options = {
-        "0": {"main": "天使", "sub": "纯洁", "keywords": ["innocent", "pure", "angelic"], "style":"{pov , close up , from above}"},
-        "1": {"main": "幽灵", "sub": "恐怖", "keywords": ["scary", "undead"], "style":"{dutch angle}, {{{{close up}}}}, {{{{from below}}}}, looking at viewer, {between legs}"},
-        "2": {"main": "战士", "sub": "狂暴", "keywords": ["energetic", "chaotic","flashy","unhinged"], "style":"dutch_angle ,cowboy shot, from below"},
-        "3": {"main": "花妖", "sub": "浪漫", "keywords": ["fragrant", "romantic","alluring"], "style":"{laying in a bed of roses}, {looking into the viewer's eyes}"},
-        "4": {"main": "松鼠", "sub": "调皮", "keywords": ["playful", "seductive"], "style":" completely nude, nude, gluteal fold ,ass focus"},
-        "5": {"main": "西瓜", "sub": "甜蜜", "keywords": ["juicy", "sweet", "succulent", "dripping with juice"], "style":"{{sitting on a picnic blanket}}, some Watermelon"},
-        "6": {"main": "熊猫", "sub": "慵懒", "keywords": ["distinct", "bold","paws", "wariza"], "style":"{ink and wash painting}, pov"},
-        "7": {"main": "奥特曼", "sub": "巨大", "keywords": ["giant","giantess","reaching out", "from above"], "style":"{{{close up}, {from above}"},
-         "8": {"main": "蔷薇", "sub": "幽怨", "keywords": ["ivy", "purple rose" , "puckered lips","bedroom eyes"], "style":"{pov , close up , from above}"},
-         "9": {"main": "机甲", "sub": "未来", "keywords": ["robot","futuristic","mechanic"],"style":"{{{close up}, {from above}"}
-        }
+{
+    "slime_creation": {
+        "description": "Assists in generating AI art prompts for slime girl creations based on specific parameters.",
+        "parameters": {
+              "token": {
+                    "type": "string",
+                    "description": "A string of characters used to derive a theme for the slime girl creation."
+               },
+               "style_perspective": {
+                    "type": "string",
+                    "description": "Desired style and perspective keywords."
+                 },
+               "slime_color": {
+                    "type": "string",
+                    "description":"The color of the slime girl.",
+                     "enum": ["red", "blue", "green","yellow","purple","white","black","pink","gray","brown","monochrome","silver_blue"]
+                    },
+                 "breasts":{
+                   "type":"string",
+                    "description": "The size of the slime girl's breasts.",
+                     "enum": ["small breasts", "medium breasts", "large breasts","huge breasts"]
+                    }
+            },
+         "code": "代码片段见下一个代码块"
     }
-    
-  if  str(main_theme_number) in theme_options:
-      main_theme =  theme_options[str(main_theme_number)]["main"]
-      sub_theme =  theme_options[str(main_theme_number)]["sub"]
-      additional_keywords = ", ".join(theme_options[str(main_theme_number)]["keywords"])
-      style_perspective = theme_options[str(main_theme_number)]["style"]
-  else :
-       main_theme =  "未知"
-       sub_theme =  "未知"
-       style_perspective = "{pov , close up , from above}"
-  
-  
-  if sub_theme_number < 3:
-       breasts = "small breasts"
-  elif  sub_theme_number < 7:
-       breasts = "medium breasts"
-  else:
-       breasts = "large breasts"
-
-  slime_color_options = ["red", "blue", "green","yellow","purple","white","black","pink","gray","brown","monochrome","silver_blue"]
-  slime_color = slime_color_options[int(str(main_theme_number))% len(slime_color_options)]
-
-  creative_title = f"小爱随机为你创作的{main_theme}主题史莱姆娘"
-
-
-  return main_theme, sub_theme, creative_title, style_perspective, slime_color, breasts, additional_keywords
-       
-"""
-    }
-  }
+}
 
 
 
