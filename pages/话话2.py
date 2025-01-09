@@ -699,7 +699,7 @@ def getAnswer_text(prompt, token):
 """
 def random_slime_prompt(token):
     if not token:
-        return "主人，人家没有收到token，请给小爱发送新的token哦！(>_<)"
+        return \"主人，人家没有收到token，请给小爱发送新的token哦！(>_<)\"
     
      # Token Interpretation & Theme Selection
     main_theme_number, sub_theme_number, theme_keywords = interpret_random_token(token)
