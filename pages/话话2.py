@@ -67,7 +67,6 @@ def generate_token():
     return f"({hanzi_token})({digit_token})"
 
 
-
 def getAnswer_text(prompt, token):
     """处理用户输入，生成文本回复并显示"""
     his_messages = []  # 存储最近的 20 条聊天记录
