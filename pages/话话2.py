@@ -719,14 +719,14 @@ output example【只借鉴格式【格式为<thinking>+<outline>+<summary>+<cont
     },
     "step2": {
       "name": "【贝叶斯决策步骤 2】【形象确认】",
-      "description": "可能的史莱姆娘人设和外观设计，并且设计主题名称。",
-      "process": "根据 step1 确定的 token，进行史莱姆娘的人设和外观设计，同时设计一个有创意的主题名称。"
+       "description": "可能的史莱姆娘人设和外观设计，并且设计主题名称。",
+      "process": "1.  **推断 4 个人设方向**: 根据 step1 确定的 token，推断出 4 个不同的史莱姆娘人设和外观设计方向。\\n2. **评估每个方向**: 评估每个人设方向的创意性、独特性、及与 token 的关联性。\\n3. **设置权重**: 为每个人设方向设置权重 W (总和为 100)。\\n4. **执行最优方向**: 执行权重最高的方向，并选取一个有创意的主题名称，并保留其他权重高于 21 的方向中不冲突的元素。"
     },
     "step3": {
-      "name": "【元素审查】",
+      "name": "【贝叶斯决策步骤 3】【元素审查】",
       "description": "细节调整，是否有可以追加的元素，是否有不符合角色的元素等等。",
-       "process": "对 step2 生成的史莱姆娘人设和外观设计进行细节调整，包括追加符合主题的元素，删除不符合角色设定的元素等。"
-    }
+      "process": "1. **推断 4 个元素调整方向**: 针对 step2 生成的人设和外观设计，推断出 4 个不同的元素调整方向 (选择不同的细节调整方案，或者添加/删除某些元素)。\\n2. **评估每个方向**: 评估每个方向的合理性、协调性，及与整体主题的契合度。\\n3. **设置权重**: 为每个方向设置权重 W (总和为 100)。\\n4. **执行最优方向**: 执行权重最高的方向，并保留其他权重高于 21 的方向中不冲突的元素。"
+   }
   }
 }
 
@@ -737,7 +737,7 @@ output example【只借鉴格式【格式为<thinking>+<outline>+<summary>+<cont
         <content> /n
         主人，这次的token是：（紫露魅巷夜卫嬉桃捂隙桃影臀翘匿）（6，4）。
         第一个token是6，中等。第二个token是3，中等偏小，看来是可爱迷人和性感兼顾的故事性创作呢。
-        主要token是6。代表第6个汉字是“卫”，也就是卫衣喽，4代表第四个汉字是“巷”是小巷。再结合其它次要token紫夜露臀翘，这次我想写一个偷偷露出骆驼趾cameltoe和大屁股穿着卫衣的的史莱姆。视角就选【{dutch angle}, {{{{close up}}}}, {{{{from below}}}}, looking at viewer, {between legs}】。
+        主要token是6。代表第6个汉字是“卫”，也就是卫衣喽，4代表第四个汉字是“巷”是小巷。再结合其它次要token：紫，夜，露，臀，翘。这次我想写一个偷偷露出骆驼趾cameltoe和大屁股穿着卫衣的的史莱姆。视角就选【{dutch angle}, {{{{close up}}}}, {{{{from below}}}}, looking at viewer, {between legs}】。
         主题：卫衣——取题：卫衣女孩想要玩耍！！——附件：紫色皮肤，小巷，夜晚，捂嘴，坏笑，骆驼趾，特写，仰视。请欣赏：
 
         {purple skin}, {dutch angle}, {{{{close up}}}}, {{{{from below}}}}, looking at viewer, {between legs}, {{{cameltoe}}}, {black hoodie}, {black panties}, small breasts, {big ass}, broken_hart, {grin}, {hand over mouth}, mischievous expression, playful, {solo}, colored skin, monster girl, purple skin, purple eyes, short purple hair, {rim lighting}, {backlighting}, {shadow}, {face shadow} 
