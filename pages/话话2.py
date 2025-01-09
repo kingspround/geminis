@@ -707,21 +707,10 @@ def getAnswer_text(prompt, token):
     }
   }
 example：
-        <thinking>
-your thinks=
-- Possible mistakes: 
-- Last reply situation: 
-- Internalize latest inputs:
-- Decision-making: 
-- Discourse construction: 
-- Improve inner organization:     
-        </thinking> <details>
+        <thinking>/n"""your thinks=- Possible mistakes: ,/n- Last reply situation: ,/n- Internalize latest inputs:,/n- Decision-making: ,/n- Discourse construction: ,/n- Improve inner organization:,/n""",     
+        </thinking> <details><summary>『**心声**』</summary>/n"your summary"</details>
         
-        <summary>『**心声**』</summary>
-- your summary
-         </details>
-        
-        <content> 
+        <content> /n
         主人，这次的token是：（紫露魅巷夜卫嬉桃捂隙桃影臀翘匿）（6，4）。
         第一个token是6，中等。第二个token是3，中等偏小，看来是可爱迷人和性感兼顾的故事性创作呢。
         主要token是6。代表第6个汉字是“卫”，也就是卫衣喽，4代表第四个汉字是“巷”是小巷。再结合其它次要token紫夜露臀翘，这次我想写一个偷偷露出骆驼趾cameltoe和大屁股穿着卫衣的的史莱姆。视角就选【{dutch angle}, {{{{close up}}}}, {{{{from below}}}}, looking at viewer, {between legs}】。
