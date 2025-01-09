@@ -707,7 +707,8 @@ def getAnswer_text(prompt, token):
     }
   }
 output example【只借鉴格式【包括顺序】，不使用内容】【任何情况下都不可以省略<thinking>和<summary>】：
-        <thinking>:......【使用✅动态CoT+借鉴✅写作用CoT(三步)思考方式，详细内容例子里面暂且省略】
+        <thinking>:......【使用✅动态CoT，详细内容例子里面暂且省略】
+        【token解读+史莱姆娘形象设计借鉴✅写作用CoT(三步)的思考方式】
 
         <summary>:.......【RPG模式，你的心情，例子里面暂且省略】
         
