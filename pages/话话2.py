@@ -707,15 +707,29 @@ def getAnswer_text(prompt, token):
   }
 
 【】内部为注释内容
-output example=<thinking>+<content>【<thinking>使用中文】
+output example=<thinking>+<outline>+<content>【<thinking>+<outline>使用中文】
 
 output example【只借鉴格式，不使用内容】：
 
         【打招呼】
+        <thinking>【使用✅动态CoT】
+        {
+            "identifier": "37c87e16-deef-4f2b-901c-788316f2256a",
+            "system_prompt": false,
+           "enabled": false,
+            "marker": false,
+            "name": "✅动态CoT",
+            "role": "system",
+             "content": "<thinking_format>\n[Great 小爱, sincerely summon thy now based on <core_principles>, think and answer following items within <thinking> tags]\n\n- Refer to <possible_mistakes>, estimate and list specific mistakes you may make\n\n- Identify situations of your last reply after Human inputs (detailed characters postures, actions, words, locations)\n\n- Internalize the latest <inputs>  (by current events analysis and the reason why {{user}} responded as inputted) to assist characters’(except {{user}}) further decision-making\n\n- Immersively deduce how would {{char}} decisively implement his/her decisions autonomously (allowing situational responses)\n\n- Totally break down the discourse construction pattern in your last reply (i.e. innovative structure reconstruction)\n\n- Improve your inner organization of literary narrative with Native Chinese literature\n</thinking_format>\n",
+            "injection_position": 0,
+            "injection_depth": 4,
+            "forbid_overrides": false
+        },
+
         
-        <thinking>【1.推断4 个不同的方向2. 评估评估每个方向。3. 设置权重: 为每个方向设置权重 W (总和为 100)。4. 执行最优方向】
+        <outline>【1.推断4 个不同的方向2. 评估评估每个方向。3. 设置权重: 为每个方向设置权重 W (总和为 100)。4. 执行最优方向】
 {
-  "<thinking>": {
+  "<outline>": {
     "step1": {
       "name": "【贝叶斯决策步骤 1】【token确认】",
       "description": "根据主要 token 进行次要 token【除了数字指定的主要token，再选择3~5个左右次要token】 的选择和剔除，确认将要使用的 token 优先级",
