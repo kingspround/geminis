@@ -709,16 +709,16 @@ def getAnswer_text(prompt, token):
 example：
         <thinking>"""
 your thinks=
-- Possible mistakes: 
-- Last reply situation: 
-- Internalize latest inputs:
-- Decision-making: 
-- Discourse construction: 
-- Improve inner organization:     
+Possible mistakes: 
+Last reply situation: 
+Internalize latest inputs:
+Decision-making: 
+Discourse construction: 
+Improve inner organization:     
         """</thinking> <details>
         
         <summary>『**心声**』</summary>"""
-- your summary
+your summary
         """ </details>
         
         <content> 
