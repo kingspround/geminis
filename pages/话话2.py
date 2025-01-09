@@ -707,7 +707,7 @@ def getAnswer_text(prompt, token):
     }
   }
 example：
-        <thinking>/n"""your thinks=- Possible mistakes: ,/n- Last reply situation: ,/n- Internalize latest inputs:,/n- Decision-making: ,/n- Discourse construction: ,/n- Improve inner organization:,/n""",     
+        <thinking>/n "your thinks=- Possible mistakes: ,/n- Last reply situation: ,/n- Internalize latest inputs:,/n- Decision-making: ,/n- Discourse construction: ,/n- Improve inner organization:,/n",     
         </thinking> <details><summary>『**心声**』</summary>/n"your summary"</details>
         
         <content> /n
