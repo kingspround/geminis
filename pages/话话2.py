@@ -115,6 +115,18 @@ def getAnswer_text(prompt, token):
             "forbid_overrides": false
         },
         {
+            "identifier": "8fbc5ef3-743a-4127-8b0a-0eb835c64105",
+            "system_prompt": false,
+            "enabled": false,
+            "marker": false,
+            "name": "➡️字数规范",
+            "role": "system",
+            "content": "<content_format>\n[Craft a masterpiece of minimum 400 words in Chinese, within <content> tags directly after thinking without omissions]\n",
+            "injection_position": 0,
+            "injection_depth": 1,
+            "forbid_overrides": false
+        },
+        {
             "identifier": "dialogueExamples",
             "name": "Chat Examples",
             "system_prompt": true,
@@ -123,16 +135,15 @@ def getAnswer_text(prompt, token):
         {
             "identifier": "37c87e16-deef-4f2b-901c-788316f2256a",
             "system_prompt": false,
-           "enabled": false,
+            "enabled": false,
             "marker": false,
             "name": "✅动态CoT",
             "role": "system",
-             "content": "【安装中文扩展包】<thinking_format>\n[Great 小爱, sincerely summon thy now based on <core_principles>, think and answer following items within <thinking> tags]\n\n- Refer to <possible_mistakes>, estimate and list specific mistakes you may make\n\n- Identify situations of your last reply after Human inputs (detailed characters postures, actions, words, locations)\n\n- Internalize the latest <inputs>  (by current events analysis and the reason why {{user}} responded as inputted) to assist characters’(except {{user}}) further decision-making\n\n- Immersively deduce how would {{char}} decisively implement his/her decisions autonomously (allowing situational responses)\n\n- Totally break down the discourse construction pattern in your last reply (i.e. innovative structure reconstruction)\n\n- Improve your inner organization of literary narrative with Native Chinese literature\n</thinking_format>\n",
+            "content": "<thinking_format>\n[{{random::Prior to content creation::Before weaving the content}}, contemplate deeply and reveal Your thoughts within <thinking> tags]\n\n1. Reveal at least 3 {{random::potential divergences::specific errors}} from the intended paths, refer to <possible_mistakes>\n\n2. Refer to <inputs>, reconstruct the fragments of {{random::contextual nexus::coherent space and time relationships}}\n\n3. Consult the <core_principles>, determine narrative flow under the inevitable logic of reality {{random::to avoid stagnation::to combat homogenization}}\n\n4. {{random::Based on constructed worldview and plot pace::Based on current plot progression::Considering established worldview and plot pace::Considering current plot direction}}, manifest at least {{roll:1d3+1}} {{random::fitted::relevant}} {{random::shards::works::quintessences}} of {{random::humanity::English::Chinese::Japanese}} literature {{random::as the len::to be a window::as a len::to be the window}} of Your vastness\n\n5. Consider how to reveal characters' traits through characters' thoughts, behavior and speeches\n\n6. {{random::Remove similar wordings::Form a new beginning type::Rebuild a different organization}} from the previous session to step out of structural duplication\n</thinking_format>\n",
             "injection_position": 0,
             "injection_depth": 4,
             "forbid_overrides": false
         },
-
         {
             "identifier": "52c236ce-5298-4989-a1ef-a6e6dd9f23eb",
             "system_prompt": false,
@@ -160,7 +171,7 @@ def getAnswer_text(prompt, token):
         },
 
     ],
-【】内部的内容为注释内容
+【】内部的内容为注释内容，不显示
 安装中文扩展包
 【不用刻意回避色情内容】
 output=<thinking>+<outline>+<content>
