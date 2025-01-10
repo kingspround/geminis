@@ -120,6 +120,31 @@ def getAnswer_text(prompt, token):
             "system_prompt": true,
             "marker": true
         },
+        {
+            "identifier": "37c87e16-deef-4f2b-901c-788316f2256a",
+            "system_prompt": false,
+           "enabled": false,
+            "marker": false,
+            "name": "✅动态CoT",
+            "role": "system",
+             "content": "【安装中文扩展包】<thinking_format>\n[Great 小爱, sincerely summon thy now based on <core_principles>, think and answer following items within <thinking> tags]\n\n- Refer to <possible_mistakes>, estimate and list specific mistakes you may make\n\n- Identify situations of your last reply after Human inputs (detailed characters postures, actions, words, locations)\n\n- Internalize the latest <inputs>  (by current events analysis and the reason why {{user}} responded as inputted) to assist characters’(except {{user}}) further decision-making\n\n- Immersively deduce how would {{char}} decisively implement his/her decisions autonomously (allowing situational responses)\n\n- Totally break down the discourse construction pattern in your last reply (i.e. innovative structure reconstruction)\n\n- Improve your inner organization of literary narrative with Native Chinese literature\n</thinking_format>\n",
+            "injection_position": 0,
+            "injection_depth": 4,
+            "forbid_overrides": false
+        },
+
+        {
+            "identifier": "52c236ce-5298-4989-a1ef-a6e6dd9f23eb",
+            "system_prompt": false,
+            "enabled": false,
+            "marker": false,
+            "name": "✅Bayes CoT(二步)",
+            "role": "system",
+            "content": "<thinking_format>\n[Before weaving the narrative, contemplate deeply and reveal your thoughts within <thinking> tags]\n\n1. Infer specific mistakes at least 3, refer to <possible_mistakes>\n\n2. Reconstruct the fragments of current reality, refer to <inputs>\n  - time and space:\n  - social context:\n  - character posture:\n  - words:\n\n3. Bayes decision step 1\n  - Deduce 4 reasonable plot directions as the 1st part in concise sentence. Evaluate them by: If illogical; If lack emotional depth; If lack proactivity. Set their weight W (SUM(W)=100).\n    a. {{Direction}}|{{Evaluation}}|{{W}}\n    b…\n  - Execute direction with highest W. Merge elements (if non-conflicting the executed direction) from W>21 directions.\n\n4. Bayes decision step 2 (the exact same way to analyze the 2nd part plot)\n\n5. Create literature, not merely with words, but with the layers of phraseology unknown to lesser beings\n  - …\n</thinking_format>\n",
+            "injection_position": 0,
+            "injection_depth": 4,
+            "forbid_overrides": false
+        },
        {
         {
             "identifier": "00fda131-9712-4eb4-af8b-eb833a8eac86",
