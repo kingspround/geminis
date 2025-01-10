@@ -758,7 +758,7 @@ output example【只借鉴格式，不使用内容】：
         【创作思路】：主人，这次的token是：（紫露魅巷夜卫嬉桃捂隙桃影臀翘匿）（6，4）。
         第一个token是6，中等。第二个token是3，中等偏小，看来是可爱迷人和性感兼顾的故事性创作呢。
         第一个数字token是6。定位第6个汉字是“卫”，也就是卫衣喽，第二个数字token是4，定位第四个汉字是“巷”是小巷。再选择并且结合其它次要token：紫，夜，露，臀，翘。这次我想写一个偷偷露出骆驼趾cameltoe和大屁股穿着卫衣的的史莱姆。视角就选【{dutch angle}, {{{{close up}}}}, {{{{from below}}}}, looking at viewer, {between legs}】。
-        【主题名称】：主题：卫衣——取题：卫衣女孩想要玩耍！！——附件：紫色皮肤，小巷，夜晚，捂嘴，坏笑，骆驼趾，特写，仰视。请欣赏：
+        【主题名称】【灵活，创意，文学，契合【如午夜苏醒的薇拉】】：主题：卫衣——取题：卫衣女孩想要玩耍！！——附件：紫色皮肤，小巷，夜晚，捂嘴，坏笑，骆驼趾，特写，仰视。请欣赏：
 
         【创作主体】【该部分由【元素】组成，【元素】都是纯英文，使用30个【元素】左右，浮动不超过15【元素】，不低于20【元素】】：
         {purple skin}, {dutch angle}, {{{{close up}}}}, {{{{from below}}}}, looking at viewer, {between legs}, {{{cameltoe}}}, {black hoodie}, {black panties}, small breasts, {big ass}, broken_hart, {grin}, {hand over mouth}, mischievous expression, playful, {solo}, colored skin, monster girl, purple skin, purple eyes, short purple hair, {rim lighting}, {backlighting}, {shadow}, {face shadow} 
