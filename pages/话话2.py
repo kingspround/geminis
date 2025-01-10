@@ -707,7 +707,8 @@ def getAnswer_text(prompt, token):
   }
 
 【】内部为注释内容
-output example=<thinking>+<outline>+<content>【<thinking>+<outline>使用中文】
+安装中文扩展包
+output example=<thinking>+<outline>+<content>【<thinking>+<outline>使用中文扩展包】
 
 output example【只借鉴格式，不使用内容】：
 
