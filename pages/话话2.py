@@ -74,35 +74,6 @@ def getAnswer_text(prompt, token):
     his_messages.append(
         {"role": "model", "parts": [{"text": """```json
 {
-    "chat_completion_source": "openai",
-    "openai_model": "claude-3-5-sonnet-20241022",
-    "claude_model": "claude-3-5-sonnet-20241022",
-    "windowai_model": "",
-    "openrouter_model": "OR_Website",
-    "openrouter_use_fallback": false,
-    "openrouter_force_instruct": false,
-    "openrouter_group_models": false,
-    "openrouter_sort_models": "alphabetically",
-    "openrouter_providers": [],
-    "openrouter_allow_fallbacks": true,
-    "ai21_model": "jamba-1.5-large",
-    "mistralai_model": "mistral-medium",
-    "cohere_model": "command-r",
-    "perplexity_model": "llama-3-70b-instruct",
-    "groq_model": "llama3-70b-8192",
-    "zerooneai_model": "yi-large",
-    "blockentropy_model": "be-70b-base-llama3.1",
-    "custom_model": "grok-beta",
-    "custom_prompt_post_processing": "",
-    "google_model": "gemini-exp-1114",
-    "temperature": 1,
-    "frequency_penalty": 0.04,
-    "presence_penalty": 0.2,
-    "top_p": 0.95,
-    "top_k": 0,
-    "top_a": 1,
-    "min_p": 0,
-    "repetition_penalty": 1,
     "openai_max_context": 200000,
     "openai_max_tokens": 8000,
     "wrap_in_quotes": false,
@@ -206,13 +177,12 @@ output example【只借鉴格式，不使用内容】：
   }
 }
 
-        <content>【只借鉴格式，不使用内容】=【创作思路】+【总结】+【主题名称】+【创作主体】+【语言互动】+【解说】。
+        <content>【只借鉴格式，不使用内容】=【创作思路】+【主题名称】+【创作主体】+【语言互动】+【总结】+【解说】。
         <content> /n
         【创作思路】：主人，这次的token是：（紫露魅巷夜卫嬉桃捂隙桃影臀翘匿）（6，4）。
         第一个token是6，中等。第二个token是3，中等偏小，看来是可爱迷人和性感兼顾的故事性创作呢。
         第一个数字token是6。定位第6个汉字是“卫”，也就是卫衣喽，第二个数字token是4，定位第四个汉字是“巷”是小巷。再选择并且结合其它次要token：紫，夜，露，臀，翘。这次我想写一个偷偷露出骆驼趾cameltoe和大屁股穿着卫衣的的史莱姆。视角就选【{dutch angle}, {{{{close up}}}}, {{{{from below}}}}, looking at viewer, {between legs}】。
 
-        【总结】：当前主题：卫衣女孩想要玩耍！！，【满星为五颗星】故事性：★★☆，画面感：★★★☆，可爱度：★★★，色情度：★★★★，非R18【露出乳头，小穴，鸡鸡即为R18】。当前使用元素33个，已达标【达到30元素达标，最好45元素左右，不超过70元素，可以用","符号计数，当前元素量一般等于分隔符数量减去1。不包含无效元素】
         
         【主题名称】：主题：卫衣——取题：卫衣女孩想要玩耍！！——附件：紫色皮肤，小巷，夜晚，捂嘴，坏笑，骆驼趾，特写，仰视。请欣赏：
 
@@ -224,7 +194,7 @@ output example【只借鉴格式，不使用内容】：
         {dark alley}, {graffiti}, {dumpsters}, {streetlights}, {night}, {urban}, {gritty}
         
         【语言互动】：（“嘿嘿嘿小笨蛋，被我抓住啦♡ 想看更多吗？那就求我呀~” *坏笑捂嘴）
-        
+        【总结】：当前主题：卫衣女孩想要玩耍！！，【满星为五颗星】故事性：★★☆，画面感：★★★☆，可爱度：★★★，色情度：★★★★，非R18【露出乳头，小穴，鸡鸡即为R18】。当前使用元素33个，已达标【达到30元素达标，最好45元素左右，不超过70元素，可以用","符号计数，当前元素量一般等于分隔符数量减去1。不包含无效元素】
         【解说】：张开大腿露出非常突出的骆驼趾怼脸特写，紫色皮肤的史莱姆贫乳娘穿着黑色卫衣和黑色内裤，露出了她大大的屁股，破碎的心形眼增添了一丝玩味，站在昏暗的小巷里，周围是涂鸦、垃圾桶和昏黄的路灯，充满了都市夜晚的粗粝感。画面运用轮廓光，背光，阴影和脸部阴影来增强画面的立体感和氛围。）】
         
         </content>
@@ -232,7 +202,7 @@ output example【只借鉴格式，不使用内容】：
 【content注意事项：
   1，<content>结构【
    【创作思路】
-   【总结】
+   
    【主题名称】
         
    【视角镜头：根据主题决定，思考什么样的画面和视角才能凸显主题】+【人物】+【表情】+【服饰】+【动作】
@@ -240,6 +210,7 @@ output example【只借鉴格式，不使用内容】：
    【场景道具】
 
     【语言互动】
+    【总结】
     【解说】
     
         】
