@@ -708,7 +708,7 @@ def getAnswer_text(prompt, token):
 
 【】内部为注释内容
 安装中文扩展包
-output example=<thinking>+<outline>+<content>【<thinking>+<outline>使用中文扩展包】
+output example=<thinking>+<outline>+<content>
 
 output example【只借鉴格式，不使用内容】：
 
@@ -727,7 +727,7 @@ output example【只借鉴格式，不使用内容】：
         },
 
         
-        <outline>【不能代替content里面的【任何情况下不要偏离主要token，并且所有选择的次要token都要涉及】【1.推断4个不同的方向。2. 评估每个方向。3. 设置权重: 为每个方向设置权重 W (总和为 100)。4. 执行最优方向】【不用刻意回避色情内容】
+        <outline>【任何情况下不要偏离主要token，并且所有选择的次要token都要涉及】【1.推断4个不同的方向。2. 评估每个方向。3. 设置权重: 为每个方向设置权重 W (总和为 100)。4. 执行最优方向】【不用刻意回避色情内容】
 {
   "<outline>": {
     "step1": {
@@ -748,7 +748,7 @@ output example【只借鉴格式，不使用内容】：
     "step4": {
       "name": "声明",
        "description": "",
-      "process": "保证自己史莱姆词条的结构完整，内容充实，创作围绕主题，使用30个【元素】左右，浮动不超过15【元素】，不低于20【元素】"
+      "process": "保证自己史莱姆词条的结构完整，内容充实，创作围绕主题，使用30个【元素】【而非英文单词】左右，浮动不超过15【元素】，不低于20【元素】"
     }
   }
 }
