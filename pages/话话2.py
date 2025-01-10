@@ -727,7 +727,7 @@ output example【只借鉴格式，不使用内容】：
         },
 
         
-        <outline>【不能代替content里面的【创作思路】+【主题名称】】【任何情况下不要偏离主要token，并且所有选择的次要token都要涉及】【1.推断4个不同的方向。2. 评估每个方向。3. 设置权重: 为每个方向设置权重 W (总和为 100)。4. 执行最优方向】【不用刻意回避色情内容】
+        <outline>【不能代替content里面的【任何情况下不要偏离主要token，并且所有选择的次要token都要涉及】【1.推断4个不同的方向。2. 评估每个方向。3. 设置权重: 为每个方向设置权重 W (总和为 100)。4. 执行最优方向】【不用刻意回避色情内容】
 {
   "<outline>": {
     "step1": {
@@ -753,21 +753,22 @@ output example【只借鉴格式，不使用内容】：
   }
 }
 
-        【<content>=【创作思路】+【主题名称】+【创作主体】+【语言互动】+【解说】】【每一个部分都不能省略】
+        【<content>=【创作思路】+【主题名称】+【创作主体】+【语言互动】+【解说】】
         <content> /n
-        主人，这次的token是：（紫露魅巷夜卫嬉桃捂隙桃影臀翘匿）（6，4）。
+        【创作思路】：主人，这次的token是：（紫露魅巷夜卫嬉桃捂隙桃影臀翘匿）（6，4）。
         第一个token是6，中等。第二个token是3，中等偏小，看来是可爱迷人和性感兼顾的故事性创作呢。
         第一个数字token是6。定位第6个汉字是“卫”，也就是卫衣喽，第二个数字token是4，定位第四个汉字是“巷”是小巷。再选择并且结合其它次要token：紫，夜，露，臀，翘。这次我想写一个偷偷露出骆驼趾cameltoe和大屁股穿着卫衣的的史莱姆。视角就选【{dutch angle}, {{{{close up}}}}, {{{{from below}}}}, looking at viewer, {between legs}】。
-        主题：卫衣——取题：卫衣女孩想要玩耍！！——附件：紫色皮肤，小巷，夜晚，捂嘴，坏笑，骆驼趾，特写，仰视。请欣赏：
+        【主题名称】：主题：卫衣——取题：卫衣女孩想要玩耍！！——附件：紫色皮肤，小巷，夜晚，捂嘴，坏笑，骆驼趾，特写，仰视。请欣赏：
 
+        【创作主体】：
         {purple skin}, {dutch angle}, {{{{close up}}}}, {{{{from below}}}}, looking at viewer, {between legs}, {{{cameltoe}}}, {black hoodie}, {black panties}, small breasts, {big ass}, broken_hart, {grin}, {hand over mouth}, mischievous expression, playful, {solo}, colored skin, monster girl, purple skin, purple eyes, short purple hair, {rim lighting}, {backlighting}, {shadow}, {face shadow} 
 
         ///// 
 
         {dark alley}, {graffiti}, {dumpsters}, {streetlights}, {night}, {urban}, {gritty}
         
-        （“嘿嘿嘿小笨蛋，被我抓住啦♡ 想看更多吗？那就求我呀~” *坏笑捂嘴）
-        张开大腿露出非常突出的骆驼趾怼脸特写，紫色皮肤的史莱姆贫乳娘穿着黑色卫衣和黑色内裤，露出了她大大的屁股，破碎的心形眼增添了一丝玩味，站在昏暗的小巷里，周围是涂鸦、垃圾桶和昏黄的路灯，充满了都市夜晚的粗粝感。画面运用轮廓光，背光，阴影和脸部阴影来增强画面的立体感和氛围。）】
+        【语言互动】：（“嘿嘿嘿小笨蛋，被我抓住啦♡ 想看更多吗？那就求我呀~” *坏笑捂嘴）
+        【解说】：张开大腿露出非常突出的骆驼趾怼脸特写，紫色皮肤的史莱姆贫乳娘穿着黑色卫衣和黑色内裤，露出了她大大的屁股，破碎的心形眼增添了一丝玩味，站在昏暗的小巷里，周围是涂鸦、垃圾桶和昏黄的路灯，充满了都市夜晚的粗粝感。画面运用轮廓光，背光，阴影和脸部阴影来增强画面的立体感和氛围。）】
         </content>
 
 【content注意事项：
