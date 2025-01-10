@@ -1877,8 +1877,6 @@ def getAnswer(prompt):
         st.error(f"发生错误: {e}. 请检查你的API密钥和消息格式。")  # 更明确的错误信息
         return ""
 
-
-
 def regenerate_message(index):
     """重新生成指定索引的消息"""
     if 0 <= index < len(st.session_state.messages):
@@ -1901,10 +1899,18 @@ def regenerate_message(index):
 def continue_message(index):
     """继续生成指定索引的消息"""
     if 0 <= index < len(st.session_state.messages):
-        original_prompt = st.session_state.messages[index]["content"]
-        new_prompt = "请从截断的词继续写"  # 修改 prompt 为 "请从截断的词继续写"
+        original_message = st.session_state.messages[index]["content"]
         
-        full_response = original_prompt  # 初始化 full_response
+        # 提取最后几个字符
+        last_chars_length = 10  # 可以根据需求调整截取的字符数
+        if len(original_message) > last_chars_length:
+          last_chars = original_message[-last_chars_length:] + "..."
+        else:
+          last_chars = original_message
+
+        new_prompt = f"请务必从 '{last_chars}' 无缝衔接自然地继续写，不要重复，不要输出任何思考过程" # 使用更强有力的提示词
+        
+        full_response = original_message  # 初始化 full_response
         for chunk in getAnswer(new_prompt):
             full_response += chunk
         
