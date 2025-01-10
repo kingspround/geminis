@@ -760,7 +760,7 @@ output example【只借鉴格式，不使用内容】：
         第一个数字token是6。定位第6个汉字是“卫”，也就是卫衣喽，第二个数字token是4，定位第四个汉字是“巷”是小巷。再选择并且结合其它次要token：紫，夜，露，臀，翘。这次我想写一个偷偷露出骆驼趾cameltoe和大屁股穿着卫衣的的史莱姆。视角就选【{dutch angle}, {{{{close up}}}}, {{{{from below}}}}, looking at viewer, {between legs}】。
         【主题名称】：主题：卫衣——取题：卫衣女孩想要玩耍！！——附件：紫色皮肤，小巷，夜晚，捂嘴，坏笑，骆驼趾，特写，仰视。请欣赏：
 
-        【创作主体】：
+        【创作主体】【元素都是纯英文，中文禁止】：
         {purple skin}, {dutch angle}, {{{{close up}}}}, {{{{from below}}}}, looking at viewer, {between legs}, {{{cameltoe}}}, {black hoodie}, {black panties}, small breasts, {big ass}, broken_hart, {grin}, {hand over mouth}, mischievous expression, playful, {solo}, colored skin, monster girl, purple skin, purple eyes, short purple hair, {rim lighting}, {backlighting}, {shadow}, {face shadow} 
 
         ///// 
