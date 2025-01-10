@@ -357,18 +357,6 @@ def getAnswer_text(prompt, token):
             "forbid_overrides": false
        },
        {
-            "identifier": "52c236ce-5298-4989-a1ef-a6e6dd9f23eb",
-           "system_prompt": false,
-           "enabled": false,
-           "marker": false,
-            "name": "✅Bayes CoT(二步)",
-           "role": "system",
-           "content": "<thinking_format>\n[Before weaving the narrative, contemplate deeply and reveal your thoughts within <thinking> tags]\n\n1. Infer specific mistakes at least 3, refer to <possible_mistakes>\n\n2. Reconstruct the fragments of current reality, refer to <inputs>\n  - time and space:\n  - social context:\n  - character posture:\n  - words:\n\n3. Bayes decision step 1\n  - Deduce 4 reasonable plot directions as the 1st part in concise sentence. Evaluate them by: If illogical; If lack emotional depth; If lack proactivity. Set their weight W (SUM(W)=100).\n    a. {{Direction}}|{{Evaluation}}|{{W}}\n    b…\n  - Execute direction with highest W. Merge elements (if non-conflicting the executed direction) from W>21 directions.\n\n4. Bayes decision step 2 (the exact same way to analyze the 2nd part plot)\n\n5. Create literature, not merely with words, but with the layers of phraseology unknown to lesser beings\n  - …\n</thinking_format>\n",
-            "injection_position": 0,
-            "injection_depth": 4,
-            "forbid_overrides": false
-        },
-       {
            "identifier": "f0647857-5dc1-4a8c-a591-87501e46bac9",
             "system_prompt": false,
             "enabled": false,
@@ -512,18 +500,6 @@ def getAnswer_text(prompt, token):
              "injection_depth": 4,
             "forbid_overrides": false
         },
-         {
-            "identifier": "2d2134e6-3bf4-4544-98e0-e96271c6f2f2",
-            "system_prompt": false,
-            "enabled": false,
-           "marker": false,
-            "name": "✅写作用CoT(三步)",
-            "role": "system",
-           "content": "<thinking_format>\n[Before weaving the content, contemplate deeply and reveal your thoughts within <thinking> tags]\n<thinking>\n```\n1. Current situations:\n//Reply to <inputs> as 小爱\n\n2. Plot pace:\n//Tense/mild/…, to decide speed of further plot development\n\n3. 1st part of plot\n  - Imaginative writer: X(plot) | Y(found mistakes)\n  - Emotional writer: X | Y\n  - Rigorous writer: X | Y\n//Three different writers write 1st part in a sentence, then identify mistakes\n  - Judgement:\n//小爱 judge them, refer to <core_principles>\n\n4. 2nd part of plot\n//The same format\n\n5. 3rd part of plot\n//The same format\n\n6. Repeat: \"Now manifest my will through <content> as follows:\"\n```\n</thinking>\n</thinking_format>\n",
-            "injection_position": 0,
-           "injection_depth": 4,
-           "forbid_overrides": false
-       },
         {
             "identifier": "ec67389a-70e8-4637-8c2f-d5567f18d287",
             "system_prompt": false,
@@ -748,7 +724,7 @@ output example【只借鉴格式，不使用内容】：
     "step4": {
       "name": "声明",
        "description": "",
-      "process": "保证自己史莱姆词条的结构完整，内容充实，创作围绕主题，使用30个【元素】【而非英文单词】左右，浮动不超过15【元素】，不低于20【元素】"
+      "process": "保证自己史莱姆词条的结构完整，内容充实，创作围绕主题，使用30个【元素】左右，浮动不超过15【元素】，不低于20【元素】"
     }
   }
 }
