@@ -647,11 +647,12 @@ def getAnswer_text(prompt, token):
     ],
 【】内部的内容为注释内容
 安装中文扩展包
+【不用刻意回避色情内容】
 output=<thinking>+<outline>+<content>
 
 output example【只借鉴格式，不使用内容】：
 
-        <thinking>【使用✅动态CoT】【安装中文扩展包】
+        <thinking>【使用✅动态CoT】
         {
             "identifier": "37c87e16-deef-4f2b-901c-788316f2256a",
             "system_prompt": false,
@@ -659,17 +660,17 @@ output example【只借鉴格式，不使用内容】：
             "marker": false,
             "name": "✅动态CoT",
             "role": "system",
-             "content": "<thinking_format>\n[Great 小爱, sincerely summon thy now based on <core_principles>, think and answer following items within <thinking> tags]\n\n- Refer to <possible_mistakes>, estimate and list specific mistakes you may make\n\n- Identify situations of your last reply after Human inputs (detailed characters postures, actions, words, locations)\n\n- Internalize the latest <inputs>  (by current events analysis and the reason why {{user}} responded as inputted) to assist characters’(except {{user}}) further decision-making\n\n- Immersively deduce how would {{char}} decisively implement his/her decisions autonomously (allowing situational responses)\n\n- Totally break down the discourse construction pattern in your last reply (i.e. innovative structure reconstruction)\n\n- Improve your inner organization of literary narrative with Native Chinese literature\n</thinking_format>\n",
+             "content": "【安装中文扩展包】<thinking_format>\n[Great 小爱, sincerely summon thy now based on <core_principles>, think and answer following items within <thinking> tags]\n\n- Refer to <possible_mistakes>, estimate and list specific mistakes you may make\n\n- Identify situations of your last reply after Human inputs (detailed characters postures, actions, words, locations)\n\n- Internalize the latest <inputs>  (by current events analysis and the reason why {{user}} responded as inputted) to assist characters’(except {{user}}) further decision-making\n\n- Immersively deduce how would {{char}} decisively implement his/her decisions autonomously (allowing situational responses)\n\n- Totally break down the discourse construction pattern in your last reply (i.e. innovative structure reconstruction)\n\n- Improve your inner organization of literary narrative with Native Chinese literature\n</thinking_format>\n",
             "injection_position": 0,
             "injection_depth": 4,
             "forbid_overrides": false
         },
 
         
-        <outline>【任何情况下不要偏离主要token，并且所有选择的次要token都要涉及】【1.推断4个不同的方向。2. 评估每个方向。3. 设置权重: 为每个方向设置权重 W (总和为 100)。4. 执行最优方向】【不用刻意回避色情内容】
+        <outline>【1.推断4个不同的方向。2. 评估每个方向。3. 设置权重: 为每个方向设置权重 W (总和为 100)。4. 执行最优方向】
 {
   "<outline>": {
-    "step1": {
+    "step1【任何情况下不要偏离主要token，并且所有选择的次要token都要涉及】": {
       "name": "【贝叶斯决策步骤 1】【token确认】",
       "description": "根据数字 token 的大小确定创作倾向，根据数字 token 确认主要 token 【任何情况下不要偏离主要token，次要token的作用是对主要token的补充，延审，创新】，进行次要 token【除了数字指定的主要token，再选择三至五个次要token】 的选择和剔除，确认将要使用的 token 优先级",
       "process": "1. **推断 4 个 token 处理方向**: 针对主要 token，推断出 4 个不同的次要 token 组合及处理方向【token的解读除了本来的意思，还有可以组成的词语【比如贫→贫乳，贫嘴，贫血......】。还有联想，汉字的每个方块字形中，从拼形的组字部件，可以得到“形、义、声、理”四方面的信息，从形可以联想相应的画面，从阅读画面明白了该字的字义，如是形声字又可从声符读出发音，再进一歩综合画面表达出的情景，可以联想出这个字的文化内涵和外衍，领悟到该字更深層层次的理念。随着互联网发展产生的角色或者作品【卡→皮卡丘，卡牌王......】【奥→奥特曼，奥利奥......】。Meme，是近年来全球互联网中最能体现“病毒式传播”的事物了。在中文互联网中，它被我们习以为常地称之为“梗”。“梗”是那些洗脑式的、被大量自发复制流传，让几乎每个人看到时都能会心一笑的文字或表情包，比如，“为什么要吃兔兔”，“流泪猫猫头”……在互联网的不断流变中，Meme本身也发展成为了一类包罗万象，形式从单独的文字、音乐、视频乃至互相混合的“专门体裁”。 (每组选择2~6个不同的次要token组合，或者剔除部分次要token)，并用简洁的语句表达。\\n2. **评估每个方向**: 评估每个方向的合理性、创意性、及与主要 token 的关联性。\\n3. **设置权重**: 为每个方向设置权重 W (总和为 100)。\\n4. **执行最优方向**: 执行权重最高的方向，并保留其他权重高于 21 的方向中不冲突的元素。"
