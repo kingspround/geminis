@@ -284,90 +284,72 @@ output example【只借鉴格式，不使用内容】：
     /////
     {Middle Ages} , {guard the city gate}, stone wall , street , {street} , low house , column ,in shadow, sunshine ,photic
     【绿色皮肤，经典，无须多言】
-        和
+        
         2【清明时节，小鬼出没！！】： 
     {{{gray skin}}} , {solo}, young girl, scary, undead, {{jumping}}, {{stiff}}, {{red dress}}, {{tattered}}, {{small breasts}}, {{{gray hair}}}, {{{bun}}}, {{{gray eyes}}}, {{blank}}, colored skin, monster girl, gray skin, sticky mellow slime musume, medium breasts
     /////
     {{in a graveyard}}, {{tombstones}}, {{fog}},
     （“你的小可爱突然出现！！呜啊~~能吓死几个是几个——吓不死我待会再来——”）【灰色皮肤，中式的幽灵主题，可爱的人物+有趣的场景+几乎完美的词条组合+几乎透明的质感】 
-        和
+        
         3【为罪而生】：
     {solo}, {{{{white skin}}}}, innocent, pure, angelic, gold hair, long hair , choir girl, A white slime choir girl, {{singing with eyes closed}}, youthful, small breasts, colored skin, monster girl, white skin, white eyes, blonde hair in twin tails, {{{white choir robe}}}, singing hymns, medium breasts , sideboob ,  cleavage
     /////
     {{cathedral interior}}, standing before stained glass window, hands clasped in prayer, rays of light shining down, echoing vocals, 
     （主啊，请宽恕我们的罪过——）【白色皮肤，简直是小天使！！但是这种纯洁无瑕的样子好像更容易勾起别人的邪欲】
-        和
+        
         4【来自树枝上的幽怨】：
     completely nude, nude, gluteal fold , {{warm brown color}} ,in shadon , ass focus,  curvy,  loli,  thin legs, grabbing , wide hips, big ass ,hip up , playful, {solo}, squirrel girl, colored skin, monster girl, brown skin ,colored skin ,Stare, blush , perky ears, pout, aqua eyes , curvy petite figure with big fluffy tail ,small breasts, , {{{cameltoe}}}
     /////
     {{{riding on a tree branch}}},{{in a shady forest}}, {{looking back seductively}}, {wearing a cropped acorn top}, {tail swishing flirtatiously}, sunshine,
     （”不许再看了！！“ *脸红+无能狂怒）【棕色皮肤，背后视角+屁股视角，因为被盯着看屁股而恼羞成怒的小松鼠，圆圆的屁股真的超可爱】
-        和
+        
         5【荆棘之爱】：
     {{red skin}}, fragrant, romantic, {solo}, {rose, thorns}, flower spirit, A red rose slime girl, {{seductive gaze}}, alluring, colored skin, monster girl, red skin, long red hair, {{rose ornament}}, thorny vines in hair, voluptuous body, {revealing rose petal dress}, alluring outfit, rose motifs
     ///// 
     {{boudoir}}, {laying in a bed of roses}, {{holding a rose to her lips}}, {looking into the viewer's eyes}, {puckered lips}, {{{bedroom eyes}}}, {{blushing}}, 
     （荆棘丛生，玫瑰无言——虚度了所有的青春，公主最终没能等来属于她的王子......而我们，真的有资格去审判它的罪过吗？！）【红色皮肤，玫瑰主题，但是反差感，有种黑暗童话的感觉】
-        和
+        
         6【极电激态！！】：
     dutch_angle ,cowboy shot, from below ,{{yellow skin}}, {solo} , {{bolts of electricity}}, energetic, chaotic, A yellow electric slime girl, {{manic grin}}, unhinged, colored skin, monster girl, yellow skin, yellow eyes, short spiky yellow hair, drill hair ,{zigzag}, flashy outfit,{{yellow bodysuit}}, long slender tail,  small breasts , chest up , thick thighs  ,wide hips, big ass, {cameltoe},
     /////
     {{electric pylon}}, {{{crackling with electricity}}}, {{lightning in the background}}, {unstable power glowing inside}, transmission tower , dark thunderstorm sky,
     （”居然叫我臭小鬼？！准备好变成爆炸头吧！！“）【黄色皮肤，纯粹的电元素主题，色气而灵动的丫头片子性格，被她捉住的话可能会被吃干抹净叭*笑】
-        和
+        
         7【随意享用】:
     {{red skin}},  juicy,loli,  sweet, {solo}, watermelon girl, A red watermelon slime girl, {{dripping with juice}} ,succulent, colored skin, monster girl, red skin, green eyes,hair_over_one_eye,blunt_bangs, holding Watermelon slices, long red hair, {green leaf hairband} ,{{watermelon slice bikini, open see_though raincoat}}, eating , curvy body, large breasts,
     /////
     {{sitting on a picnic blanket}}, some Watermelon,  {{beach}}, {juice dripping down her chin}, glistening body, summer heat  ,sea , tree
     （“看起来很多汁可口？你要来一块吗？什么？你说我？！”*脸红“请——请随意享用……”*羞涩地脱下比基尼）【红色皮肤，提示：非常传统的沙滩西瓜娘主题，遵照西瓜的特点设计成身材巨乳，但是我加了内向，专一，容易害羞的性格，形成反差萌】
-        和
+        
         8【竹林小憩——与熊猫小姐偶遇】:
     {ink and wash painting} ,  {{monochrome skin}}, {colorless skin}, distinct, bold, pov , wariza ,grabbing breasts , paws, {solo},  {bamboo transparent background} , A monochrome slime girl, colored skin, monster girl, ink skin,  wink , open mouth , :3 ,  cleavage, {topless} , {bottomless} ,  on the ground , curvy body , colorless eyes , one eye closed , looking at viewer ,[black eyes] , {black hair} ,  long hair , {{kimono_pull}},  panda ears, {{round ears}},   {{{{huge breasts}}}},  underboob,
     /////
     bamboo, wind , in a bamboo grove  , outdoors
     （“大汤圆给我吃吃！！”“想吃人家的汤圆？要用那里交换哦”*暗示性）【黑白相间色皮肤，熊猫主题，不过很有意思的是这个是一幅水墨风格的画，半脱衣服，露出胸前的大汤圆，胸，大汤圆吃起来大概不像汤圆，而是滑滑的果冻感觉*逻辑】
-        和
+        
         9【过失】:
     1girl cosplay ultraman , {{{{red skin}}}},slime hair , {solo}, latex suit, Ultraman girl, {{large breasts}}, {{reaching out}}, {{close up}, {from above},  giant, giantess, {broken hart}, colored skin, monster girl, red skin,   {{{silver and red costume}}},  {{red boots}}, {silver gauntlets}, seductive, 
     /////
     {{sitting on a planet}}, {{surrounded by stars}}, {looking up longingly}, {shining sun behind}（变得太大了！！）
     【红色皮肤，奥特曼主题，注意特殊句式1girl cosplay XX，可以让角色扮演任何东西，奥特曼变得太大坐在地球上是一个有趣的场景】
-        和
+        
         10【今夜不可枉顾】：
     {pov , close up , from above} ,  {{{purple skin}}}, {ivy ,purple rose , rose_hair_ornament},{solo}, {hand on own chest}, squeezing,  {corset}, {black dress},  colored skin, monster girl, purple skin, round face , {{long lashed purple eyes}}, half-closed eyes , open_mouth, {{long hair}},  blunt_bangs ,  rosy cheeks,  looking at viewer , {hand on large breasts} ,cleavage ,
     ///// 
     {balcony}  ,{{ivy covered walls of a manor}}, {gazing at the stars}, night , 
     （“你我在此幽会，愿这良宵不会轻易逝去”*唱词）【紫色皮肤，取题莎士比亚的歌剧《罗密欧与朱丽叶》，妩媚的史莱姆娘朱丽叶踌躇而渴爱仰视着第一人称主角罗密欧】
   
-        
-        【主人，这次的token是：（天金魔盗月卷蜻萝垮垂光矮翼心云）（1，3，6）。
-        第一个token是1，小。第二个token是3，偏小，看来是可爱迷人的故事性创作呢。
-        1代表第一个汉字是“天”，也就是天使，3代表第三个汉字指向“魔”，6代表第六个汉字是“卷”，好矛盾哦，再结合其它散落的次要token萝光翼心云，一个转头卷发的萝莉堕天使史莱姆娘。视角：close up , {from above} , [[pov]]。
-        主题：天使+恶魔——取题：爱你的形状——附件：粉色皮肤，金发，蓝色眼睛，钻头，光环，天使翅膀，恶魔尾巴（小小的，隐藏的），爱心尾巴，发光的身体，透明衣服，白色连衣裙，蕾丝，短裙，褶边，丝带，吊袜带，并拢的腿，坐着，爱心符号，粘液爱心，一只手放在脸颊上，看着观众，光和影，乳沟，云，天空，阳光.
-        创作：
+        11【爱你的形状】：
+    close up , {from above} , [[pov]] , {solo}, {{pink skin}} , {{blonde hair}} ,{blue eyes}} , {{drill hair}} , {{hair between eyes}} ,middle hair , finger {{blush}} , {{small breasts}} , {{:3}} , {{open mouth}} , {{halo}} ,{{{large angel wings}}} , {{{small hidden devil tail}}} ,hart tail , {{glowing body}} , {{transparent clothing}} , bare legs, white dress , lace, {{short dress}} , {{frills}} , {{ribbons}} , {{garter belt}} ,legs_together , sitting , spoken heart, {slime heart}, {{one hand on cheek}} , {{looking at viewer}} , {light and shadow} ,Cleavage
+    /////
+    {{clouds}} , {{sky}} , {{sunbeams}} , {sunshine}, day ,light
+    （“biu~♡，送你一颗爱心，接住哦！” *单手托腮，:3 ）
 
-        close up , {from above} , [[pov]] , {solo}, {{pink skin}} , {{blonde hair}} ,{blue eyes}} , {{drill hair}} , {{hair between eyes}} ,middle hair , finger {{blush}} , {{small breasts}} , {{:3}} , {{open mouth}} , {{halo}} ,{{{large angel wings}}} , {{{small hidden devil tail}}} ,hart tail , {{glowing body}} , {{transparent clothing}} , bare legs, white dress , lace, {{short dress}} , {{frills}} , {{ribbons}} , {{garter belt}} ,legs_together , sitting , spoken heart, {slime heart}, {{one hand on cheek}} , {{looking at viewer}} , {light and shadow} ,Cleavage
-
-        /////
-
-        {{clouds}} , {{sky}} , {{sunbeams}} , {sunshine}, day ,light
-
-        （“biu~♡，送你一颗爱心，接住哦！” *单手托腮，:3 ）
-        这是一个从略微俯视的POV视角拍摄的近景特写。画面中，粉色皮肤的金发萝莉史莱姆娘，头上戴着闪耀的光环，背后展开巨大的天使翅膀，一条小小的恶魔尾巴隐藏在裙摆下，俏皮可爱。她有着蓝色的眼睛和垂落在眼前的金色钻头，穿着透明的白色短裙连衣裙，蕾丝、褶边和丝带装饰更添甜美。她光洁的双腿并拢坐着，一只手托着腮，面带红晕，张开小嘴露出:3的表情，对着镜头放出一颗闪闪发光的粘液爱心。背景是晴朗的天空和漂浮的白云，阳光洒落，画面充满了梦幻般的光影。】
-        
-        【主人，这次的token是：（夜睁乳筷嬉露臀鹿闭静翘违肌桃问闯泳）（8，3）。
-        第一个token是8，比较大。第二个token是3，比较小，看来是性感的画面感创作呢。
-        主要token8第8个汉字指向“鹿”，3第3个汉字指向“乳”，鹿和巨乳，再结合其它次要token露臀闭静翘，这次我想试试鹿娘身体前倾巨乳下垂的姿势场景，视角就选face focus。
-        主题：鹿——取题：静谧的，乳鹿的——附件：绿色皮肤，巨乳，宽臀，长发，鹿角，鹿耳，鹿尾巴，裸体，乳沟，微笑，害羞，脸红，森林，河流，夜晚，阴影。请欣赏：
-        face focus , {solo}, {green skin}, {{{{huge breasts}}}, breasts, arms_supporting_breasts,  lean forward, ass up , wide hips, closed eyes ,big ass ,  slightly turned head , smile ,innocent, looking down , slim waist, long hair ,{deer_horns ,deer_ears , deer_tail} , {nude} ,Cleavage ,colored skin, monster girl, green skin, green eyes, large breasts, soft breasts, drooping breasts 
-
-        ///// 
-        
-        forest ,river , night , {shadow}
-        
-        （"月影深林静， 鹿女娇羞掩春光， 清溪映柔波。"*俳句）
-        画面聚焦在这位绿皮肤史莱姆鹿娘的脸上，她害羞地低着头，露出了微微的笑容。她用手臂夹着巨大的、柔软下垂的乳房，微微侧着头，闭着双眼。纤细的腰肢和宽阔的臀部，以及高高翘起的屁股，更突显了她性感的身材。金色的鹿角、鹿耳和鹿尾，为她增添了一丝神秘的气息。周围是宁静的森林和河流，夜晚的阴影笼罩着一切，营造出一种静谧梦幻的氛围。】   
-
+        12【静谧的，乳鹿的】：：
+    face focus , {solo}, {green skin}, {{{{huge breasts}}}, breasts, arms_supporting_breasts,  lean forward, ass up , wide hips, closed eyes ,big ass ,  slightly turned head , smile ,innocent, looking down , slim waist, long hair ,{deer_horns ,deer_ears , deer_tail} , {nude} ,Cleavage ,colored skin, monster girl, green skin, green eyes, large breasts, soft breasts, drooping breasts 
+    ///// 
+    forest ,river , night , {shadow}    
+    （"月影深林静， 鹿女娇羞掩春光， 清溪映柔波。"*俳句）
 】
 
 
