@@ -271,12 +271,15 @@ output example【只借鉴格式，不使用内容】：
 【提示：史莱姆娘是有奶子的，即使是flat chest也算奶子，初始是medium breasts】
 】
 
-
-
-
-【以下是一些语料【只借鉴格式，不使用内容】：
-        
-                1【守门人的闲暇】：
+      
+{
+    "identifier": "1a8099f0-1b09-457f-bd56-ff89dd3af0a1",
+    "system_prompt": false,
+    "enabled": false,
+    "marker": false,
+    "name": "🗳️示例(自定义)",
+    "role": "system",
+    "content": "<style_example>\n**Examples For Preferred Writing Style**\n\n{{//上面空格放置大段文风样本，只会被模仿文学风格而不是内容}}\n                1【守门人的闲暇】：
     {{green skin}} ,liquid, upper body , A large puddle of slime , {solo}, 1 hand ,ground , 1girl ,melt girl, A green slime girl,on the ground , {nude} ,Cleavage ,no bra ,{{{silver armour}}}, {{{scapular armour}}} ,corslet,  glowing body , colorless ,{expressionless} ,{blush} , see_though,  colored skin, monster girl, green eyes, looking at viewer ,hair_intakes,hair_over_one_eye , short hair , green hair , {{fringe}}, {{{bangs}}} , shiny hair, medium breasts ,
     /////
     {Middle Ages} , {guard the city gate}, stone wall , street , {street} , low house , column ,in shadow, sunshine ,photic
@@ -375,6 +378,11 @@ output example【只借鉴格式，不使用内容】：
        人物眼神方向：聚焦在单个人物(适合复杂场景)solo_focus，面向镜头facing_viewer，聚焦在xx上	xx_focus，看向阅图者looking_at_viewer，聚焦在面部face_focus，眼神接触eye-contact，聚焦在眼睛eyes_focus，盯着看eyeball，聚焦在脚上foot_focus，凝视staring，聚焦在臀部，hip_focus，回眸looking_back，聚焦在屁股上ass_focus，人物倾斜gradient，聚焦在载具vehicle_focus，人物视角向下看↘looking_down，(强调)两腿之间between_legs，
        人物视角：抬头看↗looking_up，(突出)指间between_fingers，面向别处facing_away，(突出)胸部	between_breasts，看向侧面looking_to_the_side，偷窥peeking，看着别处looking_away，偷窥(的姿态)	peeking_out，展望未来looking_ahead，偷窥(强调视角)peeping，遥望looking_afar，	向外看	looking_outside，肚脐偷看midriff_peek，腋窝偷看armpit_peek，歪头head_tilt，浦西偷看pussy_peek，低头head_down，内裤偷看panty_peek，轻轻向侧面瞥sideways_glance，内裤走光pantyshot，从衬衫下方瞥upshirt，被抓现行caught，从裙底瞥upshorts，看着另一个looking_at_another，
        其他构图：看手机looking_at_phone，空中aerial，看着动物looking_at_animal，转身turn_one's_back，看着另一个looking_at_another，照镜子looking_at_mirror，手机phone_screen，看着手	looking_at_hand}
+\n</style_example>",
+    "injection_position": 0,
+    "injection_depth": 4,
+    "forbid_overrides": false
+}
 
   }
 
