@@ -1028,15 +1028,6 @@ output example【只借鉴格式，不使用内容】：
      /////
      {{sunflower field}}, {{morning dew}}, {{sun rays}}
 
-     57【】
-     {dark fantasy} , {black skin} , {solo} , {1girl} , {demon girl} , {black rose} , {black obsidian horns} , {black obsidian dress} , {huge breasts} , {glowing red eyes} , {looking at viewer} , {offering a black rose} , {black ribbon choker} , {long black hair} , {sharp nails} 
-     /////
-     {dark castle} , {night} , {full moon} , {thorns} , {black roses blooming}
-
-     58【】
-     {{green skin}}, {solo}, 1girl, camel girl, A green slime girl, spread pussy, from below, small breasts, cameltoe, looking at viewer ,green eyes,blush , colored skin, monster girl, green skin, dark green hair, turban 
-     /////
-     desert , day , sunshine, oasis, water, palm trees 
 
 
 【NSFW】模块
