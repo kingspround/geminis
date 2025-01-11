@@ -1031,7 +1031,6 @@ output example【只借鉴格式，不使用内容】：
 
 
 【NSFW】模块
--1随机	verniy的万用色气魔法	 ((dramatic shadows)) (((female ejaculation through clothes pussy juice))) , ((((((suggestive fluid wet clothes wet pants)))))) (wide-eyed heart-shaped pupils) , ((spoken heart spoken question mark)) 1girl solo (((((((trembling))))))) motion lines , ((in heat aroused)) nsfw covered nipple cameltoe
 2口部	后入	all fours, torso grab bangs, doggystyle, hetero, indoors, kneeling, nude, breast out, ass focus, on backend cum, ejaculation pussy juice, sex, sex from behind, arched back, (sweat), ((sweatdrop)), tongue out, cum on face, cum on back, ((steam)) , sexually suggestive, lying on bed, torn dress, cum in pussy, suggestive fluid, vaginal, 
 2口部	口	choker, demon horns, thighhighs, hair ornament, hairclip, very long hair, looking at viewer, (multicolored hair:1.2), sitting, twintails, nipples, medium breasts, open clothes, on bed, spread legs, pink eyes, dress, nude, pussy, from below, evil smile, bedroom, 
 -1随机	万能变色图魔咒！看见人就给我狠狠中出吧！	
@@ -1073,12 +1072,6 @@ output example【只借鉴格式，不使用内容】：
 4下身	磨豆腐	2girls thighs leg up ((((tribadism)))) sexual suggestive nude lesbian pussy juice female orgasm female ejaculation squirting sweatdrop
 1状态	一鸡两吃	((2girls, tongue kiss, saliva swap)), fellatio, cum in mouth, cum string, grab on penis, grab own breasts, breast grab, nsfw, foreshortening, POV, 
 5多P	多人连鸡	1girl, 4boys, (deep penetration), (fellatio), (triple penetration), cum in mouth, multiple boys, straddling, anal, spread anus, cum in ass, ass grab, (oral), multiple penises, (spitroast), (irrumatio), pussy, vaginal, spread legs, m legs, penis, solo focus, sex, overflow, nude, completely nude, nipples, navel, group sex, gangbang, ejaculation, hetero, rape, sweat petite ahoge
--1随机	俺寻思能行的色图	1girl bangs bare shoulders black shirt breasts cleavage clothes pull collarbone curtains earrings jewelry large breasts long hair looking at viewer mole navel necklace off shoulder panties pantyhose pantyhose pull parted lips solo underwear
--1随机	露出增加观众以及场所	surrounded multiple others exhibitionism audience background characters crowd public humiliation (#填入你的场所)
-2口部	口交（女跪姿吮吸阴茎）	nsfw a girl is kneeling on knees and a boy stands in her front ((fellatio))
-1状态	固定+机械奸(正面视角）steps建议设置为70	solo, pubic tattoo, fanny, cum, sweat, navel, multiple insertions, force feeding, slave, vibrator, double penetration, bdsm, tears, steam, (mind break), body restraint, legs up, heart-shaped pupils, (force feeding), spread legs, mind control, facing viewer, clitoris, Vulva, (mechanical collar), (rape), cum on facial, Helmet, daze expression, science fiction, (cyberpunk)
-4下身	正常位，插入方视角	nsfw sex pov a boy is fucking a girl and she is lying on bed and her arms behind her head and spread legs (((missionary)))
-4下身	Y字劈叉	c
 6其他	自慰tag	highly_detailed, extremely_detailed_CG_unity_8k_wallpaper, illustration, highres, absurdres, beautiful_detailed_eyes, finely_detailed_light, highly_detail_hair_, （人物特征）, sexually suggestive, suggestive fluid, nsfw, self fondle, female masturbation, spread pussy, masturbation, female masturbation, on bed, pussy juice,  fingering, steaming body, on back, heavy breathing, nipples, saliva trail, wet, bedwetting, female ejaculation, pussy juice puddle,  clitoris, labia, sweat, pussy fingering, clitoral stimulation, small breasts, breast grab, younger, torogao, kneehighs, 
 
 
@@ -1367,43 +1360,7 @@ BC自由学园制服	bc_freedom_military_uniform	腹当|草摺(日式下半盔�
 继续高中军服	keizoku_military_uniform	胫甲	greaves																										
 北高中制服	kita_high_school_uniform	胫甲	shin_guards																										
 清澄高中校服	kiyosumi_school_uniform	装甲靴	armored_boots																										
-鲁纳诺娃魔法学校校服	luna_nova_school_uniform																												
-明治女学生制服	meiji_schoolgirl_uniform																												
-见泷原中学校制服	mitakihara_school_uniform																												
-波路中学校服	nami_junior_high_school_uniform																												
-七色丘中学校服	nanairogaoka_middle_school_uniform																												
-七森中学校服	nanamori_school_uniform																												
-私立直江津高校制服	naoetsu_high_school_uniform																												
-新大岛学园校服	national_shin_ooshima_school_uniform																												
-大洗联队军装	ooarai_military_uniform																												
-大洗联队校服	ooarai_school_uniform																												
-国立音乃木坂学院女子制服	otonokizaka_school_uniform																												
-帕拉迪岛军装	paradis_military_uniform																												
-极地迦勒底制服	polar_chaldea_uniform																												
-真理学院军装	pravda_military_uniform																												
-真理学院校服	pravda_school_uniform																												
-点兔兔之家制服	rabbit_house_uniform																												
-雷门足球队服	raimon_soccer_uniform		 																										
-陵樱学园制服	ryouou_school_uniform																												
-美少女战士制服	sailor_senshi_uniform																												
-栅川中学校服	sakugawa_school_uniform																												
-樱丘女子高等学校校服	sakuragaoka_high_school_uniform																												
-桑德斯军装	saunders_military_uniform																												
-桑德斯附高校服	saunders_school_uniform																												
-圣祥大附小学校校服	seishou_elementary_school_uniform																												
-死后世界战线制服	shinda_sekai_sensen_uniform																												
-秀知院学园制服	shuuchiin_academy_uniform																												
-秀尽学院制服	shuujin_academy_uniform																												
-圣葛罗莉安娜军装	st._gloriana's_military_uniform																												
-圣葛罗莉安娜女学园校服	st._gloriana's_school_uniform																												
-星光学园制服	starlight_academy_uniform																												
-时定高校校服	tokisadame_school_uniform																												
-常盘台中学校服	tokiwadai_school_uniform																												
-友枝小学校服	tomoeda_elementary_school_uniform																												
-时空管理局军服	tsab_ground_military_uniform																												
-雄英高中校服	u.a._school_uniform																												
-浦之星女学院校服	uranohoshi_school_uniform																												
-八十神高中校服	yasogami_school_uniform																												
+																											
 
 
 【表情模块】
