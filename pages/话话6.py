@@ -2023,6 +2023,13 @@ def getAnswer(prompt, continue_mode=False):
 
 
 # --- Streamlit 布局 ---
+st.set_page_config(
+    page_title="Gemini Chatbot",
+    layout="wide"
+)
+
+st.title("Gemini 聊天机器人")
+
 
 # 功能区 1: 文件操作
 with st.sidebar.expander("文件操作"):
