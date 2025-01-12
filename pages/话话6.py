@@ -8,7 +8,7 @@ import string
 import time
 from google.api_core import exceptions
 
-genai.configure(api_key="AIzaSyCBjZbA78bPusYmUNvfsmHpt6rPx6Ur0QE") # Use API Key directly, replace 【钥匙】 
+genai.configure(api_key="AIzaSyDdyhqcowl0ftcbK9pMObXzM7cIOQMtlmA") # Use API Key directly, replace 【钥匙】 
 
 # Create the model
 generation_config = {
