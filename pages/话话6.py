@@ -1957,6 +1957,7 @@ if 'continue_index' not in st.session_state:
     st.session_state.continue_index = None
 if "use_token" not in st.session_state:
     st.session_state.use_token = False # 默认不启用token
+
     
 
 # --- 功能函数 ---
@@ -2016,7 +2017,7 @@ def getAnswer(prompt, continue_mode=False):
          prompt = f"[Continue the story. Do not include ANY parts of the original message. Use capitalization and punctuation as if your reply is a part of the original message: {st.session_state.messages[-1]['content']}]"
 
     #使用之前存储的会话，而不是每次都重新开启
-    if st.session_state.chat_session is None:
+    if "chat_session" not in st.session_state or st.session_state.chat_session is None:
         st.session_state.chat_session = model.start_chat(history = [])
         if system_message != "":
             st.session_state.chat_session.send_message(system_message)
@@ -2152,9 +2153,8 @@ if prompt := st.chat_input("输入你的消息:"):
     else:
         # 如果关闭随机token，则直接将用户输入添加到his_messages
        st.session_state.messages.append({"role": "user", "content": prompt})
-       
     with st.chat_message("user"):
-          st.markdown(prompt if not "use_token" in st.session_state or not st.session_state.use_token else f"{prompt} (token: {token})")
+        st.markdown(prompt if not "use_token" in st.session_state or not st.session_state.use_token else f"{prompt} (token: {token})")
     with st.chat_message("assistant"):
         message_placeholder = st.empty()
         full_response = ""
