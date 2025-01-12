@@ -1,15 +1,7 @@
 import os
 import google.generativeai as genai
+import json
 import streamlit as st
-from dotenv import load_dotenv  
-from PIL import Image
-import numpy as np
-import streamlit as st
-import pickle
-import glob
-import json  # Import the json library
-from tkinter import Tk, Text, Scrollbar, Entry, Button, END, VERTICAL, Y, BOTH, RIGHT, LEFT, TOP, BOTTOM, X, DISABLED, NORMAL
-from tkinter.font import Font
 
 
 # 在所有其他代码之前，初始化 session state 变量
@@ -84,93 +76,45 @@ def save_chat_history(history):
         json.dump(history, f, ensure_ascii=False, indent=4)
 
 
-chat_history = load_chat_history()
-chat_session = model.start_chat(history=chat_history)
+# --- Streamlit GUI ---
+st.set_page_config(
+    page_title="Gemini Chatbot",
+    layout="wide"
+)
+
+st.title("Gemini 聊天机器人")
+
+# -- Initialize or Load Chat History --
+if 'chat_history' not in st.session_state:
+    st.session_state.chat_history = load_chat_history()
+chat_session = model.start_chat(history=st.session_state.chat_history)
 
 
-# --- Tkinter GUI ---
-window = Tk()
-window.title("Gemini Chatbot")
-window.geometry("800x600")
-window.resizable(True, True)
-window.configure(bg="#f0f0f0")
-
-# --- Custom Font ---
-custom_font = Font(family="Helvetica", size=10)
-custom_bold_font = Font(family="Helvetica", size=10, weight="bold")
-
-
-# --- Chat display ---
-chat_display = Text(window, wrap="word", bg="white", state=DISABLED, font=custom_font)
-chat_scrollbar = Scrollbar(window, command=chat_display.yview)
-chat_display.config(yscrollcommand=chat_scrollbar.set)
-
-chat_scrollbar.pack(side=RIGHT, fill=Y)
-chat_display.pack(side=LEFT, fill=BOTH, expand=True, padx=10, pady=10)
-
-
-# --- Input area ---
-input_frame = Tk()
-input_frame.pack(side=BOTTOM, fill=X, padx=10, pady=10)
-input_frame.configure(bg="#f0f0f0")
-
-
-input_box = Entry(input_frame, font=custom_font)
-input_box.pack(side=LEFT, fill=X, expand=True, padx=5)
-
-send_button = Button(input_frame, text="Send", command=lambda: send_message(), font=custom_bold_font, bg="#4CAF50", fg="white", activebackground="#367C39")
-send_button.pack(side=RIGHT, padx=5)
-
-
-# --- Helper Functions ---
-
-def display_message(sender, message, color="black", bold=False):
-    chat_display.config(state=NORMAL)
-    if sender == "You":
-        chat_display.insert(END, f"\n{sender}: ", "user_tag")
-        chat_display.insert(END, f"{message}\n", "user_text")
-    else:
-        chat_display.insert(END, f"\n{sender}: ", "bot_tag")
-        chat_display.insert(END, f"{message}\n", "bot_text")
-    chat_display.config(state=DISABLED)
-    chat_display.see(END)
-
-def send_message():
-    message = input_box.get()
-    if message:
-        input_box.delete(0, END)
-        display_message("You", message, "blue")
-        bot_response(message)
-
-def bot_response(message):
-    try:
-        response = chat_session.send_message(message)
-        display_message("Gemini", response.text)
-
-        # Update and save chat history
-        chat_history.append({"parts": [{"text": message}], "role": "user"})
-        chat_history.append({"parts": [{"text": response.text}], "role": "model"})
-
-        save_chat_history(chat_history)
-    except Exception as e:
-        display_message("Error", f"Error: {e}", "red")
-
-
-# --- Tags for styling in the chat display ---
-chat_display.tag_configure("user_tag", foreground="blue", font=custom_bold_font)
-chat_display.tag_configure("user_text", foreground="black", font=custom_font)
-
-chat_display.tag_configure("bot_tag", foreground="green", font=custom_bold_font)
-chat_display.tag_configure("bot_text", foreground="black", font=custom_font)
-
-
-# Display previous history on startup
-for turn in chat_history:
+# Display Chat History
+for turn in st.session_state.chat_history:
     role = turn.get("role")
     if role == "user":
-       display_message("You", turn.get("parts")[0].get("text"), "blue")
+        with st.chat_message("user"):
+            st.markdown(turn.get("parts")[0].get("text"))
     elif role == "model":
-        display_message("Gemini", turn.get("parts")[0].get("text"), "green")
+        with st.chat_message("assistant"):
+            st.markdown(turn.get("parts")[0].get("text"))
 
-# --- Run the GUI ---
-window.mainloop()
+
+# Input Area and Send Message
+if prompt := st.chat_input("在这里输入你的消息..."):
+    with st.chat_message("user"):
+        st.markdown(prompt)
+
+    try:
+        response = chat_session.send_message(prompt)
+        with st.chat_message("assistant"):
+            st.markdown(response.text)
+
+        # Update and save chat history
+        st.session_state.chat_history.append({"parts": [{"text": prompt}], "role": "user"})
+        st.session_state.chat_history.append({"parts": [{"text": response.text}], "role": "model"})
+        save_chat_history(st.session_state.chat_history)
+
+    except Exception as e:
+        st.error(f"错误: {e}")
