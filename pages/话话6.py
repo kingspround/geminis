@@ -628,7 +628,7 @@ step3【贝叶斯决策步骤 3】【元素审查】, "这次的史莱姆娘是�
 }
 
 
-output formet
+output formet【只展示格式和说明具体输出参考output example】
 {
 <thinking>【使用✅动态CoT】
         {
