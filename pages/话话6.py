@@ -1942,7 +1942,6 @@ DEFAULT_CHARACTER_SETTINGS = {
 filename = "chat_log.txt"
 log_file = "chat_log.pkl"
 
-
 # --- 初始化 Session State ---
 if "messages" not in st.session_state:
     st.session_state.messages = []
@@ -1957,6 +1956,8 @@ if 'continue_index' not in st.session_state:
     st.session_state.continue_index = None
 if "use_token" not in st.session_state:
     st.session_state.use_token = False # 默认不启用token
+    
+
     
 
 # --- 功能函数 ---
@@ -2021,13 +2022,6 @@ def getAnswer(prompt, continue_mode=False):
 
 
 # --- Streamlit 布局 ---
-st.set_page_config(
-    page_title="Gemini Chatbot",
-    layout="wide"
-)
-
-st.title("Gemini 聊天机器人")
-
 
 # 功能区 1: 文件操作
 with st.sidebar.expander("文件操作"):
