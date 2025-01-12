@@ -172,23 +172,23 @@ with st.sidebar.expander("角色设定"):
 # 显示历史记录和编辑功能
 for i, message in enumerate(st.session_state.messages):
     with st.chat_message(message["role"]):
-        main_col, button_col = st.columns([12, 1]) # 调整比例使按钮区域更小
-
+       
+        main_col, button_col = st.columns([12, 1])
         with main_col:
-             st.write(message["content"], key=f"message_{i}")
-
+            st.write(message["content"], key=f"message_{i}")
         with button_col:
-             col1, col2, col3 = st.columns(3)
-             with col1:
-                if st.button("✏️", key=f"edit_{i}"):
-                    st.session_state.editable_index = i
-                    st.session_state.editing = True
-             with col2:
-                if st.button("♻️", key=f"regenerate_{i}"):
-                    regenerate_message(i)
-             with col3:
-                if st.button("➕", key=f"continue_{i}"):
-                   continue_message(i)
+            with st.container(): # 保证按钮只显示在消息的下方
+                col1, col2, col3 = st.columns(3)
+                with col1:
+                     if st.button("✏️", key=f"edit_{i}"):
+                         st.session_state.editable_index = i
+                         st.session_state.editing = True
+                with col2:
+                     if st.button("♻️", key=f"regenerate_{i}"):
+                         regenerate_message(i)
+                with col3:
+                    if st.button("➕", key=f"continue_{i}"):
+                        continue_message(i)
 
 
 if st.session_state.get("editing"):
