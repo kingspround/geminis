@@ -3,8 +3,36 @@ import google.generativeai as genai
 import json
 import streamlit as st
 import pickle
+import random
+import string
+import time
+from google.api_core import exceptions
 
-genai.configure(api_key="AIzaSyCBjZbA78bPusYmUNvfsmHpt6rPx6Ur0QE") # Use API Key directly, replace 【钥匙】 
+
+# --- API 密钥设置 ---
+api_keys = {
+    "主密钥": "AIzaSyCBjZbA78bPusYmUNvfsmHpt6rPx6Ur0QE",  # 替换成你的主 API 密钥
+    "备用1号": "AIzaSyAWfFf6zqy1DizINOwPfxPD8EF2ACdwCaQ",  # 替换成你的备用 API 密钥
+    "备用2号":"AIzaSyD4UdMp5wndOAKxtO1CWpzuZEGEf78YKUQ",
+    "备用3号":"AIzaSyBVbA7tEyyy_ASp7l9P60qSh1xOM2CSMNw",
+    "备用4号":"AIzaSyDezEpxvtY1AKN6JACMU9XHte5sxATNcUs",
+    "备用5号":"AIzaSyBgyyy2kTTAdsLB53OCR2omEbj7zlx1mjw",
+    "备用6号":"AIzaSyDPFZ7gRba9mhKTqbXA_Y7fhAxS8IEu0bY",
+    "备用7号":"AIzaSyDdyhqcowl0ftcbK9pMObXzM7cIOQMtlmA",
+    "备用8号":"AIzaSyAA7Qs9Lzy4UxxIqCIQ4RknchiWQt_1hgI",
+    "备用9号":"AIzaSyCj_CCwQua1mfq3EjzqV6Up6NHsxtb9dy8",
+    "备用10号":"AIzaSyDOI2e-I1RdXBnk99jY2H00A3aymXREETA"
+}
+
+selected_key = st.sidebar.selectbox("选择 API 密钥", list(api_keys.keys()), index=0) # 默认选择主密钥
+api_key = api_keys[selected_key]
+
+if not api_key:
+    st.error("请设置有效的API密钥。")
+    st.stop()
+
+genai.configure(api_key=api_key)
+
 
 # Create the model
 generation_config = {
