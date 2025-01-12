@@ -28,7 +28,6 @@ model = genai.GenerativeModel(
   generation_config=generation_config,
   safety_settings=safety_settings,
   system_instruction="""
-{
     "openai_max_context": 200000,
     "openai_max_tokens": 8000,
     "wrap_in_quotes": false,
@@ -1928,7 +1927,7 @@ mediumslateblue	中板岩蓝
     "injection_position": 0,
     "injection_depth": 4,
     "forbid_overrides": false}
-"""}},
+""",
 )
 
 
