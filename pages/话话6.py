@@ -1,45 +1,12 @@
 import os
 import google.generativeai as genai
+import json
 import streamlit as st
-from dotenv import load_dotenv
-from PIL import Image
-import numpy as np
-from io import BytesIO
-from io import StringIO
 import pickle
-import glob
 
-# 在所有其他代码之前，初始化 session state 变量
-if "character_settings" not in st.session_state:
-    st.session_state.character_settings = {} 
-if "enabled_settings" not in st.session_state:
-    st.session_state.enabled_settings = {}
+genai.configure(api_key="AIzaSyCBjZbA78bPusYmUNvfsmHpt6rPx6Ur0QE") # Use API Key directly, replace 【钥匙】 
 
-# --- API 密钥设置 ---
-api_keys = {
-    "主密钥": "AIzaSyCBjZbA78bPusYmUNvfsmHpt6rPx6Ur0QE",  # 替换成你的主 API 密钥
-    "备用1号": "AIzaSyAWfFf6zqy1DizINOwPfxPD8EF2ACdwCaQ",  # 替换成你的备用 API 密钥
-    "备用2号":"AIzaSyD4UdMp5wndOAKxtO1CWpzuZEGEf78YKUQ",
-    "备用3号":"AIzaSyBVbA7tEyyy_ASp7l9P60qSh1xOM2CSMNw",
-    "备用4号":"AIzaSyDezEpxvtY1AKN6JACMU9XHte5sxATNcUs",
-    "备用5号":"AIzaSyBgyyy2kTTAdsLB53OCR2omEbj7zlx1mjw",
-    "备用6号":"AIzaSyDPFZ7gRba9mhKTqbXA_Y7fhAxS8IEu0bY",
-    "备用7号":"AIzaSyDdyhqcowl0ftcbK9pMObXzM7cIOQMtlmA",
-    "备用8号":"AIzaSyAA7Qs9Lzy4UxxIqCIQ4RknchiWQt_1hgI",
-    "备用9号":"AIzaSyCj_CCwQua1mfq3EjzqV6Up6NHsxtb9dy8",
-    "备用10号":"AIzaSyDOI2e-I1RdXBnk99jY2H00A3aymXREETA"
-}
-
-selected_key = st.sidebar.selectbox("选择 API 密钥", list(api_keys.keys()), index=0) # 默认选择主密钥
-api_key = api_keys[selected_key]
-
-if not api_key:
-    st.error("请设置有效的API密钥。")
-    st.stop()
-
-genai.configure(api_key=api_key)
-
-# --- 模型设置 ---
+# Create the model
 generation_config = {
   "temperature": 1,
   "top_p": 0.95,
@@ -47,6 +14,7 @@ generation_config = {
   "max_output_tokens": 8192,
   "response_mime_type": "text/plain",
 }
+
 
 safety_settings = [
     {"category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_NONE"},
@@ -56,9 +24,10 @@ safety_settings = [
 ]
 
 model = genai.GenerativeModel(
-  model_name="gemini-2.0-flash-thinking-exp-1219",
+  model_name="gemini-2.0-flash-exp",
   generation_config=generation_config,
-  system_instruction="""{```json
+  safety_settings=safety_settings,
+  system_instruction="""
 {
     "openai_max_context": 200000,
     "openai_max_tokens": 8000,
