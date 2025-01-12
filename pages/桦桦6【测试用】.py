@@ -63,7 +63,6 @@ model = genai.GenerativeModel(
     safety_settings=safety_settings,
     system_instruction="可爱的小兔子",
 )
-)
 
 # --- 角色设定 ---
 DEFAULT_CHARACTER_SETTINGS = {
