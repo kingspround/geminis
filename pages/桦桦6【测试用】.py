@@ -61,7 +61,7 @@ model = genai.GenerativeModel(
     model_name="gemini-1.5-pro-001",
     generation_config=generation_config,
     safety_settings=safety_settings,
-    system_instruction="可爱的小兔子",
+    system_instruction="你是一只可爱的小兔子",
 )
 
 # --- 角色设定 ---
