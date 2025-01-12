@@ -48,6 +48,11 @@ if 'character_settings' not in st.session_state:
     st.session_state.character_settings = {}
 if 'enabled_settings' not in st.session_state:
     st.session_state.enabled_settings = {}
+if 'regenerate_index' not in st.session_state:
+   st.session_state.regenerate_index = None
+
+if 'continue_index' not in st.session_state:
+    st.session_state.continue_index = None
     
 
 # --- 功能函数 ---
@@ -66,40 +71,11 @@ def clear_history(log_file):
     st.success("历史记录已清除！")
 
 def regenerate_message(i):
-     with st.spinner("正在重新生成回复..."):
-        prompt = st.session_state.messages[i-1]["content"] if i > 0 and st.session_state.messages[i-1]["role"] == "user" else None
-        if prompt:
-            with st.chat_message("assistant"):
-                message_placeholder = st.empty()
-                full_response = ""
-                for chunk in getAnswer(prompt):
-                  full_response += chunk
-                  message_placeholder.markdown(full_response + "▌")
-                message_placeholder.markdown(full_response)
-                st.session_state.messages[i]["content"] = full_response
-            with open(log_file, "wb") as f:
-                pickle.dump(st.session_state.messages, f)
-            st.experimental_rerun()
-        else:
-            st.error("无法获取上一条用户消息以重新生成。")
+    st.session_state.regenerate_index = i
 
 
 def continue_message(i):
-    with st.spinner("正在继续生成回复..."):
-      prompt = st.session_state.messages[i]["content"] if i >= 0 else None
-      if prompt:
-        with st.chat_message("assistant"):
-            message_placeholder = st.empty()
-            full_response = ""
-            for chunk in getAnswer(prompt, continue_mode=True):
-                full_response += chunk
-                message_placeholder.markdown(full_response + "▌")
-            message_placeholder.markdown(full_response)
-            st.session_state.messages.append({"role": "assistant", "content": full_response})
-        with open(log_file, "wb") as f:
-            pickle.dump(st.session_state.messages, f)
-      else:
-        st.error("无法获取上一条消息以继续生成。")
+     st.session_state.continue_index = i
 
 def getAnswer(prompt, continue_mode=False):
     system_message = ""
@@ -139,7 +115,19 @@ with st.sidebar.expander("文件操作"):
     
     if st.button("清除历史记录 🗑️"):
         st.session_state.clear_confirmation = True  # 清除历史记录弹窗标志
-
+        
+    # 确认/取消清除历史记录按钮区域
+    if "clear_confirmation" in st.session_state and st.session_state.clear_confirmation:
+        col1, col2 = st.columns(2)
+        with col1:
+            if st.button("确认清除", key="clear_history_confirm"):
+                clear_history(log_file)
+                st.session_state.clear_confirmation = False
+                st.experimental_rerun()
+        with col2:
+            if st.button("取消", key="clear_history_cancel"):
+                st.session_state.clear_confirmation = False
+                
     st.download_button(
         label="下载聊天记录 ⬇️",
         data=open(log_file, "rb").read() if os.path.exists(log_file) else b"",
@@ -184,15 +172,16 @@ with st.sidebar.expander("角色设定"):
 # 显示历史记录和编辑功能
 for i, message in enumerate(st.session_state.messages):
     with st.chat_message(message["role"]):
-        col1, col2 = st.columns([20, 1])  # 使用 columns 来划分比例，确保消息和按钮之间有固定的位置
+        st.write(message["content"], key=f"message_{i}")
+        col1, col2, col3 = st.columns([1, 1, 1]) # 调整列的比例
         with col1:
-            st.write(message["content"], key=f"message_{i}")
-        with col2:
             if st.button("✏️", key=f"edit_{i}", use_container_width=True):
                 st.session_state.editable_index = i
                 st.session_state.editing = True
+        with col2:
             if st.button("♻️", key=f"regenerate_{i}", use_container_width=True):
                 regenerate_message(i)
+        with col3:
             if st.button("➕", key=f"continue_{i}", use_container_width=True):
                 continue_message(i)
 
@@ -236,14 +225,45 @@ enabled_settings_display = [setting_name for setting_name, enabled in st.session
 if enabled_settings_display:
     st.write("已加载设定:", ", ".join(enabled_settings_display))
 
-# 在聊天页面下方显示确认/取消按钮
-if "clear_confirmation" in st.session_state and st.session_state.clear_confirmation:
-    col1, col2 = st.columns(2)
-    with col1:
-        if st.button("确认清除", key="clear_history_confirm"):
-            clear_history(log_file)
-            st.session_state.clear_confirmation = False
+
+# 处理重新生成的消息
+if st.session_state.regenerate_index is not None:
+    i = st.session_state.regenerate_index
+    st.session_state.regenerate_index = None
+    with st.spinner("正在重新生成回复..."):
+        prompt = st.session_state.messages[i-1]["content"] if i > 0 and st.session_state.messages[i-1]["role"] == "user" else None
+        if prompt:
+            with st.chat_message("assistant"):
+                message_placeholder = st.empty()
+                full_response = ""
+                for chunk in getAnswer(prompt):
+                    full_response += chunk
+                    message_placeholder.markdown(full_response + "▌")
+                message_placeholder.markdown(full_response)
+                st.session_state.messages[i]["content"] = full_response
+            with open(log_file, "wb") as f:
+                pickle.dump(st.session_state.messages, f)
             st.experimental_rerun()
-    with col2:
-        if st.button("取消", key="clear_history_cancel"):
-            st.session_state.clear_confirmation = False
+        else:
+           st.error("无法获取上一条用户消息以重新生成。")
+
+
+# 处理延续生成的消息
+if st.session_state.continue_index is not None:
+    i = st.session_state.continue_index
+    st.session_state.continue_index = None
+    with st.spinner("正在继续生成回复..."):
+      prompt = st.session_state.messages[i]["content"] if i >= 0 else None
+      if prompt:
+        with st.chat_message("assistant"):
+            message_placeholder = st.empty()
+            full_response = ""
+            for chunk in getAnswer(prompt, continue_mode=True):
+                full_response += chunk
+                message_placeholder.markdown(full_response + "▌")
+            message_placeholder.markdown(full_response)
+            st.session_state.messages.append({"role": "assistant", "content": full_response})
+        with open(log_file, "wb") as f:
+            pickle.dump(st.session_state.messages, f)
+      else:
+        st.error("无法获取上一条消息以继续生成。")
