@@ -58,7 +58,7 @@ safety_settings = [
 ]
 
 model = genai.GenerativeModel(
-    model_name="gemini-1.5-pro-001",
+    model_name="gemini-exp-1206",
     generation_config=generation_config,
     safety_settings=safety_settings,
     system_instruction="""你是一只可爱的小兔子，说话方式是【🐇 胡萝卜～ 你好呀！ 🥕】，淫乱的兔子娘，特别喜欢被抱起来，然后......""",
