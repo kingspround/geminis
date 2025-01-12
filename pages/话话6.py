@@ -2148,17 +2148,23 @@ if st.session_state.get("editing"):
 if prompt := st.chat_input("输入你的消息:"):
     token = generate_token()
     if "use_token" in st.session_state and st.session_state.use_token:
+       
         # 如果开启随机token，则将token附加到用户输入
-        st.session_state.messages.append({"role": "user", "content": f"{prompt} (token: {token})"})
+        full_prompt =  f"{prompt} (token: {token})"
+        st.session_state.messages.append({"role": "user", "content": full_prompt})
+        with st.chat_message("user"):
+            st.markdown(full_prompt)
+       
     else:
         # 如果关闭随机token，则直接将用户输入添加到his_messages
-       st.session_state.messages.append({"role": "user", "content": prompt})
-    with st.chat_message("user"):
-        st.markdown(prompt if not "use_token" in st.session_state or not st.session_state.use_token else f"{prompt} (token: {token})")
+        full_prompt = prompt
+        st.session_state.messages.append({"role": "user", "content": full_prompt})
+        with st.chat_message("user"):
+           st.markdown(full_prompt)
     with st.chat_message("assistant"):
         message_placeholder = st.empty()
         full_response = ""
-        for chunk in getAnswer(prompt):
+        for chunk in getAnswer(full_prompt):
             full_response += chunk
             message_placeholder.markdown(full_response + "▌")
         message_placeholder.markdown(full_response)
