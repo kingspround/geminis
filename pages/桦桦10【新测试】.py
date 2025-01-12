@@ -4,36 +4,14 @@ import json
 import streamlit as st
 
 
-# 在所有其他代码之前，初始化 session state 变量
-if "character_settings" not in st.session_state:
-    st.session_state.character_settings = {} 
-if "enabled_settings" not in st.session_state:
-    st.session_state.enabled_settings = {}
+if "key" not in st.session_state:
+    st.session_state.key = "AIzaSyC7vfMxqZQJVNq0rUhzpOKu1m84y737Tak"  # 请替换为你的实际密钥
 
-# --- API 密钥设置 ---
-api_keys = {
-    "主密钥": "AIzaSyCBjZbA78bPusYmUNvfsmHpt6rPx6Ur0QE",  # 替换成你的主 API 密钥
-    "备用1号": "AIzaSyAWfFf6zqy1DizINOwPfxPD8EF2ACdwCaQ",  # 替换成你的备用 API 密钥
-    "备用2号":"AIzaSyD4UdMp5wndOAKxtO1CWpzuZEGEf78YKUQ",
-    "备用3号":"AIzaSyBVbA7tEyyy_ASp7l9P60qSh1xOM2CSMNw",
-    "备用4号":"AIzaSyDezEpxvtY1AKN6JACMU9XHte5sxATNcUs",
-    "备用5号":"AIzaSyBgyyy2kTTAdsLB53OCR2omEbj7zlx1mjw",
-    "备用6号":"AIzaSyDPFZ7gRba9mhKTqbXA_Y7fhAxS8IEu0bY",
-    "备用7号":"AIzaSyDdyhqcowl0ftcbK9pMObXzM7cIOQMtlmA",
-    "备用8号":"AIzaSyAA7Qs9Lzy4UxxIqCIQ4RknchiWQt_1hgI",
-    "备用9号":"AIzaSyCj_CCwQua1mfq3EjzqV6Up6NHsxtb9dy8",
-    "备用10号":"AIzaSyDOI2e-I1RdXBnk99jY2H00A3aymXREETA"
-}
-
-selected_key = st.sidebar.selectbox("选择 API 密钥", list(api_keys.keys()), index=0) # 默认选择主密钥
-api_key = api_keys[selected_key]
-
-if not api_key:
-    st.error("请设置有效的API密钥。")
+if not st.session_state.key:
+    st.info("Please add your key to continue.")
     st.stop()
 
-genai.configure(api_key=api_key)
-
+genai.configure(api_key=st.session_state.key)
 
 # Create the model
 generation_config = {
