@@ -3,15 +3,7 @@ import google.generativeai as genai
 import json
 import streamlit as st
 
-
-if "key" not in st.session_state:
-    st.session_state.key = "AIzaSyC7vfMxqZQJVNq0rUhzpOKu1m84y737Tak"  # 请替换为你的实际密钥
-
-if not st.session_state.key:
-    st.info("Please add your key to continue.")
-    st.stop()
-
-genai.configure(api_key=st.session_state.key)
+genai.configure(api_key="AIzaSyC7vfMxqZQJVNq0rUhzpOKu1m84y737Tak") # Use API Key directly, replace 【钥匙】 
 
 # Create the model
 generation_config = {
