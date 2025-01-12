@@ -8,6 +8,11 @@ import string
 import time
 from google.api_core import exceptions
 
+# 在所有其他代码之前，初始化 session state 变量
+if "character_settings" not in st.session_state:
+    st.session_state.character_settings = {} 
+if "enabled_settings" not in st.session_state:
+    st.session_state.enabled_settings = {}
 
 # --- API 密钥设置 ---
 api_keys = {
