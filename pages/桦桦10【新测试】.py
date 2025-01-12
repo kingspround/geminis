@@ -79,7 +79,7 @@ def save_chat_history(history):
 # --- Streamlit GUI ---
 st.set_page_config(
     page_title="Gemini Chatbot",
-    layout="wide"
+    # layout="wide" # REMOVED THIS LAYOUT FOR DEBUGGING
 )
 
 st.title("Gemini 聊天机器人")
