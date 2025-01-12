@@ -2015,10 +2015,16 @@ def getAnswer(prompt, continue_mode=False):
     if continue_mode and st.session_state.messages[-1]["role"] == "assistant":
          prompt = f"[Continue the story. Do not include ANY parts of the original message. Use capitalization and punctuation as if your reply is a part of the original message: {st.session_state.messages[-1]['content']}]"
 
-    chat_session = model.start_chat(history = [])
-    if system_message != "":
-       chat_session.send_message(system_message)
-    response = chat_session.send_message(prompt, stream=True)
+    #使用之前存储的会话，而不是每次都重新开启
+    if st.session_state.chat_session is None:
+        st.session_state.chat_session = model.start_chat(history = [])
+        if system_message != "":
+            st.session_state.chat_session.send_message(system_message)
+
+    if system_message != "" and not st.session_state.chat_session.history:
+         st.session_state.chat_session.send_message(system_message)
+
+    response = st.session_state.chat_session.send_message(prompt, stream=True)
     for chunk in response:
         yield chunk.text
 
@@ -2143,13 +2149,12 @@ if prompt := st.chat_input("输入你的消息:"):
     if "use_token" in st.session_state and st.session_state.use_token:
         # 如果开启随机token，则将token附加到用户输入
         st.session_state.messages.append({"role": "user", "content": f"{prompt} (token: {token})"})
-        
     else:
         # 如果关闭随机token，则直接将用户输入添加到his_messages
        st.session_state.messages.append({"role": "user", "content": prompt})
-    
+       
     with st.chat_message("user"):
-       st.markdown(prompt if not "use_token" in st.session_state or not st.session_state.use_token else f"{prompt} (token: {token})")
+          st.markdown(prompt if not "use_token" in st.session_state or not st.session_state.use_token else f"{prompt} (token: {token})")
     with st.chat_message("assistant"):
         message_placeholder = st.empty()
         full_response = ""
