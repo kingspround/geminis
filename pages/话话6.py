@@ -1927,9 +1927,8 @@ mediumslateblue	中板岩蓝
 \n</style_example>",
     "injection_position": 0,
     "injection_depth": 4,
-    "forbid_overrides": false
-}
-"""},
+    "forbid_overrides": false}
+"""}},
 )
 
 
