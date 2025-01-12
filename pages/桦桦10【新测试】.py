@@ -62,6 +62,7 @@ model = genai.GenerativeModel(
     generation_config=generation_config,
     safety_settings=safety_settings,
     system_instruction="""
+{
     "chat_completion_source": "openai",
     "openai_model": "claude-3-5-sonnet-20241022",
     "claude_model": "claude-3-5-sonnet-20241022",
@@ -1721,6 +1722,7 @@ model = genai.GenerativeModel(
     "function_calling": false,
     "seed": -1,
     "n": 1
+}
 """,
 )
 
