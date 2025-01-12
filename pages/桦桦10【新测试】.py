@@ -10,6 +10,10 @@ from io import StringIO
 import streamlit as st
 import pickle
 import glob
+import json  # Import the json library
+from tkinter import Tk, Text, Scrollbar, Entry, Button, END, VERTICAL, Y, BOTH, RIGHT, LEFT, TOP, BOTTOM, X, DISABLED, NORMAL
+from tkinter.font import Font
+
 
 # 在所有其他代码之前，初始化 session state 变量
 if "character_settings" not in st.session_state:
