@@ -173,7 +173,9 @@ with st.sidebar.expander("角色设定"):
 for i, message in enumerate(st.session_state.messages):
     with st.chat_message(message["role"]):
         st.write(message["content"], key=f"message_{i}")
-        col1, col2, col3 = st.columns([1, 1, 1]) # 调整列的比例
+        
+        # 使用 columns 来创建水平布局的按钮
+        col1, col2, col3 = st.columns(3) # 使用 3 列
         with col1:
             if st.button("✏️", key=f"edit_{i}", use_container_width=True):
                 st.session_state.editable_index = i
