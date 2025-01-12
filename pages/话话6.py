@@ -1930,10 +1930,9 @@ mediumslateblue	中板岩蓝
     "forbid_overrides": false
 }
 
-  }
 
 """}
-   )
+)
 
 
 
