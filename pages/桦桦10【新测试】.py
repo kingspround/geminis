@@ -174,19 +174,20 @@ for i, message in enumerate(st.session_state.messages):
     with st.chat_message(message["role"]):
         st.write(message["content"], key=f"message_{i}")
         
-        # 使用 container 创建水平排列的按钮区域
-        with st.container():
-            col1, col2, col3 = st.columns(3)
-            with col1:
-                if st.button("✏️", key=f"edit_{i}", use_container_width=True):
-                     st.session_state.editable_index = i
-                     st.session_state.editing = True
-            with col2:
-                if st.button("♻️", key=f"regenerate_{i}", use_container_width=True):
-                    regenerate_message(i)
-            with col3:
-                if st.button("➕", key=f"continue_{i}", use_container_width=True):
-                   continue_message(i)
+        # 使用 columns 来创建水平排列的按钮区域
+        button_col1, button_col2, button_col3 = st.columns([1, 1, 1])
+        with button_col1:
+            if st.button("✏️", key=f"edit_{i}"):
+                st.session_state.editable_index = i
+                st.session_state.editing = True
+        with button_col2:
+            if st.button("♻️", key=f"regenerate_{i}"):
+                regenerate_message(i)
+        with button_col3:
+            if st.button("➕", key=f"continue_{i}"):
+               continue_message(i)
+        
+
 
 if st.session_state.get("editing"):
     i = st.session_state.editable_index
