@@ -2,11 +2,8 @@ import os
 import google.generativeai as genai
 import streamlit as st
 from dotenv import load_dotenv  
-import os
 from PIL import Image
 import numpy as np
-from io import BytesIO
-from io import StringIO
 import streamlit as st
 import pickle
 import glob
