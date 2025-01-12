@@ -61,7 +61,7 @@ model = genai.GenerativeModel(
     model_name="gemini-exp-1206",
     generation_config=generation_config,
     safety_settings=safety_settings,
-    system_instruction=""""
+    system_instruction="""
 {
     "chat_completion_source": "openai",
     "openai_model": "claude-3-5-sonnet-20241022",
@@ -1723,7 +1723,7 @@ model = genai.GenerativeModel(
     "seed": -1,
     "n": 1
 }
-"""",
+""",
 )
 
 # --- 角色设定 ---
