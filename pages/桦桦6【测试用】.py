@@ -1,4 +1,4 @@
-# First
+import os
 import google.generativeai as genai
 import streamlit as st
 from dotenv import load_dotenv  
@@ -187,7 +187,6 @@ def clear_history(log_file):
         st.warning(f"{filename} 不存在。")
 
 
-
 # --- LLM 函数 ---
 def getAnswer(prompt):
     prompt = prompt or ""
@@ -209,30 +208,19 @@ def getAnswer(prompt):
     # 将角色设定和 test_text 添加到用户消息的开头
     prompt = enabled_settings_content + prompt #  <--  在这里添加 enabled_settings_content
 
-    his_messages = []
-    his_messages.append(
-        {"role": "model", "parts":[{"text": """
-{
+    # 构建对话历史
+    history = []
+    for msg in st.session_state.messages:
+        history.append({"role": msg["role"], "parts": [msg["content"]]})
 
-}    """}]}
-    )
-
-    for msg in st.session_state.messages[-20:]:
-        if msg["role"] == "user":
-            his_messages.append({"role": "user", "parts": [{"text": msg["content"]}]})
-        elif msg is not None and msg["content"] is not None:
-            his_messages.append({"role": "model", "parts": [{"text": msg["content"]}]})
-
-    his_messages = [msg for msg in his_messages if msg["role"] in ["user", "model"]]
-    his_messages.append({"role": "user", "parts": [{"text": prompt}]})
-
-
+    # 创建新的聊天会话或使用现有的会话
+    if "chat_session" not in st.session_state or not st.session_state.chat_session:
+        st.session_state.chat_session = model.start_chat(history=history)
+    
+    # 发送消息并获取响应
     try:
-        response = model.generate_content(contents=his_messages, stream=True)
-        full_response = ""
-        for chunk in response:
-            full_response += chunk.text
-            yield chunk.text
+        response = st.session_state.chat_session.send_message(prompt)
+        full_response = response.text
         return full_response
     except Exception as e:
         st.error(f"发生错误: {e}. 请检查你的API密钥和消息格式。") #更明确的错误信息
@@ -338,22 +326,14 @@ if st.session_state.get("editing"):
             if st.button("取消", key=f"cancel_{i}"):
                 st.session_state.editing = False
 
-
-
-
-
 # 聊天输入和响应
 if prompt := st.chat_input("输入你的消息:"):
     st.session_state.messages.append({"role": "user", "content": prompt})
     with st.chat_message("user"):
         st.markdown(prompt)
     with st.chat_message("assistant"):
-        message_placeholder = st.empty()
-        full_response = ""
-        for chunk in getAnswer(prompt):
-            full_response += chunk
-            message_placeholder.markdown(full_response + "▌")
-        message_placeholder.markdown(full_response)
+        full_response = getAnswer(prompt)
+        st.markdown(full_response)
         st.session_state.messages.append({"role": "assistant", "content": full_response})
     with open(log_file, "wb") as f:
         pickle.dump(st.session_state.messages, f)
