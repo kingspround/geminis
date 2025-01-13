@@ -1509,6 +1509,17 @@ with st.sidebar.expander("文件操作"):
     
     if st.button("清除历史记录 🗑️"):
         st.session_state.clear_confirmation = True  # 清除历史记录弹窗标志
+    
+    if "clear_confirmation" in st.session_state and st.session_state.clear_confirmation:
+            col1, col2 = st.columns(2)
+            with col1:
+                if st.button("确认清除", key="clear_history_confirm"):
+                    clear_history(log_file)
+                    st.session_state.clear_confirmation = False
+                    st.experimental_rerun()
+            with col2:
+                if st.button("取消", key="clear_history_cancel"):
+                    st.session_state.clear_confirmation = False
 
     st.download_button(
         label="下载聊天记录 ⬇️",
@@ -1554,16 +1565,17 @@ with st.sidebar.expander("角色设定"):
 # 显示历史记录和编辑功能
 for i, message in enumerate(st.session_state.messages):
     with st.chat_message(message["role"]):
-        col1, col2 = st.columns([20, 1])  # 使用 columns 来划分比例，确保消息和按钮之间有固定的位置
+        st.write(message["content"], key=f"message_{i}")
+        col1, col2, col3 = st.columns(3)
         with col1:
-            st.write(message["content"], key=f"message_{i}")
-        with col2:
             if st.button("✏️", key=f"edit_{i}", use_container_width=True):
                 st.session_state.editable_index = i
                 st.session_state.editing = True
+        with col2:
             if st.button("♻️", key=f"regenerate_{i}", use_container_width=True):
                 regenerate_message(i)
-            if st.button("➕", key=f"continue_{i}", use_container_width=True):
+        with col3:
+             if st.button("➕", key=f"continue_{i}", use_container_width=True):
                 continue_message(i)
 
 
@@ -1605,15 +1617,3 @@ if prompt := st.chat_input("输入你的消息:"):
 enabled_settings_display = [setting_name for setting_name, enabled in st.session_state.enabled_settings.items() if enabled]
 if enabled_settings_display:
     st.write("已加载设定:", ", ".join(enabled_settings_display))
-
-# 在聊天页面下方显示确认/取消按钮
-if "clear_confirmation" in st.session_state and st.session_state.clear_confirmation:
-    col1, col2 = st.columns(2)
-    with col1:
-        if st.button("确认清除", key="clear_history_confirm"):
-            clear_history(log_file)
-            st.session_state.clear_confirmation = False
-            st.experimental_rerun()
-    with col2:
-        if st.button("取消", key="clear_history_cancel"):
-            st.session_state.clear_confirmation = False
