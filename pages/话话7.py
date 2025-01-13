@@ -1451,9 +1451,6 @@ if 'continue_index' not in st.session_state:
     st.session_state.continue_index = None
 if "use_token" not in st.session_state:
     st.session_state.use_token = True # 默认启用token
-if "chat_session" not in st.session_state:
-     st.session_state.chat_session = None
-    
 
 # --- 功能函数 ---
 def generate_token():
@@ -1462,7 +1459,7 @@ def generate_token():
     import string
     random.seed() # Add a seed for consistency
     token_length = random.randint(10, 15)
-    characters = "一乙二十丁厂七卜人入八九几儿了力乃刀又三于干亏士工土才寸下大丈与万上小口巾山千乞川亿个勺久凡及夕丸么广亡门义之尸弓己已子卫也女飞刃习叉马乡丰王井开鳍癞瀑襟璧戳攒孽蘑藻鳖蹭蹬簸簿蟹靡癣羹鬓攘蠕巍鳞糯譬霹躏髓蘸镶瓤矗"
+    characters = "一乙二十丁厂七卜人入八九几儿了力乃刀又三于干亏士工土才寸下大丈与万上小口巾山千乞川亿个勺久凡及夕丸么广亡门义之尸弓己已子卫也女飞刃习叉马乡丰王井开鳍癞瀑襟璧戳攒孽蘑藻鳖蹭蹬簸簿蟹靡癣羹鬓攘蠕巍鳞糯霹躏髓蘸镶瓤矗"
     hanzi_token = "".join(random.choice(characters) for _ in range(token_length - 1))
 
     # 随机生成数字部分
@@ -1475,7 +1472,6 @@ def generate_token():
         digit_count = 3
 
     digit_token = "、".join(random.choice(string.digits) for _ in range(digit_count))
-
 
     return f"({hanzi_token})({digit_token})"
 
@@ -1496,49 +1492,38 @@ def clear_history(log_file):
 def regenerate_message(i):
     st.session_state.regenerate_index = i
 
-
 def continue_message(i):
      st.session_state.continue_index = i
 
-def getAnswer(prompt, continue_mode=False, max_retries = 3, retry_delay = 1):
+def getAnswer(prompt, continue_mode=False):
     system_message = ""
     if st.session_state.get("test_text"):
         system_message += st.session_state.test_text + "\n"
     for setting_name in st.session_state.enabled_settings:
        if st.session_state.enabled_settings[setting_name]:
             system_message += st.session_state.character_settings[setting_name] + "\n"
-    
-    if continue_mode and st.session_state.messages[-1]["role"] == "assistant":
-         prompt = f"[Continue the story. Do not include ANY parts of the original message. Use capitalization and punctuation as if your reply is a part of the original message: {st.session_state.messages[-1]['content']}]"
 
-    #使用之前存储的会话，而不是每次都重新开启
-    if "chat_session" not in st.session_state or st.session_state.chat_session is None:
-        st.session_state.chat_session = model.start_chat(history = [])
+    try:
+        chat_session = model.start_chat(history = [])
         if system_message != "":
-            st.session_state.chat_session.send_message(system_message)
+           chat_session.send_message(system_message)
 
-    if system_message != "" and not st.session_state.chat_session.history:
-         st.session_state.chat_session.send_message(system_message)
-         
-    # 强制使用指定的输出格式
-    prompt = f"[Output the response strictly with format <thinking> + <outline> + <content>. Following the format in <outline>, provide 4 different options in step1 and step2. Use only one unique name in each step. For evaluation, strictly use the format 'if illogical; if lack emotional depth; if lack proactivity' and W=xx, with a summary of the final decision at the end. In <content>, follow the format in the example I gave you before. Then add more details in the <解说> section.] {prompt}"
+        if continue_mode and st.session_state.messages and st.session_state.messages[-1]["role"] == "assistant":
+             prompt = f"[请继续补全这句话，不要重复之前的内容，使用合适的标点符号和大小写：{st.session_state.messages[-1]['content']}]"
 
-    retries = 0
-    while retries < max_retries:
-        try:
-            response = st.session_state.chat_session.send_message(prompt, stream=True)
-            full_response = ""
-            for chunk in response:
-                full_response += chunk.text
-            return full_response
-        except exceptions.ServiceUnavailable as e:
-            retries += 1
-            st.warning(f"Gemini API 服务不可用, 正在尝试重试 ({retries}/{max_retries})...")
-            time.sleep(retry_delay) # Add a retry_delay before retrying
-        except Exception as e:
-            st.error(f"发生了一个错误: {e}")
-            return f"抱歉，发生了一个无法处理的错误: {e}"
-    return "抱歉，多次尝试连接 Gemini API 失败，请稍后再试。"
+        response = chat_session.send_message(prompt, stream=True)
+        full_response = ""
+        for chunk in response:
+            full_response += chunk.text
+            yield chunk.text
+        return full_response
+
+    except exceptions.GoogleAPIError as e:
+        st.error(f"Google API 错误：错误代码 {e.code}, 原因: {e.reason}, 详细信息: {e}")
+        return None
+    except Exception as e:
+        st.error(f"发生了一个未知错误：类型 {type(e).__name__}, 错误信息：{e}")
+        return None
 
 def download_all_logs():
     zip_buffer = BytesIO()
@@ -1548,7 +1533,6 @@ def download_all_logs():
                  zip_file.write(file)
     return zip_buffer.getvalue()
 
-
 # --- Streamlit 布局 ---
 st.set_page_config(
     page_title="Gemini Chatbot",
@@ -1557,7 +1541,6 @@ st.set_page_config(
 
 # 移除标题
 # st.title("Gemini 聊天机器人")
-
 
 # 添加 API key 选择器
 with st.sidebar.expander("API Key 选择"):
@@ -1579,40 +1562,42 @@ if prompt := st.chat_input("输入你的消息:"):
         # 如果开启随机token，则将token附加到用户输入
         full_prompt =  f"{prompt} (token: {token})"
         st.session_state.messages.append({"role": "user", "content": full_prompt})
-        
+
     else:
         # 如果关闭随机token，则直接将用户输入添加到his_messages
         full_prompt = prompt
         st.session_state.messages.append({"role": "user", "content": full_prompt})
-   
+
     with st.chat_message("user"):
           st.markdown(prompt if not "use_token" in st.session_state or not st.session_state.use_token else f"{prompt} (token: {token})")
     with st.chat_message("assistant"):
         message_placeholder = st.empty()
+        full_response_iter = getAnswer(full_prompt)
         full_response = ""
-        for chunk in getAnswer(full_prompt):
-            full_response += chunk
-            message_placeholder.markdown(full_response + "▌")
-        message_placeholder.markdown(full_response)
-        st.session_state.messages.append({"role": "assistant", "content": full_response})
+        if full_response_iter:
+            for chunk in full_response_iter:
+                full_response += chunk
+                message_placeholder.markdown(full_response + "▌")
+            message_placeholder.markdown(full_response)
+            st.session_state.messages.append({"role": "assistant", "content": full_response})
 
-    # Save the messages to a new .pkl file based on time.
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    new_log_file = f"chat_log_{timestamp}.pkl"
-    with open(new_log_file, "wb") as f:
-            pickle.dump(st.session_state.messages, f)
+            # Save the messages to a new .pkl file based on time.
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            new_log_file = f"chat_log_{timestamp}.pkl"
+            with open(new_log_file, "wb") as f:
+                    pickle.dump(st.session_state.messages, f)
 
 # 功能区 1: 文件操作
 with st.sidebar.expander("文件操作"):
     if len(st.session_state.messages) > 0:
-        st.button("重置上一个输出 ⏪",
+        st.button("重置上一个输出 system_instruction",
                     on_click=lambda: st.session_state.messages.pop(-1) if len(st.session_state.messages) > 1 else None)
 
     st.button("读取历史记录 📖", on_click=lambda: load_history(log_file))
-    
+
     if st.button("清除历史记录 🗑️"):
         st.session_state.clear_confirmation = True  # 清除历史记录弹窗标志
-        
+
     # 确认/取消清除历史记录按钮区域
     if "clear_confirmation" in st.session_state and st.session_state.clear_confirmation:
         col1, col2 = st.columns(2)
@@ -1631,7 +1616,7 @@ with st.sidebar.expander("文件操作"):
         file_name="chat_logs.zip",
         mime="application/zip",
     )
-    
+
     uploaded_file = st.file_uploader("读取本地pkl文件 📁", type=["pkl"])
     if uploaded_file is not None:
         try:
@@ -1661,7 +1646,6 @@ with st.sidebar.expander("角色设定"):
             st.session_state.character_settings[setting_name] = DEFAULT_CHARACTER_SETTINGS[setting_name]
         st.session_state.enabled_settings[setting_name] = st.checkbox(setting_name, st.session_state.enabled_settings.get(setting_name, False),key=f"checkbox_{setting_name}") #直接显示checkbox
 
-
     st.session_state.test_text = st.text_area("System Message (Optional):", st.session_state.get("test_text", ""), key="system_message")
 
     if st.button("刷新 🔄"):  # 添加刷新按钮
@@ -1687,7 +1671,6 @@ for i, message in enumerate(st.session_state.messages):
                     if st.button("➕", key=f"continue_{i}"):
                         continue_message(i)
 
-
 if st.session_state.get("editing"):
     i = st.session_state.editable_index
     message = st.session_state.messages[i]
@@ -1705,13 +1688,12 @@ if st.session_state.get("editing"):
             if st.button("取消 ❌", key=f"cancel_{i}"):
                 st.session_state.editing = False
 
-        
+
 
 # 显示已加载的设定
 enabled_settings_display = [setting_name for setting_name, enabled in st.session_state.enabled_settings.items() if enabled]
 if enabled_settings_display:
     st.write("已加载设定:", ", ".join(enabled_settings_display))
-
 
 # 处理重新生成的消息
 if st.session_state.regenerate_index is not None:
@@ -1722,18 +1704,19 @@ if st.session_state.regenerate_index is not None:
         if prompt:
             with st.chat_message("assistant"):
                 message_placeholder = st.empty()
+                full_response_iter = getAnswer(prompt)
                 full_response = ""
-                for chunk in getAnswer(prompt):
-                    full_response += chunk
-                    message_placeholder.markdown(full_response + "▌")
-                message_placeholder.markdown(full_response)
-                st.session_state.messages[i]["content"] = full_response
-            with open(log_file, "wb") as f:
-                pickle.dump(st.session_state.messages, f)
-            st.experimental_rerun()
+                if full_response_iter:
+                    for chunk in full_response_iter:
+                        full_response += chunk
+                        message_placeholder.markdown(full_response + "▌")
+                    message_placeholder.markdown(full_response)
+                    st.session_state.messages[i]["content"] = full_response
+                    with open(log_file, "wb") as f:
+                        pickle.dump(st.session_state.messages, f)
+                    st.experimental_rerun()
         else:
            st.error("无法获取上一条用户消息以重新生成。")
-
 
 # 处理延续生成的消息
 if st.session_state.continue_index is not None:
@@ -1744,13 +1727,15 @@ if st.session_state.continue_index is not None:
       if prompt:
         with st.chat_message("assistant"):
             message_placeholder = st.empty()
+            full_response_iter = getAnswer(prompt, continue_mode=True)
             full_response = ""
-            for chunk in getAnswer(prompt, continue_mode=True):
-                full_response += chunk
-                message_placeholder.markdown(full_response + "▌")
-            message_placeholder.markdown(full_response)
-            st.session_state.messages.append({"role": "assistant", "content": full_response})
-        with open(log_file, "wb") as f:
-            pickle.dump(st.session_state.messages, f)
+            if full_response_iter:
+                for chunk in full_response_iter:
+                    full_response += chunk
+                    message_placeholder.markdown(full_response + "▌")
+                message_placeholder.markdown(full_response)
+                st.session_state.messages.append({"role": "assistant", "content": full_response})
+                with open(log_file, "wb") as f:
+                    pickle.dump(st.session_state.messages, f)
       else:
         st.error("无法获取上一条消息以继续生成。")
