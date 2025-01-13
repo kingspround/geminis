@@ -1415,23 +1415,6 @@ DEFAULT_CHARACTER_SETTINGS = {
     "设定2": "这是一个示例设定 2。",
 }
 
-# --- 初始化 Session State ---
-if "messages" not in st.session_state:
-    st.session_state.messages = []
-if 'character_settings' not in st.session_state:
-    st.session_state.character_settings = {}
-if 'enabled_settings' not in st.session_state:
-    st.session_state.enabled_settings = {}
-if 'regenerate_index' not in st.session_state:
-   st.session_state.regenerate_index = None
-
-if 'continue_index' not in st.session_state:
-    st.session_state.continue_index = None
-if "use_token" not in st.session_state:
-    st.session_state.use_token = False # 默认不启用token
-if "chat_session" not in st.session_state:
-    st.session_state.chat_session = None
-
 
 # --- 功能函数 ---
 def generate_token():
@@ -1456,7 +1439,6 @@ def generate_token():
 
 
     return f"({hanzi_token})({digit_token})"
-
 
 def load_history(log_file):
     try:
@@ -1515,7 +1497,7 @@ def getAnswer(prompt, continue_mode=False, max_retries = 3, retry_delay = 1):
             st.warning(f"Gemini API 服务不可用, 正在尝试重试 ({retries}/{max_retries})...")
             time.sleep(retry_delay) # Add a retry_delay before retrying
         except Exception as e:
-            return f"抱歉，发生了一个无法处理的错误: {e}"
+             return f"抱歉，发生了一个无法处理的错误: {e}"
     return "抱歉，多次尝试连接 Gemini API 失败，请稍后再试。"
 
 # --- Streamlit 布局 ---
@@ -1530,6 +1512,15 @@ if "filename" not in st.session_state:
     st.session_state.filename = os.path.basename(__file__).replace(".py", ".txt")
 if "log_file" not in st.session_state:
     st.session_state.log_file = os.path.basename(__file__).replace(".py", ".pkl")
+
+# 初始化 session state，确保加载只执行一次
+if "history_loaded" not in st.session_state:
+    st.session_state.history_loaded = False
+
+if not st.session_state.history_loaded:
+    load_history(st.session_state.log_file)
+    st.session_state.history_loaded = True
+
 
 # 功能区 1: 文件操作
 with st.sidebar.expander("文件操作"):
