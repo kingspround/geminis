@@ -1407,13 +1407,31 @@ mediumslateblue	中板岩蓝
 )
 
 
+# --- 默认角色设定 ---
+DEFAULT_CHARACTER_SETTINGS = {
+    "设定1": "这是一个示例设定 1。",
+    "设定2": "这是一个示例设定 2。",
+}
+
+# --- 模型配置 ---
+generation_config = {
+    "temperature": 1,
+    "top_p": 0.95,
+    "top_k": 40,
+    "max_output_tokens": 8192,
+}
+
+model = genai.GenerativeModel(
+    model_name="gemini-2.0-flash-exp",
+    generation_config=generation_config
+)
+
 # --- 动态文件名生成 ---
 current_file = os.path.basename(__file__)
 filename = os.path.splitext(current_file)[0] + ".txt"
 log_file = os.path.splitext(current_file)[0] + ".pkl"
 
-
-# --- 初始化 Session State ---
+# 放在顶部，确保先初始化 session state
 if "messages" not in st.session_state:
     st.session_state.messages = []
 if 'character_settings' not in st.session_state:
@@ -1426,10 +1444,10 @@ if 'regenerate_index' not in st.session_state:
 if 'continue_index' not in st.session_state:
     st.session_state.continue_index = None
 if "use_token" not in st.session_state:
-    st.session_state.use_token = False # 默认不启用token
+    st.session_state.use_token = False
 if "chat_session" not in st.session_state:
-     st.session_state.chat_session = None
-
+    st.session_state.chat_session = None
+    
 
 # --- 功能函数 ---
 def generate_token():
