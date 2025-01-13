@@ -1480,7 +1480,7 @@ def regenerate_message(i):
 def continue_message(i):
      st.session_state.continue_index = i
 
-def getAnswer(prompt, continue_mode=False):
+def getAnswer(prompt, continue_mode=False, max_retries = 3, retry_delay = 1):
     system_message = ""
     if st.session_state.get("test_text"):
         system_message += st.session_state.test_text + "\n"
@@ -1499,13 +1499,44 @@ def getAnswer(prompt, continue_mode=False):
 
     if system_message != "" and not st.session_state.chat_session.history:
          st.session_state.chat_session.send_message(system_message)
+         
+    # 强制使用指定的输出格式
+    prompt = f"[Output the response strictly with format <thinking> + <outline> + <content>. Following the format in <outline>, provide 4 different options in step1 and step2. Use only one unique name in each step. For evaluation, strictly use the format 'if illogical; if lack emotional depth; if lack proactivity' and W=xx, with a summary of the final decision at the end. In <content>, follow the format in the example I gave you before. Then add more details in the <解说> section.] {prompt}"
 
-    response = st.session_state.chat_session.send_message(prompt, stream=True)
-    for chunk in response:
-        yield chunk.text
+    retries = 0
+    while retries < max_retries:
+        try:
+            response = st.session_state.chat_session.send_message(prompt, stream=True)
+            full_response = ""
+            for chunk in response:
+                full_response += chunk.text
+            return full_response
+        except exceptions.ServiceUnavailable as e:
+            retries += 1
+            st.warning(f"Gemini API 服务不可用, 正在尝试重试 ({retries}/{max_retries})...")
+            time.sleep(retry_delay) # Add a retry_delay before retrying
+        except Exception as e:
+            st.error(f"发生了一个错误: {e}")
+            return f"抱歉，发生了一个无法处理的错误: {e}"
+    return "抱歉，多次尝试连接 Gemini API 失败，请稍后再试。"
+
+def download_all_logs():
+    zip_buffer = BytesIO()
+    with zipfile.ZipFile(zip_buffer, "a", zipfile.ZIP_DEFLATED, False) as zip_file:
+        for file in os.listdir("."):
+            if file.endswith(".pkl"):
+                 zip_file.write(file)
+    return zip_buffer.getvalue()
 
 
 # --- Streamlit 布局 ---
+st.set_page_config(
+    page_title="Gemini Chatbot",
+    layout="wide"
+)
+
+st.title("Gemini 聊天机器人")
+
 
 # 功能区 1: 文件操作
 with st.sidebar.expander("文件操作"):
@@ -1513,8 +1544,11 @@ with st.sidebar.expander("文件操作"):
         st.button("重置上一个输出 ⏪",
                     on_click=lambda: st.session_state.messages.pop(-1) if len(st.session_state.messages) > 1 else None)
 
-    st.button("读取历史记录 📖", on_click=lambda: load_history(log_file))
-    
+    if st.button("读取指定文件 📖"):
+        file_name = st.text_input("请输入文件名（xxx.pkl）:")
+        if file_name:
+            load_history(file_name)
+   
     if st.button("清除历史记录 🗑️"):
         st.session_state.clear_confirmation = True  # 清除历史记录弹窗标志
         
@@ -1529,13 +1563,14 @@ with st.sidebar.expander("文件操作"):
         with col2:
             if st.button("取消", key="clear_history_cancel"):
                 st.session_state.clear_confirmation = False
-                
+
     st.download_button(
-        label="下载聊天记录 ⬇️",
-        data=open(log_file, "rb").read() if os.path.exists(log_file) else b"",
-        file_name=filename,
-        mime="application/octet-stream",
+        label="下载所有聊天记录 ⬇️",
+        data=download_all_logs(),
+        file_name="chat_logs.zip",
+        mime="application/zip",
     )
+    
     uploaded_file = st.file_uploader("读取本地pkl文件 📁", type=["pkl"])
     if uploaded_file is not None:
         try:
@@ -1616,19 +1651,15 @@ if st.session_state.get("editing"):
 if prompt := st.chat_input("输入你的消息:"):
     token = generate_token()
     if "use_token" in st.session_state and st.session_state.use_token:
-       
         # 如果开启随机token，则将token附加到用户输入
         full_prompt =  f"{prompt} (token: {token})"
         st.session_state.messages.append({"role": "user", "content": full_prompt})
-        with st.chat_message("user"):
-            st.markdown(full_prompt)
-       
     else:
         # 如果关闭随机token，则直接将用户输入添加到his_messages
         full_prompt = prompt
         st.session_state.messages.append({"role": "user", "content": full_prompt})
-        with st.chat_message("user"):
-           st.markdown(full_prompt)
+    with st.chat_message("user"):
+          st.markdown(prompt if not "use_token" in st.session_state or not st.session_state.use_token else f"{prompt} (token: {token})")
     with st.chat_message("assistant"):
         message_placeholder = st.empty()
         full_response = ""
@@ -1637,8 +1668,11 @@ if prompt := st.chat_input("输入你的消息:"):
             message_placeholder.markdown(full_response + "▌")
         message_placeholder.markdown(full_response)
         st.session_state.messages.append({"role": "assistant", "content": full_response})
-    with open(log_file, "wb") as f:
-        pickle.dump(st.session_state.messages, f)
+    # Save the messages to a new .pkl file based on time.
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    new_log_file = f"chat_log_{timestamp}.pkl"
+    with open(new_log_file, "wb") as f:
+            pickle.dump(st.session_state.messages, f)
         
 
 # 显示已加载的设定
