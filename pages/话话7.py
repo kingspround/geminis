@@ -1536,18 +1536,17 @@ st.set_page_config(
     layout="wide"
 )
 
-
 # 移除标题
 # st.title("Gemini 聊天机器人")
 
-# 创建一个固定在页面左下角的复选框
+# 创建一个固定在页面右下角的复选框
 st.markdown(
     """
     <style>
         .fixed-checkbox {
             position: fixed;
             bottom: 20px;
-            left: 20px;
+            right: 20px;
         }
     </style>
     """,
