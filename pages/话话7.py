@@ -12,6 +12,7 @@ from google.api_core import exceptions
 from datetime import datetime
 
 
+
 genai.configure(api_key="AIzaSyDOI2e-I1RdXBnk99jY2H00A3aymXREETA") # Use API Key directly, replace 【钥匙】 
 
 # --- 模型设置 ---
@@ -1463,9 +1464,9 @@ def load_history(log_file):
     try:
         with open(log_file, "rb") as f:
             st.session_state.messages = pickle.load(f)
-        st.success("成功读取历史记录！")
+        st.success(f"成功读取历史记录！({os.path.basename(log_file)})")
     except FileNotFoundError:
-        st.warning("没有找到历史记录文件。")
+        st.warning(f"没有找到历史记录文件。({os.path.basename(log_file)})")
 
 def clear_history(log_file):
     st.session_state.messages.clear()  # 清空列表
@@ -1535,7 +1536,8 @@ st.set_page_config(
     layout="wide"
 )
 
-st.title("Gemini 聊天机器人")
+# 移除标题
+# st.title("Gemini 聊天机器人")
 
 
 # 功能区 1: 文件操作
@@ -1544,7 +1546,6 @@ with st.sidebar.expander("文件操作"):
         st.button("重置上一个输出 ⏪",
                     on_click=lambda: st.session_state.messages.pop(-1) if len(st.session_state.messages) > 1 else None)
 
-    # 修改为读取当前路径的文件
     st.button("读取历史记录 📖", on_click=lambda: load_history(log_file))
     
     if st.button("清除历史记录 🗑️"):
@@ -1574,7 +1575,7 @@ with st.sidebar.expander("文件操作"):
         try:
             loaded_messages = pickle.load(uploaded_file)
             st.session_state.messages = loaded_messages  # 使用 = 替换现有消息
-            st.success("成功读取本地pkl文件！")
+            st.success(f"成功读取本地pkl文件！({uploaded_file.name})")
             st.experimental_rerun()
         except Exception as e:
             st.error(f"读取本地pkl文件失败：{e}")
@@ -1605,7 +1606,43 @@ with st.sidebar.expander("角色设定"):
         st.experimental_rerun()
 # 添加 token 功能
 with st.sidebar.expander("高级选项"):
-    st.session_state.use_token = st.checkbox("启用随机Token", st.session_state.get("use_token",False))
+   #st.session_state.use_token = st.checkbox("启用随机Token", st.session_state.get("use_token",True)) # 默认启用Token
+    pass
+
+# 聊天输入框和token选项
+col1, col2 = st.columns([1, 12])
+with col1:
+   st.session_state.use_token = st.checkbox("Token", st.session_state.get("use_token", True)) # 复选框移动到输入框左边，并且默认选中
+with col2:
+    if prompt := st.chat_input("输入你的消息:"):
+        token = generate_token()
+        if "use_token" in st.session_state and st.session_state.use_token:
+           
+            # 如果开启随机token，则将token附加到用户输入
+            full_prompt =  f"{prompt} (token: {token})"
+            st.session_state.messages.append({"role": "user", "content": full_prompt})
+            
+        else:
+            # 如果关闭随机token，则直接将用户输入添加到his_messages
+            full_prompt = prompt
+            st.session_state.messages.append({"role": "user", "content": full_prompt})
+       
+        with st.chat_message("user"):
+              st.markdown(prompt if not "use_token" in st.session_state or not st.session_state.use_token else f"{prompt} (token: {token})")
+        with st.chat_message("assistant"):
+            message_placeholder = st.empty()
+            full_response = ""
+            for chunk in getAnswer(full_prompt):
+                full_response += chunk
+                message_placeholder.markdown(full_response + "▌")
+            message_placeholder.markdown(full_response)
+            st.session_state.messages.append({"role": "assistant", "content": full_response})
+
+        # Save the messages to a new .pkl file based on time.
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        new_log_file = f"chat_log_{timestamp}.pkl"
+        with open(new_log_file, "wb") as f:
+                pickle.dump(st.session_state.messages, f)
 
 # 显示历史记录和编辑功能
 for i, message in enumerate(st.session_state.messages):
@@ -1645,35 +1682,6 @@ if st.session_state.get("editing"):
             if st.button("取消 ❌", key=f"cancel_{i}"):
                 st.session_state.editing = False
 
-# 聊天输入和响应
-if prompt := st.chat_input("输入你的消息:"):
-    token = generate_token()
-    if "use_token" in st.session_state and st.session_state.use_token:
-        # 如果开启随机token，则将token附加到用户输入
-        full_prompt =  f"{prompt} (token: {token})"
-        st.session_state.messages.append({"role": "user", "content": full_prompt})
-        
-    else:
-        # 如果关闭随机token，则直接将用户输入添加到his_messages
-        full_prompt = prompt
-        st.session_state.messages.append({"role": "user", "content": full_prompt})
-   
-    with st.chat_message("user"):
-          st.markdown(prompt if not "use_token" in st.session_state or not st.session_state.use_token else f"{prompt} (token: {token})")
-    with st.chat_message("assistant"):
-        message_placeholder = st.empty()
-        full_response = ""
-        for chunk in getAnswer(full_prompt):
-            full_response += chunk
-            message_placeholder.markdown(full_response + "▌")
-        message_placeholder.markdown(full_response)
-        st.session_state.messages.append({"role": "assistant", "content": full_response})
-
-    # Save the messages to a new .pkl file based on time.
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    new_log_file = f"chat_log_{timestamp}.pkl"
-    with open(new_log_file, "wb") as f:
-            pickle.dump(st.session_state.messages, f)
         
 
 # 显示已加载的设定
