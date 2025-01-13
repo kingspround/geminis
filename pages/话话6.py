@@ -798,11 +798,13 @@ def load_history(log_file):
     except FileNotFoundError:
        st.warning(f"没有找到历史记录文件。({os.path.basename(log_file)})")
 
+
 def clear_history(log_file):
     st.session_state.messages.clear()
     if os.path.exists(log_file):
         os.remove(log_file)
     st.success("历史记录已清除！")
+
 
 def regenerate_message(i):
     st.session_state.regenerate_index = i
@@ -827,12 +829,11 @@ def getAnswer(prompt, continue_mode=False):
     response = chat_session.send_message(prompt, stream=True)
     full_response = ""
     for chunk in response:
-        full_response += chunk.text
-        yield chunk.text
-
-    #只有第一次回复会保存到session，解决顶置和重复问题
+      full_response += chunk.text
+      yield chunk.text
+    # 添加到消息列表，只有第一次回复
     if not continue_mode:
-        st.session_state.messages.append({"role": "assistant", "content": full_response})
+         st.session_state.messages.append({"role": "assistant", "content": full_response})
 
 
 # --- Streamlit 布局 ---
@@ -879,7 +880,6 @@ if prompt := st.chat_input("输入你的消息:"):
             full_response += chunk
             message_placeholder.markdown(full_response + "▌")
         message_placeholder.markdown(full_response)
-
 
 
     # 保存聊天记录
@@ -947,7 +947,7 @@ for i, message in enumerate(st.session_state.messages):
     with st.chat_message(message["role"]):
         main_col, button_col = st.columns([12, 1])
         with main_col:
-             st.container(key=f"message_container_{i}").write(message["content"])
+            st.container(key=f"message_container_{i}").write(message["content"])
         with button_col:
             with st.container():
                 col1, col2, col3 = st.columns(3)
@@ -1019,7 +1019,6 @@ if st.session_state.continue_index is not None:
                     pickle.dump(st.session_state.messages, f)
         else:
             st.error("无法获取上一条消息以继续生成。")
-
 
 # 显示已加载的设定
 enabled_settings_display = [setting_name for setting_name, enabled in st.session_state.enabled_settings.items() if enabled]
