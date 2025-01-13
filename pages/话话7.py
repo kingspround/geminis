@@ -30,10 +30,10 @@ generation_config = {
     "max_output_tokens": 8192,
 }
 safety_settings = {
-    "HARASSMENT": "BLOCK_NONE",
-    "HATE_SPEECH": "BLOCK_NONE",
-    "SEXUALLY_EXPLICIT": "BLOCK_NONE",
-    "DANGEROUS_CONTENT": "BLOCK_NONE",
+    safety_types.HarmCategory.HARASSMENT: safety_types.HarmBlockThreshold.BLOCK_NONE,
+    safety_types.HarmCategory.HATE_SPEECH: safety_types.HarmBlockThreshold.BLOCK_NONE,
+    safety_types.HarmCategory.SEXUALLY_EXPLICIT: safety_types.HarmBlockThreshold.BLOCK_NONE,
+    safety_types.HarmCategory.DANGEROUS_CONTENT: safety_types.HarmBlockThreshold.BLOCK_NONE,
 }
 
 
@@ -1480,15 +1480,28 @@ def continue_message(i):
      st.session_state.continue_index = i
 
 def getAnswer(prompt, continue_mode=False, max_retries = 3, retry_delay = 1):
+    system_message = ""
+    if st.session_state.get("test_text"):
+        system_message += st.session_state.test_text + "\n"
+    for setting_name in st.session_state.enabled_settings:
+       if st.session_state.enabled_settings[setting_name]:
+            system_message += st.session_state.character_settings[setting_name] + "\n"
+    
     if continue_mode and st.session_state.messages[-1]["role"] == "assistant":
          prompt = f"[Continue the story. Do not include ANY parts of the original message. Use capitalization and punctuation as if your reply is a part of the original message: {st.session_state.messages[-1]['content']}]"
 
     #使用之前存储的会话，而不是每次都重新开启
     if "chat_session" not in st.session_state or st.session_state.chat_session is None:
-         st.session_state.chat_session = model.start_chat(history = [])
-   
+        st.session_state.chat_session = model.start_chat(history = [])
+        if system_message != "":
+            st.session_state.chat_session.send_message(system_message)
+
+    if system_message != "" and not st.session_state.chat_session.history:
+         st.session_state.chat_session.send_message(system_message)
+         
     # 强制使用指定的输出格式
     prompt = f"[Output the response strictly with format <thinking> + <outline> + <content>. Following the format in <outline>, provide 4 different options in step1 and step2. Use only one unique name in each step. For evaluation, strictly use the format 'if illogical; if lack emotional depth; if lack proactivity' and W=xx, with a summary of the final decision at the end. In <content>, follow the format in the example I gave you before. Then add more details in the <解说> section.] {prompt}"
+
     retries = 0
     while retries < max_retries:
         try:
