@@ -826,7 +826,9 @@ def getAnswer(prompt, continue_mode=False):
         prompt = f"[请继续补全这句话，不要重复之前的内容，使用合适的标点符号和大小写：{st.session_state.messages[-1]['content']}]"
 
     response = chat_session.send_message(prompt, stream=True)
+    full_response = ""
     for chunk in response:
+        full_response += chunk.text
         yield chunk.text
 
 # --- Streamlit 布局 ---
@@ -848,6 +850,11 @@ with st.sidebar.expander("API Key 选择"):
 with st.sidebar:
     st.session_state.use_token = st.checkbox("Token", value=True) # 默认开启
 
+
+# 加载历史记录（仅在会话初始化时）
+if "messages" not in st.session_state:
+    load_history(log_file)
+
 # 聊天输入框
 if prompt := st.chat_input("输入你的消息:"):
     token = generate_token()
@@ -868,6 +875,7 @@ if prompt := st.chat_input("输入你的消息:"):
             message_placeholder.markdown(full_response + "▌")
         message_placeholder.markdown(full_response)
         st.session_state.messages.append({"role": "assistant", "content": full_response})
+
 
     # 保存聊天记录
     with open(log_file, "wb") as f:
@@ -1011,3 +1019,7 @@ if st.session_state.continue_index is not None:
 enabled_settings_display = [setting_name for setting_name, enabled in st.session_state.enabled_settings.items() if enabled]
 if enabled_settings_display:
     st.write("已加载设定:", ", ".join(enabled_settings_display))
+
+# 显示历史记录加载信息
+with st.container():
+    st.markdown(f"<p style='text-align: center;'><code>{os.path.basename(file)}</code> 已加载</p>", unsafe_allow_html=True)
