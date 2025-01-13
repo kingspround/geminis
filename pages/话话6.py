@@ -1,15 +1,15 @@
 import os
 import google.generativeai as genai
-import json
 import streamlit as st
 import pickle
 import random
 import string
-import time
-import zipfile
-from io import BytesIO
-from google.api_core import exceptions
 from datetime import datetime
+import logging
+
+
+# --- 配置日志记录 ---
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 
 # --- API 密钥设置 ---
@@ -812,6 +812,7 @@ def continue_message(i):
     st.session_state.continue_index = i
 
 def getAnswer(prompt, continue_mode=False):
+    import logging
     system_message = ""
     if st.session_state.get("test_text"):
         system_message += st.session_state.test_text + "\n"
@@ -947,7 +948,7 @@ for i, message in enumerate(st.session_state.messages):
     with st.chat_message(message["role"]):
         main_col, button_col = st.columns([12, 1])
         with main_col:
-            st.container(key=f"message_container_{i}").write(message["content"])
+             st.container(key=f"message_container_{i}").write(message["content"])
         with button_col:
             with st.container():
                 col1, col2, col3 = st.columns(3)
