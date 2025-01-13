@@ -1413,8 +1413,7 @@ DEFAULT_CHARACTER_SETTINGS = {
     "设定2": "这是一个示例设定 2。",
 }
 
-
-# --- 获取当前文件路径并设置文件名 ---
+# 获取当前文件路径
 file = os.path.abspath(__file__)
 filename = os.path.splitext(os.path.basename(file))[0] + ".pkl"
 log_file = os.path.join(os.path.dirname(file), filename)
@@ -1433,7 +1432,7 @@ if 'regenerate_index' not in st.session_state:
 if 'continue_index' not in st.session_state:
     st.session_state.continue_index = None
 if "use_token" not in st.session_state:
-    st.session_state.use_token = False
+    st.session_state.use_token = False # 默认不启用token
 if "chat_session" not in st.session_state:
      st.session_state.chat_session = None
     
@@ -1631,14 +1630,14 @@ if prompt := st.chat_input("输入你的消息:"):
         full_prompt =  f"{prompt} (token: {token})"
         st.session_state.messages.append({"role": "user", "content": full_prompt})
         with st.chat_message("user"):
-            st.markdown(f"{prompt} (token: {token})")
+            st.markdown(full_prompt)
        
     else:
         # 如果关闭随机token，则直接将用户输入添加到his_messages
         full_prompt = prompt
         st.session_state.messages.append({"role": "user", "content": full_prompt})
         with st.chat_message("user"):
-            st.markdown(full_prompt)
+           st.markdown(full_prompt)
     with st.chat_message("assistant"):
         message_placeholder = st.empty()
         full_response = ""
