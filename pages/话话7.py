@@ -1555,34 +1555,27 @@ st.set_page_config(
     layout="wide"
 )
 
-
 # 移除标题
 # st.title("Gemini 聊天机器人")
 
-# 创建一个固定在页面左下角的复选框
-st.markdown(
-    """
-    <style>
-        .fixed-checkbox {
-            position: fixed;
-            bottom: 20px;
-            left: 20px;
-        }
-    </style>
-    """,
-    unsafe_allow_html=True,
-)
 
-# 添加 token 功能
-st.markdown(
-    f'<div class="fixed-checkbox">{st.checkbox("Token", value=True, key="use_token_checkbox")}</div>',
-    unsafe_allow_html=True,
-)
+# 添加 API key 选择器
+with st.sidebar.expander("API Key 选择"):
+    st.session_state.selected_api_key = st.selectbox(
+        "选择 API Key:",
+        options=list(API_KEYS.keys()),
+        index=list(API_KEYS.keys()).index(st.session_state.selected_api_key),
+    )
+    genai.configure(api_key=API_KEYS[st.session_state.selected_api_key]) # 使用选定的API key
+
+# 在左侧边栏创建 token 复选框
+with st.sidebar:
+    st.session_state.use_token = st.checkbox("Token", value=True) # 默认开启
 
 # 聊天输入框
 if prompt := st.chat_input("输入你的消息:"):
     token = generate_token()
-    if st.session_state.use_token_checkbox:
+    if "use_token" in st.session_state and st.session_state.use_token:
         # 如果开启随机token，则将token附加到用户输入
         full_prompt =  f"{prompt} (token: {token})"
         st.session_state.messages.append({"role": "user", "content": full_prompt})
@@ -1593,7 +1586,7 @@ if prompt := st.chat_input("输入你的消息:"):
         st.session_state.messages.append({"role": "user", "content": full_prompt})
    
     with st.chat_message("user"):
-          st.markdown(prompt if not st.session_state.use_token_checkbox else f"{prompt} (token: {token})")
+          st.markdown(prompt if not "use_token" in st.session_state or not st.session_state.use_token else f"{prompt} (token: {token})")
     with st.chat_message("assistant"):
         message_placeholder = st.empty()
         full_response = ""
