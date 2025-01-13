@@ -1409,7 +1409,6 @@ mediumslateblue	中板岩蓝
 )
 
 
-
 # --- 默认角色设定 ---
 DEFAULT_CHARACTER_SETTINGS = {
     "设定1": "这是一个示例设定 1。",
@@ -1420,8 +1419,9 @@ DEFAULT_CHARACTER_SETTINGS = {
 filename = "chat_log.txt"
 log_file = "chat_log.pkl"
 
-
-# --- 初始化 Session State ---
+# --- 初始化 Session State (必须先初始化，才能使用) ---
+if "log_file" not in st.session_state:
+    st.session_state.log_file = log_file
 if "messages" not in st.session_state:
     st.session_state.messages = []
 if 'character_settings' not in st.session_state:
@@ -1437,8 +1437,6 @@ if "use_token" not in st.session_state:
     st.session_state.use_token = False # 默认不启用token
 if "chat_session" not in st.session_state:
      st.session_state.chat_session = None
-if "log_file" not in st.session_state:
-     st.session_state.log_file = "chat_log.pkl"
 
 
 # --- 功能函数 ---
@@ -1471,12 +1469,13 @@ def load_history(log_file):
             with open(log_file, "rb") as f:
                 st.session_state.messages = pickle.load(f)
             st.success("成功读取历史记录！")
-        st.session_state.log_file = log_file
-    except FileNotFoundError:
-        st.warning("没有找到历史记录文件。")
+            st.session_state.log_file = log_file
+        else:
+             st.warning("没有找到历史记录文件。")
     except Exception as e:
-        st.error(f"读取本地pkl文件失败：{e}")
-    
+         st.error(f"读取本地pkl文件失败：{e}")
+
+
 def clear_history(log_file):
     st.session_state.messages.clear()  # 清空列表
     if os.path.exists(log_file):
@@ -1546,6 +1545,16 @@ st.set_page_config(
 st.title("Gemini 聊天机器人")
 
 
+# 确保文件存在
+if not os.path.exists(st.session_state.log_file):
+    with open(st.session_state.log_file, "wb") as f:
+        pass
+
+# 初始化 session state
+if "messages" not in st.session_state or not st.session_state.messages:
+    load_history(st.session_state.log_file)
+    
+
 # 功能区 1: 文件操作
 with st.sidebar.expander("文件操作"):
     if len(st.session_state.messages) > 0:
@@ -1556,8 +1565,7 @@ with st.sidebar.expander("文件操作"):
     file_name = st.text_input("读取本地pkl文件 📁(请输入文件名,如`chat_log.pkl`):", key="file_input")
     if file_name:
         if st.button("读取"):
-           load_history(file_name)
-
+            load_history(file_name)
     
     if st.button("清除历史记录 🗑️"):
         st.session_state.clear_confirmation = True  # 清除历史记录弹窗标志
@@ -1585,12 +1593,11 @@ with st.sidebar.expander("文件操作"):
         try:
             loaded_messages = pickle.load(uploaded_file)
             st.session_state.messages = loaded_messages  # 使用 = 替换现有消息
-            st.session_state.log_file = uploaded_file.name  # 设置文件名
+            st.session_state.log_file = uploaded_file.name  # 使用上传文件的名字作为log_file
             st.success("成功读取本地pkl文件！")
             st.experimental_rerun()
         except Exception as e:
             st.error(f"读取本地pkl文件失败：{e}")
-
 
 # 功能区 2: 角色设定
 with st.sidebar.expander("角色设定"):
@@ -1708,8 +1715,8 @@ if st.session_state.regenerate_index is not None:
                 message_placeholder.markdown(full_response)
                 st.session_state.messages[i]["content"] = full_response
             if "log_file" in st.session_state and st.session_state.log_file:
-                with open(st.session_state.log_file, "wb") as f:
-                  pickle.dump(st.session_state.messages, f)
+                 with open(st.session_state.log_file, "wb") as f:
+                    pickle.dump(st.session_state.messages, f)
             st.experimental_rerun()
         else:
            st.error("无法获取上一条用户消息以重新生成。")
