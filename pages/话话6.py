@@ -631,7 +631,7 @@ step3【贝叶斯决策步骤 3】【元素审查】, "紫色皮肤，大屁股�
         </content>
 }
 
-output formet 【关于格式的解释，不要在输出里面显示此内容】【只展示格式和说明，具体输出参考output example】
+output formet【禁止仅复述步骤，具体输出参考output example】
 {
 <thinking>【使用✅动态CoT】
         {
