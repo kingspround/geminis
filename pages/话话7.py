@@ -1545,8 +1545,9 @@ st.markdown(
     <style>
         .fixed-checkbox {
             position: fixed;
-            bottom: 20px;
-            right: 20px;
+            bottom: 55px; /* 调整这个值来控制垂直位置 */
+            right: 60px; /* 调整这个值来控制水平位置 */
+            
         }
     </style>
     """,
