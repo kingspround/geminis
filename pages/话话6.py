@@ -948,7 +948,8 @@ for i, message in enumerate(st.session_state.messages):
     with st.chat_message(message["role"]):
         main_col, button_col = st.columns([12, 1])
         with main_col:
-             st.container(key=f"message_container_{i}").write(message["content"])
+            message_container = st.container(key=f"message_container_{i}")
+            message_container.write(message["content"])
         with button_col:
             with st.container():
                 col1, col2, col3 = st.columns(3)
