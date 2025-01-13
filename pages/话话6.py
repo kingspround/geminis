@@ -6,11 +6,15 @@ import pickle
 import random
 import string
 import time
+import zipfile
+from io import BytesIO
 from google.api_core import exceptions
+from datetime import datetime
 
-genai.configure(api_key="AIzaSyDdyhqcowl0ftcbK9pMObXzM7cIOQMtlmA") # Use API Key directly, replace 【钥匙】 
 
-# Create the model
+genai.configure(api_key="AIzaSyDOI2e-I1RdXBnk99jY2H00A3aymXREETA") # Use API Key directly, replace 【钥匙】 
+
+# --- 模型设置 ---
 generation_config = {
   "temperature": 1,
   "top_p": 0.95,
@@ -19,13 +23,13 @@ generation_config = {
   "response_mime_type": "text/plain",
 }
 
-
 safety_settings = [
     {"category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_NONE"},
     {"category": "HARM_CATEGORY_HATE_SPEECH", "threshold": "BLOCK_NONE"},
     {"category": "HARM_CATEGORY_SEXUALLY_EXPLICIT", "threshold": "BLOCK_NONE"},
     {"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_NONE"},
 ]
+
 
 model = genai.GenerativeModel(
   model_name="gemini-2.0-flash-exp",
