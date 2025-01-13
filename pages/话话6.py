@@ -796,7 +796,7 @@ def load_history(log_file):
             st.session_state.messages = pickle.load(f)
         st.success(f"成功读取历史记录！({os.path.basename(log_file)})")
     except FileNotFoundError:
-       st.warning(f"没有找到历史记录文件。({os.path.basename(log_file)})")
+        st.warning(f"没有找到历史记录文件。({os.path.basename(log_file)})")
 
 
 def clear_history(log_file):
@@ -804,7 +804,6 @@ def clear_history(log_file):
     if os.path.exists(log_file):
         os.remove(log_file)
     st.success("历史记录已清除！")
-
 
 def regenerate_message(i):
     st.session_state.regenerate_index = i
@@ -819,13 +818,14 @@ def getAnswer(prompt, continue_mode=False):
     for setting_name in st.session_state.enabled_settings:
         if st.session_state.enabled_settings[setting_name]:
             system_message += st.session_state.character_settings[setting_name] + "\n"
-
+    logging.info(f"getAnswer called with prompt: {prompt}, continue_mode: {continue_mode}")
     chat_session = model.start_chat(history=[])
     if system_message:
         chat_session.send_message(system_message)
+        logging.info(f"System message sent: {system_message}")
 
     if continue_mode and st.session_state.messages and st.session_state.messages[-1]["role"] == "assistant":
-        prompt = f"[请继续补全这句话，不要重复之前的内容，使用合适的标点符号和大小写：{st.session_state.messages[-1]['content']}]"
+         prompt = f"[请继续补全这句话，不要重复之前的内容，使用合适的标点符号和大小写：{st.session_state.messages[-1]['content']}]"
     response = chat_session.send_message(prompt, stream=True)
     full_response = ""
     for chunk in response:
@@ -833,8 +833,8 @@ def getAnswer(prompt, continue_mode=False):
       yield chunk.text
     # 添加到消息列表，只有第一次回复
     if not continue_mode:
+         logging.info(f"Adding assistant message: {full_response}")
          st.session_state.messages.append({"role": "assistant", "content": full_response})
-
 
 # --- Streamlit 布局 ---
 st.set_page_config(
