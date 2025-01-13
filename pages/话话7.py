@@ -1440,14 +1440,6 @@ if "chat_session" not in st.session_state:
 if "log_file" not in st.session_state:
      st.session_state.log_file = "chat_log.pkl"
 
-# 确保文件存在
-if not os.path.exists(st.session_state.log_file):
-    with open(st.session_state.log_file, "wb") as f:
-        pass
-
-# 初始化 session state
-if "messages" not in st.session_state or not st.session_state.messages:
-    load_history(st.session_state.log_file)
 
 # --- 功能函数 ---
 def generate_token():
@@ -1475,13 +1467,16 @@ def generate_token():
 
 def load_history(log_file):
     try:
-        with open(log_file, "rb") as f:
-            st.session_state.messages = pickle.load(f)
-        st.success("成功读取历史记录！")
+        if os.path.exists(log_file):
+            with open(log_file, "rb") as f:
+                st.session_state.messages = pickle.load(f)
+            st.success("成功读取历史记录！")
         st.session_state.log_file = log_file
     except FileNotFoundError:
         st.warning("没有找到历史记录文件。")
-
+    except Exception as e:
+        st.error(f"读取本地pkl文件失败：{e}")
+    
 def clear_history(log_file):
     st.session_state.messages.clear()  # 清空列表
     if os.path.exists(log_file):
@@ -1542,7 +1537,6 @@ def download_all_logs():
                  zip_file.write(file)
     return zip_buffer.getvalue()
 
-
 # --- Streamlit 布局 ---
 st.set_page_config(
     page_title="Gemini Chatbot",
@@ -1558,27 +1552,45 @@ with st.sidebar.expander("文件操作"):
         st.button("重置上一个输出 ⏪",
                     on_click=lambda: st.session_state.messages.pop(-1) if len(st.session_state.messages) > 1 else None)
 
-    st.button("读取历史记录 📖", on_click=lambda: load_history(st.session_state.log_file))
+    # 读取指定文件
+    file_name = st.text_input("读取本地pkl文件 📁(请输入文件名,如`chat_log.pkl`):", key="file_input")
+    if file_name:
+        if st.button("读取"):
+           load_history(file_name)
+
     
     if st.button("清除历史记录 🗑️"):
         st.session_state.clear_confirmation = True  # 清除历史记录弹窗标志
+        
+    # 确认/取消清除历史记录按钮区域
+    if "clear_confirmation" in st.session_state and st.session_state.clear_confirmation:
+        col1, col2 = st.columns(2)
+        with col1:
+            if st.button("确认清除", key="clear_history_confirm"):
+                clear_history(st.session_state.log_file)
+                st.session_state.clear_confirmation = False
+                st.experimental_rerun()
+        with col2:
+            if st.button("取消", key="clear_history_cancel"):
+                st.session_state.clear_confirmation = False
 
     st.download_button(
-        label="下载聊天记录 ⬇️",
-        data=open(st.session_state.log_file, "rb").read() if os.path.exists(st.session_state.log_file) else b"",
-        file_name=filename,
-        mime="application/octet-stream",
+        label="下载所有聊天记录 ⬇️",
+        data=download_all_logs(),
+        file_name="chat_logs.zip",
+        mime="application/zip",
     )
     uploaded_file = st.file_uploader("读取本地pkl文件 📁", type=["pkl"])
     if uploaded_file is not None:
         try:
             loaded_messages = pickle.load(uploaded_file)
             st.session_state.messages = loaded_messages  # 使用 = 替换现有消息
-            st.session_state.log_file = uploaded_file.name  # 使用上传文件的名字作为log_file
+            st.session_state.log_file = uploaded_file.name  # 设置文件名
             st.success("成功读取本地pkl文件！")
             st.experimental_rerun()
         except Exception as e:
             st.error(f"读取本地pkl文件失败：{e}")
+
 
 # 功能区 2: 角色设定
 with st.sidebar.expander("角色设定"):
