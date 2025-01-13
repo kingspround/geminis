@@ -1544,11 +1544,9 @@ with st.sidebar.expander("文件操作"):
         st.button("重置上一个输出 ⏪",
                     on_click=lambda: st.session_state.messages.pop(-1) if len(st.session_state.messages) > 1 else None)
 
-    if st.button("读取指定文件 📖"):
-        file_name = st.text_input("请输入文件名（xxx.pkl）:")
-        if file_name:
-            load_history(file_name)
-   
+    # 修改为读取当前路径的文件
+    st.button("读取历史记录 📖", on_click=lambda: load_history(log_file))
+    
     if st.button("清除历史记录 🗑️"):
         st.session_state.clear_confirmation = True  # 清除历史记录弹窗标志
         
