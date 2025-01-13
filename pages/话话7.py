@@ -8,7 +8,7 @@ import string
 import time
 from google.api_core import exceptions
 import zipfile
-from io import BytesIO  # 确保导入 BytesIO
+from io import BytesIO
 
 
 genai.configure(api_key="AIzaSyDdyhqcowl0ftcbK9pMObXzM7cIOQMtlmA") # Use API Key directly, replace 【钥匙】 
