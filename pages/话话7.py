@@ -10,7 +10,7 @@ from google.api_core import exceptions
 
 genai.configure(api_key="AIzaSyDdyhqcowl0ftcbK9pMObXzM7cIOQMtlmA") # Use API Key directly, replace 【钥匙】 
 
-# Create the model
+# Create the model 
 generation_config = {
   "temperature": 1,
   "top_p": 0.95,
