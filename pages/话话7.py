@@ -5,8 +5,7 @@ import streamlit as st
 import pickle
 import random
 import string
-import time
-from google.api_core import exceptions
+
 
 
 genai.configure(api_key="AIzaSyDdyhqcowl0ftcbK9pMObXzM7cIOQMtlmA") # Use API Key directly, replace 【钥匙】 
@@ -1413,7 +1412,6 @@ DEFAULT_CHARACTER_SETTINGS = {
     "设定2": "这是一个示例设定 2。",
 }
 
-# --- 文件名 ---
 # 获取当前文件路径
 file = os.path.abspath(__file__)
 filename = os.path.splitext(os.path.basename(file))[0] + ".pkl"
@@ -1496,13 +1494,7 @@ def getAnswer(prompt, continue_mode=False):
 
     #使用之前存储的会话，而不是每次都重新开启
     if "chat_session" not in st.session_state or st.session_state.chat_session is None:
-        history = []
-        for msg in st.session_state.messages:
-           history.append({
-             "role": msg["role"],
-             "parts": [{"text": msg["content"]}]
-             })
-        st.session_state.chat_session = model.start_chat(history = history)
+        st.session_state.chat_session = model.start_chat(history = [])
         if system_message != "":
             st.session_state.chat_session.send_message(system_message)
 
