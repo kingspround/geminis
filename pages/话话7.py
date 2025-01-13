@@ -1431,7 +1431,7 @@ if 'regenerate_index' not in st.session_state:
 if 'continue_index' not in st.session_state:
     st.session_state.continue_index = None
 if "use_token" not in st.session_state:
-    st.session_state.use_token = False # 默认不启用token
+    st.session_state.use_token = True # 默认启用token
 if "chat_session" not in st.session_state:
      st.session_state.chat_session = None
     
@@ -1443,7 +1443,7 @@ def generate_token():
     import string
     random.seed() # Add a seed for consistency
     token_length = random.randint(10, 15)
-    characters = "一乙二十丁厂七卜人入八九几儿了力乃刀又三于干亏士工土才寸下大丈与万上小口巾山千乞川亿个勺久凡及夕丸么广亡门义之尸弓己已子卫也女飞刃习叉"
+    characters = "一乙二十丁厂七卜人入八九几儿了力乃刀又三于干亏士工土才寸下大丈与万上小口巾山千乞川亿个勺久凡及夕丸么广亡门义之尸弓己已子卫也女飞刃习叉马乡丰王井开鳍癞瀑襟璧戳攒孽蘑藻鳖蹭蹬簸簿蟹靡癣羹鬓攘蠕巍鳞糯譬霹躏髓蘸镶瓤矗"
     hanzi_token = "".join(random.choice(characters) for _ in range(token_length - 1))
 
     # 随机生成数字部分
@@ -1605,44 +1605,42 @@ with st.sidebar.expander("角色设定"):
     if st.button("刷新 🔄"):  # 添加刷新按钮
         st.experimental_rerun()
 # 添加 token 功能
-with st.sidebar.expander("高级选项"):
-   #st.session_state.use_token = st.checkbox("启用随机Token", st.session_state.get("use_token",True)) # 默认启用Token
-    pass
 
-# 聊天输入框和token选项
-col1, col2 = st.columns([1, 12])
-with col1:
-   st.session_state.use_token = st.checkbox("Token", st.session_state.get("use_token", True)) # 复选框移动到输入框左边，并且默认选中
-with col2:
-    if prompt := st.chat_input("输入你的消息:"):
-        token = generate_token()
-        if "use_token" in st.session_state and st.session_state.use_token:
+with st.container():
+    col1, col2 = st.columns([1, 12])
+    with col1:
+        st.session_state.use_token = st.checkbox("Token", st.session_state.get("use_token", True))  # 默认开启
+    with col2:
+        if prompt := st.chat_input("输入你的消息:"):
+            token = generate_token()
+            if "use_token" in st.session_state and st.session_state.use_token:
+               
+                # 如果开启随机token，则将token附加到用户输入
+                full_prompt =  f"{prompt} (token: {token})"
+                st.session_state.messages.append({"role": "user", "content": full_prompt})
+               
+            else:
+                # 如果关闭随机token，则直接将用户输入添加到his_messages
+                full_prompt = prompt
+                st.session_state.messages.append({"role": "user", "content": full_prompt})
            
-            # 如果开启随机token，则将token附加到用户输入
-            full_prompt =  f"{prompt} (token: {token})"
-            st.session_state.messages.append({"role": "user", "content": full_prompt})
-            
-        else:
-            # 如果关闭随机token，则直接将用户输入添加到his_messages
-            full_prompt = prompt
-            st.session_state.messages.append({"role": "user", "content": full_prompt})
-       
-        with st.chat_message("user"):
-              st.markdown(prompt if not "use_token" in st.session_state or not st.session_state.use_token else f"{prompt} (token: {token})")
-        with st.chat_message("assistant"):
-            message_placeholder = st.empty()
-            full_response = ""
-            for chunk in getAnswer(full_prompt):
-                full_response += chunk
-                message_placeholder.markdown(full_response + "▌")
-            message_placeholder.markdown(full_response)
-            st.session_state.messages.append({"role": "assistant", "content": full_response})
+            with st.chat_message("user"):
+                  st.markdown(prompt if not "use_token" in st.session_state or not st.session_state.use_token else f"{prompt} (token: {token})")
+            with st.chat_message("assistant"):
+                message_placeholder = st.empty()
+                full_response = ""
+                for chunk in getAnswer(full_prompt):
+                    full_response += chunk
+                    message_placeholder.markdown(full_response + "▌")
+                message_placeholder.markdown(full_response)
+                st.session_state.messages.append({"role": "assistant", "content": full_response})
 
-        # Save the messages to a new .pkl file based on time.
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        new_log_file = f"chat_log_{timestamp}.pkl"
-        with open(new_log_file, "wb") as f:
-                pickle.dump(st.session_state.messages, f)
+            # Save the messages to a new .pkl file based on time.
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            new_log_file = f"chat_log_{timestamp}.pkl"
+            with open(new_log_file, "wb") as f:
+                    pickle.dump(st.session_state.messages, f)
+        
 
 # 显示历史记录和编辑功能
 for i, message in enumerate(st.session_state.messages):
