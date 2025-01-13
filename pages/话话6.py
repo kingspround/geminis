@@ -12,7 +12,7 @@ from google.api_core import exceptions
 from datetime import datetime
 
 
-genai.configure(api_key="AIzaSyDOI2e-I1RdXBnk99jY2H00A3aymXREETA") # Use API Key directly, replace 【钥匙】 
+genai.configure(api_key="AIzaSyCBjZbA78bPusYmUNvfsmHpt6rPx6Ur0QE") # Use API Key directly, replace 【钥匙】 
 
 # --- 模型设置 ---
 generation_config = {
