@@ -796,7 +796,7 @@ def load_history(log_file):
             st.session_state.messages = pickle.load(f)
         st.success(f"成功读取历史记录！({os.path.basename(log_file)})")
     except FileNotFoundError:
-        st.warning(f"没有找到历史记录文件。({os.path.basename(log_file)})")
+       st.warning(f"没有找到历史记录文件。({os.path.basename(log_file)})")
 
 def clear_history(log_file):
     st.session_state.messages.clear()
@@ -824,12 +824,16 @@ def getAnswer(prompt, continue_mode=False):
 
     if continue_mode and st.session_state.messages and st.session_state.messages[-1]["role"] == "assistant":
         prompt = f"[请继续补全这句话，不要重复之前的内容，使用合适的标点符号和大小写：{st.session_state.messages[-1]['content']}]"
-
     response = chat_session.send_message(prompt, stream=True)
     full_response = ""
     for chunk in response:
         full_response += chunk.text
         yield chunk.text
+
+    #只有第一次回复会保存到session，解决顶置和重复问题
+    if not continue_mode:
+        st.session_state.messages.append({"role": "assistant", "content": full_response})
+
 
 # --- Streamlit 布局 ---
 st.set_page_config(
@@ -850,10 +854,11 @@ with st.sidebar.expander("API Key 选择"):
 with st.sidebar:
     st.session_state.use_token = st.checkbox("Token", value=True) # 默认开启
 
-
 # 加载历史记录（仅在会话初始化时）
 if "messages" not in st.session_state:
     load_history(log_file)
+    st.success(f"<code>{os.path.basename(file)}</code> 已加载", unsafe_allow_html=True)
+
 
 # 聊天输入框
 if prompt := st.chat_input("输入你的消息:"):
@@ -874,7 +879,7 @@ if prompt := st.chat_input("输入你的消息:"):
             full_response += chunk
             message_placeholder.markdown(full_response + "▌")
         message_placeholder.markdown(full_response)
-        st.session_state.messages.append({"role": "assistant", "content": full_response})
+
 
 
     # 保存聊天记录
@@ -942,7 +947,7 @@ for i, message in enumerate(st.session_state.messages):
     with st.chat_message(message["role"]):
         main_col, button_col = st.columns([12, 1])
         with main_col:
-            st.write(message["content"], key=f"message_{i}")
+             st.container(key=f"message_container_{i}").write(message["content"])
         with button_col:
             with st.container():
                 col1, col2, col3 = st.columns(3)
@@ -1015,11 +1020,8 @@ if st.session_state.continue_index is not None:
         else:
             st.error("无法获取上一条消息以继续生成。")
 
+
 # 显示已加载的设定
 enabled_settings_display = [setting_name for setting_name, enabled in st.session_state.enabled_settings.items() if enabled]
 if enabled_settings_display:
     st.write("已加载设定:", ", ".join(enabled_settings_display))
-
-# 显示历史记录加载信息
-with st.container():
-    st.markdown(f"<p style='text-align: center;'><code>{os.path.basename(file)}</code> 已加载</p>", unsafe_allow_html=True)
