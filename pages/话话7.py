@@ -1407,12 +1407,6 @@ mediumslateblue	中板岩蓝
 
 
 
-# --- 默认角色设定 ---
-DEFAULT_CHARACTER_SETTINGS = {
-    "设定1": "这是一个示例设定 1。",
-    "设定2": "这是一个示例设定 2。",
-}
-
 # --- 文件名 ---
 filename = "chat_log.txt"
 log_file = "chat_log.pkl"
@@ -1432,6 +1426,10 @@ if 'continue_index' not in st.session_state:
     st.session_state.continue_index = None
 if "use_token" not in st.session_state:
     st.session_state.use_token = False # 默认不启用token
+if "chat_session" not in st.session_state:
+     st.session_state.chat_session = None
+if "log_file" not in st.session_state:
+    st.session_state.log_file = log_file
 
     
 
@@ -1463,6 +1461,7 @@ def load_history(log_file):
     try:
         with open(log_file, "rb") as f:
             st.session_state.messages = pickle.load(f)
+        st.session_state.log_file = log_file
         st.success("成功读取历史记录！")
     except FileNotFoundError:
         st.warning("没有找到历史记录文件。")
@@ -1499,9 +1498,7 @@ def getAnswer(prompt, continue_mode=False, max_retries = 3, retry_delay = 1):
 
     if system_message != "" and not st.session_state.chat_session.history:
          st.session_state.chat_session.send_message(system_message)
-         
-    # 强制使用指定的输出格式
-    prompt = f"[Output the response strictly with format <thinking> + <outline> + <content>. Following the format in <outline>, provide 4 different options in step1 and step2. Use only one unique name in each step. For evaluation, strictly use the format 'if illogical; if lack emotional depth; if lack proactivity' and W=xx, with a summary of the final decision at the end. In <content>, follow the format in the example I gave you before. Then add more details in the <解说> section.] {prompt}"
+
 
     retries = 0
     while retries < max_retries:
@@ -1516,7 +1513,6 @@ def getAnswer(prompt, continue_mode=False, max_retries = 3, retry_delay = 1):
             st.warning(f"Gemini API 服务不可用, 正在尝试重试 ({retries}/{max_retries})...")
             time.sleep(retry_delay) # Add a retry_delay before retrying
         except Exception as e:
-            st.error(f"发生了一个错误: {e}")
             return f"抱歉，发生了一个无法处理的错误: {e}"
     return "抱歉，多次尝试连接 Gemini API 失败，请稍后再试。"
 
@@ -1535,8 +1531,7 @@ st.set_page_config(
     layout="wide"
 )
 
-st.title("Gemini 聊天机器人")
-
+# st.title("Gemini 聊天机器人") #Removed the title
 
 # 功能区 1: 文件操作
 with st.sidebar.expander("文件操作"):
@@ -1544,11 +1539,13 @@ with st.sidebar.expander("文件操作"):
         st.button("重置上一个输出 ⏪",
                     on_click=lambda: st.session_state.messages.pop(-1) if len(st.session_state.messages) > 1 else None)
 
-    if st.button("读取指定文件 📖"):
-        file_name = st.text_input("请输入文件名（xxx.pkl）:")
-        if file_name:
+    # 读取指定文件
+    file_name = st.text_input("读取本地pkl文件 📁(请输入文件名,如`chat_log.pkl`):", key="file_input")
+    if file_name:
+        if st.button("读取"):
             load_history(file_name)
-   
+
+    
     if st.button("清除历史记录 🗑️"):
         st.session_state.clear_confirmation = True  # 清除历史记录弹窗标志
         
@@ -1557,7 +1554,7 @@ with st.sidebar.expander("文件操作"):
         col1, col2 = st.columns(2)
         with col1:
             if st.button("确认清除", key="clear_history_confirm"):
-                clear_history(log_file)
+                clear_history(st.session_state.log_file)
                 st.session_state.clear_confirmation = False
                 st.experimental_rerun()
         with col2:
@@ -1570,16 +1567,6 @@ with st.sidebar.expander("文件操作"):
         file_name="chat_logs.zip",
         mime="application/zip",
     )
-    
-    uploaded_file = st.file_uploader("读取本地pkl文件 📁", type=["pkl"])
-    if uploaded_file is not None:
-        try:
-            loaded_messages = pickle.load(uploaded_file)
-            st.session_state.messages = loaded_messages  # 使用 = 替换现有消息
-            st.success("成功读取本地pkl文件！")
-            st.experimental_rerun()
-        except Exception as e:
-            st.error(f"读取本地pkl文件失败：{e}")
 
 # 功能区 2: 角色设定
 with st.sidebar.expander("角色设定"):
@@ -1639,7 +1626,7 @@ if st.session_state.get("editing"):
         with col1:
             if st.button("保存 ✅", key=f"save_{i}"):
                 st.session_state.messages[i]["content"] = new_content
-                with open(log_file, "wb") as f:
+                with open(st.session_state.log_file, "wb") as f:
                     pickle.dump(st.session_state.messages, f)
                 st.success("已保存更改！")
                 st.session_state.editing = False
@@ -1658,6 +1645,7 @@ if prompt := st.chat_input("输入你的消息:"):
         # 如果关闭随机token，则直接将用户输入添加到his_messages
         full_prompt = prompt
         st.session_state.messages.append({"role": "user", "content": full_prompt})
+        
     with st.chat_message("user"):
           st.markdown(prompt if not "use_token" in st.session_state or not st.session_state.use_token else f"{prompt} (token: {token})")
     with st.chat_message("assistant"):
@@ -1668,10 +1656,9 @@ if prompt := st.chat_input("输入你的消息:"):
             message_placeholder.markdown(full_response + "▌")
         message_placeholder.markdown(full_response)
         st.session_state.messages.append({"role": "assistant", "content": full_response})
-    # Save the messages to a new .pkl file based on time.
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    new_log_file = f"chat_log_{timestamp}.pkl"
-    with open(new_log_file, "wb") as f:
+    
+    if "log_file" in st.session_state and st.session_state.log_file:
+         with open(st.session_state.log_file, "wb") as f:
             pickle.dump(st.session_state.messages, f)
         
 
@@ -1696,8 +1683,9 @@ if st.session_state.regenerate_index is not None:
                     message_placeholder.markdown(full_response + "▌")
                 message_placeholder.markdown(full_response)
                 st.session_state.messages[i]["content"] = full_response
-            with open(log_file, "wb") as f:
-                pickle.dump(st.session_state.messages, f)
+            if "log_file" in st.session_state and st.session_state.log_file:
+                with open(st.session_state.log_file, "wb") as f:
+                  pickle.dump(st.session_state.messages, f)
             st.experimental_rerun()
         else:
            st.error("无法获取上一条用户消息以重新生成。")
@@ -1718,7 +1706,8 @@ if st.session_state.continue_index is not None:
                 message_placeholder.markdown(full_response + "▌")
             message_placeholder.markdown(full_response)
             st.session_state.messages.append({"role": "assistant", "content": full_response})
-        with open(log_file, "wb") as f:
-            pickle.dump(st.session_state.messages, f)
+        if "log_file" in st.session_state and st.session_state.log_file:
+            with open(st.session_state.log_file, "wb") as f:
+                pickle.dump(st.session_state.messages, f)
       else:
         st.error("无法获取上一条消息以继续生成。")
