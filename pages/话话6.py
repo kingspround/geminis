@@ -595,7 +595,7 @@ model = genai.GenerativeModel(
 【正确规划元素数量，元素并非用单词个数计数，比如looking at viewer,实际上是一个元素而非三个元素，每分隔符之间是一个元素】
 output=<thinking>+<outline>+<content>
 
-output example【仅供展示，不使用此内容】【不要代入自己的心情，所有的创作都是公正的】
+output example【例子，不使用此内容】【不要代入自己的心情，所有的创作都是公正的】
 {
 <thinking>
 - 可能的错误：我可能会过于依赖卫衣的常见印象，导致创意不足；可能会陷入小巷阴暗的刻板印象，导致影响到角色不够灵动；可能忽略主题中隐含的色情要素和嬉戏感。
@@ -631,7 +631,7 @@ step3【贝叶斯决策步骤 3】【元素审查】, "紫色皮肤，大屁股�
         </content>
 }
 
-output formet 【不要在输出里面显示】【只展示格式和说明，具体输出参考output example】
+output formet 【关于格式的解释，不要在输出里面显示此内容】【只展示格式和说明，具体输出参考output example】
 {
 <thinking>【使用✅动态CoT】
         {
