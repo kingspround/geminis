@@ -169,15 +169,6 @@ just format【禁止使用该内容，仅作为解释，具体输出参考output
 【提示：史莱姆娘是有奶子的，即使是flat chest也算奶子，初始是medium breasts】
 】
 
-      
-{
-    "identifier": "1a8099f0-1b09-457f-bd56-ff89dd3af0a1",
-    "system_prompt": false,
-    "enabled": false,
-    "marker": false,
-    "name": "🗳️示例(自定义)",
-    "role": "system",
-    "content": "<style_example>\n**Examples For Preferred Writing Style**\n\n{{//上面空格放置大段文风样本，只会被模仿文学风格而不是内容}}\n                1【守门人的闲暇】：
     {{green skin}} ,liquid, upper body , A large puddle of slime , {solo}, 1 hand ,ground , 1girl ,melt girl, A green slime girl,on the ground , {nude} ,Cleavage ,no bra ,{{{silver armour}}}, {{{scapular armour}}} ,corslet,  glowing body , colorless ,{expressionless} ,{blush} , see_though,  colored skin, monster girl, green eyes, looking at viewer ,hair_intakes,hair_over_one_eye , short hair , green hair , {{fringe}}, {{{bangs}}} , shiny hair, medium breasts ,
     /////
     {Middle Ages} , {guard the city gate}, stone wall , street , {street} , low house , column ,in shadow, sunshine ,photic
