@@ -7,6 +7,9 @@ import random
 import string
 import time
 from google.api_core import exceptions
+import zipfile
+from io import BytesIO  # 确保导入 BytesIO
+
 
 genai.configure(api_key="AIzaSyDdyhqcowl0ftcbK9pMObXzM7cIOQMtlmA") # Use API Key directly, replace 【钥匙】 
 
@@ -1407,11 +1410,6 @@ mediumslateblue	中板岩蓝
 
 
 
-# --- 文件名 ---
-filename = "chat_log.txt"
-log_file = "chat_log.pkl"
-
-
 # --- 初始化 Session State ---
 if "messages" not in st.session_state:
     st.session_state.messages = []
@@ -1429,9 +1427,7 @@ if "use_token" not in st.session_state:
 if "chat_session" not in st.session_state:
      st.session_state.chat_session = None
 if "log_file" not in st.session_state:
-    st.session_state.log_file = log_file
-
-    
+     st.session_state.log_file = "chat_log.pkl"
 
 # --- 功能函数 ---
 def generate_token():
@@ -1498,7 +1494,9 @@ def getAnswer(prompt, continue_mode=False, max_retries = 3, retry_delay = 1):
 
     if system_message != "" and not st.session_state.chat_session.history:
          st.session_state.chat_session.send_message(system_message)
-
+         
+    # 强制使用指定的输出格式
+    prompt = f"[Output the response strictly with format <thinking> + <outline> + <content>. Following the format in <outline>, provide 4 different options in step1 and step2. Use only one unique name in each step. For evaluation, strictly use the format 'if illogical; if lack emotional depth; if lack proactivity' and W=xx, with a summary of the final decision at the end. In <content>, follow the format in the example I gave you before. Then add more details in the <解说> section.] {prompt}"
 
     retries = 0
     while retries < max_retries:
@@ -1531,7 +1529,8 @@ st.set_page_config(
     layout="wide"
 )
 
-# st.title("Gemini 聊天机器人") #Removed the title
+st.title("Gemini 聊天机器人")
+
 
 # 功能区 1: 文件操作
 with st.sidebar.expander("文件操作"):
