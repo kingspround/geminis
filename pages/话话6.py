@@ -857,14 +857,14 @@ st.set_page_config(
 
 # 添加 API key 选择器
 with st.sidebar:
-    st.session_state.selected_api_key = st.selectbox(
-        "选择 API Key:",
-        options=list(API_KEYS.keys()),
-        index=list(API_KEYS.keys()).index(st.session_state.selected_api_key),
-        label_visibility="visible",
-          key="api_selector"
-    )
-    genai.configure(api_key=API_KEYS[st.session_state.selected_api_key])
+  st.session_state.selected_api_key = st.selectbox(
+      "选择 API Key:",
+      options=list(API_KEYS.keys()),
+      index=list(API_KEYS.keys()).index(st.session_state.selected_api_key),
+      label_visibility="visible",
+        key="api_selector"
+  )
+  genai.configure(api_key=API_KEYS[st.session_state.selected_api_key])
 
 # 在左侧边栏创建 token 复选框
 with st.sidebar:
@@ -928,24 +928,21 @@ with st.sidebar:
 
         st.session_state.test_text = st.text_area("System Message (Optional):", st.session_state.get("test_text", ""), key="system_message")
 st.markdown(
-        f"""
-        <div style="position: fixed; top: 70px; right: 10px; display: flex; flex-direction: column; align-items: flex-end;">
+    f"""
+        <div style="position: fixed; top: 100px; right: 10px; display: flex; flex-direction: column; align-items: flex-end;">
+            <label style="display: block; margin-bottom: 2px;">
+                <input type="checkbox" {'checked' if st.session_state.get('use_token', False) else ''} onclick="this.closest('form').submit()" name="use_token" id="use_token">
+                    Token
+            </label>
+            <button  onclick="this.closest('form').submit()" name="refresh_button" id="refresh_button">🔄</button>
+         <input type="hidden" name="_use_token" value="True" >
+        </div>
         """,
             unsafe_allow_html=True,
-     )
-   
-if st.checkbox("Token", value=st.session_state.get("use_token",True), key="use_token_checkbox"):
-   st.session_state.use_token = True
-else:
-   st.session_state.use_token = False
-if st.button("🔄",key="refresh_button"):
+   )
+
+if "refresh_button" in st.session_state:
    st.experimental_rerun()
-st.markdown(
-    """
-    </div>
-    """,
-        unsafe_allow_html=True,
- )
 # 显示历史记录和编辑按钮
 for i, message in enumerate(st.session_state.messages):
     with st.chat_message(message["role"]):
