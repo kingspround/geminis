@@ -945,8 +945,7 @@ with st.markdown(
         document.getElementById('refreshButton').addEventListener('click', function() {
             Streamlit.rerun();
         });
-    </script>
-""", unsafe_allow_html=True)
+    </script>""", unsafe_allow_html=True)
 
 
 if "tokenCheckbox" in st.session_state:
