@@ -948,8 +948,7 @@ with st.container():
     with cols[0]:
       st.session_state.use_token = st.checkbox("Token", value=True, label_visibility="hidden")
     with cols[1]:
-        if st.button("🔄", key = 'refresh_button', label_visibility="hidden", on_click=lambda:st.experimental_rerun()):
-           pass
+        st.button("🔄", key = 'refresh_button', label_visibility="hidden", on_click=lambda: st.experimental_rerun())
 
 st.markdown(
     """
@@ -996,7 +995,7 @@ for i, message in enumerate(st.session_state.messages):
                            st.session_state.editable_index = i
                            st.session_state.editing = True
                     with cols[1]:
-                       if st.button("♻️", key=f"regenerate_{i}"):
+                        if st.button("♻️", key=f"regenerate_{i}"):
                            regenerate_message(i)
                     with cols[2]:
                         if st.button("➕", key=f"continue_{i}"):
