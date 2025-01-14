@@ -853,6 +853,21 @@ st.set_page_config(
     layout="wide"
 )
 
+# 添加自定义 CSS 样式，让 Token 复选框固定在右下角
+st.markdown(
+    """
+    <style>
+    .token-container {
+        position: fixed;
+        bottom: 70px;
+        right: 20px;
+        z-index: 1000;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
+
 # 添加 API key 选择器
 with st.sidebar.expander("API Key 选择"):
     st.session_state.selected_api_key = st.selectbox(
@@ -862,12 +877,13 @@ with st.sidebar.expander("API Key 选择"):
     )
     genai.configure(api_key=API_KEYS[st.session_state.selected_api_key])
 
-# 在左侧边栏创建 token 复选框
-with st.sidebar:
-    st.session_state.use_token = st.checkbox("Token", value=True) # 默认开启
+#  将 Token 复选框移到主页面右下角
+with st.container():
+     st.session_state.use_token = st.checkbox("Token", value=True)  # 默认开启
 
-    if st.button("刷新 🔄"):
+     if st.button("刷新 🔄"):
         st.experimental_rerun()
+
 
 # 功能区 1: 文件操作
 with st.sidebar.expander("文件操作"):
@@ -927,6 +943,7 @@ with st.sidebar.expander("角色设定"):
 
     st.session_state.test_text = st.text_area("System Message (Optional):", st.session_state.get("test_text", ""), key="system_message")
 
+
 # 显示历史记录和编辑按钮
 for i, message in enumerate(st.session_state.messages):
     with st.chat_message(message["role"]):
@@ -935,16 +952,17 @@ for i, message in enumerate(st.session_state.messages):
                 f"{message['role']}:", message["content"], key=f"message_edit_{i}"
            )
            cols = st.columns(20) #创建20列
-           with cols[3]:
-               if st.button("保存 ✅", key=f"save_{i}"):
+           with cols[0]:
+               if st.button("✅", key=f"save_{i}"):
                    st.session_state.messages[i]["content"] = new_content
                    with open(log_file, "wb") as f:
                       pickle.dump(st.session_state.messages, f)
                    st.success("已保存更改！")
                    st.session_state.editing = False
-           with cols[4]:
-              if st.button("取消 ❌", key=f"cancel_{i}"):
+           with cols[1]:
+              if st.button("❌", key=f"cancel_{i}"):
                  st.session_state.editing = False
+
         else:
             st.write(message["content"], key=f"message_{i}")
             if i >= len(st.session_state.messages) - 2:
