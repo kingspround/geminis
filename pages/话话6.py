@@ -940,12 +940,13 @@ with st.markdown(
         document.getElementById('tokenCheckbox').checked = """ + str(st.session_state.use_token) + """;
         document.getElementById('tokenCheckbox').addEventListener('change', function() {
             var value = this.checked;
-            Streamlit.setComponentValue('tokenCheckbox', value);
+            Streamlit.setComponentValue(value);
         });
         document.getElementById('refreshButton').addEventListener('click', function() {
             Streamlit.rerun();
         });
-    </script>""", unsafe_allow_html=True)
+    </script>
+""", unsafe_allow_html=True)
 
 
 if "tokenCheckbox" in st.session_state:
