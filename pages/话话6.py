@@ -861,18 +861,18 @@ st.session_state.selected_api_key = st.selectbox(
     options=list(API_KEYS.keys()),
     index=list(API_KEYS.keys()).index(st.session_state.selected_api_key),
     label_visibility="visible",
-    key="api_selector"
+   key="api_selector"
 )
 genai.configure(api_key=API_KEYS[st.session_state.selected_api_key])
 
-
 # 在左侧边栏创建 token 复选框
 with st.sidebar:
+
     
     # 功能区 1: 文件操作
     with st.expander("文件操作"):
         if len(st.session_state.messages) > 0:
-            st.button("重置上一个输出", on_click=lambda: st.session_state.messages.pop(-1) if len(st.session_state.messages) > 1 and not st.session_state.reset_history else None, key='reset_last')
+           st.button("重置上一个输出 ⏪", on_click=lambda: st.session_state.messages.pop(-1) if len(st.session_state.messages) > 1 and not st.session_state.reset_history else None, key='reset_last')
 
         st.button("读取历史记录 📖", on_click=lambda: load_history(log_file))
 
@@ -891,11 +891,11 @@ with st.sidebar:
                     st.session_state.clear_confirmation = False
         
         st.download_button(
-           label="下载所有聊天记录 ⬇️",
-           data=download_all_logs(),
-           file_name="chat_logs.zip",
-           mime="application/zip",
-           )
+        label="下载所有聊天记录 ⬇️",
+        data=download_all_logs(),
+        file_name="chat_logs.zip",
+        mime="application/zip",
+        )
         
         uploaded_file = st.file_uploader("读取本地pkl文件 📁", type=["pkl"])
         if uploaded_file is not None:
@@ -904,7 +904,7 @@ with st.sidebar:
                 st.session_state.messages.extend(loaded_messages)
                 st.session_state.upload_count = st.session_state.get("upload_count", 0) + 1
                 with open(log_file, "wb") as f:
-                     pickle.dump(st.session_state.messages, f)
+                    pickle.dump(st.session_state.messages, f)
             except Exception as e:
                 st.error(f"读取本地pkl文件失败：{e}")
 # 功能区 2: 角色设定
@@ -927,95 +927,24 @@ with st.sidebar:
 
         st.session_state.test_text = st.text_area("System Message (Optional):", st.session_state.get("test_text", ""), key="system_message")
 
-# --- 浮动 token 复选框和刷新按钮 ---
-st.markdown(
-    """
-    <div style="position: fixed; bottom: 50px; right: 20px; z-index: 1000;">
-        <div style="display: flex; align-items: center;">
-            <input type="checkbox" id="tokenCheckbox" style="margin-right: 5px;">
-            <label for="tokenCheckbox" style="margin-right: 10px; font-size:0.9rem;">Token</label>
-            <button id="refreshButton" style="background-color: transparent; border: none; padding: 0; cursor: pointer; font-size:1rem;">🔄</button>
+    st.markdown(
+        """
+        <div style="position: fixed; bottom: 50px; right: 50px;">
+        """,
+        unsafe_allow_html=True,
+    )
+    with st.container():
+        col_float = st.columns([10,2]) # 创建10列，让按钮靠右显示
+        with col_float[1]: # 按钮浮动在最右侧
+           st.session_state.use_token = st.checkbox("Token", value=True)
+           if st.button("🔄"):
+             st.experimental_rerun()
+    st.markdown(
+        """
         </div>
-    </div>
-    """,
-    unsafe_allow_html=True,
-)
-# 使用 JavaScript 来同步 Token 复选框的状态
-st.markdown(
-    """
-    <script>
-        const checkbox = document.getElementById('tokenCheckbox');
-        const refreshButton = document.getElementById('refreshButton');
-
-        checkbox.checked = """ + str(st.session_state.use_token) + """;
-
-        checkbox.addEventListener('change', function() {
-            window.parent.postMessage({ type: 'setTokenState', value: checkbox.checked }, '*');
-        });
-        refreshButton.addEventListener('click', function() {
-            window.parent.postMessage({ type: 'rerun' }, '*');
-        });
-
-    </script>
-    """,
-    unsafe_allow_html=True
-)
-def reruns():
-  st.experimental_rerun()
-
-# 接收来自 JavaScript 的消息
-for msg in st.session_state.get("incoming_messages",[]):
-  if msg.get('type') == "setTokenState":
-      st.session_state.use_token = msg.get('value')
-  if msg.get('type') == "rerun":
-       reruns()
-
-# 保存来自 JavaScript 的消息
-if "incoming_messages" not in st.session_state:
-  st.session_state.incoming_messages = []
-
-if st.session_state.get('incoming_messages_changed', False):
-    st.session_state.incoming_messages_changed = False # 重置标志
-    st.experimental_rerun()
-def set_incoming_message(msg):
-    st.session_state.incoming_messages.append(msg)
-    st.session_state.incoming_messages_changed = True
-import streamlit.components.v1 as components
-components.html(
-    """
-        <script>
-          window.addEventListener('message', function(event) {
-            if(event.source !== window.parent) {
-                window.parent.postMessage({
-                    type: 'save_incoming_message', 
-                    data: event.data
-                  }, "*");
-            }
-           
-          });
-        </script>
-    """,
-    height=0,
-)
-for key, value in st.session_state.items():
-  if key == 'incoming_messages_changed':
-    continue
-
-  if isinstance(value, dict):
-    value.update({"_streamlit_key": key})
-  if isinstance(value, list):
-    for item in value:
-       if isinstance(item, dict):
-            item.update({"_streamlit_key": key})
-st.session_state["incoming_messages"] = st.session_state.get("incoming_messages", [])
-
-if "streamlit_key" in st.session_state:
-   del st.session_state["streamlit_key"]
-if st.session_state.get('incoming_messages_changed', False):
-    st.session_state.incoming_messages_changed = False
-    st.experimental_rerun()
-if st.session_state.get('component_value'):
-    set_incoming_message(st.session_state.get('component_value'))
+        """,
+        unsafe_allow_html=True,
+    )
 # 显示历史记录和编辑按钮
 for i, message in enumerate(st.session_state.messages):
     with st.chat_message(message["role"]):
@@ -1053,12 +982,12 @@ for i, message in enumerate(st.session_state.messages):
                        if st.session_state.messages and st.button("⏪", key=f"reset_last_{i}"):
                           st.session_state.reset_history = True
                           st.session_state.messages.pop(-1) if len(st.session_state.messages) > 1 else None
-                    if st.session_state.reset_history and i >= len(st.session_state.messages) -2:
-                      with cols[4]:
-                           if st.button("↩️", key=f"undo_reset_{i}"):
-                               st.session_state.reset_history = False
-                               st.experimental_rerun()
 
+                    if st.session_state.reset_history and i >= len(st.session_state.messages) -2 :
+                      with cols[4]:
+                        if st.button("↩️", key=f"undo_reset_{i}"):
+                             st.session_state.reset_history = False
+                             st.experimental_rerun()
 
 if prompt := st.chat_input("输入你的消息:"):
     token = generate_token()
