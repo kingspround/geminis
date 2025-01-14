@@ -768,8 +768,8 @@ if 'continue_index' not in st.session_state:
     st.session_state.continue_index = None
 if "use_token" not in st.session_state:
     st.session_state.use_token = True  # 默认启用token
-if "undo_available" not in st.session_state:
-    st.session_state.undo_available = False
+if "reset_history" not in st.session_state:
+    st.session_state.reset_history = False
 
 # --- 功能函数 ---
 def generate_token():
@@ -855,166 +855,129 @@ st.set_page_config(
     layout="wide"
 )
 
-#  API key 选择器直接在侧边栏
-st.sidebar.selectbox(
+# 添加 API key 选择器
+st.session_state.selected_api_key = st.selectbox(
     "选择 API Key:",
     options=list(API_KEYS.keys()),
     index=list(API_KEYS.keys()).index(st.session_state.selected_api_key),
-    key='api_selector',
-    on_change=lambda: genai.configure(api_key=API_KEYS[st.session_state.selected_api_key])
+    label_visibility="visible",
+   key="api_selector"
 )
 genai.configure(api_key=API_KEYS[st.session_state.selected_api_key])
-# 功能区 1: 文件操作
-with st.sidebar.expander("文件操作"):
-    if len(st.session_state.messages) > 0:
-      st.button("重置上一个输出", on_click=lambda: st.session_state.messages.pop(-1) if len(st.session_state.messages) > 1 else None)
 
-    st.button("读取历史记录 📖", on_click=lambda: load_history(log_file))
+# 在左侧边栏创建 token 复选框
+with st.sidebar:
 
-    if st.button("清除历史记录 🗑️"):
-        st.session_state.clear_confirmation = True
-
-    # 确认/取消清除历史记录按钮区域
-    if "clear_confirmation" in st.session_state and st.session_state.clear_confirmation:
-        col1, col2 = st.columns(2)
-        with col1:
-            if st.button("确认清除", key="clear_history_confirm"):
-                clear_history(log_file)
-                st.session_state.clear_confirmation = False
-        with col2:
-            if st.button("取消", key="clear_history_cancel"):
-                st.session_state.clear_confirmation = False
     
-    st.download_button(
-      label="下载所有聊天记录 ⬇️",
-      data=download_all_logs(),
-      file_name="chat_logs.zip",
-      mime="application/zip",
-    )
-    
-    uploaded_file = st.file_uploader("读取本地pkl文件 📁", type=["pkl"])
-    if uploaded_file is not None:
-        try:
-            loaded_messages = pickle.load(uploaded_file)
-            st.session_state.messages.extend(loaded_messages)
-            st.session_state.upload_count = st.session_state.get("upload_count", 0) + 1
-            with open(log_file, "wb") as f:
-                 pickle.dump(st.session_state.messages, f)
-        except Exception as e:
-            st.error(f"读取本地pkl文件失败：{e}")
+    # 功能区 1: 文件操作
+    with st.expander("文件操作"):
+        if len(st.session_state.messages) > 0:
+           st.button("重置上一个输出", on_click=lambda: st.session_state.messages.pop(-1) if len(st.session_state.messages) > 1 and not st.session_state.reset_history else None, key='reset_last')
+
+        st.button("读取历史记录 📖", on_click=lambda: load_history(log_file))
+
+        if st.button("清除历史记录 🗑️"):
+            st.session_state.clear_confirmation = True
+
+        # 确认/取消清除历史记录按钮区域
+        if "clear_confirmation" in st.session_state and st.session_state.clear_confirmation:
+            col1, col2 = st.columns(2)
+            with col1:
+                if st.button("确认清除", key="clear_history_confirm"):
+                    clear_history(log_file)
+                    st.session_state.clear_confirmation = False
+            with col2:
+                if st.button("取消", key="clear_history_cancel"):
+                    st.session_state.clear_confirmation = False
+        
+        st.download_button(
+        label="下载所有聊天记录 ⬇️",
+        data=download_all_logs(),
+        file_name="chat_logs.zip",
+        mime="application/zip",
+        )
+        
+        uploaded_file = st.file_uploader("读取本地pkl文件 📁", type=["pkl"])
+        if uploaded_file is not None:
+            try:
+                loaded_messages = pickle.load(uploaded_file)
+                st.session_state.messages.extend(loaded_messages)
+                st.session_state.upload_count = st.session_state.get("upload_count", 0) + 1
+                with open(log_file, "wb") as f:
+                    pickle.dump(st.session_state.messages, f)
+            except Exception as e:
+                st.error(f"读取本地pkl文件失败：{e}")
 # 功能区 2: 角色设定
-with st.sidebar.expander("角色设定"):
-    uploaded_setting_file = st.file_uploader("读取本地设定文件 (txt)", type=["txt"])
-    if uploaded_setting_file is not None:
-        try:
-            setting_name = os.path.splitext(uploaded_setting_file.name)[0]
-            setting_content = uploaded_setting_file.read().decode("utf-8")
-            st.session_state.character_settings[setting_name] = setting_content
-            st.session_state.enabled_settings[setting_name] = False
-            st.experimental_rerun()
-        except Exception as e:
-            st.error(f"读取文件失败: {e}")
+    with st.expander("角色设定"):
+        uploaded_setting_file = st.file_uploader("读取本地设定文件 (txt)", type=["txt"])
+        if uploaded_setting_file is not None:
+            try:
+                setting_name = os.path.splitext(uploaded_setting_file.name)[0]
+                setting_content = uploaded_setting_file.read().decode("utf-8")
+                st.session_state.character_settings[setting_name] = setting_content
+                st.session_state.enabled_settings[setting_name] = False
+                st.experimental_rerun()
+            except Exception as e:
+                st.error(f"读取文件失败: {e}")
 
-    for setting_name in DEFAULT_CHARACTER_SETTINGS:
-        if setting_name not in st.session_state.character_settings:
-            st.session_state.character_settings[setting_name] = DEFAULT_CHARACTER_SETTINGS[setting_name]
-        st.session_state.enabled_settings[setting_name] = st.checkbox(setting_name, st.session_state.enabled_settings.get(setting_name, False), key=f"checkbox_{setting_name}")
+        for setting_name in DEFAULT_CHARACTER_SETTINGS:
+            if setting_name not in st.session_state.character_settings:
+                st.session_state.character_settings[setting_name] = DEFAULT_CHARACTER_SETTINGS[setting_name]
+            st.session_state.enabled_settings[setting_name] = st.checkbox(setting_name, st.session_state.enabled_settings.get(setting_name, False), key=f"checkbox_{setting_name}")
 
-    st.session_state.test_text = st.text_area("System Message (Optional):", st.session_state.get("test_text", ""), key="system_message")
+        st.session_state.test_text = st.text_area("System Message (Optional):", st.session_state.get("test_text", ""), key="system_message")
+with st.container(): # 用于浮动token和刷新按钮
+  col_float = st.columns([10,2]) # 创建10列，让按钮靠右显示
 
-# 在页面右下角添加 Token 复选框和刷新按钮
-st.markdown(
-    """
-    <style>
-        .fixed-bottom {
-            position: fixed;
-            bottom: 50px;
-            right: 20px;
-            z-index: 999;
-            display:flex;
-            align-items: center;
-        }
-        .fixed-bottom > div {
-            display:flex;
-            gap:5px
-        }
-    </style>
-    """,
-    unsafe_allow_html=True,
-)
+  with col_float[1]: # 按钮浮动在最右侧
+    st.session_state.use_token = st.checkbox("Token", value=True)
 
-with st.container():
-    cols = st.columns([10,1])
-    with cols[0]:
-      st.session_state.use_token = st.checkbox("Token", value=True, label_visibility="hidden")
-    with cols[1]:
-        st.button("🔄", key = 'refresh_button', label_visibility="hidden", on_click=lambda: st.experimental_rerun())
+    if st.button("🔄"):
+      st.experimental_rerun()
 
-st.markdown(
-    """
-    <div class="fixed-bottom"></div>
-    """,
-    unsafe_allow_html=True,
-)
-BUTTON_WIDTH = 30 # 设定按钮宽度
-BUTTON_GAP = 5 # 设定按钮之间的空隙
-BUTTON_NUM = 4 # 设定按钮的数量
-SIDE_BUTTON_NUM = 2  # 设定侧边栏按钮数量
-
-# 消息下方的栏目的固定宽度
-button_area_width = BUTTON_WIDTH * (BUTTON_NUM + SIDE_BUTTON_NUM) + BUTTON_GAP * (BUTTON_NUM + SIDE_BUTTON_NUM - 1)
 # 显示历史记录和编辑按钮
 for i, message in enumerate(st.session_state.messages):
     with st.chat_message(message["role"]):
-        if st.session_state.get("editing") == True and i == st.session_state.editable_index:
-           new_content = st.text_area(
+      if st.session_state.get("editing") == True and i == st.session_state.editable_index:
+          new_content = st.text_area(
                 f"{message['role']}:", message["content"], key=f"message_edit_{i}"
-           )
-           cols = st.columns(20) #创建20列
-           with st.container():
-            st.markdown(f"""<div style="width:{button_area_width}px; display:flex; gap: {BUTTON_GAP}px" >""", unsafe_allow_html=True)
-            with cols[0]:
-               if st.button("✅", key=f"save_{i}", ):
-                  st.session_state.messages[i]["content"] = new_content
-                  with open(log_file, "wb") as f:
+          )
+          cols = st.columns(20) #创建20列
+          with cols[0]:
+              if st.button("✅", key=f"save_{i}"):
+                   st.session_state.messages[i]["content"] = new_content
+                   with open(log_file, "wb") as f:
                       pickle.dump(st.session_state.messages, f)
-                  st.success("已保存更改！")
-                  st.session_state.editing = False
-            with cols[1]:
+                   st.success("已保存更改！")
+                   st.session_state.editing = False
+          with cols[1]:
                if st.button("❌", key=f"cancel_{i}"):
-                    st.session_state.editing = False
-            st.markdown("</div>", unsafe_allow_html = True)
-        else:
+                  st.session_state.editing = False
+      else:
             st.write(message["content"], key=f"message_{i}")
             if i >= len(st.session_state.messages) - 2:
                 with st.container():
-                    st.markdown(f"""<div style="width:{button_area_width}px; display:flex; gap: {BUTTON_GAP}px" >""", unsafe_allow_html=True)
                     cols = st.columns(20) #创建20列
                     with cols[0]:
                         if st.button("✏️", key=f"edit_{i}"):
                            st.session_state.editable_index = i
                            st.session_state.editing = True
                     with cols[1]:
-                        if st.button("♻️", key=f"regenerate_{i}"):
+                      if st.button("♻️", key=f"regenerate_{i}"):
                            regenerate_message(i)
                     with cols[2]:
-                        if st.button("➕", key=f"continue_{i}"):
-                            continue_message(i)
+                       if st.button("➕", key=f"continue_{i}"):
+                         continue_message(i)
                     with cols[3]:
-                       if st.button("🔄", key=f"refresh_in_chat_{i}", on_click=lambda: st.experimental_rerun()):
-                          pass
+                       if st.session_state.messages and st.button("⏪", key=f"reset_last_{i}"):
+                          st.session_state.reset_history = True
+                          st.session_state.messages.pop(-1) if len(st.session_state.messages) > 1 else None
 
-                    with cols[4]:
-                        if st.button("⏪", key=f"reset_{i}"):
-                           st.session_state.messages.pop(-1)
-                           st.session_state.undo_available = True
-                    if st.session_state.undo_available and i == len(st.session_state.messages) - 1:
-                        with cols[5]:
-                           if st.button("↩️", key = f"undo_{i}"):
-                             st.session_state.messages.append({"role":"assistant", "content":" "})
-                             st.session_state.undo_available = False
-                    st.markdown("</div>", unsafe_allow_html = True)
-
+                    if st.session_state.reset_history and i >= len(st.session_state.messages) -2 :
+                      with cols[4]:
+                        if st.button("↩️", key=f"undo_reset_{i}"):
+                             st.session_state.reset_history = False
+                             st.experimental_rerun()
 if prompt := st.chat_input("输入你的消息:"):
     token = generate_token()
     if "use_token" in st.session_state and st.session_state.use_token:
