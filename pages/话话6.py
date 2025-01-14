@@ -948,10 +948,7 @@ with st.container():
     with cols[0]:
       st.session_state.use_token = st.checkbox("Token", value=True, label_visibility="hidden")
     with cols[1]:
-       st.button("🔄", key = 'refresh_button', label_visibility="hidden")
-       if st.session_state.get("refresh_button")==True:
-          st.experimental_rerun()
-          st.session_state["refresh_button"] = False 
+        st.button("🔄", key = 'refresh_button', label_visibility="hidden", on_click=lambda: st.experimental_rerun())
 
 st.markdown(
     """
@@ -961,7 +958,7 @@ st.markdown(
 )
 BUTTON_WIDTH = 30 # 设定按钮宽度
 BUTTON_GAP = 5 # 设定按钮之间的空隙
-BUTTON_NUM = 3 # 设定按钮的数量
+BUTTON_NUM = 4 # 设定按钮的数量
 SIDE_BUTTON_NUM = 2  # 设定侧边栏按钮数量
 
 # 消息下方的栏目的固定宽度
@@ -1004,11 +1001,15 @@ for i, message in enumerate(st.session_state.messages):
                         if st.button("➕", key=f"continue_{i}"):
                             continue_message(i)
                     with cols[3]:
+                       if st.button("🔄", key=f"refresh_in_chat_{i}", on_click=lambda: st.experimental_rerun()):
+                          pass
+
+                    with cols[4]:
                         if st.button("⏪", key=f"reset_{i}"):
-                            st.session_state.messages.pop(-1)
-                            st.session_state.undo_available = True
+                           st.session_state.messages.pop(-1)
+                           st.session_state.undo_available = True
                     if st.session_state.undo_available and i == len(st.session_state.messages) - 1:
-                        with cols[4]:
+                        with cols[5]:
                            if st.button("↩️", key = f"undo_{i}"):
                              st.session_state.messages.append({"role":"assistant", "content":" "})
                              st.session_state.undo_available = False
