@@ -940,7 +940,7 @@ with st.markdown(
         document.getElementById('tokenCheckbox').checked = """ + str(st.session_state.use_token) + """;
         document.getElementById('tokenCheckbox').addEventListener('change', function() {
             var value = this.checked;
-            Streamlit.setComponentValue(value);
+            Streamlit.setComponentValue('tokenCheckbox', value);
         });
         document.getElementById('refreshButton').addEventListener('click', function() {
             Streamlit.rerun();
