@@ -738,12 +738,6 @@ just format【禁止使用该内容，仅作为解释，具体输出参考output
 )
 
 
-# --- 默认角色设定 ---
-DEFAULT_CHARACTER_SETTINGS = {
-    "设定1": "这是一个示例设定 1。",
-    "设定2": "这是一个示例设定 2。",
-}
-
 # --- 文件操作函数 ---
 # 获取当前文件路径
 file = os.path.abspath(__file__)
@@ -818,7 +812,7 @@ def regenerate_message(i):
 def continue_message(i):
     st.session_state.continue_index = i
 
-def getAnswer(prompt, update_message, continue_mode=False): # Add update_message argument
+def getAnswer(prompt, update_message = None, continue_mode=False): # Add update_message argument
     system_message = ""
     if st.session_state.get("test_text"):
         system_message += st.session_state.test_text + "\n"
@@ -838,7 +832,8 @@ def getAnswer(prompt, update_message, continue_mode=False): # Add update_message
     full_response = ""
     for chunk in response:
         full_response += chunk.text
-        update_message(full_response) # call update message inside of getAnswer
+        if update_message:
+           update_message(full_response) # call update message inside of getAnswer
     return full_response
 
 def download_all_logs():
@@ -862,7 +857,7 @@ with st.sidebar:
         options=list(API_KEYS.keys()),
         index=list(API_KEYS.keys()).index(st.session_state.selected_api_key),
         label_visibility="visible",
-          key="api_selector"
+        key="api_selector"
     )
     genai.configure(api_key=API_KEYS[st.session_state.selected_api_key])
 
@@ -927,6 +922,7 @@ with st.sidebar:
             st.session_state.enabled_settings[setting_name] = st.checkbox(setting_name, st.session_state.enabled_settings.get(setting_name, False), key=f"checkbox_{setting_name}")
 
         st.session_state.test_text = st.text_area("System Message (Optional):", st.session_state.get("test_text", ""), key="system_message")
+
 
 # 显示历史记录和编辑按钮
 for i, message in enumerate(st.session_state.messages):
@@ -996,6 +992,7 @@ if prompt := st.chat_input("输入你的消息:"):
     st.session_state.messages.append({"role": "assistant", "content": full_response})
     with open(log_file, "wb") as f:
         pickle.dump(st.session_state.messages, f)
+    
 
 # Token 复选框和刷新按钮
 col1, col2 = st.columns(2)
@@ -1007,7 +1004,6 @@ with col1:
 with col2:
     if st.button("🔄", key="refresh_button"):
         st.experimental_rerun()
-
 
 # 处理重新生成的消息
 if st.session_state.regenerate_index is not None:
