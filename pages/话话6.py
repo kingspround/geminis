@@ -933,13 +933,18 @@ for i, message in enumerate(st.session_state.messages):
         st.write(message["content"], key=f"message_{i}")
         if i >= len(st.session_state.messages) - 2:
             with st.container():
-                if st.button("✏️", key=f"edit_{i}"):
-                    st.session_state.editable_index = i
-                    st.session_state.editing = True
-                if st.button("♻️", key=f"regenerate_{i}"):
-                    regenerate_message(i)
-                if st.button("➕", key=f"continue_{i}"):
-                     continue_message(i)
+                col1, col2, col3 = st.columns(3)
+                with col1:
+                   if st.button("✏️", key=f"edit_{i}"):
+                      st.session_state.editable_index = i
+                      st.session_state.editing = True
+                with col2:
+                   if st.button("♻️", key=f"regenerate_{i}"):
+                        regenerate_message(i)
+                with col3:
+                    if st.button("➕", key=f"continue_{i}"):
+                        continue_message(i)
+
 
 if st.session_state.get("editing"):
     i = st.session_state.editable_index
