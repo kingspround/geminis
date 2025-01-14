@@ -864,7 +864,6 @@ st.sidebar.selectbox(
     on_change=lambda: genai.configure(api_key=API_KEYS[st.session_state.selected_api_key])
 )
 genai.configure(api_key=API_KEYS[st.session_state.selected_api_key])
-
 # 功能区 1: 文件操作
 with st.sidebar.expander("文件操作"):
     if len(st.session_state.messages) > 0:
@@ -949,8 +948,8 @@ with st.container():
     with cols[0]:
       st.session_state.use_token = st.checkbox("Token", value=True, label_visibility="hidden")
     with cols[1]:
-        if st.button("🔄", key = 'refresh_button', label_visibility="hidden"):
-            st.experimental_rerun()
+        if st.button("🔄", key = 'refresh_button', label_visibility="hidden", on_click=lambda:st.experimental_rerun()):
+           pass
 
 st.markdown(
     """
@@ -997,7 +996,7 @@ for i, message in enumerate(st.session_state.messages):
                            st.session_state.editable_index = i
                            st.session_state.editing = True
                     with cols[1]:
-                        if st.button("♻️", key=f"regenerate_{i}"):
+                       if st.button("♻️", key=f"regenerate_{i}"):
                            regenerate_message(i)
                     with cols[2]:
                         if st.button("➕", key=f"continue_{i}"):
@@ -1012,6 +1011,7 @@ for i, message in enumerate(st.session_state.messages):
                              st.session_state.messages.append({"role":"assistant", "content":" "})
                              st.session_state.undo_available = False
                     st.markdown("</div>", unsafe_allow_html = True)
+
 if prompt := st.chat_input("输入你的消息:"):
     token = generate_token()
     if "use_token" in st.session_state and st.session_state.use_token:
