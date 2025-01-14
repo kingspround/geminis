@@ -856,17 +856,19 @@ st.set_page_config(
 )
 
 # 添加 API key 选择器
-st.session_state.selected_api_key = st.selectbox(
-    "选择 API Key:",
-    options=list(API_KEYS.keys()),
-    index=list(API_KEYS.keys()).index(st.session_state.selected_api_key),
-    label_visibility="visible",
-   key="api_selector"
-)
-genai.configure(api_key=API_KEYS[st.session_state.selected_api_key])
+with st.sidebar:
+  st.session_state.selected_api_key = st.selectbox(
+      "选择 API Key:",
+      options=list(API_KEYS.keys()),
+      index=list(API_KEYS.keys()).index(st.session_state.selected_api_key),
+      label_visibility="visible",
+     key="api_selector"
+  )
+  genai.configure(api_key=API_KEYS[st.session_state.selected_api_key])
 
 # 在左侧边栏创建 token 复选框
 with st.sidebar:
+
 
     
     # 功能区 1: 文件操作
@@ -926,25 +928,25 @@ with st.sidebar:
             st.session_state.enabled_settings[setting_name] = st.checkbox(setting_name, st.session_state.enabled_settings.get(setting_name, False), key=f"checkbox_{setting_name}")
 
         st.session_state.test_text = st.text_area("System Message (Optional):", st.session_state.get("test_text", ""), key="system_message")
+st.markdown(
+    """
+    <div style="position: fixed; bottom: 50px; right: 50px;">
+    """,
+    unsafe_allow_html=True,
+)
+with st.container():
+    col_float = st.columns([10,2]) # 创建10列，让按钮靠右显示
+    with col_float[1]: # 按钮浮动在最右侧
+       st.session_state.use_token = st.checkbox("Token", value=True)
+       if st.button("🔄"):
+         st.experimental_rerun()
+st.markdown(
+    """
+    </div>
+    """,
+    unsafe_allow_html=True,
+)
 
-    st.markdown(
-        """
-        <div style="position: fixed; bottom: 50px; right: 50px;">
-        """,
-        unsafe_allow_html=True,
-    )
-    with st.container():
-        col_float = st.columns([10,2]) # 创建10列，让按钮靠右显示
-        with col_float[1]: # 按钮浮动在最右侧
-           st.session_state.use_token = st.checkbox("Token", value=True)
-           if st.button("🔄"):
-             st.experimental_rerun()
-    st.markdown(
-        """
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
 # 显示历史记录和编辑按钮
 for i, message in enumerate(st.session_state.messages):
     with st.chat_message(message["role"]):
