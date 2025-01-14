@@ -769,7 +769,7 @@ if 'continue_index' not in st.session_state:
 if "use_token" not in st.session_state:
     st.session_state.use_token = True  # 默认启用token
 if "undo_available" not in st.session_state:
-     st.session_state.undo_available = False
+    st.session_state.undo_available = False
 
 # --- 功能函数 ---
 def generate_token():
@@ -948,7 +948,10 @@ with st.container():
     with cols[0]:
       st.session_state.use_token = st.checkbox("Token", value=True, label_visibility="hidden")
     with cols[1]:
-        st.button("🔄", key = 'refresh_button', label_visibility="hidden", on_click=lambda: st.experimental_rerun())
+       st.button("🔄", key = 'refresh_button', label_visibility="hidden")
+       if st.session_state.get("refresh_button")==True:
+          st.experimental_rerun()
+          st.session_state["refresh_button"] = False 
 
 st.markdown(
     """
