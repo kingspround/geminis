@@ -760,6 +760,11 @@ file = os.path.abspath(__file__)
 filename = os.path.splitext(os.path.basename(file))[0] + ".pkl"
 log_file = os.path.join(os.path.dirname(file), filename)
 
+# 检查文件是否存在，如果不存在就创建空文件
+if not os.path.exists(log_file):
+    with open(log_file, "wb") as f:
+        pass  # 创建空文件
+
 # --- 初始化 Session State ---
 if "messages" not in st.session_state:
     st.session_state.messages = []
@@ -936,12 +941,18 @@ st.sidebar.title("功能区")
 if st.session_state.messages: # 简化条件
     st.sidebar.button("重置上一个输出", on_click=lambda: st.session_state.messages.pop(-1))
 
+# 文件下载部分
+download_data = None # 初始化变量
+if os.path.exists(log_file):
+  with open(log_file, "rb") as f:
+      download_data = f.read()
 st.sidebar.download_button(
     label="下载聊天记录",
-    data=open(log_file, "rb").read(),
+    data=download_data if download_data else b"",
     file_name=os.path.basename(log_file),
     mime="application/octet-stream",
 )
+
 
 st.sidebar.button("读取历史记录", on_click=lambda: load_history(log_file))
 st.sidebar.button("清除历史记录", on_click=lambda: clear_history(log_file))
