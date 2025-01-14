@@ -927,25 +927,15 @@ with st.sidebar:
             st.session_state.enabled_settings[setting_name] = st.checkbox(setting_name, st.session_state.enabled_settings.get(setting_name, False), key=f"checkbox_{setting_name}")
 
         st.session_state.test_text = st.text_area("System Message (Optional):", st.session_state.get("test_text", ""), key="system_message")
-    
-    
-st.markdown(
-        f"""
-        <div style="position: fixed; top: 100px; right: 10px; display: flex; flex-direction: column; align-items: flex-end;">
-           <form>
-           <label style="display: block; margin-bottom: 2px;">
-                    <input type="checkbox" {'checked' if st.session_state.get('use_token', False) else ''} name="use_token" id="use_token" onchange="this.closest('form').submit()">
-                    Token
-                </label>
-             <button type="submit" name="refresh_button" id="refresh_button">🔄</button>
-             </form>
-        </div>
-        """,
-            unsafe_allow_html=True,
-      )
-if "refresh_button" in st.session_state:
-   st.session_state.pop("refresh_button")
-   st.experimental_rerun()
+col_float = st.columns([10,2])
+with col_float[1]:
+    if st.checkbox("Token", value=st.session_state.get("use_token", True), key="use_token_checkbox"):
+         st.session_state.use_token = True
+    else:
+         st.session_state.use_token = False
+    if st.button("🔄", key="refresh_button"):
+        st.experimental_rerun()
+
 # 显示历史记录和编辑按钮
 for i, message in enumerate(st.session_state.messages):
     with st.chat_message(message["role"]):
@@ -1031,23 +1021,3 @@ def clear_history(log_file):
     if os.path.exists(log_file):
         os.remove(log_file)
     st.success("历史记录已清除！")
-Use code with caution.
-Python
-关键修改:
-
-浮动元素使用 st.form:
-
-st.markdown(
-    f"""
-    <div style="position: fixed; top: 100px; right: 10px; display: flex; flex-direction: column; align-items: flex-end;">
-       <form>
-       <label style="display: block; margin-bottom: 2px;">
-                <input type="checkbox" {'checked' if st.session_state.get('use_token', False) else ''} name="use_token" id="use_token" onchange="this.closest('form').submit()">
-                Token
-            </label>
-         <button type="submit" name="refresh_button" id="refresh_button">🔄</button>
-         </form>
-    </div>
-    """,
-        unsafe_allow_html=True,
-  )
