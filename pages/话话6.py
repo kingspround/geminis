@@ -964,10 +964,10 @@ FIXED_WIDTH = (BUTTON_WIDTH * NUM_BUTTONS + SPACE_WIDTH * (NUM_BUTTONS-1)) # 总
 for i, message in enumerate(st.session_state.messages):
     with st.chat_message(message["role"]):
         if st.session_state.get("editing") == True and i == st.session_state.editable_index:
-            new_content = st.text_area(
+           new_content = st.text_area(
                 f"{message['role']}:", message["content"], key=f"message_edit_{i}"
-            )
-            with st.container():
+           )
+           with st.container():
                st.markdown(
                 f"""
                 <div style="width: {FIXED_WIDTH*12}px;">
@@ -1017,6 +1017,7 @@ for i, message in enumerate(st.session_state.messages):
                            if st.button("↩️", key = f"undo_{i}"):
                              st.session_state.messages.append({"role":"assistant", "content":" "})
                              st.session_state.undo_available = False
+
 if prompt := st.chat_input("输入你的消息:"):
     token = generate_token()
     if "use_token" in st.session_state and st.session_state.use_token:
