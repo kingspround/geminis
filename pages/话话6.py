@@ -748,6 +748,12 @@ DEFAULT_CHARACTER_SETTINGS = {
     "设定2": "这是一个示例设定 2。",
 }
 
+# --- 默认角色设定 ---
+DEFAULT_CHARACTER_SETTINGS = {
+    "设定1": "这是一个示例设定 1。",
+    "设定2": "这是一个示例设定 2。",
+}
+
 # --- 文件操作函数 ---
 # 获取当前文件路径
 file = os.path.abspath(__file__)
@@ -798,7 +804,6 @@ def load_history(log_file):
     except FileNotFoundError:
         st.warning(f"没有找到历史记录文件。({os.path.basename(log_file)})")
 
-
 def clear_history(log_file):
     st.session_state.messages.clear()
     if os.path.exists(log_file):
@@ -812,30 +817,23 @@ def continue_message(i):
     st.session_state.continue_index = i
 
 def getAnswer(prompt, continue_mode=False):
-    import logging
     system_message = ""
     if st.session_state.get("test_text"):
         system_message += st.session_state.test_text + "\n"
     for setting_name in st.session_state.enabled_settings:
         if st.session_state.enabled_settings[setting_name]:
             system_message += st.session_state.character_settings[setting_name] + "\n"
-    logging.info(f"getAnswer called with prompt: {prompt}, continue_mode: {continue_mode}")
+
     chat_session = model.start_chat(history=[])
     if system_message:
         chat_session.send_message(system_message)
-        logging.info(f"System message sent: {system_message}")
 
     if continue_mode and st.session_state.messages and st.session_state.messages[-1]["role"] == "assistant":
-         prompt = f"[请继续补全这句话，不要重复之前的内容，使用合适的标点符号和大小写：{st.session_state.messages[-1]['content']}]"
+        prompt = f"[请继续补全这句话，不要重复之前的内容，使用合适的标点符号和大小写：{st.session_state.messages[-1]['content']}]"
+
     response = chat_session.send_message(prompt, stream=True)
-    full_response = ""
     for chunk in response:
-      full_response += chunk.text
-      yield chunk.text
-    # 添加到消息列表，只有第一次回复
-    if not continue_mode:
-         logging.info(f"Adding assistant message: {full_response}")
-         st.session_state.messages.append({"role": "assistant", "content": full_response})
+        yield chunk.text
 
 # --- Streamlit 布局 ---
 st.set_page_config(
@@ -856,12 +854,6 @@ with st.sidebar.expander("API Key 选择"):
 with st.sidebar:
     st.session_state.use_token = st.checkbox("Token", value=True) # 默认开启
 
-# 加载历史记录（仅在会话初始化时）
-if "messages" not in st.session_state:
-    load_history(log_file)
-    st.success(f"<code>{os.path.basename(file)}</code> 已加载", unsafe_allow_html=True)
-
-
 # 聊天输入框
 if prompt := st.chat_input("输入你的消息:"):
     token = generate_token()
@@ -881,7 +873,7 @@ if prompt := st.chat_input("输入你的消息:"):
             full_response += chunk
             message_placeholder.markdown(full_response + "▌")
         message_placeholder.markdown(full_response)
-
+        st.session_state.messages.append({"role": "assistant", "content": full_response})
 
     # 保存聊天记录
     with open(log_file, "wb") as f:
@@ -948,8 +940,7 @@ for i, message in enumerate(st.session_state.messages):
     with st.chat_message(message["role"]):
         main_col, button_col = st.columns([12, 1])
         with main_col:
-            message_container = st.container(key=f"message_container_{i}")
-            message_container.write(message["content"])
+            st.write(message["content"], key=f"message_{i}")
         with button_col:
             with st.container():
                 col1, col2, col3 = st.columns(3)
