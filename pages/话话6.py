@@ -864,6 +864,7 @@ st.sidebar.selectbox(
     on_change=lambda: genai.configure(api_key=API_KEYS[st.session_state.selected_api_key])
 )
 genai.configure(api_key=API_KEYS[st.session_state.selected_api_key])
+
 # 功能区 1: 文件操作
 with st.sidebar.expander("文件操作"):
     if len(st.session_state.messages) > 0:
@@ -934,6 +935,10 @@ st.markdown(
             display:flex;
             align-items: center;
         }
+        .fixed-bottom > div {
+            display:flex;
+            gap:5px
+        }
     </style>
     """,
     unsafe_allow_html=True,
@@ -946,20 +951,20 @@ with st.container():
     with cols[1]:
         if st.button("🔄", key = 'refresh_button', label_visibility="hidden"):
             st.experimental_rerun()
+
 st.markdown(
     """
     <div class="fixed-bottom"></div>
     """,
     unsafe_allow_html=True,
 )
+BUTTON_WIDTH = 30 # 设定按钮宽度
+BUTTON_GAP = 5 # 设定按钮之间的空隙
+BUTTON_NUM = 3 # 设定按钮的数量
+SIDE_BUTTON_NUM = 2  # 设定侧边栏按钮数量
 
-
-# 计算按钮宽度和间距
-BUTTON_WIDTH = 3  # 每个按钮占用字符宽度
-SPACE_WIDTH = 1   # 按钮之间间距的字符宽度
-NUM_BUTTONS = 5     # 按钮总数
-FIXED_WIDTH = (BUTTON_WIDTH * NUM_BUTTONS + SPACE_WIDTH * (NUM_BUTTONS-1)) # 总宽度
-
+# 消息下方的栏目的固定宽度
+button_area_width = BUTTON_WIDTH * (BUTTON_NUM + SIDE_BUTTON_NUM) + BUTTON_GAP * (BUTTON_NUM + SIDE_BUTTON_NUM - 1)
 # 显示历史记录和编辑按钮
 for i, message in enumerate(st.session_state.messages):
     with st.chat_message(message["role"]):
@@ -967,43 +972,32 @@ for i, message in enumerate(st.session_state.messages):
            new_content = st.text_area(
                 f"{message['role']}:", message["content"], key=f"message_edit_{i}"
            )
+           cols = st.columns(20) #创建20列
            with st.container():
-               st.markdown(
-                f"""
-                <div style="width: {FIXED_WIDTH*12}px;">
-                </div>
-                """,
-                  unsafe_allow_html=True,
-               )
-               cols = st.columns(20) #创建20列
-               with cols[0]:
-                  if st.button("✅", key=f"save_{i}", ):
-                       st.session_state.messages[i]["content"] = new_content
-                       with open(log_file, "wb") as f:
-                         pickle.dump(st.session_state.messages, f)
-                       st.success("已保存更改！")
-                       st.session_state.editing = False
-               with cols[1]:
-                  if st.button("❌", key=f"cancel_{i}"):
-                     st.session_state.editing = False
+            st.markdown(f"""<div style="width:{button_area_width}px; display:flex; gap: {BUTTON_GAP}px" >""", unsafe_allow_html=True)
+            with cols[0]:
+               if st.button("✅", key=f"save_{i}", ):
+                  st.session_state.messages[i]["content"] = new_content
+                  with open(log_file, "wb") as f:
+                      pickle.dump(st.session_state.messages, f)
+                  st.success("已保存更改！")
+                  st.session_state.editing = False
+            with cols[1]:
+               if st.button("❌", key=f"cancel_{i}"):
+                    st.session_state.editing = False
+            st.markdown("</div>", unsafe_allow_html = True)
         else:
             st.write(message["content"], key=f"message_{i}")
             if i >= len(st.session_state.messages) - 2:
                 with st.container():
-                    st.markdown(
-                     f"""
-                     <div style="width: {FIXED_WIDTH*12}px;">
-                     </div>
-                      """,
-                     unsafe_allow_html=True,
-                    )
+                    st.markdown(f"""<div style="width:{button_area_width}px; display:flex; gap: {BUTTON_GAP}px" >""", unsafe_allow_html=True)
                     cols = st.columns(20) #创建20列
                     with cols[0]:
                         if st.button("✏️", key=f"edit_{i}"):
                            st.session_state.editable_index = i
                            st.session_state.editing = True
                     with cols[1]:
-                       if st.button("♻️", key=f"regenerate_{i}"):
+                        if st.button("♻️", key=f"regenerate_{i}"):
                            regenerate_message(i)
                     with cols[2]:
                         if st.button("➕", key=f"continue_{i}"):
@@ -1017,7 +1011,7 @@ for i, message in enumerate(st.session_state.messages):
                            if st.button("↩️", key = f"undo_{i}"):
                              st.session_state.messages.append({"role":"assistant", "content":" "})
                              st.session_state.undo_available = False
-
+                    st.markdown("</div>", unsafe_allow_html = True)
 if prompt := st.chat_input("输入你的消息:"):
     token = generate_token()
     if "use_token" in st.session_state and st.session_state.use_token:
