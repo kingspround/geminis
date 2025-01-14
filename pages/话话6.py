@@ -771,6 +771,7 @@ if "use_token" not in st.session_state:
 if "reset_history" not in st.session_state:
     st.session_state.reset_history = False
 
+
 # --- 功能函数 ---
 def generate_token():
     """生成带括号的随机 token (汉字+数字，数字个数随机)"""
@@ -959,15 +960,15 @@ for i, message in enumerate(st.session_state.messages):
             )
             cols = st.columns(20) #创建20列
             with cols[0]:
-              if st.button("✅", key=f"save_{i}"):
+               if st.button("✅", key=f"save_{i}"):
                    st.session_state.messages[i]["content"] = new_content
                    with open(log_file, "wb") as f:
                       pickle.dump(st.session_state.messages, f)
                    st.success("已保存更改！")
                    st.session_state.editing = False
             with cols[1]:
-              if st.button("❌", key=f"cancel_{i}"):
-                  st.session_state.editing = False
+               if st.button("❌", key=f"cancel_{i}"):
+                   st.session_state.editing = False
         else:
             st.write(message["content"], key=f"message_{i}")
             if i >= len(st.session_state.messages) - 2:
