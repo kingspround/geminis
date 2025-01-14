@@ -996,17 +996,16 @@ if prompt := st.chat_input("输入你的消息:"):
     st.session_state.messages.append({"role": "assistant", "content": full_response})
     with open(log_file, "wb") as f:
         pickle.dump(st.session_state.messages, f)
-    
+
 col1, col2 = st.columns(2)
 with col1:
-      if st.checkbox("Token", value=st.session_state.get("use_token",True), key="use_token_checkbox"):
-         st.session_state.use_token = True
-      else:
-         st.session_state.use_token = False
+    if st.checkbox("Token", value=st.session_state.get("use_token", True), key="use_token_checkbox"):
+        st.session_state.use_token = True
+    else:
+        st.session_state.use_token = False
 with col2:
-       if st.button("🔄", key="refresh_button"):
-           st.experimental_rerun()
-
+    if st.button("🔄", key="refresh_button"):
+        st.experimental_rerun()
 
 def load_history(log_file):
     try:
