@@ -928,8 +928,8 @@ with st.sidebar:
 
         st.session_state.test_text = st.text_area("System Message (Optional):", st.session_state.get("test_text", ""), key="system_message")
 st.markdown(
-        f"""
-    <div style="position: fixed; top: 10px; right: 10px; display: flex; flex-direction: column; align-items: flex-end;">
+    f"""
+    <div style="position: fixed; top: 50px; right: 10px; display: flex; flex-direction: column; align-items: flex-end; margin-top:20px">
         <div style="margin-bottom: 5px;">
             <label style="display: block; margin-bottom: 2px;">
                 <input type="checkbox" {'checked' if st.session_state.get('use_token', False) else ''} onclick="this.closest('form').submit()" name="use_token" id="use_token">
@@ -939,11 +939,11 @@ st.markdown(
         <div>
             <button  onclick="this.closest('form').submit()" name="refresh_button" id="refresh_button">🔄</button>
         </div>
-        <input type="hidden" name="_use_token" value="True" >
+     <input type="hidden" name="_use_token" value="True" >
     </div>
     """,
     unsafe_allow_html=True,
-)
+ )
 if "refresh_button" in st.session_state:
     st.experimental_rerun()
 # 显示历史记录和编辑按钮
