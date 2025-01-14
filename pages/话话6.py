@@ -853,23 +853,24 @@ if prompt := st.chat_input("输入你的消息:"):
     token = generate_token()
     if "use_token" in st.session_state and st.session_state.use_token:
         full_prompt = f"{prompt} (token: {token})"
-        st.session_state.messages.append({"role": "user", "content": full_prompt})
     else:
         full_prompt = prompt
-        st.session_state.messages.append({"role": "user", "content": full_prompt})
+
+    st.session_state.messages.append({"role": "user", "content": full_prompt})
 
     with st.chat_message("user"):
-        st.markdown(prompt if not st.session_state.use_token else f"{prompt} (token: {token})")
+         st.markdown(prompt if not st.session_state.use_token else f"{prompt} (token: {token})")
+
     with st.chat_message("assistant"):
-        message_placeholder = st.empty()
         full_response = ""
+        response_placeholder = st.empty()
         for chunk in getAnswer(full_prompt):
             full_response += chunk
-            message_placeholder.markdown(full_response + "▌")
-        message_placeholder.markdown(full_response)
-        st.session_state.messages.append({"role": "assistant", "content": full_response})
+            response_placeholder.markdown(full_response + "▌")
+        response_placeholder.markdown(full_response)
+    st.session_state.messages.append({"role": "assistant", "content": full_response})
 
-    # 保存聊天记录
+     # 保存聊天记录
     with open(log_file, "wb") as f:
         pickle.dump(st.session_state.messages, f)
 
@@ -934,9 +935,9 @@ for i, message in enumerate(st.session_state.messages):
     with st.chat_message(message["role"]):
         main_col, button_col = st.columns([12, 1])
         with main_col:
-            st.write(message["content"], key=f"message_{i}")
+            st.markdown(message["content"], key=f"message_{i}")
         with button_col:
-            with st.container():
+             with st.container():
                 col1, col2, col3 = st.columns(3)
                 with col1:
                     if st.button("✏️", key=f"edit_{i}"):
@@ -974,12 +975,12 @@ if st.session_state.regenerate_index is not None:
         prompt = st.session_state.messages[i - 1]["content"] if i > 0 and st.session_state.messages[i - 1]["role"] == "user" else None
         if prompt:
             with st.chat_message("assistant"):
-                message_placeholder = st.empty()
                 full_response = ""
+                response_placeholder = st.empty()
                 for chunk in getAnswer(prompt):
-                    full_response += chunk
-                    message_placeholder.markdown(full_response + "▌")
-                message_placeholder.markdown(full_response)
+                   full_response += chunk
+                   response_placeholder.markdown(full_response + "▌")
+                response_placeholder.markdown(full_response)
                 st.session_state.messages[i]["content"] = full_response
                 with open(log_file, "wb") as f:
                     pickle.dump(st.session_state.messages, f)
@@ -995,17 +996,18 @@ if st.session_state.continue_index is not None:
         prompt = st.session_state.messages[i]["content"] if i >= 0 else None
         if prompt:
             with st.chat_message("assistant"):
-                message_placeholder = st.empty()
                 full_response = ""
+                response_placeholder = st.empty()
                 for chunk in getAnswer(prompt, continue_mode=True):
-                    full_response += chunk
-                    message_placeholder.markdown(full_response + "▌")
-                message_placeholder.markdown(full_response)
+                   full_response += chunk
+                   response_placeholder.markdown(full_response + "▌")
+                response_placeholder.markdown(full_response)
                 st.session_state.messages.append({"role": "assistant", "content": full_response})
                 with open(log_file, "wb") as f:
                     pickle.dump(st.session_state.messages, f)
         else:
             st.error("无法获取上一条消息以继续生成。")
+
 
 # 显示已加载的设定
 enabled_settings_display = [setting_name for setting_name, enabled in st.session_state.enabled_settings.items() if enabled]
