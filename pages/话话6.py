@@ -771,7 +771,6 @@ if "use_token" not in st.session_state:
 if "reset_history" not in st.session_state:
     st.session_state.reset_history = False
 
-
 # --- 功能函数 ---
 def generate_token():
     """生成带括号的随机 token (汉字+数字，数字个数随机)"""
@@ -855,14 +854,15 @@ st.set_page_config(
     page_title="Gemini Chatbot",
     layout="wide"
 )
-# 在左侧边栏创建 API key 选择器
+
+# 添加 API key 选择器
 st.session_state.selected_api_key = st.selectbox(
-        "选择 API Key:",
-        options=list(API_KEYS.keys()),
-        index=list(API_KEYS.keys()).index(st.session_state.selected_api_key),
-        label_visibility="visible",
-        key="api_selector"
-    )
+    "选择 API Key:",
+    options=list(API_KEYS.keys()),
+    index=list(API_KEYS.keys()).index(st.session_state.selected_api_key),
+    label_visibility="visible",
+    key="api_selector",
+)
 genai.configure(api_key=API_KEYS[st.session_state.selected_api_key])
 
 # 在左侧边栏创建 token 复选框
@@ -905,7 +905,7 @@ with st.sidebar:
                     pickle.dump(st.session_state.messages, f)
             except Exception as e:
                 st.error(f"读取本地pkl文件失败：{e}")
-    # 功能区 2: 角色设定
+# 功能区 2: 角色设定
     with st.expander("角色设定"):
         uploaded_setting_file = st.file_uploader("读取本地设定文件 (txt)", type=["txt"])
         if uploaded_setting_file is not None:
@@ -924,51 +924,74 @@ with st.sidebar:
             st.session_state.enabled_settings[setting_name] = st.checkbox(setting_name, st.session_state.enabled_settings.get(setting_name, False), key=f"checkbox_{setting_name}")
 
         st.session_state.test_text = st.text_area("System Message (Optional):", st.session_state.get("test_text", ""), key="system_message")
-with st.markdown(
+  
+# token和刷新按钮固定浮动在右下角
+st.markdown(
     """
-    <div style="position: fixed; bottom: 50px; right: 50px; z-index: 999;">
-        <div style="display: flex; flex-direction: column; align-items: flex-end;">
-            <div style="margin-bottom: 5px;">
-                <input type="checkbox" id="tokenCheckbox" name="tokenCheckbox">
-                <label for="tokenCheckbox">Token</label>
-            </div>
+    <div style="position: fixed; bottom: 50px; right: 50px;">
+        <div style="display: flex; align-items: center;">
+        <style>
+        .stCheckbox [data-baseweb="checkbox"]{
+         margin-bottom: 1px;
+         margin-right: 5px;
            
-            <button id="refreshButton">🔄</button>
+        }
+        </style>
+            <div >
+                <input type="checkbox" id="tokenCheckbox"  style="vertical-align: middle;">
+                 <label for="tokenCheckbox" style="vertical-align: middle;">Token</label> 
+            </div>
+            <button style="margin-left: 5px; background-color:transparent;border:none;font-size:20px;cursor:pointer;vertical-align: middle;" id="refreshButton">🔄</button>
+           <script>
+               document.getElementById('tokenCheckbox').checked =  """ + str(st.session_state.use_token) + """
+            document.getElementById('tokenCheckbox').addEventListener('change', function() {
+                    var tokenValue = this.checked;
+                    sessionStorage.setItem('tokenValue', tokenValue);
+                });
+                document.getElementById('refreshButton').addEventListener('click', function() {
+                    sessionStorage.setItem('refreshClick', true);
+                    window.location.reload()
+                });
+                var storedToken = sessionStorage.getItem('tokenValue');
+                 if (storedToken === 'true'){
+                      document.getElementById('tokenCheckbox').checked = true
+                 }else if (storedToken === 'false'){
+                      document.getElementById('tokenCheckbox').checked = false
+                 }
+                 var refresh_click = sessionStorage.getItem('refreshClick');
+                if(refresh_click){
+                   sessionStorage.setItem('refreshClick', false);
+                }
+
+           </script>
         </div>
     </div>
-    <script>
-        document.getElementById('tokenCheckbox').checked = """ + str(st.session_state.use_token) + """;
-        document.getElementById('tokenCheckbox').addEventListener('change', function() {
-            var value = this.checked;
-            Streamlit.setComponentValue(value);
-        });
-        document.getElementById('refreshButton').addEventListener('click', function() {
-            Streamlit.rerun();
-        });
-    </script>
-""", unsafe_allow_html=True)
+    """,
+    unsafe_allow_html=True,
+)
+# st.session_state.use_token = st.checkbox("Token", value=True) # 默认开启
 
-if "tokenCheckbox" in st.session_state:
-    st.session_state.use_token = st.session_state.tokenCheckbox
+# if st.button("刷新 🔄"):
+#     st.experimental_rerun()
 # 显示历史记录和编辑按钮
 for i, message in enumerate(st.session_state.messages):
     with st.chat_message(message["role"]):
-        if st.session_state.get("editing") == True and i == st.session_state.editable_index:
-            new_content = st.text_area(
+      if st.session_state.get("editing") == True and i == st.session_state.editable_index:
+          new_content = st.text_area(
                 f"{message['role']}:", message["content"], key=f"message_edit_{i}"
-            )
-            cols = st.columns(20) #创建20列
-            with cols[0]:
-               if st.button("✅", key=f"save_{i}"):
+          )
+          cols = st.columns(20) #创建20列
+          with cols[0]:
+              if st.button("✅", key=f"save_{i}"):
                    st.session_state.messages[i]["content"] = new_content
                    with open(log_file, "wb") as f:
                       pickle.dump(st.session_state.messages, f)
                    st.success("已保存更改！")
                    st.session_state.editing = False
-            with cols[1]:
+          with cols[1]:
                if st.button("❌", key=f"cancel_{i}"):
-                   st.session_state.editing = False
-        else:
+                  st.session_state.editing = False
+      else:
             st.write(message["content"], key=f"message_{i}")
             if i >= len(st.session_state.messages) - 2:
                 with st.container():
@@ -978,7 +1001,7 @@ for i, message in enumerate(st.session_state.messages):
                            st.session_state.editable_index = i
                            st.session_state.editing = True
                     with cols[1]:
-                      if st.button("♻️", key=f"regenerate_{i}"):
+                       if st.button("♻️", key=f"regenerate_{i}"):
                            regenerate_message(i)
                     with cols[2]:
                        if st.button("➕", key=f"continue_{i}"):
@@ -993,6 +1016,7 @@ for i, message in enumerate(st.session_state.messages):
                         if st.button("↩️", key=f"undo_reset_{i}"):
                              st.session_state.reset_history = False
                              st.experimental_rerun()
+
 if prompt := st.chat_input("输入你的消息:"):
     token = generate_token()
     if "use_token" in st.session_state and st.session_state.use_token:
