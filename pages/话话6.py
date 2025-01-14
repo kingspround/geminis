@@ -748,12 +748,6 @@ DEFAULT_CHARACTER_SETTINGS = {
     "设定2": "这是一个示例设定 2。",
 }
 
-# --- 默认角色设定 ---
-DEFAULT_CHARACTER_SETTINGS = {
-    "设定1": "这是一个示例设定 1。",
-    "设定2": "这是一个示例设定 2。",
-}
-
 # --- 文件操作函数 ---
 # 获取当前文件路径
 file = os.path.abspath(__file__)
@@ -806,7 +800,7 @@ def load_history(log_file):
         with open(log_file, "rb") as f:
             st.session_state.messages = pickle.load(f)
         st.success(f"成功读取历史记录！({os.path.basename(log_file)})")
-        st.experimental_rerun()
+        st.session_state.load_count = st.session_state.get("load_count", 0) + 1 # force to refresh the screen
     except FileNotFoundError:
         st.warning(f"没有找到历史记录文件。({os.path.basename(log_file)})")
     except EOFError:
@@ -818,6 +812,8 @@ def clear_history(log_file):
     if os.path.exists(log_file):
         os.remove(log_file)
     st.success("历史记录已清除！")
+    
+    
 
 def regenerate_message(i):
     st.session_state.regenerate_index = i
@@ -872,19 +868,18 @@ for i, message in enumerate(st.session_state.messages):
     with st.chat_message(message["role"]):
         st.write(message["content"], key=f"message_{i}")
         if i >= len(st.session_state.messages) - 2:
-            with st.container():
-                col1, col2, col3 = st.columns(3)
-                with col1:
-                     if st.button("✏️", key=f"edit_{i}"):
-                         st.session_state.editable_index = i
-                         st.session_state.editing = True
-                with col2:
-                     if st.button("♻️", key=f"regenerate_{i}"):
-                         regenerate_message(i)
-                with col3:
-                    if st.button("➕", key=f"continue_{i}"):
-                        continue_message(i)
-
+             with st.container():
+                 col1, col2, col3 = st.columns(3)
+                 with col1:
+                      if st.button("✏️", key=f"edit_{i}"):
+                          st.session_state.editable_index = i
+                          st.session_state.editing = True
+                 with col2:
+                      if st.button("♻️", key=f"regenerate_{i}"):
+                          regenerate_message(i)
+                 with col3:
+                     if st.button("➕", key=f"continue_{i}"):
+                         continue_message(i)
 
 if st.session_state.get("editing"):
     i = st.session_state.editable_index
@@ -976,8 +971,7 @@ if st.session_state.get("file_upload_mode"):
                 pickle.dump(st.session_state.messages, f)
 
             st.session_state.file_loaded = True
-            st.experimental_rerun()
-
+            st.session_state.upload_count = st.session_state.get("upload_count", 0) + 1  # 添加计数器
         except Exception as e:
             st.error(f"读取本地文件失败：{e}")
 
@@ -1014,7 +1008,8 @@ def load_history(log_file):
     try:
         with open(log_file, "rb") as f:
             st.session_state.messages = pickle.load(f)
-        st.experimental_rerun()
+        st.success(f"成功读取历史记录！({os.path.basename(log_file)})")
+        st.session_state.load_count = st.session_state.get("load_count", 0) + 1 # force to refresh the screen
     except FileNotFoundError:
         st.warning(f"{os.path.basename(log_file)} 不存在。")
     except EOFError:
