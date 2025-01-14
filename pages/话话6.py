@@ -818,18 +818,20 @@ def getAnswer(prompt, continue_mode=False):
         if st.session_state.enabled_settings[setting_name]:
             system_message += st.session_state.character_settings[setting_name] + "\n"
 
-    chat_session = model.start_chat(history=[])
-    if system_message:
-        chat_session.send_message(system_message)
+    try:
+        chat_session = model.start_chat(history=[])
+        if system_message:
+            chat_session.send_message(system_message)
 
-    if continue_mode and st.session_state.messages and st.session_state.messages[-1]["role"] == "assistant":
-        prompt = f"[请继续补全这句话，不要重复之前的内容，使用合适的标点符号和大小写：{st.session_state.messages[-1]['content']}]"
+        if continue_mode and st.session_state.messages and st.session_state.messages[-1]["role"] == "assistant":
+            prompt = f"[请继续补全这句话，不要重复之前的内容，使用合适的标点符号和大小写：{st.session_state.messages[-1]['content']}]"
 
-    response = chat_session.send_message(prompt, stream=True)
-    full_response = ""
-    for chunk in response:
-         full_response += chunk.text
-         yield chunk.text, full_response
+        response = chat_session.send_message(prompt, stream=True)
+        for chunk in response:
+            yield chunk.text
+    except Exception as e:
+        st.error(f"发生错误: {e}")
+        yield f"发生错误: {e}"
 
 # --- Streamlit 布局 ---
 st.set_page_config(
@@ -855,25 +857,27 @@ if prompt := st.chat_input("输入你的消息:"):
     token = generate_token()
     if "use_token" in st.session_state and st.session_state.use_token:
         full_prompt = f"{prompt} (token: {token})"
+        st.session_state.messages.append({"role": "user", "content": full_prompt})
     else:
         full_prompt = prompt
-
-    st.session_state.messages.append({"role": "user", "content": full_prompt})
+        st.session_state.messages.append({"role": "user", "content": full_prompt})
 
     with st.chat_message("user"):
         st.markdown(prompt if not st.session_state.use_token else f"{prompt} (token: {token})")
 
     with st.chat_message("assistant"):
+        response_container = st.container() # 创建一个容器
         full_response = ""
-        response_placeholder = st.empty()
-        for chunk, temp_full_response in getAnswer(full_prompt):
-            full_response = temp_full_response
-            response_placeholder.markdown(full_response + "▌")
-        response_placeholder.markdown(full_response)
+        for chunk in getAnswer(full_prompt):
+            full_response += chunk
+            with response_container:
+                st.markdown(full_response + "▌")
+        with response_container:
+                st.markdown(full_response) # 确保最后一次也更新了
 
-    st.session_state.messages.append({"role": "assistant", "content": full_response})
+        st.session_state.messages.append({"role": "assistant", "content": full_response})
 
-     # 保存聊天记录
+    # 保存聊天记录
     with open(log_file, "wb") as f:
         pickle.dump(st.session_state.messages, f)
 
@@ -938,9 +942,9 @@ for i, message in enumerate(st.session_state.messages):
     with st.chat_message(message["role"]):
         main_col, button_col = st.columns([12, 1])
         with main_col:
-             st.markdown(str(message["content"]), key=f"message_{i}")
+            st.write(message["content"], key=f"message_{i}")
         with button_col:
-             with st.container():
+            with st.container():
                 col1, col2, col3 = st.columns(3)
                 with col1:
                     if st.button("✏️", key=f"edit_{i}"):
@@ -977,13 +981,15 @@ if st.session_state.regenerate_index is not None:
     with st.spinner("正在重新生成回复..."):
         prompt = st.session_state.messages[i - 1]["content"] if i > 0 and st.session_state.messages[i - 1]["role"] == "user" else None
         if prompt:
-             with st.chat_message("assistant"):
+            with st.chat_message("assistant"):
+                response_container = st.container()
                 full_response = ""
-                response_placeholder = st.empty()
-                for chunk, temp_full_response in getAnswer(prompt):
-                   full_response = temp_full_response
-                   response_placeholder.markdown(full_response + "▌")
-                response_placeholder.markdown(full_response)
+                for chunk in getAnswer(prompt):
+                     full_response += chunk
+                     with response_container:
+                        st.markdown(full_response + "▌")
+                with response_container:
+                    st.markdown(full_response)
                 st.session_state.messages[i]["content"] = full_response
                 with open(log_file, "wb") as f:
                     pickle.dump(st.session_state.messages, f)
@@ -998,19 +1004,20 @@ if st.session_state.continue_index is not None:
     with st.spinner("正在继续生成回复..."):
         prompt = st.session_state.messages[i]["content"] if i >= 0 else None
         if prompt:
-             with st.chat_message("assistant"):
+            with st.chat_message("assistant"):
+                response_container = st.container()
                 full_response = ""
-                response_placeholder = st.empty()
-                for chunk, temp_full_response in getAnswer(prompt, continue_mode=True):
-                    full_response = temp_full_response
-                    response_placeholder.markdown(full_response + "▌")
-                response_placeholder.markdown(full_response)
+                for chunk in getAnswer(prompt, continue_mode=True):
+                    full_response += chunk
+                    with response_container:
+                        st.markdown(full_response + "▌")
+                with response_container:
+                    st.markdown(full_response)
                 st.session_state.messages.append({"role": "assistant", "content": full_response})
                 with open(log_file, "wb") as f:
                     pickle.dump(st.session_state.messages, f)
         else:
             st.error("无法获取上一条消息以继续生成。")
-
 
 # 显示已加载的设定
 enabled_settings_display = [setting_name for setting_name, enabled in st.session_state.enabled_settings.items() if enabled]
