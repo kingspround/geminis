@@ -927,14 +927,6 @@ with st.sidebar:
             st.session_state.enabled_settings[setting_name] = st.checkbox(setting_name, st.session_state.enabled_settings.get(setting_name, False), key=f"checkbox_{setting_name}")
 
         st.session_state.test_text = st.text_area("System Message (Optional):", st.session_state.get("test_text", ""), key="system_message")
-col_float = st.columns([10,2])
-with col_float[1]:
-    if st.checkbox("Token", value=st.session_state.get("use_token", True), key="use_token_checkbox"):
-         st.session_state.use_token = True
-    else:
-         st.session_state.use_token = False
-    if st.button("🔄", key="refresh_button"):
-        st.experimental_rerun()
 
 # 显示历史记录和编辑按钮
 for i, message in enumerate(st.session_state.messages):
@@ -1004,6 +996,17 @@ if prompt := st.chat_input("输入你的消息:"):
     st.session_state.messages.append({"role": "assistant", "content": full_response})
     with open(log_file, "wb") as f:
         pickle.dump(st.session_state.messages, f)
+    
+col1, col2 = st.columns(2)
+with col1:
+      if st.checkbox("Token", value=st.session_state.get("use_token",True), key="use_token_checkbox"):
+         st.session_state.use_token = True
+      else:
+         st.session_state.use_token = False
+with col2:
+       if st.button("🔄", key="refresh_button"):
+           st.experimental_rerun()
+
 
 def load_history(log_file):
     try:
