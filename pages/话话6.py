@@ -768,6 +768,8 @@ if 'continue_index' not in st.session_state:
     st.session_state.continue_index = None
 if "use_token" not in st.session_state:
     st.session_state.use_token = True  # 默认启用token
+if "undo_available" not in st.session_state:
+     st.session_state.undo_available = False
 
 # --- 功能函数 ---
 def generate_token():
@@ -853,38 +855,15 @@ st.set_page_config(
     layout="wide"
 )
 
-# 添加自定义 CSS 样式，让 Token 复选框固定在右下角
-st.markdown(
-    """
-    <style>
-    .token-container {
-        position: fixed;
-        bottom: 70px;
-        right: 20px;
-        z-index: 1000;
-    }
-    </style>
-    """,
-    unsafe_allow_html=True,
+#  API key 选择器直接在侧边栏
+st.sidebar.selectbox(
+    "选择 API Key:",
+    options=list(API_KEYS.keys()),
+    index=list(API_KEYS.keys()).index(st.session_state.selected_api_key),
+    key='api_selector',
+    on_change=lambda: genai.configure(api_key=API_KEYS[st.session_state.selected_api_key])
 )
-
-# 添加 API key 选择器
-with st.sidebar.expander("API Key 选择"):
-    st.session_state.selected_api_key = st.selectbox(
-        "选择 API Key:",
-        options=list(API_KEYS.keys()),
-        index=list(API_KEYS.keys()).index(st.session_state.selected_api_key),
-    )
-    genai.configure(api_key=API_KEYS[st.session_state.selected_api_key])
-
-#  将 Token 复选框移到主页面右下角
-with st.container():
-     st.session_state.use_token = st.checkbox("Token", value=True)  # 默认开启
-
-     if st.button("刷新 🔄"):
-        st.experimental_rerun()
-
-
+genai.configure(api_key=API_KEYS[st.session_state.selected_api_key])
 # 功能区 1: 文件操作
 with st.sidebar.expander("文件操作"):
     if len(st.session_state.messages) > 0:
@@ -943,30 +922,81 @@ with st.sidebar.expander("角色设定"):
 
     st.session_state.test_text = st.text_area("System Message (Optional):", st.session_state.get("test_text", ""), key="system_message")
 
+# 在页面右下角添加 Token 复选框和刷新按钮
+st.markdown(
+    """
+    <style>
+        .fixed-bottom {
+            position: fixed;
+            bottom: 50px;
+            right: 20px;
+            z-index: 999;
+            display:flex;
+            align-items: center;
+        }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
+
+with st.container():
+    cols = st.columns([10,1])
+    with cols[0]:
+      st.session_state.use_token = st.checkbox("Token", value=True, label_visibility="hidden")
+    with cols[1]:
+        if st.button("🔄", key = 'refresh_button', label_visibility="hidden"):
+            st.experimental_rerun()
+st.markdown(
+    """
+    <div class="fixed-bottom"></div>
+    """,
+    unsafe_allow_html=True,
+)
+
+
+# 计算按钮宽度和间距
+BUTTON_WIDTH = 3  # 每个按钮占用字符宽度
+SPACE_WIDTH = 1   # 按钮之间间距的字符宽度
+NUM_BUTTONS = 5     # 按钮总数
+FIXED_WIDTH = (BUTTON_WIDTH * NUM_BUTTONS + SPACE_WIDTH * (NUM_BUTTONS-1)) # 总宽度
 
 # 显示历史记录和编辑按钮
 for i, message in enumerate(st.session_state.messages):
     with st.chat_message(message["role"]):
         if st.session_state.get("editing") == True and i == st.session_state.editable_index:
-           new_content = st.text_area(
+            new_content = st.text_area(
                 f"{message['role']}:", message["content"], key=f"message_edit_{i}"
-           )
-           cols = st.columns(20) #创建20列
-           with cols[0]:
-               if st.button("✅", key=f"save_{i}"):
-                   st.session_state.messages[i]["content"] = new_content
-                   with open(log_file, "wb") as f:
-                      pickle.dump(st.session_state.messages, f)
-                   st.success("已保存更改！")
-                   st.session_state.editing = False
-           with cols[1]:
-              if st.button("❌", key=f"cancel_{i}"):
-                 st.session_state.editing = False
-
+            )
+            with st.container():
+               st.markdown(
+                f"""
+                <div style="width: {FIXED_WIDTH*12}px;">
+                </div>
+                """,
+                  unsafe_allow_html=True,
+               )
+               cols = st.columns(20) #创建20列
+               with cols[0]:
+                  if st.button("✅", key=f"save_{i}", ):
+                       st.session_state.messages[i]["content"] = new_content
+                       with open(log_file, "wb") as f:
+                         pickle.dump(st.session_state.messages, f)
+                       st.success("已保存更改！")
+                       st.session_state.editing = False
+               with cols[1]:
+                  if st.button("❌", key=f"cancel_{i}"):
+                     st.session_state.editing = False
         else:
             st.write(message["content"], key=f"message_{i}")
             if i >= len(st.session_state.messages) - 2:
                 with st.container():
+                    st.markdown(
+                     f"""
+                     <div style="width: {FIXED_WIDTH*12}px;">
+                     </div>
+                      """,
+                     unsafe_allow_html=True,
+                    )
                     cols = st.columns(20) #创建20列
                     with cols[0]:
                         if st.button("✏️", key=f"edit_{i}"):
@@ -977,8 +1007,16 @@ for i, message in enumerate(st.session_state.messages):
                            regenerate_message(i)
                     with cols[2]:
                         if st.button("➕", key=f"continue_{i}"):
-                           continue_message(i)
-
+                            continue_message(i)
+                    with cols[3]:
+                        if st.button("⏪", key=f"reset_{i}"):
+                            st.session_state.messages.pop(-1)
+                            st.session_state.undo_available = True
+                    if st.session_state.undo_available and i == len(st.session_state.messages) - 1:
+                        with cols[4]:
+                           if st.button("↩️", key = f"undo_{i}"):
+                             st.session_state.messages.append({"role":"assistant", "content":" "})
+                             st.session_state.undo_available = False
 if prompt := st.chat_input("输入你的消息:"):
     token = generate_token()
     if "use_token" in st.session_state and st.session_state.use_token:
