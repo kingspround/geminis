@@ -862,13 +862,12 @@ with st.sidebar:
       options=list(API_KEYS.keys()),
       index=list(API_KEYS.keys()).index(st.session_state.selected_api_key),
       label_visibility="visible",
-     key="api_selector"
+        key="api_selector"
   )
   genai.configure(api_key=API_KEYS[st.session_state.selected_api_key])
 
 # 在左侧边栏创建 token 复选框
 with st.sidebar:
-
 
     
     # 功能区 1: 文件操作
@@ -929,23 +928,25 @@ with st.sidebar:
 
         st.session_state.test_text = st.text_area("System Message (Optional):", st.session_state.get("test_text", ""), key="system_message")
 st.markdown(
-    """
-    <div style="position: fixed; bottom: 50px; right: 50px;">
-    """,
-    unsafe_allow_html=True,
-)
-with st.container():
-    col_float = st.columns([10,2]) # 创建10列，让按钮靠右显示
-    with col_float[1]: # 按钮浮动在最右侧
-       st.session_state.use_token = st.checkbox("Token", value=True)
-       if st.button("🔄"):
-         st.experimental_rerun()
-st.markdown(
-    """
+    f"""
+    <div style="position: fixed; bottom: 50px; right: 50px; display: flex; flex-direction: column; align-items: flex-end;">
+        <div style="margin-bottom: 5px;">
+            <label style="display: block; margin-bottom: 2px;">
+                <input type="checkbox" {'checked' if st.session_state.get('use_token', False) else ''} onclick="this.closest('form').submit()" name="use_token" id="use_token">
+                Token
+            </label>
+        </div>
+        <div>
+            <button  onclick="this.closest('form').submit()" name="refresh_button" id="refresh_button">🔄</button>
+        </div>
+        <input type="hidden" name="_use_token" value="True" >
     </div>
     """,
-    unsafe_allow_html=True,
-)
+        unsafe_allow_html=True,
+    )
+
+if "refresh_button" in st.session_state:
+    st.experimental_rerun()
 
 # 显示历史记录和编辑按钮
 for i, message in enumerate(st.session_state.messages):
