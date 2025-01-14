@@ -930,40 +930,36 @@ with st.sidebar.expander("角色设定"):
 # 显示历史记录和编辑按钮
 for i, message in enumerate(st.session_state.messages):
     with st.chat_message(message["role"]):
-        st.write(message["content"], key=f"message_{i}")
-        if i >= len(st.session_state.messages) - 2:
-            with st.container():
-                col = st.columns(20)
-                with col[0]:
-                   if st.button("✏️", key=f"edit_{i}"):
-                      st.session_state.editable_index = i
-                      st.session_state.editing = True
-                with col[1]:
-                   if st.button("♻️", key=f"regenerate_{i}"):
-                      regenerate_message(i)
-                with col[2]:
-                    if st.button("➕", key=f"continue_{i}"):
-                        continue_message(i)
-
-
-if st.session_state.get("editing"):
-    i = st.session_state.editable_index
-    message = st.session_state.messages[i]
-    with st.chat_message(message["role"]):
-        new_content = st.text_area(
-            f"{message['role']}:", message["content"], key=f"message_edit_{i}"
-        )
-        col1, col2 = st.columns(2)
-        with col1:
-            if st.button("保存", key=f"save_{i}"):
-                st.session_state.messages[i]["content"] = new_content
-                with open(log_file, "wb") as f:
-                    pickle.dump(st.session_state.messages, f)
-                st.success("已保存更改！")
-                st.session_state.editing = False
-        with col2:
-            if st.button("取消", key=f"cancel_{i}"):
-                st.session_state.editing = False
+        if st.session_state.get("editing") == True and i == st.session_state.editable_index:
+           new_content = st.text_area(
+                f"{message['role']}:", message["content"], key=f"message_edit_{i}"
+           )
+           cols = st.columns(20) #创建20列
+           with cols[3]:
+               if st.button("保存 ✅", key=f"save_{i}"):
+                   st.session_state.messages[i]["content"] = new_content
+                   with open(log_file, "wb") as f:
+                      pickle.dump(st.session_state.messages, f)
+                   st.success("已保存更改！")
+                   st.session_state.editing = False
+           with cols[4]:
+              if st.button("取消 ❌", key=f"cancel_{i}"):
+                 st.session_state.editing = False
+        else:
+            st.write(message["content"], key=f"message_{i}")
+            if i >= len(st.session_state.messages) - 2:
+                with st.container():
+                    cols = st.columns(20) #创建20列
+                    with cols[0]:
+                        if st.button("✏️", key=f"edit_{i}"):
+                           st.session_state.editable_index = i
+                           st.session_state.editing = True
+                    with cols[1]:
+                       if st.button("♻️", key=f"regenerate_{i}"):
+                           regenerate_message(i)
+                    with cols[2]:
+                        if st.button("➕", key=f"continue_{i}"):
+                           continue_message(i)
 
 if prompt := st.chat_input("输入你的消息:"):
     token = generate_token()
@@ -975,7 +971,6 @@ if prompt := st.chat_input("输入你的消息:"):
         st.session_state.messages.append({"role": "user", "content": full_prompt})
     with st.chat_message("user"):
         st.markdown(prompt if not st.session_state.use_token else f"{prompt} (token: {token})")
-
 
     with st.chat_message("assistant"):
         message_placeholder = st.empty()
