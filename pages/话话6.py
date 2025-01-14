@@ -818,21 +818,24 @@ def getAnswer(prompt, continue_mode=False):
         if st.session_state.enabled_settings[setting_name]:
             system_message += st.session_state.character_settings[setting_name] + "\n"
 
+    chat_session = model.start_chat(history=[])
+    if system_message:
+        chat_session.send_message(system_message)
+
+    if continue_mode and st.session_state.messages and st.session_state.messages[-1]["role"] == "assistant":
+        prompt = f"[请继续补全这句话，不要重复之前的内容，使用合适的标点符号和大小写：{st.session_state.messages[-1]['content']}]"
+
     try:
-        chat_session = model.start_chat(history=[])
-        if system_message:
-            chat_session.send_message(system_message)
-
-        if continue_mode and st.session_state.messages and st.session_state.messages[-1]["role"] == "assistant":
-            prompt = f"[请继续补全这句话，不要重复之前的内容，使用合适的标点符号和大小写：{st.session_state.messages[-1]['content']}]"
-
         response = chat_session.send_message(prompt, stream=True)
+        full_response = ""
         for chunk in response:
-            yield chunk.text
-    except Exception as e:
-        st.error(f"发生错误: {e}")
-        yield f"发生错误: {e}"
+           full_response += chunk.text
+           yield chunk.text
+        return full_response
 
+    except Exception as e:
+       st.error(f"发生错误：{type(e).__name__}, 错误信息: {e}")
+       return None
 # --- Streamlit 布局 ---
 st.set_page_config(
     page_title="Gemini Chatbot",
@@ -866,16 +869,14 @@ if prompt := st.chat_input("输入你的消息:"):
         st.markdown(prompt if not st.session_state.use_token else f"{prompt} (token: {token})")
 
     with st.chat_message("assistant"):
-        response_container = st.container() # 创建一个容器
+        full_response_iter = getAnswer(full_prompt)
         full_response = ""
-        for chunk in getAnswer(full_prompt):
-            full_response += chunk
-            with response_container:
-                st.markdown(full_response + "▌")
-        with response_container:
-                st.markdown(full_response) # 确保最后一次也更新了
-
-        st.session_state.messages.append({"role": "assistant", "content": full_response})
+        if full_response_iter:
+            for chunk in full_response_iter:
+               full_response += chunk
+               st.markdown(full_response + "▌")
+            st.markdown(full_response)  # 输出完整的助手消息
+            st.session_state.messages.append({"role": "assistant", "content": full_response})
 
     # 保存聊天记录
     with open(log_file, "wb") as f:
@@ -982,18 +983,17 @@ if st.session_state.regenerate_index is not None:
         prompt = st.session_state.messages[i - 1]["content"] if i > 0 and st.session_state.messages[i - 1]["role"] == "user" else None
         if prompt:
             with st.chat_message("assistant"):
-                response_container = st.container()
+                full_response_iter = getAnswer(prompt)
                 full_response = ""
-                for chunk in getAnswer(prompt):
-                     full_response += chunk
-                     with response_container:
+                if full_response_iter:
+                    for chunk in full_response_iter:
+                        full_response += chunk
                         st.markdown(full_response + "▌")
-                with response_container:
                     st.markdown(full_response)
-                st.session_state.messages[i]["content"] = full_response
-                with open(log_file, "wb") as f:
-                    pickle.dump(st.session_state.messages, f)
-                st.experimental_rerun()
+                    st.session_state.messages[i]["content"] = full_response
+                    with open(log_file, "wb") as f:
+                        pickle.dump(st.session_state.messages, f)
+                    st.experimental_rerun()
         else:
             st.error("无法获取上一条用户消息以重新生成。")
 
@@ -1005,17 +1005,16 @@ if st.session_state.continue_index is not None:
         prompt = st.session_state.messages[i]["content"] if i >= 0 else None
         if prompt:
             with st.chat_message("assistant"):
-                response_container = st.container()
+                full_response_iter = getAnswer(prompt, continue_mode=True)
                 full_response = ""
-                for chunk in getAnswer(prompt, continue_mode=True):
-                    full_response += chunk
-                    with response_container:
+                if full_response_iter:
+                    for chunk in full_response_iter:
+                        full_response += chunk
                         st.markdown(full_response + "▌")
-                with response_container:
                     st.markdown(full_response)
-                st.session_state.messages.append({"role": "assistant", "content": full_response})
-                with open(log_file, "wb") as f:
-                    pickle.dump(st.session_state.messages, f)
+                    st.session_state.messages.append({"role": "assistant", "content": full_response})
+                    with open(log_file, "wb") as f:
+                        pickle.dump(st.session_state.messages, f)
         else:
             st.error("无法获取上一条消息以继续生成。")
 
