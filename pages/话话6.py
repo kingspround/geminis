@@ -857,14 +857,14 @@ st.set_page_config(
 
 # 添加 API key 选择器
 with st.sidebar:
-    st.session_state.selected_api_key = st.selectbox(
-        "选择 API Key:",
-        options=list(API_KEYS.keys()),
-        index=list(API_KEYS.keys()).index(st.session_state.selected_api_key),
-        label_visibility="visible",
+  st.session_state.selected_api_key = st.selectbox(
+      "选择 API Key:",
+      options=list(API_KEYS.keys()),
+      index=list(API_KEYS.keys()).index(st.session_state.selected_api_key),
+      label_visibility="visible",
         key="api_selector"
-    )
-    genai.configure(api_key=API_KEYS[st.session_state.selected_api_key])
+  )
+  genai.configure(api_key=API_KEYS[st.session_state.selected_api_key])
 
 # 在左侧边栏创建 token 复选框
 with st.sidebar:
@@ -927,26 +927,26 @@ with st.sidebar:
             st.session_state.enabled_settings[setting_name] = st.checkbox(setting_name, st.session_state.enabled_settings.get(setting_name, False), key=f"checkbox_{setting_name}")
 
         st.session_state.test_text = st.text_area("System Message (Optional):", st.session_state.get("test_text", ""), key="system_message")
-
     
-    st.markdown(
+st.markdown(
         f"""
         <div style="position: fixed; top: 90px; right: 10px; display: flex; flex-direction: column; align-items: flex-end;">
-
         """,
             unsafe_allow_html=True,
-    )
-    
-    st.session_state.use_token = st.checkbox("Token", value=st.session_state.get("use_token",True), key="use_token_checkbox")
-    if st.button("🔄",key="refresh_button"):
-        st.experimental_rerun()
-        
-    st.markdown(
+     )
+   
+if st.checkbox("Token", value=st.session_state.get("use_token",True), key="use_token_checkbox"):
+   st.session_state.use_token = True
+else:
+   st.session_state.use_token = False
+if st.button("🔄",key="refresh_button"):
+   st.experimental_rerun()
+st.markdown(
     """
     </div>
     """,
         unsafe_allow_html=True,
-  )
+)
 
 # 显示历史记录和编辑按钮
 for i, message in enumerate(st.session_state.messages):
