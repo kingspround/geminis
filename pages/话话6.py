@@ -800,7 +800,7 @@ def load_history(log_file):
         with open(log_file, "rb") as f:
             st.session_state.messages = pickle.load(f)
         st.success(f"成功读取历史记录！({os.path.basename(log_file)})")
-        st.session_state.load_count = st.session_state.get("load_count", 0) + 1 # force to refresh the screen
+        st.session_state.load_count = st.session_state.get("load_count", 0) + 1
     except FileNotFoundError:
         st.warning(f"没有找到历史记录文件。({os.path.basename(log_file)})")
     except EOFError:
@@ -812,7 +812,6 @@ def clear_history(log_file):
     if os.path.exists(log_file):
         os.remove(log_file)
     st.success("历史记录已清除！")
-    
     
 
 def regenerate_message(i):
@@ -843,6 +842,16 @@ def getAnswer(prompt, update_message, continue_mode=False): # Add update_message
         full_response += chunk.text
         update_message(full_response) # call update message inside of getAnswer
     return full_response
+
+
+def download_all_logs():
+    zip_buffer = BytesIO()
+    with zipfile.ZipFile(zip_buffer, "a", zipfile.ZIP_DEFLATED, False) as zip_file:
+        for file in os.listdir("."):
+            if file.endswith(".pkl"):
+                 zip_file.write(file)
+    return zip_buffer.getvalue()
+
 
 # --- Streamlit 布局 ---
 st.set_page_config(
@@ -880,6 +889,7 @@ for i, message in enumerate(st.session_state.messages):
                  with col3:
                      if st.button("➕", key=f"continue_{i}"):
                          continue_message(i)
+
 
 if st.session_state.get("editing"):
     i = st.session_state.editable_index
@@ -930,53 +940,46 @@ if prompt := st.chat_input("输入你的消息:"):
 
 
 
-# 侧边栏按钮
-st.sidebar.title("功能区")
+# 功能区 1: 文件操作
+with st.sidebar.expander("文件操作"):
+    if len(st.session_state.messages) > 0:
+        st.button("重置上一个输出 system_instruction",
+                    on_click=lambda: st.session_state.messages.pop(-1) if len(st.session_state.messages) > 1 else None)
 
-if st.session_state.messages: # 简化条件
-    st.sidebar.button("重置上一个输出", on_click=lambda: st.session_state.messages.pop(-1))
+    st.button("读取历史记录 📖", on_click=lambda: load_history(log_file))
+    
+    if st.button("清除历史记录 🗑️"):
+        st.session_state.clear_confirmation = True  # 清除历史记录弹窗标志
+        
+    # 确认/取消清除历史记录按钮区域
+    if "clear_confirmation" in st.session_state and st.session_state.clear_confirmation:
+        col1, col2 = st.columns(2)
+        with col1:
+            if st.button("确认清除", key="clear_history_confirm"):
+                clear_history(log_file)
+                st.session_state.clear_confirmation = False
+                st.session_state.load_count = st.session_state.get("load_count", 0) + 1 # force to refresh
+        with col2:
+            if st.button("取消", key="clear_history_cancel"):
+                st.session_state.clear_confirmation = False
 
-# 文件下载部分
-download_data = None # 初始化变量
-if os.path.exists(log_file):
-  with open(log_file, "rb") as f:
-      download_data = f.read()
-st.sidebar.download_button(
-    label="下载聊天记录",
-    data=download_data if download_data else b"",
-    file_name=os.path.basename(log_file),
-    mime="application/octet-stream",
-)
+    st.download_button(
+        label="下载所有聊天记录 ⬇️",
+        data=download_all_logs(),
+        file_name="chat_logs.zip",
+        mime="application/zip",
+    )
 
-
-st.sidebar.button("读取历史记录", on_click=lambda: load_history(log_file))
-st.sidebar.button("清除历史记录", on_click=lambda: clear_history(log_file))
-
-
-if st.sidebar.button("读取本地文件"):
-    st.session_state.file_upload_mode = True
-    st.session_state.file_loaded = False
-
-if st.session_state.get("file_upload_mode"):
-    uploaded_file = st.sidebar.file_uploader("选择文件", type=["pkl"])
-
-    if uploaded_file and not st.session_state.file_loaded:
+    uploaded_file = st.file_uploader("读取本地pkl文件 📁", type=["pkl"])
+    if uploaded_file is not None:
         try:
             loaded_messages = pickle.load(uploaded_file)
-            st.session_state.messages.extend(loaded_messages)
-            
-            # 重新显示消息 (与之前相同)
-
-            with open(log_file, "wb") as f:
-                pickle.dump(st.session_state.messages, f)
-
-            st.session_state.file_loaded = True
+            st.session_state.messages = loaded_messages  # 使用 = 替换现有消息
+            st.success(f"成功读取本地pkl文件！({uploaded_file.name})")
             st.session_state.upload_count = st.session_state.get("upload_count", 0) + 1  # 添加计数器
         except Exception as e:
-            st.error(f"读取本地文件失败：{e}")
+            st.error(f"读取本地pkl文件失败：{e}")
 
-        if st.sidebar.button("关闭", key="close_upload"):
-            st.session_state.file_upload_mode = False
 
 
 # 角色设定
@@ -1009,7 +1012,7 @@ def load_history(log_file):
         with open(log_file, "rb") as f:
             st.session_state.messages = pickle.load(f)
         st.success(f"成功读取历史记录！({os.path.basename(log_file)})")
-        st.session_state.load_count = st.session_state.get("load_count", 0) + 1 # force to refresh the screen
+        st.session_state.load_count = st.session_state.get("load_count", 0) + 1  # force to refresh the screen
     except FileNotFoundError:
         st.warning(f"{os.path.basename(log_file)} 不存在。")
     except EOFError:
@@ -1020,5 +1023,6 @@ def clear_history(log_file):
     try:
         os.remove(log_file)
         st.success(f"成功清除 {os.path.basename(log_file)} 的历史记录！")
+        st.session_state.load_count = st.session_state.get("load_count", 0) + 1 # force to refresh the screen
     except FileNotFoundError:
         st.warning(f"{os.path.basename(log_file)} 不存在。")
