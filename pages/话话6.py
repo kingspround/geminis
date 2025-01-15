@@ -8,6 +8,12 @@ from datetime import datetime
 from io import BytesIO
 import zipfile
 
+# --- 默认角色设定 ---
+DEFAULT_CHARACTER_SETTINGS = {
+    "设定1": "这是一个示例设定 1。",
+    "设定2": "这是一个示例设定 2。",
+}
+
 # --- API 密钥设置 ---
 API_KEYS = {
     "主密钥": "AIzaSyCBjZbA78bPusYmUNvfsmHpt6rPx6Ur0QE",  # 替换成你的主 API 密钥
@@ -1017,21 +1023,21 @@ if st.session_state.regenerate_index is not None:
     i = st.session_state.regenerate_index
     st.session_state.regenerate_index = None
     with st.spinner("正在重新生成回复..."):
-      prompt = st.session_state.messages[i-1]["content"] if i > 0 and st.session_state.messages[i-1]["role"] == "user" else None
-      if prompt:
-        with st.chat_message("assistant"):
-            message_placeholder = st.empty()
-            full_response = ""
-            for chunk in getAnswer(prompt, update_message): # Fix: Pass update_message here
-                full_response += chunk
-                message_placeholder.markdown(full_response + "▌")
-            message_placeholder.markdown(full_response)
-            st.session_state.messages[i]["content"] = full_response
-        with open(log_file, "wb") as f:
-            pickle.dump(st.session_state.messages, f)
-        st.experimental_rerun()
-      else:
-        st.error("无法获取上一条用户消息以重新生成。")
+        prompt = st.session_state.messages[i-1]["content"] if i > 0 and st.session_state.messages[i-1]["role"] == "user" else None
+        if prompt:
+            with st.chat_message("assistant"):
+                message_placeholder = st.empty()
+                full_response = ""
+                for chunk in getAnswer(prompt, update_message): # Fix: Pass update_message here
+                    full_response += chunk
+                    message_placeholder.markdown(full_response + "▌")
+                message_placeholder.markdown(full_response)
+                st.session_state.messages[i]["content"] = full_response
+            with open(log_file, "wb") as f:
+                pickle.dump(st.session_state.messages, f)
+            st.experimental_rerun()
+        else:
+           st.error("无法获取上一条用户消息以重新生成。")
 
 
 # 处理延续生成的消息
