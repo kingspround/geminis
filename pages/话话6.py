@@ -773,6 +773,8 @@ if "reset_history" not in st.session_state:
     st.session_state.reset_history = False
 if "chat_session" not in st.session_state:
     st.session_state.chat_session = None
+if 'generating' not in st.session_state:
+    st.session_state.generating = False # new session state
 
 # --- 功能函数 ---
 def generate_token():
@@ -818,40 +820,46 @@ def clear_history(log_file):
 
 
 def regenerate_message(i):
+    if st.session_state.generating:
+        st.warning("请等待当前生成结束后再操作。")
+        return
+    
     st.session_state.regenerate_index = i
+    st.session_state.generating = True # flag for generation
     if i < len(st.session_state.messages) and st.session_state.messages[i]["role"] == "assistant":
         st.session_state.messages.pop(i) # 删除当前
     if i > 0 and st.session_state.messages[i-1]["role"] == "user":
         prompt = st.session_state.messages[i-1]["content"]
         st.session_state.messages.pop(i-1) # 删除user
-        with st.chat_message("assistant"):
-          message_placeholder = st.empty()
-          full_response = ""
-          def update_message(current_response):
-              message_placeholder.markdown(current_response + "▌")
-          full_response = getAnswer(prompt, update_message)
-          message_placeholder.markdown(full_response)
-        st.session_state.messages.append({"role": "assistant", "content": full_response})
+        
+        def update_message(current_response):
+            st.session_state.messages.append({"role":"assistant","content": current_response}) # append a new assistant content
+            
+        full_response = getAnswer(prompt, update_message)
         with open(log_file, "wb") as f:
             pickle.dump(st.session_state.messages, f)
-        
+
+    st.session_state.generating = False
     st.experimental_rerun()
 
 
 def continue_message(i):
+    if st.session_state.generating:
+        st.warning("请等待当前生成结束后再操作。")
+        return
+    
     st.session_state.continue_index = i
-    if i < len(st.session_state.messages) and st.session_state.messages[i]["role"] == "assistant": # if the message is assistant
+    st.session_state.generating = True
+    if i < len(st.session_state.messages) and st.session_state.messages[i]["role"] == "assistant":
         prompt = st.session_state.messages[i]["content"]
-        with st.chat_message("assistant"):
-           message_placeholder = st.empty()
-           full_response = ""
-           def update_message(current_response):
-               message_placeholder.markdown(current_response + "▌")
-           full_response = getAnswer(prompt, update_message, continue_mode=True)
-           message_placeholder.markdown(full_response)
-        st.session_state.messages.append({"role": "assistant", "content": full_response})
+       
+        def update_message(current_response):
+           st.session_state.messages.append({"role":"assistant","content": current_response})
+
+        full_response = getAnswer(prompt, update_message, continue_mode=True)
         with open(log_file, "wb") as f:
             pickle.dump(st.session_state.messages, f)
+    st.session_state.generating = False
     st.experimental_rerun()
 
 def getAnswer(prompt, update_message, continue_mode=False): # Add update_message argument
