@@ -819,6 +819,7 @@ def clear_history(log_file):
 def regenerate_message(i):
     st.session_state.regenerate_index = i
 
+
 def continue_message(i):
     st.session_state.continue_index = i
 
