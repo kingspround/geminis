@@ -818,8 +818,6 @@ def clear_history(log_file):
 
 def regenerate_message(i):
     st.session_state.regenerate_index = i
-    if i > 0:
-       st.session_state.messages.pop(i)
 
 
 def continue_message(i):
