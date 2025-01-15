@@ -819,21 +819,23 @@ def clear_history(log_file):
     st.success("历史记录已清除！")
 
 
-def regenerate_message(i, message_placeholder):
+def regenerate_message(i):
     with st.spinner("正在重新生成回复..."):
         prompt = st.session_state.messages[i-1]["content"] if i > 0 and st.session_state.messages[i-1]["role"] == "user" else None
         if prompt:
-            full_response = ""
-            def update_message(current_response):
-                message_placeholder.markdown(current_response + "▌")
-            full_response = getAnswer(prompt, update_message)
-            message_placeholder.markdown(full_response)
-            st.session_state.messages[i]["content"] = full_response
+            with st.chat_message("assistant"):
+                message_placeholder = st.empty()
+                full_response = ""
+                def update_message(current_response):
+                    message_placeholder.markdown(current_response + "▌")
+                full_response = getAnswer(prompt, update_message)
+                message_placeholder.markdown(full_response)
+                st.session_state.messages[i]["content"] = full_response
             with open(log_file, "wb") as f:
                 pickle.dump(st.session_state.messages, f)
             st.session_state.rerun_count += 1
         else:
-            st.error("无法获取上一条用户消息以重新生成。")
+           st.error("无法获取上一条用户消息以重新生成。")
 
 
 def continue_message(i, message_placeholder):
@@ -905,7 +907,7 @@ with st.sidebar:
 with st.sidebar:
     st.session_state.use_token = st.checkbox("Token", value=True) # 默认开启
 
-    if st.button("刷新 🔄"):
+    if st.button("刷新 🔄", key="refresh_button"):
          st.session_state.rerun_count += 1
          st.experimental_rerun()
 
@@ -981,12 +983,12 @@ for i, message in enumerate(st.session_state.messages):
             with st.container():
                 cols = st.columns(20) #创建20列
                 with cols[0]:
-                     if st.button("✏️", key=f"edit_{i}"):
-                         st.session_state.editable_index = i
-                         st.session_state.editing = True
+                    if st.button("✏️", key=f"edit_{i}"):
+                       st.session_state.editable_index = i
+                       st.session_state.editing = True
                 with cols[1]:
-                      if st.button("♻️", key=f"regenerate_{i}", on_click=lambda i=i: regenerate_message(i)):
-                         pass
+                    if st.button("♻️", key=f"regenerate_{i}", on_click=lambda i=i: regenerate_message(i)):
+                       pass
                 with cols[2]:
                      if st.button("➕", key=f"continue_{i}", on_click=lambda i=i, message_placeholder = message_placeholder: continue_message(i, message_placeholder)):
                        pass
@@ -1008,7 +1010,7 @@ if st.session_state.get("editing") == True and i == st.session_state.editable_in
         )
         cols = st.columns(20) #创建20列
         with cols[0]:
-            if st.button("✅", key=f"save_{i}"):
+            if st.button("保存 ✅", key=f"save_{i}"):
                  st.session_state.messages[i]["content"] = new_content
                  with open(log_file, "wb") as f:
                       pickle.dump(st.session_state.messages, f)
@@ -1017,7 +1019,7 @@ if st.session_state.get("editing") == True and i == st.session_state.editable_in
                  st.session_state.rerun_count += 1
                  st.experimental_rerun()
         with cols[1]:
-             if st.button("❌", key=f"cancel_{i}"):
+             if st.button("取消 ❌", key=f"cancel_{i}"):
                 st.session_state.editing = False
 
 if prompt := st.chat_input("输入你的消息:"):
