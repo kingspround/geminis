@@ -1072,4 +1072,3 @@ def clear_history(log_file):
     if os.path.exists(log_file):
         os.remove(log_file)
     st.success("历史记录已清除！")
-Use code with cautio
