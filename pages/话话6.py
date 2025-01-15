@@ -900,11 +900,13 @@ with st.sidebar:
                 if st.button("取消", key="clear_history_cancel"):
                     st.session_state.clear_confirmation = False
         
+        with open(log_file, "rb") as f:
+            download_data = f.read() if os.path.exists(log_file) else b"" # add a check
         st.download_button(
-        label="下载所有聊天记录 ⬇️",
-        data=download_all_logs(),
-        file_name="chat_logs.zip",
-        mime="application/zip",
+        label="下载当前聊天记录 ⬇️",
+        data=download_data,
+        file_name=os.path.basename(log_file),
+        mime="application/octet-stream",
         )
         
         uploaded_file = st.file_uploader("读取本地pkl文件 📁", type=["pkl"])
@@ -952,6 +954,7 @@ for i, message in enumerate(st.session_state.messages):
                       pickle.dump(st.session_state.messages, f)
                    st.success("已保存更改！")
                    st.session_state.editing = False
+                   st.experimental_rerun()
           with cols[1]:
                if st.button("❌", key=f"cancel_{i}"):
                   st.session_state.editing = False
@@ -1020,8 +1023,8 @@ def load_history(log_file):
     try:
         with open(log_file, "rb") as f:
             st.session_state.messages = pickle.load(f)
-        st.experimental_rerun()
         st.success(f"成功读取历史记录！({os.path.basename(log_file)})")
+        st.session_state.load_count = st.session_state.get("load_count", 0) + 1
         st.session_state.chat_session = None # Reset the chat session when loading history
     except FileNotFoundError:
         st.warning(f"没有找到历史记录文件。({os.path.basename(log_file)})")
@@ -1031,8 +1034,6 @@ def load_history(log_file):
 def clear_history(log_file):
     st.session_state.messages.clear()
     st.session_state.chat_session = None
-    try:
+    if os.path.exists(log_file):
         os.remove(log_file)
-        st.success(f"成功清除 {os.path.basename(log_file)} 的历史记录！")
-    except FileNotFoundError:
-        st.warning(f"{os.path.basename(log_file)} 不存在。")
+    st.success("历史记录已清除！")
