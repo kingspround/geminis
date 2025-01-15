@@ -1028,7 +1028,7 @@ if st.session_state.regenerate_index is not None:
             with st.chat_message("assistant"):
                 message_placeholder = st.empty()
                 full_response = ""
-                for chunk in getAnswer(prompt, update_message): # Fix: Pass update_message here
+                for chunk in getAnswer(prompt, update_message):
                     full_response += chunk
                     message_placeholder.markdown(full_response + "▌")
                 message_placeholder.markdown(full_response)
