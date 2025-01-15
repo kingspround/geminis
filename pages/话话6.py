@@ -819,22 +819,23 @@ def clear_history(log_file):
     st.success("历史记录已清除！")
 
 
-def regenerate_message(i, message_placeholder):
+def regenerate_message(i):
     with st.spinner("正在重新生成回复..."):
-        prompt = st.session_state.messages[i-1]["content"] if i > 0 and st.session_state.messages[i-1]["role"] == "user" else None
-        if prompt:
-            full_response = ""
-            def update_message(current_response):
-                message_placeholder.markdown(current_response + "▌")
-            full_response = getAnswer(prompt, update_message)
-            message_placeholder.markdown(full_response)
-            st.session_state.messages[i]["content"] = full_response
-            with open(log_file, "wb") as f:
-                pickle.dump(st.session_state.messages, f)
-            st.session_state.rerun_count += 1
+      prompt = st.session_state.messages[i-1]["content"] if i > 0 and st.session_state.messages[i-1]["role"] == "user" else None
+      if prompt:
+          message_placeholder = st.empty()
+          full_response = ""
+          def update_message(current_response):
+              message_placeholder.markdown(current_response + "▌")
+          full_response = getAnswer(prompt, update_message)
+          message_placeholder.markdown(full_response)
+          st.session_state.messages[i]["content"] = full_response
+          with open(log_file, "wb") as f:
+              pickle.dump(st.session_state.messages, f)
+          st.session_state.rerun_count += 1
+      else:
+            st.error("无法获取上一条用户消息以重新生成。")
 
-        else:
-           st.error("无法获取上一条用户消息以重新生成。")
 
 def continue_message(i, message_placeholder):
      with st.spinner("正在继续生成回复..."):
@@ -985,8 +986,8 @@ for i, message in enumerate(st.session_state.messages):
                          st.session_state.editable_index = i
                          st.session_state.editing = True
                 with cols[1]:
-                     if st.button("♻️", key=f"regenerate_{i}", on_click=lambda i=i, message_placeholder=message_placeholder: regenerate_message(i, message_placeholder)):
-                       pass
+                      if st.button("♻️", key=f"regenerate_{i}", on_click=lambda i=i: regenerate_message(i)):
+                         pass
                 with cols[2]:
                      if st.button("➕", key=f"continue_{i}", on_click=lambda i=i, message_placeholder = message_placeholder: continue_message(i, message_placeholder)):
                        pass
@@ -1063,6 +1064,7 @@ def load_history(log_file):
         st.success(f"成功读取历史记录！({os.path.basename(log_file)})")
         st.session_state.chat_session = None # Load history will reset the chat session
         st.session_state.rerun_count +=1
+        st.experimental_rerun()
     except FileNotFoundError:
         st.warning(f"没有找到历史记录文件。({os.path.basename(log_file)})")
     except EOFError:
