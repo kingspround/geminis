@@ -773,6 +773,8 @@ if "reset_history" not in st.session_state:
     st.session_state.reset_history = False
 if "chat_session" not in st.session_state:
     st.session_state.chat_session = None
+if "rerun_count" not in st.session_state:
+    st.session_state.rerun_count = 0
 
 # --- 功能函数 ---
 def generate_token():
@@ -801,8 +803,8 @@ def load_history(log_file):
         with open(log_file, "rb") as f:
             st.session_state.messages = pickle.load(f)
         st.success(f"成功读取历史记录！({os.path.basename(log_file)})")
-        st.session_state.load_count = st.session_state.get("load_count", 0) + 1
         st.session_state.chat_session = None # Load history will reset the chat session
+        st.session_state.rerun_count +=1
     except FileNotFoundError:
         st.warning(f"没有找到历史记录文件。({os.path.basename(log_file)})")
     except EOFError:
@@ -818,11 +820,41 @@ def clear_history(log_file):
 
 
 def regenerate_message(i):
-    st.session_state.regenerate_index = i
+    with st.spinner("正在重新生成回复..."):
+        prompt = st.session_state.messages[i-1]["content"] if i > 0 and st.session_state.messages[i-1]["role"] == "user" else None
+        if prompt:
+            with st.chat_message("assistant"):
+                message_placeholder = st.empty()
+                full_response = ""
+                def update_message(current_response):
+                    message_placeholder.markdown(current_response + "▌")
+                full_response = getAnswer(prompt, update_message)
+                message_placeholder.markdown(full_response)
+                st.session_state.messages[i]["content"] = full_response
+            with open(log_file, "wb") as f:
+                pickle.dump(st.session_state.messages, f)
+            st.session_state.rerun_count += 1
 
+        else:
+             st.error("无法获取上一条用户消息以重新生成。")
 
 def continue_message(i):
-    st.session_state.continue_index = i
+    with st.spinner("正在继续生成回复..."):
+      prompt = st.session_state.messages[i]["content"] if i >= 0 else None
+      if prompt:
+        with st.chat_message("assistant"):
+            message_placeholder = st.empty()
+            full_response = ""
+            def update_message(current_response):
+                 message_placeholder.markdown(current_response + "▌")
+            full_response = getAnswer(prompt, update_message, continue_mode=True)
+            message_placeholder.markdown(full_response)
+            st.session_state.messages.append({"role": "assistant", "content": full_response})
+        with open(log_file, "wb") as f:
+             pickle.dump(st.session_state.messages, f)
+        st.session_state.rerun_count += 1
+      else:
+        st.error("无法获取上一条消息以继续生成。")
 
 def getAnswer(prompt, update_message, continue_mode=False): # Add update_message argument
     system_message = ""
@@ -916,6 +948,7 @@ with st.sidebar:
                 with open(log_file, "wb") as f:
                     pickle.dump(st.session_state.messages, f)
                 st.session_state.file_loaded = True # after load file, set file_loaded to True
+                st.session_state.rerun_count += 1
                 st.experimental_rerun()
             except Exception as e:
                 st.error(f"读取本地pkl文件失败：{e}")
@@ -954,6 +987,7 @@ for i, message in enumerate(st.session_state.messages):
                       pickle.dump(st.session_state.messages, f)
                    st.success("已保存更改！")
                    st.session_state.editing = False
+                   st.session_state.rerun_count += 1
                    st.experimental_rerun() # 使用 experimental_rerun 刷新页面
           with cols[1]:
                if st.button("❌", key=f"cancel_{i}"):
@@ -968,10 +1002,10 @@ for i, message in enumerate(st.session_state.messages):
                            st.session_state.editable_index = i
                            st.session_state.editing = True
                     with cols[1]:
-                        if st.button("♻️", key=f"regenerate_{i}", on_click=lambda i=i: regenerate_logic(i)):
+                      if st.button("♻️", key=f"regenerate_{i}", on_click=lambda i=i: regenerate_message(i)):
                           pass
                     with cols[2]:
-                       if st.button("➕", key=f"continue_{i}", on_click=lambda i=i: continue_logic(i)):
+                       if st.button("➕", key=f"continue_{i}", on_click=lambda i=i: continue_message(i)):
                            pass
                     with cols[3]:
                        if st.session_state.messages and st.button("⏪", key=f"reset_last_{i}"):
@@ -1017,51 +1051,16 @@ with col1:
         st.session_state.use_token = False
 with col2:
     if st.button("🔄", key="refresh_button"):
+        st.session_state.rerun_count += 1
         st.experimental_rerun()
-    
-def regenerate_logic(i):
-    with st.spinner("正在重新生成回复..."):
-        prompt = st.session_state.messages[i-1]["content"] if i > 0 and st.session_state.messages[i-1]["role"] == "user" else None
-        if prompt:
-            with st.chat_message("assistant"):
-                message_placeholder = st.empty()
-                full_response = ""
-                def update_message(current_response):
-                    message_placeholder.markdown(current_response + "▌")
-
-                full_response = getAnswer(prompt, update_message)
-                message_placeholder.markdown(full_response)
-                st.session_state.messages[i]["content"] = full_response
-            with open(log_file, "wb") as f:
-                pickle.dump(st.session_state.messages, f)
-            st.experimental_rerun()
-        else:
-           st.error("无法获取上一条用户消息以重新生成。")
-
-def continue_logic(i):
-     with st.spinner("正在继续生成回复..."):
-        prompt = st.session_state.messages[i]["content"] if i >= 0 else None
-        if prompt:
-            with st.chat_message("assistant"):
-                message_placeholder = st.empty()
-                full_response = ""
-                def update_message(current_response):
-                     message_placeholder.markdown(current_response + "▌")
-                full_response = getAnswer(prompt, update_message, continue_mode=True)
-                message_placeholder.markdown(full_response)
-                st.session_state.messages.append({"role": "assistant", "content": full_response})
-            with open(log_file, "wb") as f:
-                 pickle.dump(st.session_state.messages, f)
-        else:
-            st.error("无法获取上一条消息以继续生成。")
 
 def load_history(log_file):
     try:
         with open(log_file, "rb") as f:
             st.session_state.messages = pickle.load(f)
         st.success(f"成功读取历史记录！({os.path.basename(log_file)})")
-        st.session_state.load_count = st.session_state.get("load_count", 0) + 1
         st.session_state.chat_session = None # Load history will reset the chat session
+        st.session_state.rerun_count +=1
     except FileNotFoundError:
         st.warning(f"没有找到历史记录文件。({os.path.basename(log_file)})")
     except EOFError:
@@ -1073,3 +1072,4 @@ def clear_history(log_file):
     if os.path.exists(log_file):
         os.remove(log_file)
     st.success("历史记录已清除！")
+Use code with cautio
