@@ -819,7 +819,6 @@ def clear_history(log_file):
 def regenerate_message(i):
     st.session_state.regenerate_index = i
 
-
 def continue_message(i):
     st.session_state.continue_index = i
 
@@ -1067,7 +1066,7 @@ def load_history(log_file):
             st.session_state.messages = pickle.load(f)
         st.success(f"成功读取历史记录！({os.path.basename(log_file)})")
         st.session_state.load_count = st.session_state.get("load_count", 0) + 1
-        st.session_state.chat_session = None # Reset the chat session when loading history
+        st.session_state.chat_session = None # Load history will reset the chat session
     except FileNotFoundError:
         st.warning(f"没有找到历史记录文件。({os.path.basename(log_file)})")
     except EOFError:
