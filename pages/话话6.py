@@ -1017,6 +1017,49 @@ with col1:
 with col2:
     if st.button("🔄", key="refresh_button"):
         st.experimental_rerun()
+    
+# 处理重新生成的消息
+if st.session_state.regenerate_index is not None:
+    i = st.session_state.regenerate_index
+    st.session_state.regenerate_index = None
+    with st.spinner("正在重新生成回复..."):
+        prompt = st.session_state.messages[i-1]["content"] if i > 0 and st.session_state.messages[i-1]["role"] == "user" else None
+        if prompt:
+            with st.chat_message("assistant"):
+                message_placeholder = st.empty()
+                full_response = ""
+                for chunk in getAnswer(prompt, update_message):
+                    full_response += chunk
+                    message_placeholder.markdown(full_response + "▌")
+                message_placeholder.markdown(full_response)
+                st.session_state.messages[i]["content"] = full_response
+            with open(log_file, "wb") as f:
+                pickle.dump(st.session_state.messages, f)
+            st.experimental_rerun()
+        else:
+           st.error("无法获取上一条用户消息以重新生成。")
+
+
+# 处理延续生成的消息
+if st.session_state.continue_index is not None:
+    i = st.session_state.continue_index
+    st.session_state.continue_index = None
+    with st.spinner("正在继续生成回复..."):
+      prompt = st.session_state.messages[i]["content"] if i >= 0 else None
+      if prompt:
+        with st.chat_message("assistant"):
+            message_placeholder = st.empty()
+            full_response = ""
+            for chunk in getAnswer(prompt, update_message, continue_mode=True):
+                full_response += chunk
+                message_placeholder.markdown(full_response + "▌")
+            message_placeholder.markdown(full_response)
+            st.session_state.messages.append({"role": "assistant", "content": full_response})
+        with open(log_file, "wb") as f:
+            pickle.dump(st.session_state.messages, f)
+      else:
+        st.error("无法获取上一条消息以继续生成。")
+
 
 def load_history(log_file):
     try:
