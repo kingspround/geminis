@@ -798,11 +798,10 @@ def generate_token():
 def load_history(log_file):
     try:
         with open(log_file, "rb") as f:
-             loaded_data = pickle.load(f)
-             st.session_state.messages = loaded_data.get("messages", [])
-             st.session_state.chat_session = loaded_data.get("chat_session", None)
+            st.session_state.messages = pickle.load(f)
         st.success(f"成功读取历史记录！({os.path.basename(log_file)})")
         st.session_state.load_count = st.session_state.get("load_count", 0) + 1
+        st.session_state.chat_session = None # Load history will reset the chat session
     except FileNotFoundError:
         st.warning(f"没有找到历史记录文件。({os.path.basename(log_file)})")
     except EOFError:
@@ -915,10 +914,7 @@ with st.sidebar:
                 st.session_state.messages.extend(loaded_messages)
                 st.session_state.upload_count = st.session_state.get("upload_count", 0) + 1
                 with open(log_file, "wb") as f:
-                    pickle.dump({"messages": st.session_state.messages,
-                                  "chat_session": st.session_state.chat_session}
-, f)
-
+                    pickle.dump(st.session_state.messages, f)
             except Exception as e:
                 st.error(f"读取本地pkl文件失败：{e}")
 # 功能区 2: 角色设定
@@ -953,9 +949,7 @@ for i, message in enumerate(st.session_state.messages):
               if st.button("✅", key=f"save_{i}"):
                    st.session_state.messages[i]["content"] = new_content
                    with open(log_file, "wb") as f:
-                      pickle.dump({"messages": st.session_state.messages,
-                                  "chat_session": st.session_state.chat_session}
-, f)
+                      pickle.dump(st.session_state.messages, f)
                    st.success("已保存更改！")
                    st.session_state.editing = False
           with cols[1]:
@@ -1010,10 +1004,8 @@ if prompt := st.chat_input("输入你的消息:"):
 
     st.session_state.messages.append({"role": "assistant", "content": full_response})
     with open(log_file, "wb") as f:
-        pickle.dump({"messages": st.session_state.messages,
-                    "chat_session": st.session_state.chat_session}
-, f)
-
+        pickle.dump(st.session_state.messages, f)
+    
 col1, col2 = st.columns(2)
 with col1:
     if st.checkbox("Token", value=st.session_state.get("use_token", True), key="use_token_checkbox"):
@@ -1027,18 +1019,17 @@ with col2:
 def load_history(log_file):
     try:
         with open(log_file, "rb") as f:
-             loaded_data = pickle.load(f)
-             st.session_state.messages = loaded_data.get("messages", [])
-             st.session_state.chat_session = loaded_data.get("chat_session", None)
+            st.session_state.messages = pickle.load(f)
         st.experimental_rerun()
         st.success(f"成功读取历史记录！({os.path.basename(log_file)})")
+        st.session_state.chat_session = None # Reset the chat session when loading history
     except FileNotFoundError:
         st.warning(f"没有找到历史记录文件。({os.path.basename(log_file)})")
     except EOFError:
         st.warning(f"读取历史记录失败：文件可能损坏。")
 
 def clear_history(log_file):
-    st.session_state.messages = []
+    st.session_state.messages.clear()
     st.session_state.chat_session = None
     try:
         os.remove(log_file)
