@@ -822,7 +822,6 @@ def regenerate_message(i):
        st.session_state.messages.pop(i)
 
 
-
 def continue_message(i):
     st.session_state.continue_index = i
 
@@ -917,6 +916,8 @@ with st.sidebar:
                 st.session_state.upload_count = st.session_state.get("upload_count", 0) + 1
                 with open(log_file, "wb") as f:
                     pickle.dump(st.session_state.messages, f)
+                st.session_state.file_loaded = True # after load file, set file_loaded to True
+                st.experimental_rerun()
             except Exception as e:
                 st.error(f"读取本地pkl文件失败：{e}")
 # 功能区 2: 角色设定
@@ -954,7 +955,7 @@ for i, message in enumerate(st.session_state.messages):
                       pickle.dump(st.session_state.messages, f)
                    st.success("已保存更改！")
                    st.session_state.editing = False
-                   st.experimental_rerun()
+                   st.experimental_rerun() # 使用 experimental_rerun 刷新页面
           with cols[1]:
                if st.button("❌", key=f"cancel_{i}"):
                   st.session_state.editing = False
@@ -963,23 +964,23 @@ for i, message in enumerate(st.session_state.messages):
             if i >= len(st.session_state.messages) - 2:
                 with st.container():
                     cols = st.columns(20) #创建20列
-                    with cols[16]:
+                    with cols[0]:
                         if st.button("✏️", key=f"edit_{i}"):
                            st.session_state.editable_index = i
                            st.session_state.editing = True
-                    with cols[17]:
+                    with cols[1]:
                       if st.button("♻️", key=f"regenerate_{i}"):
                            regenerate_message(i)
-                    with cols[18]:
+                    with cols[2]:
                        if st.button("➕", key=f"continue_{i}"):
                          continue_message(i)
-                    with cols[19]:
+                    with cols[3]:
                        if st.session_state.messages and st.button("⏪", key=f"reset_last_{i}"):
                           st.session_state.reset_history = True
                           st.session_state.messages.pop(-1) if len(st.session_state.messages) > 1 else None
 
                     if st.session_state.reset_history and i >= len(st.session_state.messages) -2 :
-                      with cols[0]:
+                      with cols[4]:
                         if st.button("↩️", key=f"undo_reset_{i}"):
                              st.session_state.reset_history = False
                              st.experimental_rerun()
