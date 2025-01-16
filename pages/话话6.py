@@ -777,6 +777,15 @@ if "rerun_count" not in st.session_state:
     st.session_state.rerun_count = 0
 if "scroll_flag" not in st.session_state:
     st.session_state.scroll_flag = False
+if 'regenerate_request' not in st.session_state:
+    st.session_state.regenerate_request = False
+if 'regenerate_index_to_process' not in st.session_state:
+    st.session_state.regenerate_index_to_process = None
+if 'continue_request' not in st.session_state:
+    st.session_state.continue_request = False
+if 'continue_index_to_process' not in st.session_state:
+    st.session_state.continue_index_to_process = None
+
 
 
 # --- 功能函数 ---
