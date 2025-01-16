@@ -771,20 +771,6 @@ if "use_token" not in st.session_state:
     st.session_state.use_token = True  # 默认启用token
 if "reset_history" not in st.session_state:
     st.session_state.reset_history = False
-if "chat_session" not in st.session_state:
-    st.session_state.chat_session = None
-if "rerun_count" not in st.session_state:
-    st.session_state.rerun_count = 0
-if "scroll_flag" not in st.session_state:
-    st.session_state.scroll_flag = False
-if 'regenerate_request' not in st.session_state:
-    st.session_state.regenerate_request = False
-if 'regenerate_index_to_process' not in st.session_state:
-    st.session_state.regenerate_index_to_process = None
-if 'continue_request' not in st.session_state:
-    st.session_state.continue_request = False
-if 'continue_index_to_process' not in st.session_state:
-    st.session_state.continue_index_to_process = None
 
 
 
@@ -866,8 +852,8 @@ def download_all_logs():
     return zip_buffer.getvalue()
 
 def regenerate_message(index_to_regenerate):
-    st.session_state.regenerate_request = True
-    st.session_state.regenerate_index_to_process = index_to_regenerate
+    st.session_state.regenerate_index = index_to_regenerate
+    st.experimental_rerun()
 
 def continue_message(index_to_continue):
     st.session_state.continue_request = True
@@ -985,8 +971,8 @@ for i, message in enumerate(st.session_state.messages):
                                  st.session_state.reset_history = False
 
 # 处理重新生成消息
-if st.session_state.regenerate_request:
-    index_to_regenerate = st.session_state.regenerate_index_to_process
+if st.session_state.regenerate_index is not None:
+    index_to_regenerate = st.session_state.regenerate_index
     if 0 <= index_to_regenerate < len(st.session_state.messages) and st.session_state.messages[index_to_regenerate]['role'] == 'assistant':
         # 找到对应的用户消息
         user_message_index = index_to_regenerate - 1
@@ -1004,10 +990,8 @@ if st.session_state.regenerate_request:
             st.session_state.messages.insert(index_to_regenerate, {"role": "assistant", "content": full_response})
             with open(log_file, "wb") as f:
                 pickle.dump(st.session_state.messages, f)
-    # 重置状态
-    st.session_state.regenerate_request = False
-    st.session_state.regenerate_index_to_process = None
-    st.experimental_rerun()
+            st.session_state.regenerate_index = None
+            st.experimental_rerun()
 
 # 处理继续生成消息
 if st.session_state.continue_request:
