@@ -818,44 +818,42 @@ def clear_history(log_file):
     st.success("历史记录已清除！")
 
 def regenerate_message(i):
-    with st.spinner("正在重新生成回复..."):
-        prompt = st.session_state.messages[i-1]["content"] if i > 0 and st.session_state.messages[i-1]["role"] == "user" else None
-        if prompt:
-             with st.chat_message("assistant"):
-                message_placeholder = st.empty()
-                full_response = ""
-                def update_message(current_response):
-                    message_placeholder.markdown(current_response + "▌")
-                full_response = getAnswer(prompt, update_message)
-                message_placeholder.markdown(full_response)
-                st.session_state.messages[i]["content"] = full_response
-                with open(log_file, "wb") as f:
-                    pickle.dump(st.session_state.messages, f)
-                st.session_state.rerun_count += 1
-                st.experimental_rerun()
-        else:
-            st.error("无法获取上一条用户消息以重新生成。")
-
-def continue_message(i):
-    if i >= 0 and st.session_state.messages[i]["role"] == "assistant":
-        with st.spinner("正在继续生成回复..."):
-            existing_content = st.session_state.messages[i]["content"]
-            prompt = f"[请继续补全这句话，不要重复之前的内容，使用合适的标点符号和大小写：{existing_content}]"
-            with st.chat_message("assistant"):
-                message_placeholder = st.empty()
-                full_response = existing_content  # 初始化为现有内容
-
-                def update_message(current_response):
-                    message_placeholder.markdown(current_response + "▌")
-
-                new_content = getAnswer(prompt, update_message, continue_mode=True)
-                full_response += new_content
-                message_placeholder.markdown(full_response)
-                st.session_state.messages[i]["content"] = full_response  # 更新现有消息
+    prompt = st.session_state.messages[i-1]["content"] if i > 0 and st.session_state.messages[i-1]["role"] == "user" else None
+    if prompt:
+         with st.chat_message("assistant"):
+            message_placeholder = st.empty()
+            full_response = ""
+            def update_message(current_response):
+                message_placeholder.markdown(current_response + "▌")
+            full_response = getAnswer(prompt, update_message)
+            message_placeholder.markdown(full_response)
+            st.session_state.messages[i]["content"] = full_response
             with open(log_file, "wb") as f:
                 pickle.dump(st.session_state.messages, f)
             st.session_state.rerun_count += 1
             st.experimental_rerun()
+    else:
+        st.error("无法获取上一条用户消息以重新生成。")
+
+def continue_message(i):
+    if i >= 0 and st.session_state.messages[i]["role"] == "assistant":
+        existing_content = st.session_state.messages[i]["content"]
+        prompt = f"[请继续补全这句话，不要重复之前的内容，使用合适的标点符号和大小写：{existing_content}]"
+        with st.chat_message("assistant"):
+            message_placeholder = st.empty()
+            full_response = existing_content  # 初始化为现有内容
+
+            def update_message(current_response):
+                message_placeholder.markdown(current_response + "▌")
+
+            new_content = getAnswer(prompt, update_message, continue_mode=True)
+            full_response += new_content
+            message_placeholder.markdown(full_response)
+            st.session_state.messages[i]["content"] = full_response  # 更新现有消息
+        with open(log_file, "wb") as f:
+            pickle.dump(st.session_state.messages, f)
+        st.session_state.rerun_count += 1
+        st.experimental_rerun()
     else:
         st.error("无法继续生成：请选择一个助手消息。")
 
