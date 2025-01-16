@@ -739,62 +739,6 @@ just format【禁止使用该内容，仅作为解释，具体输出参考output
 )
 
 
-import os
-import google.generativeai as genai
-import streamlit as st
-import pickle
-import random
-import string
-from datetime import datetime
-from io import BytesIO
-import zipfile
-
-# --- API 密钥设置 ---
-API_KEYS = {
-    "主密钥": "AIzaSyCBjZbA78bPusYmUNvfsmHpt6rPx6Ur0QE",  # 替换成你的主 API 密钥
-    "备用1号": "AIzaSyAWfFf6zqy1DizINOwPfxPD8EF2ACdwCaQ",  # 替换成你的备用 API 密钥
-    "备用2号":"AIzaSyD4UdMp5wndOAKxtO1CWpzuZEGEf78YKUQ",
-    "备用3号":"AIzaSyBVbA7tEyyy_ASp7l9P60qSh1xOM2CSMNw",
-    "备用4号":"AIzaSyDezEpxvtY1AKN6JACMU9XHte5sxATNcUs",
-    "备用5号":"AIzaSyBgyyy2kTTAdsLB53OCR2omEbj7zlx1mjw",
-    "备用6号":"AIzaSyDPFZ7gRba9mhKTqbXA_Y7fhAxS8IEu0bY",
-    "备用7号":"AIzaSyDdyhqcowl0ftcbK9pMObXzM7cIOQMtlmA",
-    "备用8号":"AIzaSyAA7Qs9Lzy4UxxIqCIQ4RknchiWQt_1hgI",
-    "备用9号":"AIzaSyCj_CCwQua1mfq3EjzqV6Up6NHsxtb9dy8",
-    "备用10号":"AIzaSyDOI2e-I1RdXBnk99jY2H00A3aymXREETA"
-    # 可以继续添加更多 API key
-}
-
-# --- 配置 API 密钥 ---
-if "selected_api_key" not in st.session_state:
-    st.session_state.selected_api_key = list(API_KEYS.keys())[0]  # Default to the first key
-genai.configure(api_key=API_KEYS[st.session_state.selected_api_key])
-
-# --- 模型设置 ---
-generation_config = {
-    "temperature": 1,
-    "top_p": 0.95,
-    "top_k": 40,
-    "max_output_tokens": 8192,
-    "response_mime_type": "text/plain",
-}
-
-safety_settings = [
-    {"category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_NONE"},
-    {"category": "HARM_CATEGORY_HATE_SPEECH", "threshold": "BLOCK_NONE"},
-    {"category": "HARM_CATEGORY_SEXUALLY_EXPLICIT", "threshold": "BLOCK_NONE"},
-    {"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_NONE"},
-]
-
-model = genai.GenerativeModel(
-    model_name="gemini-2.0-flash-exp",
-    generation_config=generation_config,
-    safety_settings=safety_settings,
-    system_instruction="""
-【省略】
-""",
-)
-
 # --- 默认角色设定 ---
 DEFAULT_CHARACTER_SETTINGS = {
     "设定1": "这是一个示例设定 1。",
@@ -874,7 +818,7 @@ def clear_history(log_file):
         os.remove(log_file)
     st.success("历史记录已清除！")
 
-def getAnswer(prompt, update_message, continue_mode=False): # Add update_message argument
+def getAnswer(prompt, update_message, continue_mode=False):
     system_message = ""
     if st.session_state.get("test_text"):
         system_message += st.session_state.test_text + "\n"
@@ -888,16 +832,16 @@ def getAnswer(prompt, update_message, continue_mode=False): # Add update_message
             st.session_state.chat_session.send_message(system_message)
 
     if continue_mode:
-        #  continue_mode 下的 prompt 已经在 continue_message 函数中构建
+        # prompt 已经在 continue_message 中构建
         pass
+
 
     response = st.session_state.chat_session.send_message(prompt, stream=True)
     full_response = ""
     for chunk in response:
         full_response += chunk.text
-        update_message(full_response) # call update message inside of getAnswer
+        update_message(full_response)
     return full_response
-
 
 def download_all_logs():
     zip_buffer = BytesIO()
@@ -907,12 +851,13 @@ def download_all_logs():
                 zip_file.write(file)
     return zip_buffer.getvalue()
 
+
 def regenerate_message(index):
     if index < 1 or index > len(st.session_state.messages):
         st.warning("Invalid message index for regeneration.")
         return
 
-    message_to_regenerate = st.session_state.messages[index -1]
+    message_to_regenerate = st.session_state.messages[index - 1]
     if message_to_regenerate["role"] == "user":
         st.warning("Cannot regenerate a user message.")
         return
@@ -922,12 +867,19 @@ def regenerate_message(index):
         full_response = ""
 
         def update_message(current_response):
-            message_placeholder.markdown(current_response + "▌")
-        
-        full_response = getAnswer(st.session_state.messages[index - 2]["content"], update_message)
+             message_placeholder.markdown(current_response + "▌")
+
+        # 获取上一个 user message 作为 prompt
+        if index > 1:
+            prompt = st.session_state.messages[index - 2]["content"]
+            full_response = getAnswer(prompt, update_message)
+
+        else :
+            full_response = getAnswer("重新生成上一条消息", update_message)
+
         message_placeholder.markdown(full_response)
 
-    st.session_state.messages[index-1]["content"] = full_response
+    st.session_state.messages[index - 1]["content"] = full_response
     with open(log_file, "wb") as f:
         pickle.dump(st.session_state.messages, f)
     st.session_state.rerun_count += 1
@@ -939,27 +891,29 @@ def continue_message(index):
     if index < 0 or index >= len(st.session_state.messages):
         st.warning("Invalid message index for continuation.")
         return
-    
+
     message_to_continue = st.session_state.messages[index]
     if message_to_continue["role"] == "user":
         st.warning("Cannot continue with a user message.")
         return
-    
+
     with st.chat_message("assistant"):
         message_placeholder = st.empty()
         full_response = ""
+
         def update_message(current_response):
-              message_placeholder.markdown(current_response + "▌")
-        full_response = getAnswer(message_to_continue["content"],update_message, continue_mode=True)
+            message_placeholder.markdown(current_response + "▌")
+
+        full_response = getAnswer(message_to_continue["content"], update_message, continue_mode=True)
         message_placeholder.markdown(full_response)
+
 
     st.session_state.messages[index]["content"] += full_response
     with open(log_file, "wb") as f:
-          pickle.dump(st.session_state.messages, f)
+        pickle.dump(st.session_state.messages, f)
     st.session_state.rerun_count += 1
     st.experimental_rerun()
     st.success("已继续生成消息！")
-
 
 # --- Streamlit 布局 ---
 st.set_page_config(
@@ -1076,7 +1030,7 @@ for i, message in enumerate(st.session_state.messages):
                      st.session_state.editable_index = i
                      st.session_state.editing = True
                with cols[1]:
-                    if st.button("♻️", key=f"regenerate_{i}", on_click=lambda i=i: regenerate_message(i+1)): # 传递下一个索引
+                    if st.button("♻️", key=f"regenerate_{i}", on_click=lambda i=i: regenerate_message(i+1)):
                        pass
                with cols[2]:
                   if st.button("➕", key=f"continue_{i}", on_click=lambda i=i: continue_message(i)):
@@ -1091,7 +1045,6 @@ for i, message in enumerate(st.session_state.messages):
                          st.session_state.reset_history = False
                          st.session_state.rerun_count += 1
                          st.experimental_rerun()
-
 
 if prompt := st.chat_input("输入你的消息:"):
     token = generate_token()
