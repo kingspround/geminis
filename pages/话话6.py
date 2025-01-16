@@ -822,13 +822,14 @@ def regenerate_message(i):
     if prompt:
         with st.chat_message("assistant"):
             message_placeholder = st.empty()
-            with st.spinner(f"正在重新生成消息 {i}..."): # 可选：显示更明确的加载信息
-                full_response = ""
-                def update_message(current_response):
-                    message_placeholder.markdown(current_response + "▌")
-                full_response = getAnswer(prompt, update_message)
+            with message_placeholder.container():
+              st.markdown("正在重新生成... 🔄")
+              full_response = ""
+              def update_message(current_response):
+                 message_placeholder.markdown(current_response + "▌")
+              full_response = getAnswer(prompt, update_message)
             st.session_state.messages[i]["content"] = full_response
-            message_placeholder.markdown(full_response)
+            message_placeholder.markdown(full_response)  # Update with final response
         with open(log_file, "wb") as f:
             pickle.dump(st.session_state.messages, f)
         st.session_state.rerun_count += 1
@@ -836,26 +837,30 @@ def regenerate_message(i):
     else:
         st.error("无法获取上一条用户消息以重新生成。")
 
+
 def continue_message(i):
     if i >= 0 and st.session_state.messages[i]["role"] == "assistant":
         existing_content = st.session_state.messages[i]["content"]
         prompt = f"[请继续补全这句话，不要重复之前的内容，使用合适的标点符号和大小写：{existing_content}]"
         with st.chat_message("assistant"):
             message_placeholder = st.empty()
-            with st.spinner(f"正在继续生成消息 {i}..."): # 可选：显示更明确的加载信息
-                full_response = existing_content
-                def update_message(current_response):
-                    message_placeholder.markdown(current_response + "▌")
-                new_content = getAnswer(prompt, update_message, continue_mode=True)
-                full_response += new_content
-            st.session_state.messages[i]["content"] = full_response
-            message_placeholder.markdown(full_response)
+            with message_placeholder.container():
+              st.markdown(f"{existing_content} 正在继续生成... ➕")  # Initial content and indicator
+              full_response = existing_content
+              def update_message(current_response):
+                message_placeholder.markdown(current_response + "▌")
+              new_content = getAnswer(prompt, update_message, continue_mode=True)
+              full_response += new_content
+            st.session_state.messages[i]["content"] = full_response # Update state
+            message_placeholder.markdown(full_response)   # Update with final content
         with open(log_file, "wb") as f:
             pickle.dump(st.session_state.messages, f)
         st.session_state.rerun_count += 1
         st.experimental_rerun()
     else:
         st.error("无法继续生成：请选择一个助手消息。")
+
+
 
 def getAnswer(prompt, update_message, continue_mode=False): # Add update_message argument
     system_message = ""
@@ -889,6 +894,25 @@ def download_all_logs():
                  zip_file.write(file)
     return zip_buffer.getvalue()
 
+# --- 新增功能函数 ---
+def regenerate_last_assistant_message():
+    """重新生成最后一条助手消息"""
+    for i in reversed(range(len(st.session_state.messages))):
+        if st.session_state.messages[i]["role"] == "assistant":
+            regenerate_message(i)
+            return
+    st.warning("没有找到可以重新生成的助手消息。")
+
+def delete_last_message():
+    """删除最后一条消息"""
+    if st.session_state.messages:
+        st.session_state.messages.pop()
+        with open(log_file, "wb") as f:
+            pickle.dump(st.session_state.messages, f)
+        st.experimental_rerun()
+    else:
+        st.warning("聊天记录为空，无法删除。")
+
 # --- Streamlit 布局 ---
 st.set_page_config(
     page_title="Gemini Chatbot",
@@ -911,12 +935,21 @@ with st.sidebar:
 
     # 功能区 1: 文件操作
     with st.expander("文件操作"):
-        if len(st.session_state.messages) > 0:
-           st.button("重置上一个输出 ⏪", on_click=lambda: st.session_state.messages.pop(-1) if len(st.session_state.messages) > 1 and not st.session_state.reset_history else None, key='reset_last')
+        # 针对最后两条记录的操作按钮
+        if len(st.session_state.messages) >= 2:
+            col1, col2 = st.columns(2)
+            with col1:
+                if st.button("♻️ 上一条回复", on_click=regenerate_last_assistant_message):
+                    pass
+            with col2:
+                if st.button("🗑️ 最后一条", on_click=delete_last_message):
+                    pass
+
+        st.button("重置上一个输出 ⏪", on_click=lambda: st.session_state.messages.pop(-1) if len(st.session_state.messages) > 1 and not st.session_state.reset_history else None, key='reset_last')
 
         st.button("读取历史记录 📖", on_click=lambda: load_history(log_file))
 
-        if st.button("清除历史记录 🗑️"):
+        if st.button("清除历史记录 🗑️ 全部"):
             st.session_state.clear_confirmation = True
 
         # 确认/取消清除历史记录按钮区域
@@ -931,7 +964,7 @@ with st.sidebar:
                     st.session_state.clear_confirmation = False
 
         with open(log_file, "rb") as f:
-            download_data = f.read() if os.path.exists(log_file) else b"" # add a check
+            download_data = f.read() if os.path.exists(log_file) else b""
         st.download_button(
         label="下载当前聊天记录 ⬇️",
         data=download_data,
@@ -947,7 +980,7 @@ with st.sidebar:
                 st.session_state.upload_count = st.session_state.get("upload_count", 0) + 1
                 with open(log_file, "wb") as f:
                     pickle.dump(st.session_state.messages, f)
-                st.session_state.file_loaded = True # after load file, set file_loaded to True
+                st.session_state.file_loaded = True
                 st.session_state.rerun_count +=1
                 st.experimental_rerun()
             except Exception as e:
@@ -1002,7 +1035,7 @@ for i, message in enumerate(st.session_state.messages):
                            st.session_state.editable_index = i
                            st.session_state.editing = True
                     with cols[1]:
-                      if st.button("♻️", key=f"regenerate_{i}", on_click=lambda i=i: regenerate_message(i)): # 传递当前索引
+                      if st.button("♻️", key=f"regenerate_{i}", on_click=lambda i=i: regenerate_message(i)):
                          pass
                     with cols[2]:
                        if st.button("➕", key=f"continue_{i}", on_click=lambda i=i: continue_message(i)):
