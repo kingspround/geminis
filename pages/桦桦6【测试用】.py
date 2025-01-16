@@ -163,8 +163,6 @@ if 'regenerate_index' not in st.session_state:
     st.session_state.regenerate_index = None
 if 'continue_index' not in st.session_state:
     st.session_state.continue_index = None
-if "use_token" not in st.session_state:
-    st.session_state.use_token = True  # 默认启用token
 if "reset_history" not in st.session_state:
     st.session_state.reset_history = False
 if "chat_session" not in st.session_state:
@@ -173,27 +171,6 @@ if "rerun_count" not in st.session_state:
     st.session_state.rerun_count = 0
 
 # --- 功能函数 ---
-def generate_token():
-    """生成带括号的随机 token (汉字+数字，数字个数随机)"""
-    import random
-    import string
-    random.seed()
-    token_length = random.randint(10, 15)
-    characters = "一乙二十丁厂七卜人入八九几儿了力乃刀又三于干亏士工土才寸下大丈与万上小口巾山千靡癣羹鬓攘蠕巍鳞糯譬霹躏髓蘸镶瓤矗"
-    hanzi_token = "".join(random.choice(characters) for _ in range(token_length - 1))
-
-    probability = random.random()
-    if probability < 0.4:
-        digit_count = 1
-    elif probability < 0.7:
-        digit_count = 2
-    else:
-        digit_count = 3
-
-    digit_token = "、".join(random.choice(string.digits) for _ in range(digit_count))
-
-    return f"({hanzi_token})({digit_token})"
-
 def load_history(log_file):
     try:
         with open(log_file, "rb") as f:
@@ -427,37 +404,10 @@ if st.session_state.regenerate_index is not None:
             st.session_state.regenerate_index = None
     st.experimental_rerun() # 放在这里确保删除后重新渲染
 
-# 处理继续生成消息 (已移动到消息显示循环中)
-# if st.session_state.continue_index is not None:
-#     index_to_continue = st.session_state.continue_index
-#     if 0 <= index_to_continue < len(st.session_state.messages) and st.session_state.messages[index_to_continue]['role'] == 'assistant':
-#         last_assistant_message = st.session_state.messages[index_to_continue]['content']
-#         continuation_prompt = f"请继续，之前说的是：【{last_assistant_message[-10:]}】" if len(last_assistant_message) >= 10 else f"请继续，之前说的是：【{last_assistant_message}】"
-#         with st.chat_message("assistant"):
-#             message_placeholder = st.empty()
-#             full_response = last_assistant_message  # 先显示之前的消息
-#             def update_message(current_response):
-#                 message_placeholder.markdown(current_response + "▌")
-#
-#             full_response_part = getAnswer(continuation_prompt, update_message, continue_mode=True)
-#             full_response += full_response_part
-#             message_placeholder.markdown(full_response)
-#
-#         st.session_state.messages[index_to_continue]['content'] = full_response
-#         with open(log_file, "wb") as f:
-#             pickle.dump(st.session_state.messages, f)
-#     st.session_state.continue_index = None
-#     st.experimental_rerun()
-
 if prompt := st.chat_input("输入你的消息:"):
-    token = generate_token()
-    if "use_token" in st.session_state and st.session_state.use_token:
-        full_prompt = f"{prompt} (token: {token})"
-    else:
-        full_prompt = prompt
-    st.session_state.messages.append({"role": "user", "content": full_prompt})
+    st.session_state.messages.append({"role": "user", "content": prompt})
     with st.chat_message("user"):
-        st.markdown(prompt if not st.session_state.use_token else f"{prompt} (token: {token})")
+        st.markdown(prompt)
 
     with st.chat_message("assistant"):
         message_placeholder = st.empty()
@@ -466,7 +416,7 @@ if prompt := st.chat_input("输入你的消息:"):
         def update_message(current_response):
             message_placeholder.markdown(current_response + "▌")
 
-        full_response = getAnswer(full_prompt, update_message)
+        full_response = getAnswer(prompt, update_message)
         message_placeholder.markdown(full_response)
 
     st.session_state.messages.append({"role": "assistant", "content": full_response})
@@ -475,10 +425,7 @@ if prompt := st.chat_input("输入你的消息:"):
 
 col1, col2 = st.columns(2)
 with col1:
-    if st.checkbox("Token", value=st.session_state.get("use_token", True), key="use_token_checkbox"):
-        st.session_state.use_token = True
-    else:
-        st.session_state.use_token = False
+    st.write("") # 占位
 with col2:
     if st.button("🔄", key="refresh_button"):
         st.session_state.rerun_count += 1
