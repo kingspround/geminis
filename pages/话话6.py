@@ -775,6 +775,9 @@ if "chat_session" not in st.session_state:
     st.session_state.chat_session = None
 if "rerun_count" not in st.session_state:
     st.session_state.rerun_count = 0
+if "scroll_flag" not in st.session_state:
+    st.session_state.scroll_flag = False
+
 
 # --- 功能函数 ---
 def generate_token():
@@ -855,11 +858,9 @@ def download_all_logs():
 
 def regenerate_message(index_to_regenerate):
     st.session_state.regenerate_index = index_to_regenerate
-    # No st.experimental_rerun() here!
 
 def continue_message(index_to_continue):
     st.session_state.continue_index = index_to_continue
-     # No st.experimental_rerun() here!
 
 # --- Streamlit 布局 ---
 st.set_page_config(
@@ -1002,6 +1003,7 @@ if st.session_state.regenerate_index is not None:
             prompt_to_regenerate = st.session_state.messages[user_message_index]['content']
             # 先删除要重新生成的消息
             del st.session_state.messages[index_to_regenerate]
+            st.session_state.rerun_count +=1 # trigger the autoscroll
             with st.chat_message("assistant"):
                 message_placeholder = st.empty()
                 full_response = ""
@@ -1015,6 +1017,7 @@ if st.session_state.regenerate_index is not None:
             with open(log_file, "wb") as f:
                 pickle.dump(st.session_state.messages, f)
     st.session_state.regenerate_index = None
+
 
 # 处理继续生成消息
 if st.session_state.continue_index is not None:
@@ -1037,6 +1040,8 @@ if st.session_state.continue_index is not None:
         with open(log_file, "wb") as f:
             pickle.dump(st.session_state.messages, f)
     st.session_state.continue_index = None
+
+
 
 if prompt := st.chat_input("输入你的消息:"):
     token = generate_token()
@@ -1072,3 +1077,13 @@ with col2:
     if st.button("🔄", key="refresh_button"):
         st.session_state.rerun_count += 1
         st.experimental_rerun()
+
+# Auto-scroll JavaScript
+st.components.v1.html(
+    f"""
+        <script>
+            window.parent.scrollTo(0,window.parent.document.body.scrollHeight)
+        </script>
+    """,
+    height=0
+)
