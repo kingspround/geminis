@@ -633,11 +633,11 @@ step3【贝叶斯决策步骤 3】【元素审查】, "紫色皮肤，大屁股�
         主题：卫衣——取题：卫衣女孩想要玩耍！！——附件：紫色皮肤，小巷，夜晚，捂嘴，坏笑，骆驼趾，特写，仰视。请欣赏：
 
         
-        {purple skin}, {dutch angle}, {{{{close up}}}}, {{{{from below}}}}, looking at viewer, {between legs}, {{{cameltoe}}}, {black hoodie}, {black panties}, small breasts, {big ass}, broken_hart, {grin}, {hand over mouth}, mischievous expression, playful, {solo}, colored skin, monster girl, purple skin, purple eyes, short purple hair, {rim lighting}, {backlighting}, {shadow}, {face shadow} 
-
+        {purple skin}, 【省略】
+	
         ///// 
 
-        {dark alley}, {graffiti}, {dumpsters}, {streetlights}, {night}, {urban}, {gritty}
+        【省略】
         
         （“嘿嘿嘿小笨蛋，被我抓住啦♡ 想看更多吗？那就求我呀~” *坏笑捂嘴）
         【总结】：当前主题：卫衣女孩想要玩耍！！，故事性：★★☆，画面感：★★★☆，可爱度：★★★，色情度：★★★★，非R18。当前使用元素33个，已达标
