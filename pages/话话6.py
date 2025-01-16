@@ -820,18 +820,19 @@ def clear_history(log_file):
 def regenerate_message(i):
     prompt = st.session_state.messages[i-1]["content"] if i > 0 and st.session_state.messages[i-1]["role"] == "user" else None
     if prompt:
-         with st.chat_message("assistant"):
+        with st.chat_message("assistant"):
             message_placeholder = st.empty()
+            message_placeholder.markdown("正在重新生成... 🔄")  # 显示加载信息
             full_response = ""
             def update_message(current_response):
                 message_placeholder.markdown(current_response + "▌")
             full_response = getAnswer(prompt, update_message)
-            message_placeholder.markdown(full_response)
             st.session_state.messages[i]["content"] = full_response
-            with open(log_file, "wb") as f:
-                pickle.dump(st.session_state.messages, f)
-            st.session_state.rerun_count += 1
-            st.experimental_rerun()
+            message_placeholder.markdown(full_response) # 更新为完整回复
+        with open(log_file, "wb") as f:
+            pickle.dump(st.session_state.messages, f)
+        st.session_state.rerun_count += 1
+        st.experimental_rerun()
     else:
         st.error("无法获取上一条用户消息以重新生成。")
 
@@ -841,15 +842,17 @@ def continue_message(i):
         prompt = f"[请继续补全这句话，不要重复之前的内容，使用合适的标点符号和大小写：{existing_content}]"
         with st.chat_message("assistant"):
             message_placeholder = st.empty()
-            full_response = existing_content  # 初始化为现有内容
+            placeholder_content = st.session_state.messages[i]["content"] # 获取当前消息内容
+            message_placeholder.markdown(placeholder_content + " 正在继续生成... ➕") # 显示加载信息，附加在当前内容后
+            full_response = placeholder_content # 初始化为现有内容
 
             def update_message(current_response):
                 message_placeholder.markdown(current_response + "▌")
 
             new_content = getAnswer(prompt, update_message, continue_mode=True)
             full_response += new_content
-            message_placeholder.markdown(full_response)
             st.session_state.messages[i]["content"] = full_response  # 更新现有消息
+            message_placeholder.markdown(full_response) # 更新为完整回复
         with open(log_file, "wb") as f:
             pickle.dump(st.session_state.messages, f)
         st.session_state.rerun_count += 1
@@ -1002,7 +1005,7 @@ for i, message in enumerate(st.session_state.messages):
                            st.session_state.editable_index = i
                            st.session_state.editing = True
                     with cols[1]:
-                      if st.button("♻️", key=f"regenerate_{i}", on_click=lambda i=i: regenerate_message(i+1)): # 传递下一个索引
+                      if st.button("♻️", key=f"regenerate_{i}", on_click=lambda i=i: regenerate_message(i)): # 传递当前索引
                          pass
                     with cols[2]:
                        if st.button("➕", key=f"continue_{i}", on_click=lambda i=i: continue_message(i)):
