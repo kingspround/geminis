@@ -739,13 +739,13 @@ just format【禁止使用该内容，仅作为解释，具体输出参考output
 )
 
 
---- 默认角色设定 ---
+# --- 默认角色设定 ---
 DEFAULT_CHARACTER_SETTINGS = {
 "设定1": "这是一个示例设定 1。",
 "设定2": "这是一个示例设定 2。",
 }
 
---- 文件操作函数 ---
+# --- 文件操作函数 ---
 # 获取当前文件路径
 file = os.path.abspath(__file__)
 filename = os.path.splitext(os.path.basename(file))[0] + ".pkl"
@@ -776,7 +776,7 @@ if "chat_session" not in st.session_state:
 if "rerun_count" not in st.session_state:
     st.session_state.rerun_count = 0
 
---- 功能函数 ---
+# --- 功能函数 ---
 def generate_token():
     """生成带括号的随机 token (汉字+数字，数字个数随机)"""
     import random
@@ -861,7 +861,7 @@ def continue_message(index_to_continue):
     st.session_state.continue_index = index_to_continue
     st.experimental_rerun()
 
---- Streamlit 布局 ---
+# --- Streamlit 布局 ---
 st.set_page_config(
     page_title="Gemini Chatbot",
     layout="wide"
