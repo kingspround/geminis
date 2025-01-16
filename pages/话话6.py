@@ -822,13 +822,13 @@ def regenerate_message(i):
     if prompt:
         with st.chat_message("assistant"):
             message_placeholder = st.empty()
-            message_placeholder.markdown("正在重新生成... 🔄")  # 显示加载信息
-            full_response = ""
-            def update_message(current_response):
-                message_placeholder.markdown(current_response + "▌")
-            full_response = getAnswer(prompt, update_message)
+            with st.spinner(f"正在重新生成消息 {i}..."): # 可选：显示更明确的加载信息
+                full_response = ""
+                def update_message(current_response):
+                    message_placeholder.markdown(current_response + "▌")
+                full_response = getAnswer(prompt, update_message)
             st.session_state.messages[i]["content"] = full_response
-            message_placeholder.markdown(full_response) # 更新为完整回复
+            message_placeholder.markdown(full_response)
         with open(log_file, "wb") as f:
             pickle.dump(st.session_state.messages, f)
         st.session_state.rerun_count += 1
@@ -842,17 +842,14 @@ def continue_message(i):
         prompt = f"[请继续补全这句话，不要重复之前的内容，使用合适的标点符号和大小写：{existing_content}]"
         with st.chat_message("assistant"):
             message_placeholder = st.empty()
-            placeholder_content = st.session_state.messages[i]["content"] # 获取当前消息内容
-            message_placeholder.markdown(placeholder_content + " 正在继续生成... ➕") # 显示加载信息，附加在当前内容后
-            full_response = placeholder_content # 初始化为现有内容
-
-            def update_message(current_response):
-                message_placeholder.markdown(current_response + "▌")
-
-            new_content = getAnswer(prompt, update_message, continue_mode=True)
-            full_response += new_content
-            st.session_state.messages[i]["content"] = full_response  # 更新现有消息
-            message_placeholder.markdown(full_response) # 更新为完整回复
+            with st.spinner(f"正在继续生成消息 {i}..."): # 可选：显示更明确的加载信息
+                full_response = existing_content
+                def update_message(current_response):
+                    message_placeholder.markdown(current_response + "▌")
+                new_content = getAnswer(prompt, update_message, continue_mode=True)
+                full_response += new_content
+            st.session_state.messages[i]["content"] = full_response
+            message_placeholder.markdown(full_response)
         with open(log_file, "wb") as f:
             pickle.dump(st.session_state.messages, f)
         st.session_state.rerun_count += 1
