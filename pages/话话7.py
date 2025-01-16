@@ -1603,7 +1603,7 @@ with st.sidebar:
                       on_click=lambda: st.session_state.messages.pop(-1) if len(st.session_state.messages) > 1 and not st.session_state.reset_history else None,
                       key='reset_last')
 
-        st.button("读取历史记录 📖", on_click=lambda: load_history(log_file))
+        st.button("读取历史记录 📖", on_click=lambda: st.session_state.rerun_count+=1)
 
         if st.button("清除历史记录 🗑️"):
             st.session_state.clear_confirmation = True
@@ -1665,6 +1665,9 @@ with st.sidebar:
 
         st.session_state.test_text = st.text_area("System Message (Optional):",
                                                   st.session_state.get("test_text", ""), key="system_message")
+
+# 加载历史记录 (每次页面加载)
+load_history(log_file)
 
 # 显示历史记录和编辑按钮
 for i, message in enumerate(st.session_state.messages):
@@ -1756,6 +1759,7 @@ if st.session_state.regenerate_index is not None:
                 pickle.dump(st.session_state.messages, f)
             st.session_state.regenerate_index = None
     st.experimental_rerun()  # 放在这里确保删除后重新渲染
+
 
 if prompt := st.chat_input("输入你的消息:"):
     st.session_state.messages.append({"role": "user", "content": prompt})
