@@ -756,7 +756,7 @@ if not os.path.exists(log_file):
     with open(log_file, "wb") as f:
         pass  # 创建空文件
 
---- 初始化 Session State ---
+# --- 初始化 Session State ---
 if "messages" not in st.session_state:
     st.session_state.messages = []
 if 'character_settings' not in st.session_state:
