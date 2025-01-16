@@ -169,14 +169,18 @@ if "chat_session" not in st.session_state:
     st.session_state.chat_session = None
 if "rerun_count" not in st.session_state:
     st.session_state.rerun_count = 0
+if "first_load" not in st.session_state:
+    st.session_state.first_load = True
 
 # --- 功能函数 ---
+
 def load_history(log_file):
+    # 加载历史记录函数
     try:
         with open(log_file, "rb") as f:
             st.session_state.messages = pickle.load(f)
         st.success(f"成功读取历史记录！({os.path.basename(log_file)})")
-        st.session_state.chat_session = None # Load history will reset the chat session
+        st.session_state.chat_session = None  # 加载历史记录会重置聊天会话
         st.session_state.rerun_count += 1
     except FileNotFoundError:
         st.warning(f"没有找到历史记录文件。({os.path.basename(log_file)})")
@@ -186,13 +190,15 @@ def load_history(log_file):
         st.error(f"读取历史记录失败：{e}")
 
 def clear_history(log_file):
+    # 清除历史记录函数
     st.session_state.messages.clear()
     st.session_state.chat_session = None
     if os.path.exists(log_file):
         os.remove(log_file)
     st.success("历史记录已清除！")
 
-def getAnswer(prompt, update_message, continue_mode=False): # Add update_message argument
+def getAnswer(prompt, update_message, continue_mode=False):
+    # 获取回答函数
     system_message = ""
     if st.session_state.get("test_text"):
         system_message += st.session_state.test_text + "\n"
@@ -215,10 +221,11 @@ def getAnswer(prompt, update_message, continue_mode=False): # Add update_message
     full_response = ""
     for chunk in response:
         full_response += chunk.text
-        update_message(full_response) # call update message inside of getAnswer
+        update_message(full_response)  # 在 getAnswer 函数内部调用 update_message 函数
     return full_response
 
 def download_all_logs():
+    # 下载所有日志函数
     zip_buffer = BytesIO()
     with zipfile.ZipFile(zip_buffer, "a", zipfile.ZIP_DEFLATED, False) as zip_file:
         for file in os.listdir("."):
@@ -227,9 +234,11 @@ def download_all_logs():
     return zip_buffer.getvalue()
 
 def regenerate_message(index_to_regenerate):
+    # 重新生成消息函数
     st.session_state.regenerate_index = index_to_regenerate
 
 def continue_message(index_to_continue):
+    # 继续消息函数
     st.session_state.continue_index = index_to_continue
 
 # --- Streamlit 布局 ---
@@ -249,15 +258,22 @@ with st.sidebar:
     )
     genai.configure(api_key=API_KEYS[st.session_state.selected_api_key])
 
-# 在左侧边栏创建 token 复选框
+# 在左侧边栏
 with st.sidebar:
-
     # 功能区 1: 文件操作
     with st.expander("文件操作"):
         if len(st.session_state.messages) > 0:
-           st.button("重置上一个输出 ⏪", on_click=lambda: st.session_state.messages.pop(-1) if len(st.session_state.messages) > 1 and not st.session_state.reset_history else None, key='reset_last')
+            st.button("重置上一个输出 ⏪",
+                      on_click=lambda: st.session_state.messages.pop(-1) if len(st.session_state.messages) > 1 and not st.session_state.reset_history else None,
+                      key='reset_last')
 
-        st.button("读取历史记录 📖", on_click=lambda: load_history(log_file))
+        # 仅在第一次加载页面时显示读取历史记录按钮
+        if st.session_state.first_load:
+            if st.button("读取历史记录 📖"):
+                load_history(log_file)
+                st.session_state.first_load = False
+        else:
+            st.button("读取历史记录 📖", key="load_history_after_first")
 
         if st.button("清除历史记录 🗑️"):
             st.session_state.clear_confirmation = True
@@ -274,7 +290,7 @@ with st.sidebar:
                     st.session_state.clear_confirmation = False
 
         with open(log_file, "rb") as f:
-            download_data = f.read() if os.path.exists(log_file) else b"" # add a check
+            download_data = f.read() if os.path.exists(log_file) else b""  # 添加检查
         st.download_button(
             label="下载当前聊天记录 ⬇️",
             data=download_data,
@@ -290,7 +306,7 @@ with st.sidebar:
                 st.session_state.upload_count = st.session_state.get("upload_count", 0) + 1
                 with open(log_file, "wb") as f:
                     pickle.dump(st.session_state.messages, f)
-                st.session_state.file_loaded = True # after load file, set file_loaded to True
+                st.session_state.file_loaded = True  # 加载文件后，将 file_loaded 设置为 True
                 st.session_state.rerun_count += 1
                 st.experimental_rerun()
             except Exception as e:
@@ -312,9 +328,18 @@ with st.sidebar:
         for setting_name in DEFAULT_CHARACTER_SETTINGS:
             if setting_name not in st.session_state.character_settings:
                 st.session_state.character_settings[setting_name] = DEFAULT_CHARACTER_SETTINGS[setting_name]
-            st.session_state.enabled_settings[setting_name] = st.checkbox(setting_name, st.session_state.enabled_settings.get(setting_name, False), key=f"checkbox_{setting_name}")
+            st.session_state.enabled_settings[setting_name] = st.checkbox(setting_name,
+                                                                         st.session_state.enabled_settings.get(
+                                                                             setting_name, False),
+                                                                         key=f"checkbox_{setting_name}")
 
-        st.session_state.test_text = st.text_area("System Message (Optional):", st.session_state.get("test_text", ""), key="system_message")
+        st.session_state.test_text = st.text_area("System Message (Optional):",
+                                                  st.session_state.get("test_text", ""), key="system_message")
+
+# 只在第一次加载页面时加载历史记录
+if st.session_state.first_load:
+    load_history(log_file)
+    st.session_state.first_load = False
 
 # 显示历史记录和编辑按钮
 for i, message in enumerate(st.session_state.messages):
@@ -323,7 +348,7 @@ for i, message in enumerate(st.session_state.messages):
             new_content = st.text_area(
                 f"{message['role']}:", message["content"], key=f"message_edit_{i}"
             )
-            cols = st.columns(20) #创建20列
+            cols = st.columns(20)  # 创建20列
             with cols[0]:
                 if st.button("✅", key=f"save_{i}"):
                     st.session_state.messages[i]["content"] = new_content
@@ -339,9 +364,10 @@ for i, message in enumerate(st.session_state.messages):
         else:
             message_content = message["content"]
             if st.session_state.continue_index == i and message["role"] == "assistant":
-                continuation_prompt = f"请继续，之前说的是：【{message_content[-10:]}】" if len(message_content) >= 10 else f"请继续，之前说的是：【{message_content}】"
+                continuation_prompt = f"请继续，之前说的是：【{message_content[-10:]}】" if len(
+                    message_content) >= 10 else f"请继续，之前说的是：【{message_content}】"
                 message_placeholder = st.empty()
-                full_response = message_content  # Start with the existing content
+                full_response = message_content  # 从现有内容开始
 
                 def update_message(current_response):
                     message_placeholder.markdown(current_response + "▌")
@@ -358,28 +384,28 @@ for i, message in enumerate(st.session_state.messages):
 
         if i >= len(st.session_state.messages) - 2 and message["role"] == "assistant":
             with st.container():
-                cols = st.columns(20) #创建20列
+                cols = st.columns(20)  # 创建20列
                 with cols[0]:
                     if st.button("✏️", key=f"edit_{i}"):
                         st.session_state.editable_index = i
                         st.session_state.editing = True
                 with cols[1]:
-                    if st.button("♻️", key=f"regenerate_{i}", on_click=lambda i=i: regenerate_message(i)): # 传递当前索引
+                    if st.button("♻️", key=f"regenerate_{i}", on_click=lambda i=i: regenerate_message(i)):  # 传递当前索引
                         pass
                 with cols[2]:
-                    if st.button("➕", key=f"continue_{i}", on_click=lambda i=i: continue_message(i)): # 传递当前索引
+                    if st.button("➕", key=f"continue_{i}", on_click=lambda i=i: continue_message(i)):  # 传递当前索引
                         pass
                 with cols[3]:
                     if st.session_state.messages and st.button("⏪", key=f"reset_last_{i}"):
                         st.session_state.reset_history = True
                         st.session_state.messages.pop(-1) if len(st.session_state.messages) > 1 else None
 
-                if st.session_state.reset_history and i >= len(st.session_state.messages) -2 :
+                if st.session_state.reset_history and i >= len(st.session_state.messages) - 2:
                     with cols[4]:
                         if st.button("↩️", key=f"undo_reset_{i}"):
-                             st.session_state.reset_history = False
-                             st.session_state.rerun_count += 1
-                             st.experimental_rerun()
+                            st.session_state.reset_history = False
+                            st.session_state.rerun_count += 1
+                            st.experimental_rerun()
 
 # 处理重新生成消息
 if st.session_state.regenerate_index is not None:
@@ -394,17 +420,20 @@ if st.session_state.regenerate_index is not None:
             with st.chat_message("assistant"):
                 message_placeholder = st.empty()
                 full_response = ""
+
                 def update_message(current_response):
                     message_placeholder.markdown(current_response + "▌")
+
                 full_response = getAnswer(prompt_to_regenerate, update_message)
                 message_placeholder.markdown(full_response)
             st.session_state.messages.insert(index_to_regenerate, {"role": "assistant", "content": full_response})
             with open(log_file, "wb") as f:
                 pickle.dump(st.session_state.messages, f)
             st.session_state.regenerate_index = None
-    st.experimental_rerun() # 放在这里确保删除后重新渲染
+    st.experimental_rerun()  # 放在这里确保删除后重新渲染
 
 if prompt := st.chat_input("输入你的消息:"):
+    # 去除了token添加
     st.session_state.messages.append({"role": "user", "content": prompt})
     with st.chat_message("user"):
         st.markdown(prompt)
@@ -425,7 +454,7 @@ if prompt := st.chat_input("输入你的消息:"):
 
 col1, col2 = st.columns(2)
 with col1:
-    st.write("") # 占位
+  st.write("")
 with col2:
     if st.button("🔄", key="refresh_button"):
         st.session_state.rerun_count += 1
