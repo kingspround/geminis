@@ -817,19 +817,19 @@ def clear_history(log_file):
         os.remove(log_file)
     st.success("历史记录已清除！")
 
+
 def regenerate_message(i):
     prompt = st.session_state.messages[i-1]["content"] if i > 0 and st.session_state.messages[i-1]["role"] == "user" else None
     if prompt:
         with st.chat_message("assistant"):
+            st.write("正在重新生成... 🔄")
             message_placeholder = st.empty()
-            with message_placeholder.container():
-              st.markdown("正在重新生成... 🔄")
-              full_response = ""
-              def update_message(current_response):
-                 message_placeholder.markdown(current_response + "▌")
-              full_response = getAnswer(prompt, update_message)
+            full_response = ""
+            def update_message(current_response):
+               message_placeholder.markdown(current_response + "▌")
+            full_response = getAnswer(prompt, update_message)
             st.session_state.messages[i]["content"] = full_response
-            message_placeholder.markdown(full_response)  # Update with final response
+            st.write(full_response)
         with open(log_file, "wb") as f:
             pickle.dump(st.session_state.messages, f)
         st.session_state.rerun_count += 1
@@ -843,16 +843,15 @@ def continue_message(i):
         existing_content = st.session_state.messages[i]["content"]
         prompt = f"[请继续补全这句话，不要重复之前的内容，使用合适的标点符号和大小写：{existing_content}]"
         with st.chat_message("assistant"):
+            st.write(f"{existing_content} 正在继续生成... ➕")
             message_placeholder = st.empty()
-            with message_placeholder.container():
-              st.markdown(f"{existing_content} 正在继续生成... ➕")  # Initial content and indicator
-              full_response = existing_content
-              def update_message(current_response):
+            full_response = existing_content
+            def update_message(current_response):
                 message_placeholder.markdown(current_response + "▌")
-              new_content = getAnswer(prompt, update_message, continue_mode=True)
-              full_response += new_content
-            st.session_state.messages[i]["content"] = full_response # Update state
-            message_placeholder.markdown(full_response)   # Update with final content
+            new_content = getAnswer(prompt, update_message, continue_mode=True)
+            full_response += new_content
+            st.session_state.messages[i]["content"] = full_response
+            st.write(full_response)
         with open(log_file, "wb") as f:
             pickle.dump(st.session_state.messages, f)
         st.session_state.rerun_count += 1
@@ -886,6 +885,7 @@ def getAnswer(prompt, update_message, continue_mode=False): # Add update_message
         update_message(full_response) # call update message inside of getAnswer
     return full_response
 
+
 def download_all_logs():
     zip_buffer = BytesIO()
     with zipfile.ZipFile(zip_buffer, "a", zipfile.ZIP_DEFLATED, False) as zip_file:
@@ -902,6 +902,7 @@ def regenerate_last_assistant_message():
             regenerate_message(i)
             return
     st.warning("没有找到可以重新生成的助手消息。")
+
 
 def delete_last_message():
     """删除最后一条消息"""
@@ -1064,14 +1065,13 @@ if prompt := st.chat_input("输入你的消息:"):
         st.markdown(prompt if not st.session_state.use_token else f"{prompt} (token: {token})")
 
     with st.chat_message("assistant"):
+        st.write("正在生成... 💭")
         message_placeholder = st.empty()
         full_response = ""
-
         def update_message(current_response):
             message_placeholder.markdown(current_response + "▌")
-
         full_response = getAnswer(full_prompt, update_message)
-        message_placeholder.markdown(full_response)
+        st.write(full_response)
 
     st.session_state.messages.append({"role": "assistant", "content": full_response})
     with open(log_file, "wb") as f:
