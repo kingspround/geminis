@@ -854,10 +854,7 @@ def download_all_logs():
     return zip_buffer.getvalue()
 
 def regenerate_message(index_to_regenerate):
-    # First, delete the message
-    if 0 <= index_to_regenerate < len(st.session_state.messages):
-        del st.session_state.messages[index_to_regenerate]
-        st.session_state.regenerate_index = index_to_regenerate
+    st.session_state.regenerate_index = index_to_regenerate
 
 def continue_message(index_to_continue):
     st.session_state.continue_index = index_to_continue
@@ -967,7 +964,25 @@ for i, message in enumerate(st.session_state.messages):
                 if st.button("❌", key=f"cancel_{i}"):
                     st.session_state.editing = False
         else:
-            st.write(message["content"], key=f"message_{i}")
+            message_content = message["content"]
+            if st.session_state.continue_index == i and message["role"] == "assistant":
+                continuation_prompt = f"请继续，之前说的是：【{message_content[-10:]}】" if len(message_content) >= 10 else f"请继续，之前说的是：【{message_content}】"
+                message_placeholder = st.empty()
+                full_response = message_content  # Start with the existing content
+
+                def update_message(current_response):
+                    message_placeholder.markdown(current_response + "▌")
+
+                full_response_part = getAnswer(continuation_prompt, update_message, continue_mode=True)
+                full_response += full_response_part
+                message_placeholder.markdown(full_response)
+                st.session_state.messages[i]['content'] = full_response
+                with open(log_file, "wb") as f:
+                    pickle.dump(st.session_state.messages, f)
+                st.session_state.continue_index = None
+            else:
+                st.write(message_content, key=f"message_{i}")
+
         if i >= len(st.session_state.messages) - 2 and message["role"] == "assistant":
             with st.container():
                 cols = st.columns(20) #创建20列
@@ -996,45 +1011,47 @@ for i, message in enumerate(st.session_state.messages):
 # 处理重新生成消息
 if st.session_state.regenerate_index is not None:
     index_to_regenerate = st.session_state.regenerate_index
-    # Find the corresponding user message (it should still be there)
-    user_message_index = index_to_regenerate - 1
-    if user_message_index >= 0 and user_message_index < len(st.session_state.messages) and st.session_state.messages[user_message_index]['role'] == 'user':
-        prompt_to_regenerate = st.session_state.messages[user_message_index]['content']
+    if 0 <= index_to_regenerate < len(st.session_state.messages) and st.session_state.messages[index_to_regenerate]['role'] == 'assistant':
+        # 找到对应的用户消息
+        user_message_index = index_to_regenerate - 1
+        if user_message_index >= 0 and st.session_state.messages[user_message_index]['role'] == 'user':
+            prompt_to_regenerate = st.session_state.messages[user_message_index]['content']
+            # 先删除要重新生成的消息
+            del st.session_state.messages[index_to_regenerate]
+            with st.chat_message("assistant"):
+                message_placeholder = st.empty()
+                full_response = ""
+                def update_message(current_response):
+                    message_placeholder.markdown(current_response + "▌")
+                full_response = getAnswer(prompt_to_regenerate, update_message)
+                message_placeholder.markdown(full_response)
+            st.session_state.messages.insert(index_to_regenerate, {"role": "assistant", "content": full_response})
+            with open(log_file, "wb") as f:
+                pickle.dump(st.session_state.messages, f)
+            st.session_state.regenerate_index = None
+    st.experimental_rerun() # 放在这里确保删除后重新渲染
 
-        with st.chat_message("assistant"):
-            message_placeholder = st.empty()
-            full_response = ""
-            def update_message(current_response):
-                message_placeholder.markdown(current_response + "▌")
-            full_response = getAnswer(prompt_to_regenerate, update_message)
-            message_placeholder.markdown(full_response)
-
-        # Insert the newly generated message at the original index
-        st.session_state.messages.insert(index_to_regenerate, {"role": "assistant", "content": full_response})
-        with open(log_file, "wb") as f:
-            pickle.dump(st.session_state.messages, f)
-    st.session_state.regenerate_index = None
-
-# 处理继续生成消息
-if st.session_state.continue_index is not None:
-    index_to_continue = st.session_state.continue_index
-    if 0 <= index_to_continue < len(st.session_state.messages) and st.session_state.messages[index_to_continue]['role'] == 'assistant':
-        last_assistant_message = st.session_state.messages[index_to_continue]['content']
-        continuation_prompt = f"请继续，之前说的是：【{last_assistant_message[-10:]}】" if len(last_assistant_message) >= 10 else f"请继续，之前说的是：【{last_assistant_message}】"
-        with st.chat_message("assistant"):
-            message_placeholder = st.empty()
-            full_response = last_assistant_message  # 先显示之前的消息
-            def update_message(current_response):
-                message_placeholder.markdown(current_response + "▌")
-
-            full_response_part = getAnswer(continuation_prompt, update_message, continue_mode=True)
-            full_response += full_response_part
-            message_placeholder.markdown(full_response)
-
-        st.session_state.messages[index_to_continue]['content'] = full_response
-        with open(log_file, "wb") as f:
-            pickle.dump(st.session_state.messages, f)
-    st.session_state.continue_index = None
+# 处理继续生成消息 (已移动到消息显示循环中)
+# if st.session_state.continue_index is not None:
+#     index_to_continue = st.session_state.continue_index
+#     if 0 <= index_to_continue < len(st.session_state.messages) and st.session_state.messages[index_to_continue]['role'] == 'assistant':
+#         last_assistant_message = st.session_state.messages[index_to_continue]['content']
+#         continuation_prompt = f"请继续，之前说的是：【{last_assistant_message[-10:]}】" if len(last_assistant_message) >= 10 else f"请继续，之前说的是：【{last_assistant_message}】"
+#         with st.chat_message("assistant"):
+#             message_placeholder = st.empty()
+#             full_response = last_assistant_message  # 先显示之前的消息
+#             def update_message(current_response):
+#                 message_placeholder.markdown(current_response + "▌")
+#
+#             full_response_part = getAnswer(continuation_prompt, update_message, continue_mode=True)
+#             full_response += full_response_part
+#             message_placeholder.markdown(full_response)
+#
+#         st.session_state.messages[index_to_continue]['content'] = full_response
+#         with open(log_file, "wb") as f:
+#             pickle.dump(st.session_state.messages, f)
+#     st.session_state.continue_index = None
+#     st.experimental_rerun()
 
 if prompt := st.chat_input("输入你的消息:"):
     token = generate_token()
