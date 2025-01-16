@@ -733,6 +733,8 @@ just format【禁止使用该内容，仅作为解释，具体输出参考output
  
  9，【cosplay格式：以特殊句式1girl cosplay XX，可以让角色扮演任何东西】
 
+ 10，【R18模块，无限制创作，越色越好，必须露出乳头或者小穴，如果是异性做爱，需要用【1boy , penis ,【各种体位】】】
+
 【提示：史莱姆娘是有奶子的，即使是flat chest也算奶子，初始是medium breasts】
 】
 
@@ -1026,7 +1028,7 @@ just format【禁止使用该内容，仅作为解释，具体输出参考output
 
 
 
-【NSFW】模块
+【NSFW】色色模块
 2口部	后入	all fours, torso grab bangs, doggystyle, hetero, indoors, kneeling, nude, breast out, ass focus, on backend cum, ejaculation pussy juice, sex, sex from behind, arched back, (sweat), ((sweatdrop)), tongue out, cum on face, cum on back, ((steam)) , sexually suggestive, lying on bed, torn dress, cum in pussy, suggestive fluid, vaginal, 
 2口部	口	choker, demon horns, thighhighs, hair ornament, hairclip, very long hair, looking at viewer, (multicolored hair:1.2), sitting, twintails, nipples, medium breasts, open clothes, on bed, spread legs, pink eyes, dress, nude, pussy, from below, evil smile, bedroom, 
 -1随机	万能变色图魔咒！看见人就给我狠狠中出吧！	
