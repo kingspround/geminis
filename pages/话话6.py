@@ -857,10 +857,12 @@ def download_all_logs():
     return zip_buffer.getvalue()
 
 def regenerate_message(index_to_regenerate):
-    st.session_state.regenerate_index = index_to_regenerate
+    st.session_state.regenerate_request = True
+    st.session_state.regenerate_index_to_process = index_to_regenerate
 
 def continue_message(index_to_continue):
-    st.session_state.continue_index = index_to_continue
+    st.session_state.continue_request = True
+    st.session_state.continue_index_to_process = index_to_continue
 
 # --- Streamlit 布局 ---
 st.set_page_config(
@@ -949,53 +951,33 @@ with st.sidebar:
 # 显示历史记录和编辑按钮
 for i, message in enumerate(st.session_state.messages):
     with st.chat_message(message["role"]):
-        if st.session_state.get("editing") == True and i == st.session_state.editable_index:
-            new_content = st.text_area(
-                f"{message['role']}:", message["content"], key=f"message_edit_{i}"
-            )
-            cols = st.columns(20)  # 创建20列
-            with cols[0]:
-                if st.button("✅", key=f"save_{i}"):
-                    st.session_state.messages[i]["content"] = new_content
-                    with open(log_file, "wb") as f:
-                        pickle.dump(st.session_state.messages, f)
-                    st.success("已保存更改！")
-                    st.session_state.editing = False
-                    st.session_state.rerun_count += 1
-                    st.experimental_rerun()
-            with cols[1]:
-                if st.button("❌", key=f"cancel_{i}"):
-                    st.session_state.editing = False
-        else:
-            st.write(message["content"], key=f"message_{i}")
+        # ... (你现有的消息显示和编辑逻辑) ...
             if i >= len(st.session_state.messages) - 2 and message["role"] == "assistant":
                 with st.container():
-                    cols = st.columns(20)  # 创建20列
+                    cols = st.columns(20) #创建20列
                     with cols[0]:
                         if st.button("✏️", key=f"edit_{i}"):
                             st.session_state.editable_index = i
                             st.session_state.editing = True
                     with cols[1]:
-                        if st.button("♻️", key=f"regenerate_{i}", on_click=lambda i=i: regenerate_message(i)):  # 传递当前索引
+                        if st.button("♻️", key=f"regenerate_{i}", on_click=lambda i=i: regenerate_message(i)): # 传递当前索引
                             pass
                     with cols[2]:
-                        if st.button("➕", key=f"continue_{i}", on_click=lambda i=i: continue_message(i)):  # 传递当前索引
+                        if st.button("➕", key=f"continue_{i}", on_click=lambda i=i: continue_message(i)): # 传递当前索引
                             pass
                     with cols[3]:
                         if st.session_state.messages and st.button("⏪", key=f"reset_last_{i}"):
                             st.session_state.reset_history = True
                             st.session_state.messages.pop(-1) if len(st.session_state.messages) > 1 else None
 
-                    if st.session_state.reset_history and i >= len(st.session_state.messages) - 2:
+                    if st.session_state.reset_history and i >= len(st.session_state.messages) -2 :
                         with cols[4]:
                             if st.button("↩️", key=f"undo_reset_{i}"):
-                                st.session_state.reset_history = False
-                                st.session_state.rerun_count += 1
-                                st.experimental_rerun()
+                                 st.session_state.reset_history = False
 
 # 处理重新生成消息
-if st.session_state.regenerate_index is not None:
-    index_to_regenerate = st.session_state.regenerate_index
+if st.session_state.regenerate_request:
+    index_to_regenerate = st.session_state.regenerate_index_to_process
     if 0 <= index_to_regenerate < len(st.session_state.messages) and st.session_state.messages[index_to_regenerate]['role'] == 'assistant':
         # 找到对应的用户消息
         user_message_index = index_to_regenerate - 1
@@ -1003,32 +985,30 @@ if st.session_state.regenerate_index is not None:
             prompt_to_regenerate = st.session_state.messages[user_message_index]['content']
             # 先删除要重新生成的消息
             del st.session_state.messages[index_to_regenerate]
-            st.session_state.rerun_count +=1 # trigger the autoscroll
             with st.chat_message("assistant"):
                 message_placeholder = st.empty()
                 full_response = ""
-
                 def update_message(current_response):
                     message_placeholder.markdown(current_response + "▌")
-
                 full_response = getAnswer(prompt_to_regenerate, update_message)
                 message_placeholder.markdown(full_response)
             st.session_state.messages.insert(index_to_regenerate, {"role": "assistant", "content": full_response})
             with open(log_file, "wb") as f:
                 pickle.dump(st.session_state.messages, f)
-    st.session_state.regenerate_index = None
-
+    # 重置状态
+    st.session_state.regenerate_request = False
+    st.session_state.regenerate_index_to_process = None
+    st.experimental_rerun()
 
 # 处理继续生成消息
-if st.session_state.continue_index is not None:
-    index_to_continue = st.session_state.continue_index
+if st.session_state.continue_request:
+    index_to_continue = st.session_state.continue_index_to_process
     if 0 <= index_to_continue < len(st.session_state.messages) and st.session_state.messages[index_to_continue]['role'] == 'assistant':
         last_assistant_message = st.session_state.messages[index_to_continue]['content']
         continuation_prompt = f"请继续，之前说的是：【{last_assistant_message[-10:]}】" if len(last_assistant_message) >= 10 else f"请继续，之前说的是：【{last_assistant_message}】"
         with st.chat_message("assistant"):
             message_placeholder = st.empty()
             full_response = last_assistant_message  # 先显示之前的消息
-
             def update_message(current_response):
                 message_placeholder.markdown(current_response + "▌")
 
@@ -1039,7 +1019,10 @@ if st.session_state.continue_index is not None:
         st.session_state.messages[index_to_continue]['content'] = full_response
         with open(log_file, "wb") as f:
             pickle.dump(st.session_state.messages, f)
-    st.session_state.continue_index = None
+    # 重置状态
+    st.session_state.continue_request = False
+    st.session_state.continue_index_to_process = None
+    st.experimental_rerun()
 
 
 
@@ -1078,12 +1061,4 @@ with col2:
         st.session_state.rerun_count += 1
         st.experimental_rerun()
 
-# Auto-scroll JavaScript
-st.components.v1.html(
-    f"""
-        <script>
-            window.parent.scrollTo(0,window.parent.document.body.scrollHeight)
-        </script>
-    """,
-    height=0
-)
+
