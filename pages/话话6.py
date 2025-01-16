@@ -854,14 +854,12 @@ def download_all_logs():
     return zip_buffer.getvalue()
 
 def regenerate_message(index_to_regenerate):
-    if 0 < index_to_regenerate < len(st.session_state.messages) and st.session_state.messages[index_to_regenerate]['role'] == 'assistant':
-        st.session_state.regenerate_index = index_to_regenerate
-        st.experimental_rerun()
+    st.session_state.regenerate_index = index_to_regenerate
+    st.experimental_rerun()
 
 def continue_message(index_to_continue):
-    if 0 <= index_to_continue < len(st.session_state.messages) and st.session_state.messages[index_to_continue]['role'] == 'assistant':
-        st.session_state.continue_index = index_to_continue
-        st.experimental_rerun()
+    st.session_state.continue_index = index_to_continue
+    st.experimental_rerun()
 
 # --- Streamlit 布局 ---
 st.set_page_config(
@@ -1002,6 +1000,8 @@ if st.session_state.regenerate_index is not None:
         user_message_index = index_to_regenerate - 1
         if user_message_index >= 0 and st.session_state.messages[user_message_index]['role'] == 'user':
             prompt_to_regenerate = st.session_state.messages[user_message_index]['content']
+            # 先删除要重新生成的消息
+            del st.session_state.messages[index_to_regenerate]
             with st.chat_message("assistant"):
                 message_placeholder = st.empty()
                 full_response = ""
@@ -1009,7 +1009,7 @@ if st.session_state.regenerate_index is not None:
                     message_placeholder.markdown(current_response + "▌")
                 full_response = getAnswer(prompt_to_regenerate, update_message)
                 message_placeholder.markdown(full_response)
-            st.session_state.messages[index_to_regenerate]["content"] = full_response
+            st.session_state.messages.insert(index_to_regenerate, {"role": "assistant", "content": full_response})
             with open(log_file, "wb") as f:
                 pickle.dump(st.session_state.messages, f)
     st.session_state.regenerate_index = None
