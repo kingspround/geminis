@@ -810,14 +810,12 @@ def load_history(log_file):
     except EOFError:
         st.warning(f"读取历史记录失败：文件可能损坏。")
 
-
 def clear_history(log_file):
     st.session_state.messages.clear()
     st.session_state.chat_session = None
     if os.path.exists(log_file):
         os.remove(log_file)
     st.success("历史记录已清除！")
-
 
 def regenerate_message(i):
     with st.spinner("正在重新生成回复..."):
@@ -833,30 +831,33 @@ def regenerate_message(i):
                 st.session_state.messages[i]["content"] = full_response
                 with open(log_file, "wb") as f:
                     pickle.dump(st.session_state.messages, f)
-                st.session_state.rerun_count += 1 # Add this line to trigger the refresh
+                st.session_state.rerun_count += 1
                 st.experimental_rerun()
         else:
             st.error("无法获取上一条用户消息以重新生成。")
 
-
 def continue_message(i):
-     with st.spinner("正在继续生成回复..."):
-        prompt = st.session_state.messages[i]["content"] if i >= 0 else None
-        if prompt:
+    if i >= 0 and st.session_state.messages[i]["role"] == "assistant":
+        with st.spinner("正在继续生成回复..."):
+            existing_content = st.session_state.messages[i]["content"]
+            prompt = f"[请继续补全这句话，不要重复之前的内容，使用合适的标点符号和大小写：{existing_content}]"
             with st.chat_message("assistant"):
                 message_placeholder = st.empty()
-                full_response = ""
+                full_response = existing_content  # 初始化为现有内容
+
                 def update_message(current_response):
-                     message_placeholder.markdown(current_response + "▌")
-                full_response = getAnswer(prompt, update_message, continue_mode=True)
+                    message_placeholder.markdown(current_response + "▌")
+
+                new_content = getAnswer(prompt, update_message, continue_mode=True)
+                full_response += new_content
                 message_placeholder.markdown(full_response)
-                st.session_state.messages.append({"role": "assistant", "content": full_response})
+                st.session_state.messages[i]["content"] = full_response  # 更新现有消息
             with open(log_file, "wb") as f:
                 pickle.dump(st.session_state.messages, f)
-            st.session_state.rerun_count += 1 # Add this line to trigger the refresh
+            st.session_state.rerun_count += 1
             st.experimental_rerun()
-        else:
-            st.error("无法获取上一条消息以继续生成。")
+    else:
+        st.error("无法继续生成：请选择一个助手消息。")
 
 def getAnswer(prompt, update_message, continue_mode=False): # Add update_message argument
     system_message = ""
@@ -865,15 +866,15 @@ def getAnswer(prompt, update_message, continue_mode=False): # Add update_message
     for setting_name in st.session_state.enabled_settings:
         if st.session_state.enabled_settings[setting_name]:
             system_message += st.session_state.character_settings[setting_name] + "\n"
-    
+
     if st.session_state.chat_session is None:
             st.session_state.chat_session = model.start_chat(history=[])
             if system_message:
                 st.session_state.chat_session.send_message(system_message)
-    
-    if continue_mode and st.session_state.messages and st.session_state.messages[-1]["role"] == "assistant":
-         prompt = f"[请继续补全这句话，不要重复之前的内容，使用合适的标点符号和大小写：{st.session_state.messages[-1]['content']}]"
 
+    if continue_mode:
+        #  continue_mode 下的 prompt 已经在 continue_message 函数中构建
+        pass
 
     response = st.session_state.chat_session.send_message(prompt, stream=True)
     full_response = ""
@@ -910,7 +911,6 @@ with st.sidebar:
 # 在左侧边栏创建 token 复选框
 with st.sidebar:
 
-    
     # 功能区 1: 文件操作
     with st.expander("文件操作"):
         if len(st.session_state.messages) > 0:
@@ -931,7 +931,7 @@ with st.sidebar:
             with col2:
                 if st.button("取消", key="clear_history_cancel"):
                     st.session_state.clear_confirmation = False
-        
+
         with open(log_file, "rb") as f:
             download_data = f.read() if os.path.exists(log_file) else b"" # add a check
         st.download_button(
@@ -940,7 +940,7 @@ with st.sidebar:
         file_name=os.path.basename(log_file),
         mime="application/octet-stream",
         )
-        
+
         uploaded_file = st.file_uploader("读取本地pkl文件 📁", type=["pkl"])
         if uploaded_file is not None:
             try:
@@ -1004,7 +1004,7 @@ for i, message in enumerate(st.session_state.messages):
                            st.session_state.editable_index = i
                            st.session_state.editing = True
                     with cols[1]:
-                      if st.button("♻️", key=f"regenerate_{i}", on_click=lambda i=i: regenerate_message(i)):
+                      if st.button("♻️", key=f"regenerate_{i}", on_click=lambda i=i: regenerate_message(i+1)): # 传递下一个索引
                          pass
                     with cols[2]:
                        if st.button("➕", key=f"continue_{i}", on_click=lambda i=i: continue_message(i)):
@@ -1045,7 +1045,7 @@ if prompt := st.chat_input("输入你的消息:"):
     st.session_state.messages.append({"role": "assistant", "content": full_response})
     with open(log_file, "wb") as f:
         pickle.dump(st.session_state.messages, f)
-    
+
 col1, col2 = st.columns(2)
 with col1:
     if st.checkbox("Token", value=st.session_state.get("use_token", True), key="use_token_checkbox"):
