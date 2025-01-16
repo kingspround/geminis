@@ -835,7 +835,6 @@ def getAnswer(prompt, update_message, continue_mode=False):
         # prompt 已经在 continue_message 中构建
         pass
 
-
     response = st.session_state.chat_session.send_message(prompt, stream=True)
     full_response = ""
     for chunk in response:
@@ -850,7 +849,6 @@ def download_all_logs():
             if file.endswith(".pkl"):
                 zip_file.write(file)
     return zip_buffer.getvalue()
-
 
 def regenerate_message(index):
     if index < 1 or index > len(st.session_state.messages):
@@ -878,7 +876,6 @@ def regenerate_message(index):
             full_response = getAnswer("重新生成上一条消息", update_message)
 
         message_placeholder.markdown(full_response)
-
     st.session_state.messages[index - 1]["content"] = full_response
     with open(log_file, "wb") as f:
         pickle.dump(st.session_state.messages, f)
@@ -897,18 +894,23 @@ def continue_message(index):
         st.warning("Cannot continue with a user message.")
         return
 
-    with st.chat_message("assistant"):
-        message_placeholder = st.empty()
-        full_response = ""
+    # Use the existing message container as a placeholder
+    message_container = st.empty()
 
-        def update_message(current_response):
-            message_placeholder.markdown(current_response + "▌")
+    with message_container.chat_message("assistant"):
+            message_placeholder = st.empty()
+            full_response = ""
 
-        full_response = getAnswer(message_to_continue["content"], update_message, continue_mode=True)
-        message_placeholder.markdown(full_response)
+            def update_message(current_response):
+                message_placeholder.markdown(current_response + "▌")
+
+            full_response = getAnswer(message_to_continue["content"], update_message, continue_mode=True)
+
+            message_placeholder.markdown(full_response)
 
 
     st.session_state.messages[index]["content"] += full_response
+
     with open(log_file, "wb") as f:
         pickle.dump(st.session_state.messages, f)
     st.session_state.rerun_count += 1
@@ -1062,7 +1064,7 @@ if prompt := st.chat_input("输入你的消息:"):
         full_response = ""
 
         def update_message(current_response):
-             message_placeholder.markdown(current_response + "▌")
+            message_placeholder.markdown(current_response + "▌")
 
         full_response = getAnswer(full_prompt, update_message)
         message_placeholder.markdown(full_response)
