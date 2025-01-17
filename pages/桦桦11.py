@@ -2030,17 +2030,18 @@ def getAnswer(prompt):
     if prompt:
         history_messages.append({"role": "user", "parts": [{"text": prompt}]})
 
+    full_response = ""
     try:
         response = model.generate_content(contents=history_messages, stream=True)
-        full_response = ""
         for chunk in response:
             full_response += chunk.text
             yield chunk.text
         return full_response
     except Exception as e:
-        st.error(f"发生错误: {e}. 请检查你的API密钥和消息格式。")  # 更明确的错误信息
-        return ""
-
+      if full_response:
+          st.session_state.messages.append({"role": "assistant", "content": full_response}) # 保存不完整输出
+      st.error(f"发生错误: {type(e).__name__} - {e}。 Prompt: {prompt}。 请检查你的API密钥、模型配置和消息格式。")
+      return ""
 def download_all_logs():
     # 下载所有日志函数
     zip_buffer = BytesIO()
@@ -2094,6 +2095,7 @@ def continue_message(index):
     else:
         st.error("无效的消息索引")
 
+
 # --- Streamlit 布局 ---
 st.set_page_config(
     page_title="Gemini Chatbot",
@@ -2138,9 +2140,9 @@ with st.sidebar:
             with col2:
                 if st.button("取消", key="clear_history_cancel"):
                     st.session_state.clear_confirmation = False
-
+        
         with open(log_file, "rb") as f:
-            download_data = f.read() if os.path.exists(log_file) else b""  # 添加检查
+          download_data = f.read() if os.path.exists(log_file) else b""  # 添加检查
         st.download_button(
             label="下载当前聊天记录 ⬇️",
             data=download_data,
@@ -2199,6 +2201,8 @@ for i, message in enumerate(st.session_state.messages):
                 regenerate_message(i)
             if st.button("➕", key=f"continue_{i}", use_container_width=True):
                 continue_message(i)
+
+
 if st.session_state.get("editing"):
     i = st.session_state.editable_index
     message = st.session_state.messages[i]
@@ -2224,10 +2228,19 @@ if prompt := st.chat_input("输入你的消息:"):
     with st.chat_message("assistant"):
         message_placeholder = st.empty()
         full_response = ""
-        for chunk in getAnswer(prompt):
-            full_response += chunk
-            message_placeholder.markdown(full_response + "▌")
-        message_placeholder.markdown(full_response)
-        st.session_state.messages.append({"role": "assistant", "content": full_response})
+        try:
+          for chunk in getAnswer(prompt):
+              full_response += chunk
+              message_placeholder.markdown(full_response + "▌")
+          message_placeholder.markdown(full_response)
+          st.session_state.messages.append({"role": "assistant", "content": full_response})
+        except Exception as e:
+          st.error(f"发生错误：{type(e).__name__} - {e}。  请检查你的 API 密钥和消息格式。")
     with open(log_file, "wb") as f:
         pickle.dump(st.session_state.messages, f)
+col1, col2 = st.columns(2)
+with col1:
+    st.write("")
+with col2:
+    if st.button("🔄", key="refresh_button"):
+        st.experimental_rerun()
