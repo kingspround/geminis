@@ -1993,20 +1993,19 @@ def getAnswer(prompt, update_message, continue_mode=False):
             if enabled:
                 enabled_settings_content += f"- {setting_name}: {st.session_state.character_settings[setting_name]}\n"
         enabled_settings_content += "```\n"
-        if not any(msg.get("parts", [""])[0] == enabled_settings_content for msg in st.session_state.messages if msg.get("role") == "system"):
-            st.session_state.messages.insert(0, {"role": "system", "parts": [enabled_settings_content]})
-
 
     if st.session_state.chat_session is None:
-         history_with_settings = [msg for msg in st.session_state.messages if msg.get("role") == "system"]
-         st.session_state.chat_session = model.start_chat(history=history_with_settings)
+        history_with_settings = [msg for msg in st.session_state.messages if msg.get("role") == "system"] # 获取历史中的系统消息
+        if enabled_settings_content and not any(msg.get("parts", [""])[0] == enabled_settings_content for msg in history_with_settings): #避免重复添加
+            history_with_settings.insert(0,{"role":"system", "parts": [enabled_settings_content]}) # 插入设定
+
+        st.session_state.chat_session = model.start_chat(history=history_with_settings)
     elif continue_mode:
-         pass
+        pass
     else:
         history_with_settings = [msg for msg in st.session_state.messages if msg.get("role") == "system"]
         if history_with_settings:
-             st.session_state.chat_session = model.start_chat(history=history_with_settings)
-
+            st.session_state.chat_session = model.start_chat(history=history_with_settings)
 
     response = st.session_state.chat_session.send_message(prompt, stream=True)
     full_response = ""
