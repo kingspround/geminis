@@ -1978,63 +1978,43 @@ def clear_history(log_file):
     st.success("历史记录已清除！")
 
 def getAnswer(prompt, update_message, continue_mode=False):
-    system_messages = []
-    if st.session_state.get("test_text"):
-        system_messages.append({"role": "system", "parts": [st.session_state.test_text]})
-    for setting_name in st.session_state.enabled_settings:
-        if st.session_state.enabled_settings[setting_name]:
-            system_messages.append({"role": "system", "parts": [st.session_state.character_settings[setting_name]]})
+    prompt = prompt or ""
+
+    # 处理 test_text (保持不变)
+    if "test_text" in st.session_state and st.session_state.test_text and not any(msg.get("parts", [""])[0] == st.session_state.test_text for msg in st.session_state.messages if msg.get("role") == "system"):
+        st.session_state.messages.insert(0, {"role": "system", "parts": [st.session_state.test_text]})
+
+    # 处理启用角色设定的代码
+    enabled_settings_content = ""
+    if any(st.session_state.enabled_settings.values()):
+        enabled_settings_content = "```system\n"
+        enabled_settings_content += "# Active Settings:\n"
+        for setting_name, enabled in st.session_state.enabled_settings.items():
+            if enabled:
+                enabled_settings_content += f"- {setting_name}: {st.session_state.character_settings[setting_name]}\n"
+        enabled_settings_content += "```\n"
+        if not any(msg.get("parts", [""])[0] == enabled_settings_content for msg in st.session_state.messages if msg.get("role") == "system"):
+            st.session_state.messages.insert(0, {"role": "system", "parts": [enabled_settings_content]})
+
 
     if st.session_state.chat_session is None:
-        history_with_settings = system_messages  # 将设定作为初始历史
-        st.session_state.chat_session = model.start_chat(history=history_with_settings)
+         history_with_settings = [msg for msg in st.session_state.messages if msg.get("role") == "system"]
+         st.session_state.chat_session = model.start_chat(history=history_with_settings)
     elif continue_mode:
-        pass
+         pass
     else:
-        # 如果不是 continue_mode 且需要更新设定，则重新初始化会话
-        if system_messages:
-            st.session_state.chat_session = model.start_chat(history=system_messages)
+        history_with_settings = [msg for msg in st.session_state.messages if msg.get("role") == "system"]
+        if history_with_settings:
+             st.session_state.chat_session = model.start_chat(history=history_with_settings)
+
 
     response = st.session_state.chat_session.send_message(prompt, stream=True)
     full_response = ""
     for chunk in response:
         full_response += chunk.text
-        update_message(full_response)  # 在 getAnswer 函数内部调用 update_message 函数
+        update_message(full_response)
     return full_response
 
-def download_all_logs():
-    # 下载所有日志函数
-    zip_buffer = BytesIO()
-    with zipfile.ZipFile(zip_buffer, "a", zipfile.ZIP_DEFLATED, False) as zip_file:
-        for file in os.listdir("."):
-            if file.endswith(".pkl"):
-                zip_file.write(file)
-    return zip_buffer.getvalue()
-
-def regenerate_message(index_to_regenerate):
-    # 重新生成消息函数
-    st.session_state.regenerate_index = index_to_regenerate
-
-def continue_message(index_to_continue):
-    # 继续消息函数
-    st.session_state.continue_index = index_to_continue
-
-# --- Streamlit 布局 ---
-st.set_page_config(
-    page_title="Gemini Chatbot",
-    layout="wide"
-)
-
-# 添加 API key 选择器
-with st.sidebar:
-    st.session_state.selected_api_key = st.selectbox(
-        "选择 API Key:",
-        options=list(API_KEYS.keys()),
-        index=list(API_KEYS.keys()).index(st.session_state.selected_api_key),
-        label_visibility="visible",
-        key="api_selector"
-    )
-    genai.configure(api_key=API_KEYS[st.session_state.selected_api_key])
 
 # 在左侧边栏
 with st.sidebar:
@@ -2044,8 +2024,6 @@ with st.sidebar:
             st.button("重置上一个输出 ⏪",
                       on_click=lambda: st.session_state.messages.pop(-1) if len(st.session_state.messages) > 1 and not st.session_state.reset_history else None,
                       key='reset_last')
-
-        # 仅在第一次加载页面时显示读取历史记录按钮
         if st.session_state.first_load:
             if st.button("读取历史记录 📖"):
                 load_history(log_file)
@@ -2056,7 +2034,6 @@ with st.sidebar:
         if st.button("清除历史记录 🗑️"):
             st.session_state.clear_confirmation = True
 
-        # 确认/取消清除历史记录按钮区域
         if "clear_confirmation" in st.session_state and st.session_state.clear_confirmation:
             col1, col2 = st.columns(2)
             with col1:
@@ -2084,7 +2061,7 @@ with st.sidebar:
                 st.session_state.upload_count = st.session_state.get("upload_count", 0) + 1
                 with open(log_file, "wb") as f:
                     pickle.dump(st.session_state.messages, f)
-                st.session_state.file_loaded = True  # 加载文件后，将 file_loaded 设置为 True
+                st.session_state.file_loaded = True
                 st.session_state.rerun_count += 1
                 st.experimental_rerun()
             except Exception as e:
@@ -2106,22 +2083,14 @@ with st.sidebar:
         for setting_name in DEFAULT_CHARACTER_SETTINGS:
             if setting_name not in st.session_state.character_settings:
                 st.session_state.character_settings[setting_name] = DEFAULT_CHARACTER_SETTINGS[setting_name]
-            st.session_state.enabled_settings[setting_name] = st.checkbox(setting_name,
-                                                                         st.session_state.enabled_settings.get(
-                                                                             setting_name, False),
-                                                                         key=f"checkbox_{setting_name}")
+            st.session_state.enabled_settings[setting_name] = st.checkbox(setting_name, st.session_state.enabled_settings.get(setting_name, False),key=f"checkbox_{setting_name}") #直接显示checkbox
 
-        st.session_state.test_text = st.text_area("System Message (Optional):",
-                                                  st.session_state.get("test_text", ""), key="system_message")
+        st.session_state.test_text = st.text_area("System Message (Optional):", st.session_state.get("test_text", ""), key="system_message")
 
-        # 添加显示已启用设定的区域 (添加到角色设定展开器的末尾)
-        st.markdown("#### 当前已启用的设定:")
-        enabled_setting_names = [name for name, enabled in st.session_state.enabled_settings.items() if enabled]
-        if enabled_setting_names:
-            st.write(", ".join(enabled_setting_names))
-        else:
-            st.write("无")
-
+        # 显示已加载的设定
+        enabled_settings_display = [setting_name for setting_name, enabled in st.session_state.enabled_settings.items() if enabled]
+        if enabled_settings_display:
+            st.write("已加载设定:", ", ".join(enabled_settings_display))
 
 # 只在第一次加载页面时加载历史记录
 if st.session_state.first_load:
