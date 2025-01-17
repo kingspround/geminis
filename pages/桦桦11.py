@@ -1980,10 +1980,10 @@ def clear_history(log_file):
 def getAnswer(prompt, update_message, continue_mode=False):
     system_messages = []
     if st.session_state.get("test_text"):
-        system_messages.append({"role": "system", "content": st.session_state.test_text})
+        system_messages.append({"role": "system", "parts": [st.session_state.test_text]})
     for setting_name in st.session_state.enabled_settings:
         if st.session_state.enabled_settings[setting_name]:
-            system_messages.append({"role": "system", "content": st.session_state.character_settings[setting_name]})
+            system_messages.append({"role": "system", "parts": [st.session_state.character_settings[setting_name]]})
 
     if st.session_state.chat_session is None:
         history_with_settings = system_messages  # 将设定作为初始历史
