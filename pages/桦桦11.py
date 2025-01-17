@@ -1978,24 +1978,22 @@ def clear_history(log_file):
     st.success("历史记录已清除！")
 
 def getAnswer(prompt, update_message, continue_mode=False):
-    # 获取回答函数
-    system_message = ""
+    system_messages = []
     if st.session_state.get("test_text"):
-        system_message += st.session_state.test_text + "\n"
+        system_messages.append({"role": "system", "content": st.session_state.test_text})
     for setting_name in st.session_state.enabled_settings:
         if st.session_state.enabled_settings[setting_name]:
-            system_message += st.session_state.character_settings[setting_name] + "\n"
+            system_messages.append({"role": "system", "content": st.session_state.character_settings[setting_name]})
 
     if st.session_state.chat_session is None:
-        st.session_state.chat_session = model.start_chat(history=[])
-        if system_message:
-            st.session_state.chat_session.send_message(system_message)
+        history_with_settings = system_messages  # 将设定作为初始历史
+        st.session_state.chat_session = model.start_chat(history=history_with_settings)
     elif continue_mode:
-        # 在 continue_mode 下，我们使用现有的会话，不需要发送系统消息
         pass
-    elif system_message:  # 如果有新的系统消息，重新初始化会话
-        st.session_state.chat_session = model.start_chat(history=[])
-        st.session_state.chat_session.send_message(system_message)
+    else:
+        # 如果不是 continue_mode 且需要更新设定，则重新初始化会话
+        if system_messages:
+            st.session_state.chat_session = model.start_chat(history=system_messages)
 
     response = st.session_state.chat_session.send_message(prompt, stream=True)
     full_response = ""
@@ -2092,29 +2090,38 @@ with st.sidebar:
             except Exception as e:
                 st.error(f"读取本地pkl文件失败：{e}")
 
-    # 功能区 2: 角色设定
-    with st.expander("角色设定"):
-        uploaded_setting_file = st.file_uploader("读取本地设定文件 (txt)", type=["txt"])
-        if uploaded_setting_file is not None:
-            try:
-                setting_name = os.path.splitext(uploaded_setting_file.name)[0]
-                setting_content = uploaded_setting_file.read().decode("utf-8")
-                st.session_state.character_settings[setting_name] = setting_content
-                st.session_state.enabled_settings[setting_name] = False
-                st.experimental_rerun()
-            except Exception as e:
-                st.error(f"读取文件失败: {e}")
+# 功能区 2: 角色设定
+with st.expander("角色设定"):
+    uploaded_setting_file = st.file_uploader("读取本地设定文件 (txt)", type=["txt"])
+    if uploaded_setting_file is not None:
+        try:
+            setting_name = os.path.splitext(uploaded_setting_file.name)[0]
+            setting_content = uploaded_setting_file.read().decode("utf-8")
+            st.session_state.character_settings[setting_name] = setting_content
+            st.session_state.enabled_settings[setting_name] = False
+            st.experimental_rerun()
+        except Exception as e:
+            st.error(f"读取文件失败: {e}")
 
-        for setting_name in DEFAULT_CHARACTER_SETTINGS:
-            if setting_name not in st.session_state.character_settings:
-                st.session_state.character_settings[setting_name] = DEFAULT_CHARACTER_SETTINGS[setting_name]
-            st.session_state.enabled_settings[setting_name] = st.checkbox(setting_name,
-                                                                         st.session_state.enabled_settings.get(
-                                                                             setting_name, False),
-                                                                         key=f"checkbox_{setting_name}")
+    for setting_name in DEFAULT_CHARACTER_SETTINGS:
+        if setting_name not in st.session_state.character_settings:
+            st.session_state.character_settings[setting_name] = DEFAULT_CHARACTER_SETTINGS[setting_name]
+        st.session_state.enabled_settings[setting_name] = st.checkbox(setting_name,
+                                                                     st.session_state.enabled_settings.get(
+                                                                         setting_name, False),
+                                                                     key=f"checkbox_{setting_name}")
 
-        st.session_state.test_text = st.text_area("System Message (Optional):",
-                                                  st.session_state.get("test_text", ""), key="system_message")
+    st.session_state.test_text = st.text_area("System Message (Optional):",
+                                              st.session_state.get("test_text", ""), key="system_message")
+
+    # 添加显示已启用设定的区域
+    st.markdown("#### 当前已启用的设定:")
+    enabled_setting_names = [name for name, enabled in st.session_state.enabled_settings.items() if enabled]
+    if enabled_setting_names:
+        st.write(", ".join(enabled_setting_names))
+    else:
+        st.write("无")
+
 
 # 只在第一次加载页面时加载历史记录
 if st.session_state.first_load:
