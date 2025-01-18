@@ -8,7 +8,6 @@ from datetime import datetime
 from io import BytesIO
 import zipfile
 
-
 # --- API 密钥设置 ---
 API_KEYS = {
     "主密钥": "AIzaSyCBjZbA78bPusYmUNvfsmHpt6rPx6Ur0QE",  # 替换成你的主 API 密钥
@@ -48,8 +47,9 @@ safety_settings = [
 ]
 
 
+
 model = genai.GenerativeModel(
-  model_name="gemini-2.0-flash-thinking-exp-1219",
+  model_name="gemini-2.0-flash-exp",
   generation_config=generation_config,
   safety_settings=safety_settings,
   system_instruction="""
