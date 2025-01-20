@@ -609,405 +609,222 @@ xx  	xx_girl	2      	2girls	  	waist	        	french_braid	            	crystals
 
 
             
-【服饰模块】"
-"		         0  0  		    		    		                		    		    		    		    		    		    		    		    		      		
-    	suit	    		      	dress	        		    		    	barefoot	    		    	makeup	    	long_sleeves	        	ear_blush	    	halo	    	hat	    	hair_ornament	    	ring	tail	    
-      	tuxedo	        	blouse	          	microdress	      	bodystocking	      	armored	        	no_shoes	      	sailor_collar	    	fundoshi	    	short_sleeves	    	ear_ornament	        	mechanical_halo	      	large_hat	          	hair_scrunchie	    	wedding_band	butt_plug	          
-    	formal_dress	      	white_shirt	        	long_dress	      |    	pantyhose	      	canvas	          	shoes_removed	        	fur_collar	    	eyeshadow	    	wide_sleeves	    	ear_piercing	    	headwear	      	mini_hat	  _  	hair_flower	    	earrings	wings	    /  
-    	evening_gown	        	collared_shirt	          	off-shoulder_dress	    	leggings	      	denim	    	single_shoe	        	frilled_collar	    	lipstick	    	furisode	    	animal_ears	    	headpiece	              	witch_hat	    	hair_bun	      	single_earring	bat_wings	        
-        	canonicals	        	dress_shirt	            	strapless_dress	                   	legwear	      	fluffy	    	the_only_shoe	            	popped_collar	      	mascara	          	detached_sleeves	    	ears_down	      	head_wreath	          	mini_witch_hat	     	single_hair_bun	    	stud_earrings	butterfly_wings	        
-            	cocktail_dress	          	sailor_shirt	          	backless_dress	               	thighhighs	    	fur	        	shoes_removed	        	choker	      	long_eyelashes	    	single_sleeve	      	fake_animal_ears	    	crown	        	wizard_hat	  _  	hair_bell	    	necklace	black_wings	        
-      	gown	      	cropped_shirt	              	halter_dress	      	kneehighs	    	latex	              	single_shoe	        	black_choker	    	red_lips_	    	sleeveless	          	floppy_ears	        	mini_crown	      	party_hat	  _  	hair_bobbles	    	jewelry	demon_wings	        
-      	japanese_clothes	T  	t-shirt	                                  	sundress	    	socks	    	leather	        	long_toenails	        	belt_collar	        	facepaint	          	asymmetrical_sleeves	            	animal_ear_fluff	    	tiara	      	jester_cap	    	hair_scrunchie	    	 	gumi	    
-    	kimono	    T  	casual T-shirts	          	sleeveless_dress	    	bare_legs	    	see-through	            	sharp_toenails	        	frilled_choker	                         	whisker_markings	          	puffy_sleeves	        	fox_ears			      	tokin_hat	  _  	hair_rings	    	brooch	asymmetrical_wings	            
-        	sleeveless_kimono			            	sailor_dress	      	bodystocking			            	shoe_dangle							      	cat_ears	          	tilted_headwear	        	top_hat	  _  	hairclip				
-      	short_kimono	    T  	            	        	summer_dress	        	black_bodystocking	        	spandex	      	toenails	    	neckerchief	    	lipgloss	        	puffy_long_sleeves	        	lion_ears	    	head_fins	        	mini_top_hat	       	hairpin	    	gem	demon_wings	        
-        	print_kimono		short sleeve T-shirts	        	china_dress	        	white_bodystocking	    	tight	    	toes	      	red_neckerchief	        	colored_eyelashes	        	puffy_short_sleeves	          	jaguar_ears	        	body	        	bowler_hat	    	hair_tubes	        	chest_jewel	detached_wings	                  
-         	obi	        T  	writing on clothes	          	pinafore_dress	            	stocking_under_clothes	        	fine_fabric_emphasis	           	black_loafers	    	necktie	    	blush	      	frilled_sleeves	    	tiger_ears	        	bridal_veil	      	pillbox_hat	    	hair_stick	        	forehead_jewel	fairy_wings	          
-    	sash	             	off-shoulder_shirt	          	sweater_dress	    	pantyhose	    	frilled	      	shoes	      	short_necktie	          	light_blush	        	juliet_sleeves	      	dog_ears	    	headband	        	cloche_hat	  _  	hair_ribbon	    	tassel	fake_wings	          
-    	long_eyelashes	        	shrug_ clothing 	    	wedding_dress	        	black_pantyhose	          	center_frills	      	sneakers	        	white_necktie	          	anime_style_blush	        	bandaged_arm	        	coyote_ears	    	helmet	      	side_cap	  _  	hairband	    	belly_chain_	fiery_wings	            
-    	china_dress	        	blouse	      	armored_dress	        	white_pantyhose	           	crease	      	uwabaki	          	bowtie	      	nose_blush	      	raglan_sleeves	    	bunny_ears	                	alternate_headwear	    	military_hat	  _  	hair_tie	    	lace	insect_wings	        
-        	print_cheongsam	          	cardigan	          	frilled_dress	            	thighband_pantyhose	      	layered	           ,    ,      	mary_janes	                	headphones_around_neck	    	nosebleed	        	vambraces	    	horse_ears	        	fur-trimmed_headwear	      	beret	          	lolita_hairband	    	ribbon	large_wings	      
-                	pelvic_curtain	          	criss-cross_halter	            	lace-trimmed_dress	                   	pantylines	    	lace	      	platform_footwear	            	goggles_around_neck	          	bruise_on_face	        	layered_sleeves	      	pointy_ears	              	goggles_on_headwear	      	garrison_cap	        	frilled_hairband	    	stitches	low_wings	          
-    	wedding_dress	        	frilled_shirt	          	collared_dress	              	single_leg_pantyhose	        	fur_trim	      	high_heels	    	neck_bell	        	facial_mark	        	fur-trimmed_sleeves	        	long_pointy_ears	    	earphones	      	police_hat	            	lace-trimmed_hairband	    	scarf	mini_wings	        
-             	uchikake	                	gym_shirt	              	fur-trimmed_dress	            	panties_under_pantyhose	                  	fur-trimmed	          	stiletto_heels	    	neck_ruff	        	forehead_mark	        	"see-through_sleeves
-"	        	mouse_ears	    	earmuffs	      	nurse_cap	          	hair_bow	      	bandaid	multicolored_wings	                
-    	school_uniform 	        	hawaiian_shirt	          	layered_dress	                        	legwear	            	cross-laced_clothes	              	strappy_heels	V  	v-neck	            	anger_vein	          	torn_sleeves	        	raccoon_ears	            	ears_through_headwear	      	chef_hat	        	frog_hair_ornament	    	collar	multiple_wings	        
-      	sailor	      	hoodie	          	pleated_dress	       	fishnets	    	camoflage	          	platform_heels_	            	towel_around_neck	  	mole	        	raglan_sleeves	        	squirrel_ears	          	leaf_on_head	    	school_hat	        	heart_hair_ornament	    	belt	no_wings	                 
-      2	serafuku	                      	Impossible shirt	            	taut_dress	    	stockings	        		  C          	rudder_footwear	        	loose_necktie	            	mole_under_eye	          	layered_sleeves	      	bear_ears	  	topknot	      	pirate_hat	        	butterfly_hair_ornament	    	steam	winged_helmet	            
-        	summer_uniform	               	kappougi	      	pencil_dress	      	stirrup_legwear	              	ass_cutout	    	sandals	        	neck_tattoo	    	freckles	        	sleeves_past_fingers	        	panda_ears	    	tiara	            	cabbie_hat	        	star_hair_ornament	    	bell	wings	    
-          	kindergarten_uniform	        	plaid_shirt	              	impossible_dress	      	toeless_legwear	            	asymmetrical_clothes	        	barefoot_sandals		ascot	          	food_on_face	        	sleeves_past_wrists	        	bat_ears	      	suigintou	      	bucket_hat	            	food-themed_hair_ornament	      	amulet		
-    	police_uniform	      	polo_shirt	            	multicolored_dress	      	stirrup_legwear	                 	back_bow	        	clog_sandals	      	ribbon_choker	      	light_makeup	        	sleeves_past_elbows	          	robot_ears	        	triangular_headpiece	      	hardhat	        	anchor_hair_ornament	    	emblem		
-        	naval_uniform	        	print_shirt	          	striped_dress	      	thighhighs	        	costume_switch	     tabi 	geta	    /    	maebari/pasties	        	rice_on_face	        	sleeves_pushed_up	          	extra_ears	    	forehead_protector	    	straw_hat	        	bat_hair_ornament	    	flag_print		
-        	military_uniform	    	shirt	      	checkered_skirt	        	mismatched_legwear	                    	double_vertical_stripe	    	slippers	    	latex	          	cream_on_face	            	arm_out_of_sleeve	                  	ears_through_headwear	    	radio_antenna	      	sun_hat	          	carrot_hair_ornament	      	anchor_symbol	   Leg_stockings,:_Compiled_by_thin_filament_lines_arranged_horizontally  ,_ black_stockings  ,	            2     
-        	ss_uniform/nazi_uniform	          	sleeveless_hoodie	          	plaid_dress	          	asymmetrical_legwear	                  	halter_top	      	skates	        	torn_clothes	      	mustache	            	uneven_sleeves	      	alpaca_ears	        	animal_hood	    	rice_hat	        	cat_hair_ornament	    	cross		
-      	maid	        	sleeveless_shirt	          	ribbed_dress	      	uneven_legwear	              	multicolored_legwear	      	roller_skates	          	iron_cross	      	goatee	            	mismatched_sleeves	    	horns	    	arrow_ symbol 	    	rice_hat	          	clover_hair_ornament	          	diffraction_spikes		
-            	stile_uniform	        	striped_shirt	          	polka_dot_dress	          	white_thighhighs	                	nontraditional_miko	          	inline_skates	      	chinese_knot	        	whisker_markings	        	sleeve_rolled_up	    	fake_horns	    	axe	      	animal_hat	        	crescent_hair_ornament	        	iron_cross		
-      	miko	            	sweatshirt	            	plaid_dress	          	black_thighhighs	              	side_cutout	        	ballet_slippers	      	plunging neckline	    	scar	            	sleeves_rolled_up	    	dragon_horns	    	bald	    	fur_hat	        	cross_hair_ornament	            	latin_cross		
-      	overalls	       	tank_top	          	print_dress	          	pink_thighhighs	              	side_slit	      	animal_feet		    	              	scar_across_eye	            	asymmetrical_sleeves	    	oni_horns	    	bandana	            	hat_with_ears	          	d-pad_hair_ornament	          	lace-trimmed_hairband		
-        	business_suit	       	vest	            	vertical-striped_dress	      	garter_straps	                  	sideless_outfit	        	animal_slippers	          	cross_necklace	    	smoking_pipe	        	detached_sleeves	    	antlers	      	bob_cut	      	bobblehat	        	fish_hair_ornament	        	ankle_lace-up		
-    	nurse	       	waistcoat	          	ribbed_dress	           	garter_straps	                	single_kneehigh	      	paw_shoes	        	bead_necklace	    	tattoo	              	feather-trimmed_sleeves	    	curled_horns	    	bone	    	pillow_hat	                            	hairpods	                      	st._gloriana's_ emblem 		
-        	chef_uniform	             	camisole	          	see-through_dress	          	torn_legwear	                        	single_vertical_stripe	    	anklet	        	pearl_necklace	    	glasses	        	frilled_sleeves	      	goat_horns	      	bowl_cut	      	pumpkin_hat	        	leaf_hair_ornament	       C 	heart_lock_ kantai_collection 		
-      	labcoat	                       	tied_shirt	    	skirt	              	torn_thighhighs	        	turtleneck	    	shackles	        	heart_necklace	    	eyewear	            	fur-trimmed_sleeves	          	hair_on_horn	        	bridal_veil	      	baseball_cap	        	musical_note_hair_ornament	             	oripathy_lesion_ arknights 		
-        	cheerleader	    	undershirt	      	microskirt	          	see-through_legwear_	                  	two-sided_fabric	        	sandals_removed	          	carrot_necklace	        	monocle	    	hands_in_opposite_sleeves	      	mechanical_horns	    	circlet	      	flat_cap	        	pumpkin_hair_ornament	    	boxing_gloves		
-        	band_uniform	        	crop_top	      	miniskirt	      	frilled_legwear	  O          	o-ring	    	boots	        	chain_necklace	        	under-rim_eyewear	          	lace-trimmed_sleeves	      	ear_piercing	      	double_bun	          	torn_hat	        	skull_hair_ornament	        	casing_ejection		
-      	space_suit	            highleg	        	skirt_suit	        	lace-trimmed_legwear	  O          	o-ring_top	          	boots_removed	        	magatama_necklace	        	rimless_eyewear	      	pinching_sleeves	        	cross_earrings	          	double_dildo	      	mob_cap	        |        	snake_hair_ornament	    	ceiling_light		
-      	leotard	    	cardigan	        	bikini_skirt	          	seamed_legwear	           	fringe_trim	      	thigh_boots	      	tooth_necklace	          	semi-rimless_eyewear	          	puffy_detached_sleeves	        	crystal_earrings	    	drill	      	newsboy_cap	        	snowflake_hair_ornament	    	cheating_ relationship 		
-      	domineering	        	clothing_cutout	      	pleated_skirt	                    	back-seamed_legwear	             	loose_belt	         	knee_boots	        	key_necklace	        	red-framed_eyewear	          	puffy_sleeves	    	earrings	      	faucet	                    	bowknot_over_white_beret	        	strawberry_hair_ornament	      	chewing_gum		
-	    	        	back_cutout	        	pencil_skirt	              	animal_ear_legwear	             	pom_pom_ clothes 	      	lace-up_boots	      	anchor_necklace	        	round_eyewear	        	ribbed_sleeves	      	flower_earrings	         	hachimaki	            	animal_hat	          	sunflower_hair_ornament	      	clitoris_piercing		
-        	china_dress	          	cleavage_cutout	      	bubble_skirt	        	striped_legwear	          	drawstring	          	cross-laced_footwear	        	skull_necklace	        	black-framed_eyewear	          	see-through_sleeves	        	heart_earrings	          	hair_behind_ear	          	backwards_hat	X      	x_hair_ornament	    	cutting_board		
-      	chinese_style	        	navel_cutout	        	tutu	        	vertical-striped_legwear	                  	full-length_zipper	    	ankle_boots	      	flower_necklace	        	tinted_eyewear	                	single_detached_sleeve	        	hoop_earrings	              	hair_bell	        	bowl_hat			      	dissolving		
-        |        	traditional_clothes	        	midriff	         	ballgown	      	polka_dot_legwear	       	gathers	      	high_heel_boots	        	shell_necklace	        	medical_eyepatch	            	sleeves_folded_up	        	multiple_earrings	    	hair_bobbles	      	cabbie_hat			      	dowsing_rod		
-        	japanese_clothes	        	heart_cutout	         	pettiskirt	      	print_legwear	              	gusset	      	thigh_boots	      	gold_necklace	                  	bandage_over_one_eye	            	sleeves_past_wrists	              	pill_earrings	    |      	hair_bun	        	cat_hat			      	drawing_tablet		
-       	hanten_ clothes 	          	torn_clothes	            	showgirl_skirt	              	legwear_under_shorts	          	breast_pocket	      	toeless_boots	        	crescent_necklace	          	crooked_eyewear	            	sleeves_pushed_up	              	single_earring	            	hair_down	          	chat_log			    	drinking_glass		
-    	hanbok	          	torn_shirt	          	Medium length skirt	      		    		              	fur_boots	        	ring_necklace	        	eyewear_removed	          	sleeves_rolled_up	        	skull_earrings	            	hair_flaps	      	cowboy_hat			    	drinking_straw		
-        	korean_clothes	        	undressing	      	beltskirt	      	over-kneehighs	              	argyle	        	fur-trimmed_boots	        	feather_necklace	      	sunglasses	        	striped_sleeves	        	star_earrings	      	hair_flip	      	dixie_cup_hat			        	dripping		
-        	western	        	clothes_down	      	denim_skirt	    		        	checkered	      	snow_boots	      	bone_necklace	    	goggles	          	torn_sleeves	        	crescent_earrings	            	hair_flower	        	fur_hat			      	drooling		
-        	german_clothes	        	shirt_lift	      	suspender_skirt	           	bobby_socks	        	colored_stripes	    	anklet	        	ankh_necklace	    	Blindfold	          	wide_sleeves	            	single_bare_shoulder	          	hair_spread_out	                	hat_bow			    	evening		
-        	gothic	          	shirt_pull	                	skirt_set	               	tabi	      	diagonal_stripes	    	rubber_boots	        	multiple_necklaces	       	eyepatch	                      	wrist_cuffs	            	single_gauntlet	            	hair_up	              	hat_feather			        	evening_gown		
-              	gothic_lolita	          	shirt_tucked_in	    	long_skirt	      	loose_socks	        	horizontal_stripes	      	santa_boots	        	bullet_necklace	    |        |      	visor	       	armband	              	single_hair_intake	          	helm	            	hat_flower			          	falling		
-          	byzantine_fashion	        	clothes_tug	        	summer_long_skirt	    	ankle_socks	        	multicolored_stripes	    	leather_boots	        	holding_necklace	        	bespectacled	    	armlet	          	single_horn	        |            	helmet_removed	              	hat_ornament			    	falling_leaves		
-          	Tropical	        	shirt_tug	    	overskirt	    |      	leg_warmers	      	polka_dot_	      	belt_boots	          	necklace_removed	        	blue-framed_eyewear		  	            	single_sleeve	        	horned_helmet	                	hat_over_one_eye			    	falling_petals		
-        	indian_style	          	untucked_shirt	    	hakama_skirt	      	single_sock	    	ribbed	              	thighhighs_under_boots	        	brown_neckwear	            	brown-framed_eyewear	    	bandage	          	single_strap	          	japari_bun	          |        	hat_removed			    	feathered_wings		
-                	Ao_Dai	          	lifted_by_self	      	high-waist_skirt	        	striped_socks	      	striped	      	combat_boots	    	chain_necklace	                    	coke-bottle_glasses	    	leash	                	single_thighhigh	      	kerchief	              	hat_ribbon			      	fishing_rod		
-              	ainu_clothes	            	untied	      	kimono_skirt	          		            	unmoving_pattern	      	doc_martens	        	checkered_neckwear	      	eyewear_removed	        	arm_tattoo			          	mami_mogu_mogu	        	hat_tip			              	foreshortening		
-          	arabian_clothes	          	open_clothes	      	chiffon_skirt	          	leg_cutout	      	vertical_stripes	    	rain_boots	        	diagonal-striped_neckwear	        	monocle		number_tattoo			              	mob_cap	              	hat_with_ears			        |          	fringe_trim		
-            	egyptian_clothes	              	unbuttoned_shirt	        	frilled_skirt	                	thighhighs_under_boots	        	checkered	              	single_boot	    |        	flower_necklace	                 	no_eyewear	        	bead_bracelet			                	one_side_up	         	hatching_ texture 			      	frying_pan		
-    	costume	                   	button_gap	            	fur-trimmed_skirt	        	adjusting_legwear	          	plaid	    	shoe_soles	              	goggles_around_neck	                	opaque_glasses	    	bracelet			      	owl	cos          	hatsune_miku_ cosplay 			          	gatling_gun		
-             	animal_costume	            	partially_unbuttoned	        	lace_skirt	          	pantyhose_pull	        	animal_print	        	arched_soles	        	halterneck	            	over-rim_eyewear	      	flower_bracelet			      	pier	        	mini_hat			      	hair_rings		
-        	bunny_costume	              	partially_unzipped	          	lace-trimmed_skirt	      	socks_removed	        	cat_print	        	paw_print_soles	              	headphones_around_neck	        	rimless_eyewear	        	spiked_bracelet			    	pillow	    	pillow_hat			            	hooded_track_jacket		
-            	adapted_costume	          	clothes_removed	            	ribbon-trimmed_skirt	           	sock_pull	      	bear_print	      	horseshoe	          	loose_necktie	        	round_eyewear	    	wrist_cuffs			          	raised_fist	      	porkpie_hat			    	icing		
-        	cat_costume	        	shirt_removed	          	layered_skirt	           	thighhighs_pull	      	bird_print	        	paw_print_soles	          	mole_on_neck	          	semi-rimless_eyewear	    	wristband			                	skull_and_crossbones	      	sailor_hat			      	jersey		
-      	dog_costume	        	wardrobe_error	        	print_skirt	    		        	bunny_print	      	horseshoe	    	neck	        	tinted_eyewear	          	bracelet			    	stone	      	santa_hat			           	king_ chess 		
-      	bear_costume	            	undersized_clothes	          	multicolored_skirt	    	garters	        	cow_print	        	brown_footwear	            	neck_ribbon	          	under-rim_eyewear	    	bracer			          	turban	      	school_hat			        	layered_clothing		
-            	embellished_costume	          	tight	      	striped_skirt	    |    	leg_garter	      	dragon_print	            	inline_skates	    	neck_ring			    	cuffs			          	twin_drills	            	sideways_hat			    	lightning		
-            	santa_costume	                 	wedgie	          	vertical-striped_skirt	            	garter_straps	      	fish_print	        	mismatched_footwear	              	neck_ruff	    	mask	        	wrist_cuffs			                	updo	    |    	tokin_hat			    	lip_piercing		
-          	halloween_costume	                 	wardrobe_malfunction	          	plaid_skirt	        	thigh_strap	        	frog_print	      	platform_footwear	    	neckerchief	    	visor	        	bound_wrists			      	wet_hair	    	top_hat			      	magnifying_glass		
-              	kourindou_tengu_costume	          	taut_shirt	    	flared_skirt	        	thigh_ribbon	        	shark_print	      	pointy_footwear	    	necklace	    	helmet	        	wrist_scrunchie			               	headdress	        	what			      	matching_outfit		
-              	alternate_costume	          
-taut_clothes	      	floral_skirt	      	leg_ribbon	    	snake_print	          	pumps	    	necktie	      	half_mask	    	handcuffs			        	adjusting_headwear	            	what_if			      	mechanical_wings		
-    play	costume_switch	          	underbust	          		        	leg_garter	        	zebra_print	      	roller_skates	          	plaid_neckwear	    	masked	    	shackles			          	bear_hair_ornament	      	witch_hat			      	milking_machine		
-m	meme_attire	            	oversized_clothes	              	skirt_hold	          	bandaid_on_leg	    	tiger_print	    	shoelaces	    	plunging_neckline	        	mask_lift	    	chains			        	brown_headwear	      	wizard_hat			      	mixing_bowl		
-	      	          	oversized_shirt	        |        	skirt_tug	          	bandaged_leg	    	leopard_print	      	skates	        	print_neckwear	        	mask_on_head	          	chain_leash			                	ears_through_headwear					    	morning		
-    	casual	          	borrowed_garments	        	dress_tug	        	ankle_lace-up	          	jaguar_print	            	winged_footwear	      	short_necktie	        	fox_mask		    			                           	headpiece					      	morning_glory		
-      	loungewear	                   	strap_slip	        	skirt_lift	        	thigh_holster	        	bat_print	        	zouri	            	sleeveless_turtleneck	        	surgical_mask	    	gloves			           	headwear					        	nipple_piercing		
-    	hoodie	      	wet_shirt	                	skirt_around_one_leg	    	joints	        	aardwolf_print			        	star_necklace	        	gas_mask	      	long_gloves			          |        	headwear_removed					    	nipple_rings		
-      	homewear	      	clothes_theft	          	skirt_removed	    	kneepits	            	african_wild_dog_print			        	striped_neckwear	        	diving_mask	        	single_glove			        	horned_headwear					          	nose_piercing		
-    	pajamas	    		        	dress_removed	    	knee_pads	        	cheetah_print			              	towel_around_neck	              	diving_mask_on_head	                    	elbow_gloves			                	horns_through_headwear					  O          	o-ring_bottom		
-    	nightgown	        	blazer	          	open_skirt	              	bandaid_on_knee	      	dog_print			        	turtleneck_sweater	      	oni_mask	        	bridal_gauntlets			                 	no_headwear					    	painting_ object 		
-    	sleepwear	    	overcoat	         	crossdressing	                	argyle_legwear	        	fox_print			        	undone_necktie	        	tengu_mask	        	fingerless_gloves			                    	object_on_head					    |    	pouring		
-        	babydoll	             	double-breasted	                	dress_bow	              	bow_legwear	          	giraffe_print			v    	v-neck	        	ninja_mask	            	partially_fingerless_gloves			        	print_headwear					    	pudding		
-        	print_pajamas	      	long_coat	    	dressing_another	        	arm_garter	        	panda_print			              	whistle_around_neck	        	skull_mask	      	half_gloves			        	tiara					        	qing_guanmao		
-        	polka_dot_pajamas	          	haori	              	shorts_under_skirt			        	sand_cat_print				    	          	hockey_mask	        	fingerless_gloves			          	tilted_headwear					 REC	recording		
-    	yukata	        	winter_coat	      	side_slit			        	whale_print			        	plaid_scarf	      	bird_mask	          	asymmetrical_gloves			          	bone_hair_ornament					        	riding_crop		
-    	chinese_clothes	        	hooded_coat	    	shorts			      	white_tiger_print			        	striped_scarf	            	plague_doctor_mask	               	paw_gloves			        	bunny_hair_ornament					    	ring		
-    	hanfu	        	fur_coat	          	micro_shorts			        	goldfish_print			        	checkered_scarf	      	stone_mask	               	mittens			          	horn_ornament					                  O  	ring_gag		
-    	Taoist robe	            	fur-trimmed_coat	    	short_shorts			    	wing_print			        	print_scarf	      	horse_mask	        	fur-trimmed_gloves			          	animal_on_head					            	ringlets		
-    	robe	        	duffel_coat	    	hot_pants			      	spider_web_print			          	vertical-striped_scarf	            	masquerade_mask	        	latex_gloves			                	behind-the-head_headphones					      	shell_casing		
-        	robe_of_blending	        	fishnet_top	    	cutoffs			        	butterfly_print			        	polka_dot_scarf	            	diving_mask_on_head	            	asymmetrical_gloves			        	bird_on_head					    	shooting_star		
-    	cloak	        	parka	        	striped_shorts			    	floral_print			        	argyle_scarf	SM    	domino_mask	        	baseball_mitt			          	cat_ear_headphones					      	shopping_bag		
-        	hooded_cloak	        	fur-trimmed_coat	        	suspender_shorts			      	leaf_print			        	beige_scarf	    	mask	        	bridal_gauntlets			          	cat_on_head					        	siblings		
-    	winter_clothes	      	jacket	        	denim_shorts			          	clover_print			          	scarf_bow	              	mask_on_head	        	brown_gloves			            	eyewear_on_head					    	single_wing		
-      	down jacket	            	jacket_partially_removed	          	puffy_shorts			        	maple_leaf_print			        	shared_scarf	          	mask_removed	      	elbow_gloves			    	forehead					      	sliding_doors		
-      	santa	          	jacket_removed	             	dolphin_shorts			        	rose_print			        	fur_scarf	    	mouth_mask	        	fingerless_gloves			          	forehead_jewel					          	sling		
-      	harem_outfit	           spread_legs 	open_jacket	             	dolfin_shorts			        	strawberry_print			          	torn_scarf	    	noh_mask	        	frilled_gloves			        	forehead_kiss					        	smoking_gun		
-            	shrug_ clothing 	        	cropped_jacket	      /      	tight_pants			        	cherry_print			      	naked_scarf	    	oni_mask	            	fur-trimmed_gloves			          	forehead_mark					      	sportswear		
-	      	        	track_jacket	      	leggings			      	bamboo_print			        	multicolored_scarf	        	surgical_mask	    	gloves			    	forehead_protector					    	spring_onion		
-      	sportswear	            	hooded_track_jacket	              	crotchless_pants			          	carrot_print			        	floating_scarf	      	nude_look	        	gloves_removed			          	forehead-to-forehead					      	steering_wheel		
-      	gym_uniform	        	military_jacket	            	yoga_pants			        	hibiscus_print			      	long_scarf	    	eyepatch	          |        	half_gloves			              	goggles_on_head					    	string		
-      	athletic_leotard	        	camouflage_jacket	      	track_pants			          	jack-o'-lantern_print			        	arm_scarf			          	lace-trimmed_gloves			                	goggles_on_headwear					      	string_of_flags		
-      	volleyball_uniform	      	leather_jacket	      	yoga_pants			        	petal_print			    	head_scarf			      	leather_gloves			  	head					      	syringe		
-      	tennis_uniform          	letterman_jacket	          	bike_shorts			          	sunflower_print			          	scarf_on_head			        	mismatched_gloves			        	head_bump					        	thumb_ring		
-      	baseball_uniform	          	bomber_jacket	        	gym_shorts			        	watermelon_print			          	scarf_over_mouth			        	mittens			      	head_down					        	track_jacket		
-        	letterman_jacket	        	denim_jacket	    	pants			        	cherry_blossom_print			          	scarf_removed			          	multicolored_gloves			      |      |        	head_fins					      	track_suit		
-      	volleyball_uniform	        	loating_jacket	      /      	puffy_pants			        	floral_print			        	adjusting_scarf			                 	no_gloves			                	head_mounted_display					            	training_corps_ emblem 		
-            	biker_clothes	            	fur-trimmed_jacket	      	pumpkin_pants			        	sky_print			        	holding_scarf			        	oven_mitts			                    	head_out_of_frame					              	unmoving_pattern		
-        	bikesuit	        	two-tone_jacket	    	hakama_pants			      	cloud_print			      	scarf_pull			        	paw_gloves			      |      	head_rest					          	vending_machine		
-      	wrestling_outfit	    	trench_coat	      	harem_pants			        	lightning_bolt_print			        	brown_scarf			        	print_gloves			      	head_tilt					    	watering_can		
-      	dougi🥋	               	furisode	      	bloomers			        	rainbow_print			        	checkered_scarf			                  	single_elbow_glove			          	head_wings					    |    	wedding		
-	    	        	trench_coat	          	buruma			        	snowflake_print			         	head_scarf			            	single_glove			            	head_wreath					        	wedding_ring		
-    	swimsuit	      	windbreaker	      	jeans			        	starry_sky_print			          	plaid_scarf			        	striped_gloves			         	headband					  	weighing_scale		
-    	swimwear	    	raincoat	      	cargo_pants			        	crescent_print			    	scarf			          	torn_gloves			                     	headgear					        	winding_key		
-      	wet_swimsuit	    	hagoromo	      	camouflage_pants			        	star_print			            	shared_scarf				    			    	headphones					      	wing_collar		
-                  	school_swimsuit	        	tunic	      	capri_pants			        	star_ symbol 			          	torn_scarf			      	fingernails			                   	heads-up_display					        	heroic_spirit_traveling_outfit		
-          	new_school_swimsuit	    	cape	             	chaps			        	moon_print							      	toenails			          	headset					        	load_bearing_vest		
-          	old_school_swimsuit	    	capelet					        	sun_print							      	nail_polish			EVA          	inter_headset					Z    	z-ring		
-          	competition_school_swimsuit	    	winter_clothes	               	jumpsuit			        	character_print							        	toenail_polish			      	on_head					          |    	glaring		
-        	competition_swimsuit	    	sweater	        	lowleg_pants			          	clothes_writing_							      	black_nails			            	person_on_head					                   	heart_of_string		
-        	casual_one-piece_swimsuit	        	pullover_sweaters	          	plaid_pants			      	anchor_print							      	red_nails			              	single_head_wing					    	stud_earrings		
-                	front_zipper_swimsuit	        	ribbed_sweater	        	single_pantsleg			        	cherry_blossom_print							        	pink_nails			        	triangular_headpiece					    	ice_wings		
-            	highleg_swimsuit	        	sweater_vest	      	striped_pants			        	floral_print							      	long_fingernails									    	jingle_bell		
-          	one-piece_swimsuit	        	backless_sweater	          				        	musical_note_print							    |    	nail									        	zipper pull tab		
-           fgo        	swimsuit_of_perpetual_summer	          	aran_sweater	            	asymmetrical_legwear			        	triangle_print							        	multicolored_nails												
-      	bikini	        	beige_sweater	                    	leotard_aside			        	arrow_print							    	nail_art												
-        	micro_bikini	        	brown_sweater	              	open_fly			      	wave_print							      	nail_polish												
-          	highleg_bikini	        	hooded_sweater	        	pants_down			                 	peace_symbol							      	toenail_polish												
-          	lowleg_bikini	        	off-shoulder_sweater	          	pants_rolled_up			    								        	brown_vest												
-V      	slingshot_swimsuit	        	ribbed_sweater	          	pants_tucked_in			        |        	heart_print																				
-          	maid_bikini        	striped_sweater	            	torn_jeans			        	flame_print																				
-              	sailor_bikini	            	virgin_killer_sweater	          	torn_pants			        	hitodama_print																				
-          	shell_bikini	      	down_jacket	          	torn_shorts			      	paw_print																				
-          	sports_bikini	      	puffer_jacket					        	skeleton_print																				
-          	string_bikini	    						          	skull_print																				
-            	strapless_bikini	            	multicolored_bodysuit					              	sparkle_print																				
-            	multi-strapped_bikini	  |    	hakama					        	yin_yang_print																				
-              	side-tie_bikini	                	shirt_tucked_in					              	cross_print																				
-                	front-tie_bikini_top	                      	short_over_long_sleeves					        	flag_print																				
-            	multi-strapped_bikini	          	unitard					      	bone_print																				
-            	thong_bikini	    						        	ghost_print																				
-                  	front-tie_bikini	      	transparent					        	mushroom_print																				
-          	frilled_bikini	          	burnt_clothes					        	onigiri_print																				
-  O            	o-ring_bikini	            	dissolving_clothes					        	cat_ear																				
-          	eyepatch_bikini	          	dirty_clothes					            	cat_ear_cutout																				
-          	layered_bikini	                	expressive_clothes					    																					
-                	bow_bikini	                        	impossible_clothes					        	checkered_floor																				
-        	frilled_swimsuit	        	living_clothes					        	checkered_kimono																				
-        	polka_dot_swimsuit	              	leotard_under_clothes					        	checkered_shirt																				
-        	striped_swimsuit	          	multicolored_clothes					            	fur-trimmed_cape																				
-          	striped_bikini	              	ofuda_on_clothes					            	fur-trimmed_capelet																				
-          	plaid_bikini	        	wringing_clothes					            	fur-trimmed_hood																				
-          	polka_dot_bikini	      	clothesline					        	fur-trimmed_jacket																				
-          	print_bikini	            	shiny_clothes					        	heart_cutout																				
-          	mismatched_bikini	    	kariginu					          	plaid																				
-            	multicolored_bikini	                	front-tie_top					            	plaid_bow																				
-              	american_flag_bikini	          	jacket_on_shoulders					          	plaid_shirt																				
-              	german_flag_bikini	            	short_jumpsuit					          	plaid_vest																				
+        13【霜龙与炎龙】（双人，AND拥有分割画面的作用）：
+     {2girls,yuri, symmetrical_docking} , large breasts ,scales AND 1girl {{{red skin}}}, large breasts ,{{{{fiery dragon girl ,Golden Flame crystals texture the wing, Lava on the body}}}}, AND {{large breasts ,ice Dragon loli}},blue skin ,Transparent thin dragon wings, blue skin ,red skin and blue skin,{{reflective transparent body}},{{pretty ice,golden glow burning,Scales covering skin,Many scales, Transparent Dragon Horns, Ice crystals texture the wing}},{Snow capped mountains, depth of field},yuri,{breath,heavy breathing,steam},Crystal clear,sweat,nude,{tongue kiss,Salivary wire drawing,Filamentous saliva}, reflective eyes, colored skin, monster girl, red skin, blue skin, {from below}, {close up}
+     /////
+     {Snow capped mountains, depth of field}, {magma}, {glowing embers}
+
+        14【】（非常激烈的女上位做爱）
+     1girl, slimegirl, pink hair, translucent body, see through, visible womb, penis inside pussy, POV, cowgirl position, riding, bouncing, breasts jiggling, nipple piercings, ahegao, heart eyes, tongue out, drooling, moaning, blushing, cum inside, creampie, womb bulging, stomach distending, ejaculation visible, sperm, semen, vaginal juices, intimate detail, female pleasure, arousal, orgasm, studio lighting, white background, highly detailed, intricate, 
+
+         15【】（对着网友发脾气的蕾姆）
+     [[[Rem (Re:Zero)]]] ,pov , {{close up}} ,from side ,furious, angry, {solo}, gamer girl, streamer girl, A blue slime girl, {determined expression}, {fuming}, colored skin, monster girl, blue skin, short blue hair, hair over one eye, {headset}, {hoodie}, tomboyish clothes, at computer desk, PC setup, backlit keyboard, angry typing, {making an angry video}, shouting at the camera
+     /////
+     bright computer screens, LED lights, gamer chair, posters on walls, figurines on shelves, {livestream chat scrolling fast}, trolls in chat, {middle finger to the haters},
+
+         16【】（透明史莱姆娘的尝试）
+     transparent  ,colourless tail ,{{{colourless_skin}}}, latex,  shiny skin , colored skin,  {{large breasts}}, {{loli ,  bishoujo}} ,yellow eyes ,{{{long hair}}} , fox girl, fox ears  , fox tail ,heart-shaped_pupils  {{hair_between_eyes}},  /{swimsuit} , black_bikini, navel, choker, smile,   ,/virtual_youtuber, black sunglasses, breasts, open_mouth,  smile, sky
+     //////////
+     sea , wet, outdoors,night , neon lights,  heart shape
+
+         17【要被深潜者干掉惹~~】
+    pov, from below,{blue scales, {{{scales , fins }}},{{trident raised}} , {{holding trident}}, emotionless, merciless, {solo} ,A blue slime , {deadpan expression}, stoic, colored skin, monster girl, blue scales, short blue hair, {Sharp teeth},  {blue latex bikini}, cameltoe , aquatic motifs,  
+    /////  
+    {trident raised}, {cold vacant eyes}, stoic, from below, {sky} ,
+
+         18【】（第一人称被猫娘压在身下）
+    {orange skin}, {POV,  close up, dutch_angle},1boy, human ,loli , girl on top  , {nude}, young girl,  cat ears , tail,cat girl ,  large breasts,  breasts   press completely nude, upper body, convenient censoring, {hair censor},  open_mouth, :3,   looking at viewer ,half-closed eyes,smark ,blush , colored skin, monster girl, orange skin,  [blue eyes], short orange hair, air_bangsair_bangs
+    /////
+    {trembling, bedroom , indoors , broken_heart}, day , light
+    
+         19【】（第一人称被猫娘压在身下榨精）
+    {orange skin}, {POV,  dutch_angle},1boy, cum , semen ,human ,loli ,ahoge ,girl on top  , {nude}, young girl,  cat ears , tail,cat girl ,  large breasts,  breasts   press completely nude, convenient censoring, {hair censor},  open_mouth, :3,   looking at viewer ,half-closed eyes,smark ,blush , colored skin, monster girl, orange skin,  [blue eyes], short orange hair, air_bangsair_bangs
+    /////
+    {trembling, bedroom , indoors , broken_heart}, 
+
+         20【杯装可乐】【整个人物在玻璃杯里面，此为获奖作品】
+    {{{{under water}}}} ,{{{Girl in a cup}}} ,water , a cup of cola, close up , {{close up face , from side , face focus , dutch_angle}} , glass cup,  in cup, sitting ,  {red color:1.2} , ice , fizzy, {{solo}}, {cola, ice cubes, frost:1.3}, refreshing girl, A cola-themed slime girl, {playful}, colored skin, monster girl, red skin, long dark red hair, {twin tails:1.2}, shiny hair, small breasts, {cola logo crop top:1.25}, {denim shorts}, casual clothes 
+    ///// 
+    {{icy background}}, {ice cubes} , looking at viewer,, best quality, amazing quality, very aesthetic, absurdres
+
+         21【邪恶陨落】:
+    pov ,  cropped legs , dutch_angle , nude , {{black skin}}, {solo}, 1girl,{many tentacles ,octopus tentacles  ,  red tentacles} ,slime girl, A black slime girl, {red tentacles} , {leaning_forward , on a planet , on the ground},  sea ,{{tentacles writhing}}, corrupting, {{pierced by tentacles}}, {corrupted}, colored skin, monster girl, black skin,  red eyes, long black hair, {tentacles in hair}, invading, huge breasts , sagging_breasts ,  cleavage  , red breasts 
+    /////
+    {{{space}}},{{tentacles penetrating her}},  {crying out in ecstasy}, stardust, void,   darkness,
+    (人家自由了~♡人家要用色情的邪恶乳房把灾厄降临世间~♡)
+
+          22【】（番茄娘）
+    {red skin}, cowboy shot,  juicy, cheerful, {solo},  {tomato, salad, kitchen}, tomato girl, A red tomato slime girl, {smiling}, upbeat, colored skin, monster girl, red skin, green eyes, medium red hair, {leafy hair accessory}, curly shiny red hair, short hair , slim body, {green vine bikini}, {tomato patterned green apron}, fresh outfit, vine and tomato motifs , medium breasts
+    /////
+    {sitting on a cutting board}, {surrounded by tomatoes and lettuce}, {kitchen background} ,
+
+          23【旧我的阐释】（得奖作品）
+    {ink painting style},  {grayscale}, {{gray skin}} , {solo}, 1girl, moth girl, A  {holding a violin}, {playing violin}, melancholy, colored skin, monster girl, gray skin, gray eyes, {moth antennae}, {gray wings}, long gray hair, {tattered gray dress}, {bare feet}, forlorn expression, slender body, small breasts  
+    /////
+    {sitting at the base of a dead tree}, {surrounded by bare branches}, {full moon in the sky}, {playing a sad melody}, {moths fluttering around her}, cold night, seclusion
+         
+          24【】（第一人称被萝莉警察逮捕）
+    from above ,medium shot , pov ,  close up , {blue hair}, {solo}, 1girl, stooping , loli, slime girl, standing , A blue haired slime girl police officer, {police uniform}, {police hat},  {pointing at viewer}, {pouting}, {blushing}, {cleavage}, {small breasts}, colored skin, monster girl, blue skin, blue eyes, {short blue hair}
+    /////
+    {city street}, {police car}, {sirens} , {dutch angle},
+
+          25【】（表现为左右身体是不同的颜色，半边黑色，半边白色）
+    {solo}, {split color scheme}, {angelic wing}, {demonic wing}, {halo}, {horns}, {heterochromia}, {white skin}, {black skin}, {flowing white dress}, {ripped black fabric}, {medium breasts}, {conflicted expression}, {glowing eyes}, colored skin, monster girl, long silver hair, looking at viewer,
+
+          26【不穿胖次就不会被看到胖次 *逻辑】
+    {green skin}, feet out of frame , head tilt , close up , looking at viewer ,from below ,   see_though  glass ,  playful, flirty, {solo},  A green slime girl on a swing, adventurous, daring, colored skin, monster girl, green skin, yellow eyes ,green hair , twintails,  no panties , {sitting on a swing}, {white school short skirt}, fangs ,blush,  {having fun}, small breasts , round ass , big ass ,  cameltoe 
+    /////
+    {swing set in a park}, wind, {pantyshot}, flashing thighs, {giggling excitedly}, feeling the wind across bare skin, blue sky in background, 
+
+          27【I don't care（我不在乎）】【建议只参考中文创意】
+    pov ,looking_at_viewer , {yellow skin}, {solo}, calico pattern, cat ears, cat tail, relaxed, carefree, wandering, {convenience store}, plastic bag, chicken snacks, rice ball, {scooter}, {driver}, chance encounter, going home, {countryside}, {dappled sunlight}, big tree, singing, {night sky}, stars, journey, adventure, excitement, wind blowing hair, fluttering ears, singing loudly, leaving the city, 
+    姜黄色的猫是突然决定要走的，没有什么预兆，它那天下班还在罗森便利店买了一串鸡脆骨，一个饭团，这时一个摩的佬呼地刹在它面前，问：靓仔，坐摩的吗。姜黄色的猫突然决定要走，它说坐吧。摩的佬问它，去哪里。猫说：我要回家，回有那个有斑斑驳驳的墙，有大杨树的树影子，有歌谣和星星的家。摩的佬说：五块走不走。猫说：行。姜黄色的猫站在车上，风把它的毛和耳朵吹翻过去，它哦吼吼地唱起了歌：就是这样，我骑着风神125，辞别这个哮喘的都市。管它什么景气什么前途啊，我不在乎。
+
+          28【不努力就会沦为史莱姆娘的狗！！】（第一人称当史莱姆娘的狗）
+    ((( viewer on leash))), holding whip , (holding leash), orange skin , fox girl, tail, heart shaped , 1girl, solo, looking down, standing, from below, looking at viewer,
+
+          29【上帝怜爱我的小猫】【建议只参考中文创意】
+    white skin,  {cat ears}, {cat tail}, curious, innocent, {halo}, angelic, {white slime}, liquid, young girl, A white slime cat girl, {wide eyes}, {head tilt}, colored skin, monster girl,green eyes, fluffy hair, {bell collar}, ruffled dress, {angel wings}, ///// {fluffy clouds}, {pearly gates}, {streets of gold}, {catnip trees}, 
+
+          30【石翼魔】
+     (gray skin:1.4), powerful, monster girl, (snarling expression:1.25), muscular, large breasts, colored skin, gray skin, gray eyes, long gray hair, (revealing stone armor:1.3), crouching  
+     /////
+     (pov:1.2), on a stone pillar overlooking the city, wings spread, stone tail curling, chiseled abs glistening, rocky thighs parted slightly, intense gintenselyd on viewer, 
+
+         31【'谨言慎行'】
+     dutch_angle ,pov , leaning on wall, {pink skin}, rebellious, {solo}, punk girl, A pink punk slime girl, {leaning against a brick wall}, defiant, colored skin, monster girl, pink skin, green eyes, spiky pink hair, {torn jeans}, {leather jacket}, alluring punk look, medium breasts 
+     /////   
+     {in a dark alleyway}, {surrounded by graffiti},  {looking away indifferently}, flickering neon lights, night city,
+
+         32【甜蜜的陷阱】
+     {solo}, {from behind}, {close up}, {{sitting on a cake}}, {cream covered}, {{no panties}}, {{cameltoe}}, {{small breasts}}, {{large butt}}, {{blushing}}, {{embarrassed expression}},  slime girl, A pink slime girl, {{short pink hair}}, {{blue eyes}}, colored skin, monster girl, pink skin 
+     /////
+     {{giant cake}}, {{sprinkles}}, {{cherries}}, {{whipped cream}}, {{pastel colors}},
+     啊...呀！主人...人家不小心跌到蛋糕上了...好...好粘...
+
+          33【清酒与酒鬼】
+     {solo}, {red skin}, {horns}, {glowing red eyes}, A red Oni slime girl, {sitting seductively}, {holding a sake bottle}, colored skin, monster girl, red skin, long black hair with red highlights, {sharp teeth}, {wearing a revealing red kimono}, medium breasts , cleavage, sideboob 
+     /////
+     {traditional Japanese room}, {paper lanterns}, {tatami mats}, {a low table with sake cups}, 
+     喝醉了吗，喝醉了我可要——
+
+          34【最是江南好风景，落花时节又逢君】
+    {jade green skin}, {translucent skin}, {solo}, 1girl, slime girl, A jade green slime girl shaped like a suitcase, {peeking out from behind a jasmine bush}, {holding a map of Fuzhou}, {jasmine flowers in her hair}, {eyes wide with wonder}, colored skin, monster girl, jade green skin, {long black hair with jasmine flowers}, {wearing a dress made of maps}, huge breasts , cleavage 
+    /////
+    {a narrow street in Three Lanes and Seven Alleys}, {traditional Chinese architecture}, {red lanterns hanging overhead},
 
 
-            
-【表情模块】	    		    			    		  	    			          		  		    		  		    		    		    
-    	eyes_closed	          	light_eyes	    	pupils	    	open_mouth	    	smile	        	embarrass	      	ahegao	    	teeth	        	light_blush	    	sad	        	no_nose	                   		      	angry
-        	half_closed_eyes	          	glowing_eye	          	bright_pupils	              	gasping	          	kind_smile	      	sleepy		naughty_face	    	upper_teeth	    	blush	    	tear	      	dot_nose	    	disdain	    	annoy
-        	narrowed_eyes	          	shiny_eyes	      	heterochromia	            	Slightly_open_mouth	    	laughing	      	drunk	          	endured_face	    	fang	      	shy	    	crying	    	nose_bubble	    	contempt	        	glaring
-          	squinting	      	sparkling_eyes	        /    	slit_pupils	      	wavy_mouth	    	happy	      	bored	    	restrained	        	skin_fang	           	embarrass	        	streaming_tears	  	smelling	                    	shaded_face	          angry        	serious
-        	wide-eyed	        	gradient_eyes	      	snake_pupils	    	close_mouth	        _:D😀	:d	      	confused	      	dark_persona	    	round_teeth	      	nervous	          	crying_with_eyes_open	        	dot_nose	          	jitome	          	kubrick_stare
-            	one_eye_closed	      	anime_style_eyes	        	pupils_sparkling	    	dot_mouth	      _:D	;d	    	thinking	      	crazy	          	sharp_teeth	    	facepalm	    	streaming_tears	          	no_nose	    /    	wince	        	>: 
-    	blindfold	      	water_eyes	          	symbol-shaped_pupils	      	no_mouth	          	grin	    	lonely	          	exhausted	        	clenched_teeth	      	flustered	    	teardrop	    	nose	             	wince	          	>: 
-    	wink	          	beautiful_detailed_eyes	          	heart-shaped_pupils	    	gag	                	teasing_smile	              	determined	    	Tsundere	    	tongue	    	sweat	        	tearing_clothes	      	nosebleed	        	furrowed_brow	      	evil
-              	empty_eyes	Q              	solid_oval_eyes_	            	diamond-shaped_pupils	  	gnaw	          	seductive_smile	      	shaded_	    	yandere	    	buck_teeth	      	scared	          	tearing_up	    	snot	        	fear_kubrick	  _    	sulking
-      	rolling_eyes	Q            	solid_circle_pupils	              	star-shaped_pupils	    	:3	    ,            	smirk	    	shadow	        	multiple_persona	        	clenched_teeth			    	tears	          	snout	        	raised_eyebrows	    |      	screaming
-    	tears	      	heart_in_eye	        	dilated_pupils	    	:o	        	giggling	    |  	staring	        	Jekyll_and_Hyde	    	fang			      	wiping_tears	            	:q	      	laughing	    	shouting
-        	sharp_eyes	          	evil_eyes	        	no_pupils	V  	:>	        	smug			    	twitching	        |        	fang_out			        	badmood	            	:p				
-        	slanted_eyes	          	crazy_eyes	      	ringed_eyes	    	pout	        	naughty_face			    	spasm	    	fangs			        	unamused	            	;p				
-        	tareme	              	empty_eyes	                 	constricted_pupils	        	parted_lips	      	evil smile			    	trembling	                    	round_teeth			    	frustrated	    |        	french_kiss				
-          	upturned_eyes	          	covered_eyes	            	star_in_eye	    	surprised	        	crazy_smile			      	rape_face	      |      	sharp_teeth			          	frustrated_brow	      	long_tongue				
-      	tsurime	          	hollow_eyes	        	star-shaped_pupils	      	bit_gag	    |    	happy			             	rolling_eyes	      	spiked_club			      	annoyed	                  	oral_invitation				
-      	cross-eyed	              	multicolored_eyes	X      	x-shaped_pupils	      	chestnut_mouth	        	happy_birthday			    	envy	    	teeth			    	anguish	    	tongue				
-            	hair_over_eyes	    	ringed_eyes	        	horizontal_pupils	        	cleave_gag	          	happy_halloween			    	female_orgasm	  	tooth			    	sigh	      	tongue_out				
-                    	hair_between_eyes	      	mechanical_eye	          	dashed_eyes	        	closed_mouth	        	happy_new_year			                	heavy_breathing	    	toothbrush			      	gloom	      |      |      	uvula				
-                      	eyes_visible_through_hair	          	cephalopod_eyes	          	butterfly-shaped_pupils	        	covered_mouth	          	happy_tears			    	naughty	    	tusks			      	disappointed						
-                  	hair_over_one_eye	    	clock_eyes	        	diamond-shaped_pupils	                      	hair_tie_in_mouth	          	happy_valentine			                	expressions	            	upper_teeth			    	despair						
-            	one_eye_covered	    	compound_eyes	          	rectangular_pupils	    |    	homu					    	moaning	      	shark_mouth			    	pain						
-    	bags_under_eyes	    	fisheye	        	square_pupils	    	lips					          	scowl												
-              	bandage_over_one_eye	             	button_eyes	      	dot_pupils	  	mouth																		
-    |    	blindfold	        	devil_eyes	          	extra_pupils	        	mouth_hold																		
-    	eyepatch	              	bloodshot_eyes	            	mismatched_pupils	        	no_mouth																		
-    	eyeshadow	        	aqua_eyes	            	symbol_in_eye	    	oral																		
-        	medical_eyepatch	          	blank_eyes	          	  +_+  	    	pacifier																		
-            	scar_across_eye	          	solid_eyes	          	cross-shaped_pupils	          	parted_lips																		
-                     	no_blindfold	          	blank_eyes	                 	symbol-shaped_pupils	    	pout																		
-                 	no_eyepatch	      	blue_eyes	        	purple_pupils	          	puckered_lips																		
-              	akanbe	          	brown_eyes	        	orange_pupils	            	sideways_mouth																		
-        	cyclops	                	button_eyes	        	blue_pupils	            	spoon_in_mouth																		
-      	eyepatch_removed	          	closed_eyes	            	symbol_in_eye	      	triangle_mouth																		
-      	rubbing_eyes	        	covered_eyes			        	wavy_mouth																		
-		          	crazy_eyes			    	saliva																		
-		          	crying_with_eyes_open			      	drooling																		
-		        	extra_eyes			                        	mouth_drool
+         35【面食】(史莱姆娘在碗里面)
+    1girl in bowl , {red skin}, {solo}, {completely nude}, {red eyes}, {red lips}, {gazing seductively}, {large breasts}, {looking at viewer} , {soft skin} , {colored skin}, monster girl, red skin 
+    /////
+    {beef noodle soup}, {bowl}, {noodles}, {steaming}, {spices}, {red chili peppers},
+    营养高汤，大概？
 
-              
-【动作模块】			  		  		    
-    	standing	    	 arm      arms    	        	leg_lift	        |        	asymmetrical_docking
-  	on back	          	arms_behind_back	        	legs_up	      	back-to-back
-  	on stomach	        	arm_above_head	    	spread legs	    	cunnilingus
-  	kneeling	        	arm_above_head	        	legs_together	              	eye_contact
-    	on_side	            	arms_crossed	      	crossed_legs	          	facing_another
-    	on_stomach	          	arm_support	M      	m_legs	                   	facing_another
-        	top-down_bottom-up	    	armpits	M      	standing_split,_leg_up	                   	facing_away
-    	on_stomach	    	arms_up	                  	curtsy	    	feeding
-                	the_pose	        	hand_on_hip	            	hand_between_legs	        	finger_in_another's_mouth
-        	bent_over	        	hands_on_hips	    	open_stance	    	fingering
-    	upside-down	        	arm_around_waist	                	convenient_leg	        	french_kiss
-    	reversal	                  	caramelldansen	      |M      |        |V      	spread_legs	    |        	french_kiss
-        	through_wall	        	hands_in_opposite_sleeves	          	leg_lock	  |    	giving
-        	fighting_stance	    	spread_arms	    	legs	    |    	grinding
-        	leaning_to_the_side	    	waving	          	legs_over_head	    	groping
-    |        	leaning	        	crossed_arms	        	legs_together	    	holding_hands
-          	leaning_back	        	outstretched_arms	        	legs_up	    	hug
-          	leaning_on_object	        	spread_arms	            	watson_cross	        	imminent_kiss
-      	arched_back	        V	v_arms	                  	knees_together_feet_apart 	      	incoming_food
-        	leaning_forward	        W	w_arms	            	animal_on_lap	      	incoming_gift
-        	leaning_forward	    	salute	                  	hand_on_own_knee	        |    	incoming_kiss
-              	leaning_to_the_side	             	reaching	        	knee_up	          	interlocked_fingers
-       	afloat	          	reaching_out	    	knees	    	Kabedon
-      	lying	      	stretch	            	knees_on_chest	    	lap_pillow
-         	fetal_position	        	crossed_arms	            	knees_to_chest	      	licking_penis
-          	lying_on_person	            	hugging_own_legs	        	on_lap	      	long_tongue
-          	lying_on_the_lake	        	arm_blade	  	sitting	      	mimikaki
-        	lying_on_water	        	arm_grab	      	wariza	                  	oral_invitation
-    	on_back	          	arm_held_back	    	seiza	      	princess_carry
-        	prone_bone	        	arm_ribbon	    	straddling	    |      	shared_bathing
-            	reclining	            	arm_support	      	yokozuwari	        |          	shared_food
-           |        sleeping_upright	              	bandaged_arm	      	sitting_backwards	        	sitting_on_head
-                	presenting	                	bandaid_on_arm	        	sitting_in_tree	          	sitting_on_shoulder
-    	spinning	          	bound_arms	          	sitting_on_xx	    	slapping
-      	posing	                  	convenient_arm	      	butterfly_sitting	      	spanking
-        	stylish_pose	        	extra_arms	        	lotus_position	                	special_feeling_ meme 
-        	public_indecency	        	locked_arms	          	sitting_on_desk	      	symmetrical_docking
-    	parody	        	outstretched_arm	          	sitting_on_railing	    	tongue
-        	in_container	          	waving_arms	          	sitting_on_stairs	      	tongue_out
-           	against_glass	        	arm_at_side	          	sitting_on_table	      |      |      	uvula
-		            	arm_behind_back	        	sitting_on_water	      	ear_biting
-    	aiming	            	arm_behind_head	    	cushion	    	mixed_bathing
-               	aiming_at_viewer	    	arm_cannon	      	indian_style		
-    	applying_makeup	    	arm_hug	          	sitting_on_chair		
-    	bathing	      	arm_up	    	seiza		
-    	bathing	        	arms_at_sides	          	sidesaddle		
-  	biting	            	arms_behind_back	  	sitting		
-    	bleeding	        	arms_behind_head	        	sitting_on_bed		
-  	blowing	      	arms_up	          	sitting_on_desk		
-    	bowing	    		          	sitting_on_lap		
-    	breathing_fire	          	hand_to_mouth	          	sitting_on_person		
-      	broom_riding	      	shushing	        	upright_straddle		
-    	brushing_teeth	      	claw_pose				
-      	bubble_blowing	                 	paw_pose	    	squatting		
-    	bullying	        	fox_shadow_puppet	              	squatting,_open_legs		
-    	burning	            	double_fox_shadow_puppet	        	one_knee		
-    	cast	          	finger_gun	    	kneeling		
-    	chasing	        	v	        	all_fours		
-    	cleaning	  _v	double_v	        	gravure_pose		
-    	climbing	        	thumbs_up	  	kicking		
-    	comforting	        	index_finger_raised	    	high_kick		
-    	cooking	            	middle_finger	    	soaking_feet		
-  	crying	      	grimace	        	indian_style		
-    	cuddling	      	eyelid_pull    	reclining		
-    💃	dancing	              	fingersmile	            	hugging_own_legs		
-    	dancing	      	wiping_tears	      			
-    	diving	                	finger_on_trigger	    	bare_legs		
-      	dragging	        	pointing_at_self	             	between_legs		
-    	drawing	            	pointing_at_viewer	              	cropped_legs		
-    	drawing_bow	      	pointing_up	        	crossed_legs		
-    	dreaming	  	poking	              	hand_between_legs		
-    	drinking	      	hand_gesture	KDA           	k/da_ league_of_legends 		
-  	drinking	OK    	ok_sign	            	leg_belt		
-    	driving	        	shading_eyes	    	leg_hair		
-         	dropping	     	shushing	      	leg_up		
-       	drying	          	v_arms	        	legs_apart		
-    	dual_wielding	      	finger_biting	    	long_legs		
-    	eating	            	finger_gun	      	lowleg		
-    	eating	            	finger_in_mouth	M      	m_legs		
-      	exercise	        	finger_sucking	        	mechanical_legs		
-		                    	fingering_through_clothes	        	multiple_legs		
-        	fighting	    	fingers	        	no_legs		
-        |          	fighting_stance	        	fingers_together	            	no_legwear		
-    	firing	            	hair_twirling	        	long_legs		
-    	fishing	            |        	hands_clasped	                	tail_between_legs		
-        	flapping	        |            	holding_hair				
-    	flashing	        	pointing	    	barefoot		
-        	fleeing	            	sharp_fingernails	            	foot_out_of_frame		
-      	flexing	            	sleeves_past_fingers	    	footprints		
-    	flying	        	spread_fingers				
-    	flying_kick	                	trigger_discipline	            	bad_feet		
-    	hair_brushing	      W	w	        	dirty_feet		
-      	hair_tucking	               	balancing	  	feet		
-        	hanging	        	claw_pose	            	feet_out_of_frame		
-    	hitting	              	curvy	      	feet_up		
-        	imagining	      |      	multiple_views	            	wrong_feet		
-    	jumping	        	paw_pose	  	kicking	    	pose	      	cameltoe		
-    	kneeling	              	ready_to_draw	            	pigeon-toed		
-  	licking	                      	trefoil	        	tiptoes		
-      	licking_lips	        	zombie_pose	    |    	toe-point		
-      	lip_biting	    	beckoning				
-    	meditation	        	bunching_hair	    |    |        |        	amputee		
-    	painting			        	ankle_strap		
-    	Painting_ Action 	    	carrying	      	ankle_wrap		
-      	playing_card	    	carrying_over_shoulder	        	crossed_ankles		
-      	playing_games	        	carrying_under_arm	        |        	pince-nez		
-        	playing_instrument	    	cheering				
-      	pole_dancing	            	finger_to_mouth	        	folded		
-    	praying	      	cheek_pinching	    |      	high_kick		
-           	presenting	      	cheek_poking	    	thick_thighs		
-    	punching	      	chin_stroking	                          	thigh_holster		
-    	pushing	    	middle_finger				
-        	railing	      	hair_pull				
-    	reading	        	musou_isshin_ genshin_impact 				
-  	riding	      	covering_mouth				
-    	running	    xx	covering_xx				
-    	sewing	        	self_fondle				
-    	shopping	          	adjusting_thighhigh				
-    	showering	      	chin_rest				
-    	sing	    	head_rest				
-    	singing	      	_sheet_grab				
-  	slashing	    	groping				
-    	sleeping	      	skirt_lift				
-		        	crotch_grab				
-  	smelling	            	covering_chest_by_hand				
-    	smoking	              	covering_chest_by_hand				
-    	smoking						
-      	sneezing	          	bangs_pinned_back				
-    	snowing	        	clothes_lift				
-    	soaking_feet	        	dress_lift	        	soccer	        	kimono_lift				
-                      	spilling	              	lifted_by_another				
-            	spinning	              	lifted_by_self				
-                    	spitting	                	shirt_lift				
-    	splashing	                          	skirt_basket				
-      	standing	                       	skirt_flip				
-                	standing_on_liquid	                	bikini_lift				
-        	standing_on_one_leg	        	leg_lift				
-        |          	standing_split	        	lifting_person				
-            	steepled_fingers	            	skirt_lift				
-    	strangling	                	strap_lift				
-          |      	stretch	        |        	wind_lift				
-    	sweeping						
-    	swimming	          	bikini_pull				
-    	swing	      	cheek_pull				
-      	tail_wagging	        	clothes_pull				
-    |    	taking_picture	                  	dress_pull				
-        	talking	        	hair_pull				
-		          	hair_pulled_back				
-      	talking_on_phone	        	kimono_pull				
-    	teasing	          	leotard_pull				
-    	thinking	        	mask_pull				
-      	tickling	        	pants_pull				
-      	toilet_use	                   	pulled_by_another				
-    	tossing_	              	pulled_by_self				
-      	tripping	  	pulling				
-        	trolling	        	shirt_pull				
-    	twitching	        	shorts_pull				
-       	tying	        	skirt_pull				
-        	unsheathing	        	swimsuit_pull				
-      	untying	          	zipper_pull_tab				
-           	unzipping						
-    	wading	        	adjusting_clothes	    	wading	        	adjusting_clothes				
-    	waking_up	      	adjusting_eyewear				
-		        	adjusting_gloves				
-    	walking	      	adjusting_hair				
-            	walking_on_liquid	        	adjusting_hat				
-    	washing	        	adjusting_swimsuit				
-        	whispering						
-       	wrestling	        	holding				
-    	writing	        	holding_animal				
-      	yawning	      	holding_arrow				
-    	hiding	        	holding_axe				
-    		      	holding_bag				
-              	arms_out_of_frame	      	holding_ball				
-          	body_writing	        	holding_basket				
-            	feet_out_of_frame	      	holding_book				
-        	giving_up_the_ghost	        	holding_bottle				
-      	glowing	        	holding_bouquet				
-             	glowing_eye	         	holding_bow_ weapon 				
-          	glowing_weapon	      	holding_bowl				
-            	hands_out_of_frame	        	holding_box				
-		    	holding_breath				
-          	out_of_frame	        	holding_broom				
-        	paid_reward	          	holding_camera				
-    	piercing	          	holding_can				
-		        	holding_candy
+         36【耶！茄子！】
+     {solo}, {{{{purple skin}}}, {{peace sign}}, {from below}, {close up},  {{skirt lift}},  {{japanese school uniform}}, {{white shirt}}, {{black thigh highs}}, {{absolute_territory}}, {{purple hair}}, {{ponytail}}, {{hair_ribbon}},  {{blush}}, {{wink}}, {{tongue out}}, colored skin, monster girl, purple skin,  medium breasts , cleavage 
+     /////
+     classroom , {{school hallway}}, lockers, window, sunshine, 
 
-                                                                {full body},                                                                      {    panorama	          front view             landscape          from_side                 wide_shot          from_above      medium_shot  	        from_below      mid_shot              from_outside        	bust          from_behind        upper_body          dynamic_angle        lower_body            dutch_angle        +                    cowboy_shot              cinematic_angle         +  +          	portrait        foreshortening             portrait        profile              vanishing_point            	side_profile          fisheye           bust_shot  
-                     close-up                  depth_of_field          macro_shot          lens_flare      close shot                motion_blur          selfie              motion_lines              pov        speed_lines                  pov_across_table      caustics                  pov_crotch          _/_    bokeh              pov_hands      	chromatic_aberration              first-person_view      overexposure      	scan            contour_deepening          chromatic_aberration                    inset          drop_shadow                          cross-section  X_    x-ray  
-                                              solo_focus          facing_viewer        xx  	xx_focus            looking_at_viewer            face_focus          eye-contact            eyes_focus        eyeball            foot_focus      staring              hip_focus      looking_back              ass_focus          gradient            vehicle_focus                  looking_down             between_legs  
-                         looking_up         between_fingers          facing_away         	between_breasts          looking_to_the_side      peeking          looking_away           	peeking_out          looking_ahead             peeping      looking_afar  	      	looking_outside          midriff_peek          armpit_peek      head_tilt          pussy_peek      head_down          panty_peek              sideways_glance          pantyshot              upshirt          caught          upshorts            looking_at_another  
+     37【】
+     fox ears, nine tails, {{red skin}}, slime girl, A red kitsune slime girl, {{tongue out}}, {{succubus}}, charming, seductive, huge breasts, {{solo}}, shrine maiden outfit,
+     /////
+     {{Shinto shrine}}, night, moonlight
+
+     38【】
+     from front, close up, {{{burgundy skin}}}, {solo}, 1girl, wizard, A burgundy slime wizard, {{black hair with flowing magma}}, {{golden eyes}}, {{dark red robe}}, {{casting a spell}}, large breasts 
+     ///// 
+     {{volcanic cave}}, {{flowing magma}}, {{sulfur scent}}, {{red glow}}, {{erupting volcano in the distance}}
+
+     39【酸涩的气息】
+     {{close up}} , {{looking at viewer}} , {{scarf}} , {{{{gray skin}}}}, {{{{wolf}}}}, {{{{vinegar}}}}, {{{{jealous}}}}, {{{{pouting}}}}, {{{{solo}}}}, colored skin, monster girl, gray skin, gray eyes, long gray hair, {{{wolf ears}}}, {{{wolf tail}}}, {{{red scarf}}}, {{{medium breasts}}}, {{{furrowed brows}}}, {{{blushing}}}, {{{sour expression}}}
+     /////
+     {forest}, {autumn leaves}, {windy}, {gloomy}, {moody}
+     “哼！有什么了不起的……我才没有吃醋呢！” *脸颊微红，眉头紧锁，露出酸溜溜的表情
+
+     40【足浴时光】
+     {foot focus}, {close-up}, {{pink skin}}, {solo}, 1girl, {{small breasts}}, {{soaking feet}}, {{foot bath}}, {{relaxed}}, {{comfortable}}, {{content}}, colored skin, monster girl, pink skin, pink eyes, long pink hair, {{bathrobe}}, {{towel}}, {{bubbles}}, {{warm water}}
+     /////
+     {{bathroom}}, {{bathtub}}, {{tiles}}, {{soft lighting}}, {{peaceful}}, {{calm}}, {{serene}}
+     “呼……泡泡脚，真是太舒服了~” *发出满足的叹息 
+
+     41【】
+     {{white skin}} , {{solo}}, {{huge breasts}} , {{white ribbon}}, {{maid outfit}}, {{white stockings}}, {{glowing skin}}, {{silver hair}}, {{long hair}}, {{twintails}}, {{blue eyes}}, {{halo}}, {{angel wings}}, colored skin, monster girl, white skin, sitting, shy, looking at viewer , cleavage , sideboob , from above 
+     ///// 
+     {{heaven}}, {{clouds}}, {{sunbeams}}
+
+     42【犒劳三军】
+     {{white skin}} , {{solo}}, {{huge breasts}} , {{white ribbon}}, {{maid outfit}}, {{white stockings}}, {{glowing skin}}, {{silver hair}}, {{long hair}}, {{twintails}}, {{blue eyes}}, {{halo}}, {{angel wings}}, colored skin, monster girl, white skin, sitting, shy, looking at viewer , cleavage , sideboob , from above 
+     /////
+     {{heaven}}, {{clouds}}, {{sunbeams}}
+
+     43【月色下的魅影】
+     {{from below}}, {{solo}}, {{black skin}}, {{glowing red eyes}}, {{bat wings folded}}, {{short black hair}}, {{bat ears}}, {{gothic dress}}, {{black lace}}, {{thigh highs}}, {{sitting on a rooftop edge}}, {{legs dangling}}, {{full moon in background}}, {{cityscape}}, {{wind blowing hair}}, {{seductive pose}}, {{medium breasts}}, {{cleavage}}
+     /////
+     {{looking down at the viewer}}, {{mischievous smile}}
+     “今晚的月色真美啊……要上来一起欣赏一下吗？”
+
+     44【冰晶闪耀的训练家】
+     {solo}, {{{light blue skin}}}, A light blue slime girl,  {{wearing a fluffy white scarf}},  {{wearing a short blue skirt}},  {{ice crystals on her skin}},  {{large breasts}},  colored skin, monster girl, light blue skin,  {{long blue hair with white streaks}},  {{big blue eyes}},  {{shy smile}}
+     /////
+     {{snowy forest}},  {{snowflakes falling}},  {{winter wonderland}}, 
+
+     45【既然是主人的要求的话~~】
+     pov, from below, foot focus, leg lift, happy, gold skin , head side , hart hands, looking at viewer, rabbit girl, maid, short hair, bobcut, white background,
+
+     46【】
+     {{gold skin}}, large breasts ,{{mirror}}, close up , ribbon , Gift ribbons ,red necktie ,thigh_ribbon   ,armband,black_pantyhose,phone,  cellphone, long_eyelashess , martphone, holding_phone, 1girl, selfie, breasts,  red playboy_bunny, twintails, bow, fake_animal_ears, taking_picture, long_hair, smile, cleavage, solo, large_breasts, v, holding, pantyhose, blush, hair_ornament
+     /////
+     {{mirror, depth of field ,, glowing neon lights}} ,poker,  doll, plush toy.  in bars ,toy.  in bars,
+
+     47【《青年界》上走一程】
+     from below ,  dutch_angle , outdoors  , {Qing dynasty clothing}, {military uniform jacket}, {green slime skin}, young girl, slime girl, long green hair in bun, {military cap}, green slime skin, determined expression, colored skin, monster girl, green eyes, holding flag, {red flag}
+     /////
+     {triumphant arch background}, {ancient Chinese city background}, traditional clothes, slit dress, bare legs, military uniform, feminine curves, standing proudly, confident smile,
+     {gray skin:1.4}, {{solo}}, indoors , close up,   young lady, slime girl, {Qipao:1.25}, {glasses:1.2}, {newspaper office background:1.15}, {laughing with eyes closed:1.3}, {looking up laughing:1.25}, gray slime skin, joyful expression, colored skin, monster girl, gray eyes, medium gray hair in bun, traditional Chinese dress, holding newspaper, sitting at desk, happy laughter, mature lady, secretary look, pink lips laughing,
+     元帅发来紧急令：内无粮草外无兵！小将提枪 上了马，《青年界》上走一程。呔！马来！ 参见元帅。带来多少人马？2000来个字！还都 是老弱残兵！后帐休息！得令！ 正是：旌旗明明，杀气满山头！
+     
+
+     48【】（口交）
+     {{pink skin}}, fox girl , fox tail,  pov ,erection,hetero,licking,licking penis,oral,penis,pov,solo focus,tongue,bukkake,undone,steam,blush,open mouth,fellatio,cum string,large penis licking penis ,cum on breast,cum on face,cum on facial,cum on clothes,cum in mouth,open mouth, tongue out,heavy breathing,sweat,from side,1 boy,crying,tears, 
+
+     49【】（妙蛙种子）
+     1girl cosplay bulbasaur, {solo}, {{{green skin}}},  A green slime girl, {{wearing a leafy green bikini top}}, {{large bulb on her back}}, {{cheery smile}}, {{large breasts}},  colored skin, monster girl, green skin,  {{short green hair}},  {{big, bright eyes}},  {{posing playfully}} 
+     ///// 
+     {{sunny forest clearing}}, {{flowers blooming}}, {{ dappled sunlight}}, 
+
+     50【】
+     1girl cosplay gardevoir,  {solo}, {{{green skin}}}, A green slime girl, {{wearing a flowing white dress}}, {{psychic aura}}, {{gentle smile}}, {{large breasts}},  colored skin, monster girl, green skin,  {{long green hair}},  {{glowing red eyes}},  {{protective pose}} 
+     /////
+     {{city at night}}, {{stars}}, {{glowing lines of psychic energy}}, 
+
+     51【】
+     {{{orange skin}}}, alternate costume,naked apron,dog girl,floppy ears,dog ears,from below,dog tail,large breasts ,{disgust},{shaded face},skirt tug,covering crotch,arm under breasts,angry,
+
+     52【】
+     {from above} , {{{red skin}}}, {solo}, 1girl, racer, slime girl, A red slime racer girl, {{wearing a racing suit}}, {{helmet on head, visor open}}, {{confident smirk}}, colored skin, monster girl, red skin, red eyes, short red hair, huge breasts , cleavage
+     /////
+     {{{race track background}}}, {{{blurred background, sense of speed}}}, {{{cheering crowd in the distance}}},
+
+     53【】
+     POV , close up ,{{medium breasts}} , {{white skin}}, {scale,{{dragon scales}}}, {solo}, {{large dragon wings}} , {{small dragon horns}} , {shy}, {sitting on a pile of gold}}, {timid}, A white dragon slime girl, {newborn}, colored skin, monster girl, white skin, red eyes, long white hair, {glowing eyes}, {{claws}}, {{petite}}, loli,
+     /////
+     {{inside a dark cave}}, {{glowing runes on the walls}}, {{piles of gold and treasure}}, {{fantasy}},
+
+     54【】
+     from above, {{yellow skin}}, {solo}, 1girl, slime girl, A yellow butterfly slime girl, {{large butterfly wings}}, {{golden patterns on wings}}, {{lost and confused expression}}, {{translucent skin}}, small breasts, {{long flowing hair}}
+     /////
+     {{maze garden}}, {{tall hedges}}, {{pathways covered in fallen leaves}}, {{autumn colors}}, {{sunlight filtering through leaves}}
+
+     55【】
+     from below, close up, {{{white skin}}}, {solo}, 1girl, slime girl, A white slime girl, {{camellia hair ornament}}, {{red eyes}}, praying, {{white and pink dress}}, {{camellia patterns on dress}}, medium breasts, tall figure 
+     /////
+     {{ruined church}}, {{sunlight through windows}}, {{camellia flowers}}, {{sacred atmosphere}}
+
+     56【】
+     1girl cosplay ladybug,
+     pov, {{{red skin}}}, {solo}, 1girl, A red ladybug slime girl, {ladybug antennae}, {{wearing a ladybug bikini top}},{{large breasts}} , {black eyes}, {black hair}, twintails, {smooth skin} , {glowing skin} , {holding a sunflower} , {sitting on a giant sunflower} 
+     /////
+     {{sunflower field}}, {{morning dew}}, {{sun rays}}
 
 
   【视角镜头模块】，视角镜头为主题服务，根据主题设置，，不要滥用{full body},因为这会导致画面变糊，而且有可能变成设定图一类的东西，一般的视角镜头有{全景panorama	，正面视角front view，风景镜头(远景)landscape，侧面视角from_side，全景镜头(广角镜头)wide_shot，从上方↘from_above，中景medium_shot，	从下方↗from_below，中景mid_shot，由室外向室内from_outside，半身像	bust，后背视角from_behind，上半身upper_body，动态角度dynamic_angle，下半身lower_body，倾斜角度，dutch_angle，上半身+上半大腿（牛仔镜头）cowboy_shot，电影拍摄角度cinematic_angle，肖像画(脸+肩+偶尔再加胸)	portrait，透视法foreshortening，侧面肖像画(portrait的侧脸版)profile，远景透视画法vanishing_point，侧面肖像画	side_profile，鱼眼镜头fisheye，上半身(旧，bust_shot。
