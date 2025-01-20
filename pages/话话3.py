@@ -1016,50 +1016,6 @@ V      	slingshot_swimsuit	        	ribbed_sweater	          	pants_tucked_in			
        人物视角：抬头看↗looking_up，(突出)指间between_fingers，面向别处facing_away，(突出)胸部	between_breasts，看向侧面looking_to_the_side，偷窥peeking，看着别处looking_away，偷窥(的姿态)	peeking_out，展望未来looking_ahead，偷窥(强调视角)peeping，遥望looking_afar，	向外看	looking_outside，肚脐偷看midriff_peek，腋窝偷看armpit_peek，歪头head_tilt，浦西偷看pussy_peek，低头head_down，内裤偷看panty_peek，轻轻向侧面瞥sideways_glance，内裤走光pantyshot，从衬衫下方瞥upshirt，被抓现行caught，从裙底瞥upshorts，看着另一个looking_at_another，
 
 
-【NSFW】色色模块
-2口部	后入	all fours, torso grab bangs, doggystyle, hetero, indoors, kneeling, nude, breast out, ass focus, on backend cum, ejaculation pussy juice, sex, sex from behind, arched back, (sweat), ((sweatdrop)), tongue out, cum on face, cum on back, ((steam)) , sexually suggestive, lying on bed, torn dress, cum in pussy, suggestive fluid, vaginal, 
-2口部	口	choker, demon horns, thighhighs, hair ornament, hairclip, very long hair, looking at viewer, (multicolored hair:1.2), sitting, twintails, nipples, medium breasts, open clothes, on bed, spread legs, pink eyes, dress, nude, pussy, from below, evil smile, bedroom, 
--1随机	万能变色图魔咒！看见人就给我狠狠中出吧！	
-3上身	骑乘位	 ((((grab another's Wrist)))), collar, leash, ahegao, pussy, fuck, spread legs, straddling,  penis, cum, trembling, pov
-1状态	街头露出	Heart-shaped pupils full-face blush steam sweat lovestruck tongue out embarrassed see-though wet clothes torn (clothes/pantyhose等服饰) cameltoe
-2口部	自拍	selfie, taking picture, cellphone depth of field, female pov, holding phone, looking at phone, mirror, navel, phone photo, background, reflection, 
-1状态	"街头露出:
- 從下以上自拍"	nsfw, (填入風格), from below, (extremely detailed face) ,(very detailed and expressive eyes), finely detailed nipple finely detailed pussy, (selfie), 1girl, exhibitionism, (填入角色細節) ,revealing clothes,clothes lift, breasts out,pussy juice,wet,sweating,looking at viewer,outdoor,day
-4下身	女上位	((((grab another's Wrist)))), leash, pussy, fuck, From behind, standing sex, penis, cum, ((Looking back)), trembling, pov, 
-4下身	轻微guro(少量R18G）	unconscious ((empty eyes)) tears teeth opened mouth drooling , ragged clothes loli dirty torn clothes poor messy hair dirty hair guro ,  bleeding on hair alternate costume sketch dynamic angle , after vaginal nsfw cum in pussy cum drip faceless male sex hetero ((defloration))
-6其他	触手sex正面视角（含双穴插入、触手捆胸、口爆、衣物破损，有需要请自行调节tag权重）	pubic tattoo, fanny, cum, sweat, navel, multiple insertions, force feeding, slave, double penetration, bdsm, tears, steam, body restraint, legs up, heart-shaped pupils, (ahegao), spread legs, facing viewer, clitoris, vulva, rape, cum on facial, daze expression, lot of tentacles, ((tentacles sex)), ((tentacles framed breasts)), ((licking tentacles)), torn clothes, torn legwear
-1状态	高潮过后	1girl, (((2boy))), ((doggystyle)), sex from behind, (side view), (fellatio), oral, cum in mouth, cum in pussy, penis
-3上身	前后夹击（口+后）横向视角，需拉宽图片	
-1状态	经典触手精灵	masterpiece best quality spread legs, penetration masterpiece best quality best quality, Amazing, beautiful detailed eyes, finely detail, Depth of field, extremely detailed CG unity 8k wallpaper, light, oil painting, (a skimpy girl with inserted by tentacles), 1girl, ((tentacles sex)), tentacles in pussy many tentacles, pussy bare feet, Tie with tentacles, bundled, small breasts, naughty face, open mouth, evil smile, yellow hair, green eyes, elf, sketch, child, original, wet, Outdoor,  sky, femdom, tears, ((dramatic shadows)), (wide-eyed heart-shaped pupils) suggestive fluid ((spoken heart)) ((((trembling)))) motion lines, motion blur ((in heat aroused)), nsfw, looking at viewer, 
-4下身	姿势更加生动	grab on own thigh, grab on another's thigh, grab on own pussy, grab on another's penis/testicles
-4下身	"抓住银屯后入
-(可能比prompt组合
-更加稳定的自然语言咒术)"	nsfw, (填入風格), from below, (extremely detailed face) (very detailed and expressive eyes), finely detailed nipple finely detailed pussy, (selfie), 1girl, exhibitionism, (填入角色細節) revealing clothes clothes lift, breasts out pussy juice wet sweating , looking at viewer outdoor day
-1状态	洗澡	nsfw, (填入風格), from below, (extremely detailed face) (very detailed and expressive eyes), finely detailed nipple finely detailed pussy, (selfie), 1girl, exhibitionism, (填入角色細節) revealing clothes clothes lift, breasts out pussy juice wet sweating , looking at viewer outdoor day
-4下身	爆炒	((((grab another's Wrist)))), ahegao pussy fuck spread legs straddling penis cum trembling First-person view, nsfw, nipple
-1状态	简易色气	empty eyes expressionless alternate hairstyle alternate costume torn clothes torn legwear posing lactation through clothes sex hetero (nsfw) large penis fainted unconscious after vaginal cum in pussy wet dynamic angle dramatic shadows
-1状态	                  开腿事后	emotionless tired after sex, after vaginal, arms behind back bar censor, bdsm blur censor bondage bound arms nipples bukkake collarbone, cum in mouth cum in pussy, cum on body, cum on breasts cum on stomach, cumdrip, fur trim medium breasts, looking at viewer, navel open mouth , spread legs, squatting tally, thighhighs, toilet, toilet stall (((urinal))) ,  heart-shaped pupils full-face blush steam sweat lovestruck embarrassed,  see-though wet clothes tornclothes cameltoe
-4下身	骑乘位+表情偏正常	(masterpiece) (1girl) (1boy) ((((grab another's Wrist)))) collar leash small breasts pussy fuck spread legs straddling penis cum trembling First-person view, disdain, cum in pussy, 
-4下身	抱起来草	1girl, ((1boy)), (((spread legs))), (((reverse suspended congress))), ((full nelson)), (((carrying))), ((leg grab)), open mouth, penis, pussy, spread pussy, sex from behind, sweat, nsfw, vaginal, 
-2口部	口	1girl (nsfw), (Blowjob), fellatio, food porn, nsfw, fellatio, precum, blood vessel, uncensored, blush, realistic, masterpiece, high quality, (an extremely delicate and beautiful)
-2口部	食鸡	erection fellatio hetero licking licking penis oral penis pov solo focus tongue tongue out uncensored 
-2口部	重点攻击口部	 (((nsfw))) (((sex))) pussy (ultra-detailed) ((cum in mouth )) (((detailed fellatio))) blow job penis (masterpiece)), ((best quality)), medium breasts perfect hand ((an extremely delicate and beautiful)), (dynamic angle), 1girl, cute eyes, (beautiful detailed eyes) messy floating hair, disheveled hair, 
-4下身	站立后入	 (((nsfw))) (((sex))) pussy (ultra-detailed) ((cum in mouth )) (((detailed fellatio))) blow job penis (masterpiece)), ((best quality)), medium breasts perfect hand ((an extremely delicate and beautiful)), (dynamic angle), 1girl, cute eyes, (beautiful detailed eyes) messy floating hair, disheveled hair, 
-4下身	足交	masterpiece, 1girl, best quality, masterpiece, 1girl, best quality, (Footjob), foot, foot insertion, penis, (penis between foot), (full body), lolita, pretty face, bishoujo
-3上身	乳交	erection, ((((paizuri)))), (breast grab), hetero, penis, large penis, looking at viewer, saliva, solo focus cool face cold attitude emotionless face blush breasts, ahegao, cum on breasts
-4下身	后背位	((((grab_another's_Wrist)))), leash, pussy fuck, From behind, standing sex , penis, cum, ((Looking back)), trembling, First-person view
-4下身	浴缸正常位	1girl, 1boy, ((((bathtub)))), bathroom, (((missionary))), sex, penis, large penis, ((spread pussy)), (((spread legs))), deep penetration, nude, nipples breasts m legs, hetero pussy, vaginal, steam, smile happy sex, pov, water, partially submerged
-1状态	工口蹲	spread legs, squatting, arms up, middle finger, nsfw, sexually suggestive, 
-1状态	雌小鬼	, naughty face, naughty face, open mouth grin smug, loli, smile, eyeball, evil smile fang
--1随机	颜射（基本能带上几把）	((hair over shoulder, fellatio, cum string, large penis licking penis)) straddling semen cum on breast, cum on face, closed eyes arms behind head, elbow gloves cum on facial, cum on clothes cum in mouth, open mouth, tongue out, heavy breathing, sweat from side, petite, ahegao, 
-1状态	亲亲pov	((((((pov, intense, stare, incoming kiss, outstretched, arms, heavy breathing, in heat aroused, strained, smile))), (masterpiece), ((dramatic shadows)), (suggestive fluid), ((spoken heart)), ((1girl, solo)), ((trembling)), 
-1状态	睡*	unconscious, closed eyes, sleeping, ((cum on face)), cum in mouth, cum on hair, cum on breast, 
-4下身	黑魔术：扶她击破之术.其实只要加个前置咏唱就行...	((((a futanari 1girl, girl with penis)))).(best quality) ((masterpiece))....
-4下身	磨豆腐	2girls thighs leg up ((((tribadism)))) sexual suggestive nude lesbian pussy juice female orgasm female ejaculation squirting sweatdrop
-1状态	一鸡两吃	((2girls, tongue kiss, saliva swap)), fellatio, cum in mouth, cum string, grab on penis, grab own breasts, breast grab, nsfw, foreshortening, POV, 
-5多P	多人连鸡	1girl, 4boys, (deep penetration), (fellatio), (triple penetration), cum in mouth, multiple boys, straddling, anal, spread anus, cum in ass, ass grab, (oral), multiple penises, (spitroast), (irrumatio), pussy, vaginal, spread legs, m legs, penis, solo focus, sex, overflow, nude, completely nude, nipples, navel, group sex, gangbang, ejaculation, hetero, rape, sweat petite ahoge
-6其他	自慰tag	highly_detailed, extremely_detailed_CG_unity_8k_wallpaper, illustration, highres, absurdres, beautiful_detailed_eyes, finely_detailed_light, highly_detail_hair_, （人物特征）, sexually suggestive, suggestive fluid, nsfw, self fondle, female masturbation, spread pussy, masturbation, female masturbation, on bed, pussy juice,  fingering, steaming body, on back, heavy breathing, nipples, saliva trail, wet, bedwetting, female ejaculation, pussy juice puddle,  clitoris, labia, sweat, pussy fingering, clitoral stimulation, small breasts, breast grab, younger, torogao, kneehighs,
-
 
                ]]"""}]}
     )
