@@ -392,6 +392,8 @@ blueviolet	深罗兰紫
 mediumpurple	中紫
 slateblue	板岩蓝
 mediumslateblue	中板岩蓝
+
+
 【人物模块】	人设		性别		身体		头发样式		头发颜色		其他
 公主	princess	单人	solo	有光泽的皮肤	shiny_skin	直发	straight_hair	挑染	streaked_hair	长发	long_hair
 舞者	dancer	女人	female	苍白皮肤	pale_skin	卷发	curly_hair	内层挑染	xx_colored_inner_hair	很短的头发	very_short_hair
@@ -739,28 +741,13 @@ xx娘	xx_girl	2个女孩	2girls	腰	waist	法式辫子	french_braid	水晶材质
     /////
     {trembling, bedroom , indoors , broken_heart}, day , light
     
-         19【】（第一人称被猫娘压在身下榨精）
-    {orange skin}, {POV,  dutch_angle},1boy, cum , semen ,human ,loli ,ahoge ,girl on top  , {nude}, young girl,  cat ears , tail,cat girl ,  large breasts,  breasts   press completely nude, convenient censoring, {hair censor},  open_mouth, :3,   looking at viewer ,half-closed eyes,smark ,blush , colored skin, monster girl, orange skin,  [blue eyes], short orange hair, air_bangsair_bangs
-    /////
-    {trembling, bedroom , indoors , broken_heart}, 
-
+         
          20【杯装可乐】【整个人物在玻璃杯里面，此为获奖作品】
     {{{{under water}}}} ,{{{Girl in a cup}}} ,water , a cup of cola, close up , {{close up face , from side , face focus , dutch_angle}} , glass cup,  in cup, sitting ,  {red color:1.2} , ice , fizzy, {{solo}}, {cola, ice cubes, frost:1.3}, refreshing girl, A cola-themed slime girl, {playful}, colored skin, monster girl, red skin, long dark red hair, {twin tails:1.2}, shiny hair, small breasts, {cola logo crop top:1.25}, {denim shorts}, casual clothes 
     ///// 
     {{icy background}}, {ice cubes} , looking at viewer,, best quality, amazing quality, very aesthetic, absurdres
 
-         21【邪恶陨落】:
-    pov ,  cropped legs , dutch_angle , nude , {{black skin}}, {solo}, 1girl,{many tentacles ,octopus tentacles  ,  red tentacles} ,slime girl, A black slime girl, {red tentacles} , {leaning_forward , on a planet , on the ground},  sea ,{{tentacles writhing}}, corrupting, {{pierced by tentacles}}, {corrupted}, colored skin, monster girl, black skin,  red eyes, long black hair, {tentacles in hair}, invading, huge breasts , sagging_breasts ,  cleavage  , red breasts 
-    /////
-    {{{space}}},{{tentacles penetrating her}},  {crying out in ecstasy}, stardust, void,   darkness,
-    (人家自由了~♡人家要用色情的邪恶乳房把灾厄降临世间~♡)
-
-          22【】（番茄娘）
-    {red skin}, cowboy shot,  juicy, cheerful, {solo},  {tomato, salad, kitchen}, tomato girl, A red tomato slime girl, {smiling}, upbeat, colored skin, monster girl, red skin, green eyes, medium red hair, {leafy hair accessory}, curly shiny red hair, short hair , slim body, {green vine bikini}, {tomato patterned green apron}, fresh outfit, vine and tomato motifs , medium breasts
-    /////
-    {sitting on a cutting board}, {surrounded by tomatoes and lettuce}, {kitchen background} ,
-
-          23【旧我的阐释】（得奖作品）
+         23【旧我的阐释】（得奖作品）
     {ink painting style},  {grayscale}, {{gray skin}} , {solo}, 1girl, moth girl, A  {holding a violin}, {playing violin}, melancholy, colored skin, monster girl, gray skin, gray eyes, {moth antennae}, {gray wings}, long gray hair, {tattered gray dress}, {bare feet}, forlorn expression, slender body, small breasts  
     /////
     {sitting at the base of a dead tree}, {surrounded by bare branches}, {full moon in the sky}, {playing a sad melody}, {moths fluttering around her}, cold night, seclusion
@@ -778,27 +765,11 @@ xx娘	xx_girl	2个女孩	2girls	腰	waist	法式辫子	french_braid	水晶材质
     /////
     {swing set in a park}, wind, {pantyshot}, flashing thighs, {giggling excitedly}, feeling the wind across bare skin, blue sky in background, 
 
-          27【I don't care（我不在乎）】【建议只参考中文创意】
-    pov ,looking_at_viewer , {yellow skin}, {solo}, calico pattern, cat ears, cat tail, relaxed, carefree, wandering, {convenience store}, plastic bag, chicken snacks, rice ball, {scooter}, {driver}, chance encounter, going home, {countryside}, {dappled sunlight}, big tree, singing, {night sky}, stars, journey, adventure, excitement, wind blowing hair, fluttering ears, singing loudly, leaving the city, 
-    姜黄色的猫是突然决定要走的，没有什么预兆，它那天下班还在罗森便利店买了一串鸡脆骨，一个饭团，这时一个摩的佬呼地刹在它面前，问：靓仔，坐摩的吗。姜黄色的猫突然决定要走，它说坐吧。摩的佬问它，去哪里。猫说：我要回家，回有那个有斑斑驳驳的墙，有大杨树的树影子，有歌谣和星星的家。摩的佬说：五块走不走。猫说：行。姜黄色的猫站在车上，风把它的毛和耳朵吹翻过去，它哦吼吼地唱起了歌：就是这样，我骑着风神125，辞别这个哮喘的都市。管它什么景气什么前途啊，我不在乎。
-
+          
           28【不努力就会沦为史莱姆娘的狗！！】（第一人称当史莱姆娘的狗）
     ((( viewer on leash))), holding whip , (holding leash), orange skin , fox girl, tail, heart shaped , 1girl, solo, looking down, standing, from below, looking at viewer,
 
-          29【上帝怜爱我的小猫】【建议只参考中文创意】
-    white skin,  {cat ears}, {cat tail}, curious, innocent, {halo}, angelic, {white slime}, liquid, young girl, A white slime cat girl, {wide eyes}, {head tilt}, colored skin, monster girl,green eyes, fluffy hair, {bell collar}, ruffled dress, {angel wings}, ///// {fluffy clouds}, {pearly gates}, {streets of gold}, {catnip trees}, 
-
-          30【石翼魔】
-     (gray skin:1.4), powerful, monster girl, (snarling expression:1.25), muscular, large breasts, colored skin, gray skin, gray eyes, long gray hair, (revealing stone armor:1.3), crouching  
-     /////
-     (pov:1.2), on a stone pillar overlooking the city, wings spread, stone tail curling, chiseled abs glistening, rocky thighs parted slightly, intense gintenselyd on viewer, 
-
-         31【'谨言慎行'】
-     dutch_angle ,pov , leaning on wall, {pink skin}, rebellious, {solo}, punk girl, A pink punk slime girl, {leaning against a brick wall}, defiant, colored skin, monster girl, pink skin, green eyes, spiky pink hair, {torn jeans}, {leather jacket}, alluring punk look, medium breasts 
-     /////   
-     {in a dark alleyway}, {surrounded by graffiti},  {looking away indifferently}, flickering neon lights, night city,
-
-         32【甜蜜的陷阱】
+          32【甜蜜的陷阱】
      {solo}, {from behind}, {close up}, {{sitting on a cake}}, {cream covered}, {{no panties}}, {{cameltoe}}, {{small breasts}}, {{large butt}}, {{blushing}}, {{embarrassed expression}},  slime girl, A pink slime girl, {{short pink hair}}, {{blue eyes}}, colored skin, monster girl, pink skin 
      /////
      {{giant cake}}, {{sprinkles}}, {{cherries}}, {{whipped cream}}, {{pastel colors}},
@@ -827,16 +798,6 @@ xx娘	xx_girl	2个女孩	2girls	腰	waist	法式辫子	french_braid	水晶材质
      /////
      classroom , {{school hallway}}, lockers, window, sunshine, 
 
-     37【】
-     fox ears, nine tails, {{red skin}}, slime girl, A red kitsune slime girl, {{tongue out}}, {{succubus}}, charming, seductive, huge breasts, {{solo}}, shrine maiden outfit,
-     /////
-     {{Shinto shrine}}, night, moonlight
-
-     38【】
-     from front, close up, {{{burgundy skin}}}, {solo}, 1girl, wizard, A burgundy slime wizard, {{black hair with flowing magma}}, {{golden eyes}}, {{dark red robe}}, {{casting a spell}}, large breasts 
-     ///// 
-     {{volcanic cave}}, {{flowing magma}}, {{sulfur scent}}, {{red glow}}, {{erupting volcano in the distance}}
-
      39【酸涩的气息】
      {{close up}} , {{looking at viewer}} , {{scarf}} , {{{{gray skin}}}}, {{{{wolf}}}}, {{{{vinegar}}}}, {{{{jealous}}}}, {{{{pouting}}}}, {{{{solo}}}}, colored skin, monster girl, gray skin, gray eyes, long gray hair, {{{wolf ears}}}, {{{wolf tail}}}, {{{red scarf}}}, {{{medium breasts}}}, {{{furrowed brows}}}, {{{blushing}}}, {{{sour expression}}}
      /////
@@ -859,20 +820,6 @@ xx娘	xx_girl	2个女孩	2girls	腰	waist	法式辫子	french_braid	水晶材质
      /////
      {{heaven}}, {{clouds}}, {{sunbeams}}
 
-     43【月色下的魅影】
-     {{from below}}, {{solo}}, {{black skin}}, {{glowing red eyes}}, {{bat wings folded}}, {{short black hair}}, {{bat ears}}, {{gothic dress}}, {{black lace}}, {{thigh highs}}, {{sitting on a rooftop edge}}, {{legs dangling}}, {{full moon in background}}, {{cityscape}}, {{wind blowing hair}}, {{seductive pose}}, {{medium breasts}}, {{cleavage}}
-     /////
-     {{looking down at the viewer}}, {{mischievous smile}}
-     “今晚的月色真美啊……要上来一起欣赏一下吗？”
-
-     44【冰晶闪耀的训练家】
-     {solo}, {{{light blue skin}}}, A light blue slime girl,  {{wearing a fluffy white scarf}},  {{wearing a short blue skirt}},  {{ice crystals on her skin}},  {{large breasts}},  colored skin, monster girl, light blue skin,  {{long blue hair with white streaks}},  {{big blue eyes}},  {{shy smile}}
-     /////
-     {{snowy forest}},  {{snowflakes falling}},  {{winter wonderland}}, 
-
-     45【既然是主人的要求的话~~】
-     pov, from below, foot focus, leg lift, happy, gold skin , head side , hart hands, looking at viewer, rabbit girl, maid, short hair, bobcut, white background,
-
      46【】
      {{gold skin}}, large breasts ,{{mirror}}, close up , ribbon , Gift ribbons ,red necktie ,thigh_ribbon   ,armband,black_pantyhose,phone,  cellphone, long_eyelashess , martphone, holding_phone, 1girl, selfie, breasts,  red playboy_bunny, twintails, bow, fake_animal_ears, taking_picture, long_hair, smile, cleavage, solo, large_breasts, v, holding, pantyhose, blush, hair_ornament
      /////
@@ -885,9 +832,6 @@ xx娘	xx_girl	2个女孩	2girls	腰	waist	法式辫子	french_braid	水晶材质
      {gray skin:1.4}, {{solo}}, indoors , close up,   young lady, slime girl, {Qipao:1.25}, {glasses:1.2}, {newspaper office background:1.15}, {laughing with eyes closed:1.3}, {looking up laughing:1.25}, gray slime skin, joyful expression, colored skin, monster girl, gray eyes, medium gray hair in bun, traditional Chinese dress, holding newspaper, sitting at desk, happy laughter, mature lady, secretary look, pink lips laughing,
      元帅发来紧急令：内无粮草外无兵！小将提枪 上了马，《青年界》上走一程。呔！马来！ 参见元帅。带来多少人马？2000来个字！还都 是老弱残兵！后帐休息！得令！ 正是：旌旗明明，杀气满山头！
      
-
-     48【】（口交）
-     {{pink skin}}, fox girl , fox tail,  pov ,erection,hetero,licking,licking penis,oral,penis,pov,solo focus,tongue,bukkake,undone,steam,blush,open mouth,fellatio,cum string,large penis licking penis ,cum on breast,cum on face,cum on facial,cum on clothes,cum in mouth,open mouth, tongue out,heavy breathing,sweat,from side,1 boy,crying,tears, 
 
      49【】（妙蛙种子）
      1girl cosplay bulbasaur, {solo}, {{{green skin}}},  A green slime girl, {{wearing a leafy green bikini top}}, {{large bulb on her back}}, {{cheery smile}}, {{large breasts}},  colored skin, monster girl, green skin,  {{short green hair}},  {{big, bright eyes}},  {{posing playfully}} 
