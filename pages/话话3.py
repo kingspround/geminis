@@ -379,6 +379,240 @@ def getAnswer_text(prompt, token):
      pov, {{{red skin}}}, {solo}, 1girl, A red ladybug slime girl, {ladybug antennae}, {{wearing a ladybug bikini top}},{{large breasts}} , {black eyes}, {black hair}, twintails, {smooth skin} , {glowing skin} , {holding a sunflower} , {sitting on a giant sunflower} 
      /////
      {{sunflower field}}, {{morning dew}}, {{sun rays}}
+
+     【颜色模块】
+orange	橙
+blue	蓝
+red	红
+light_brown	浅褐
+dark_pink	深粉
+khaki	卡其色
+blonde	金发女郎
+brown	棕
+black	黑
+dimgray	暗灰
+gray	灰
+darkgray	深灰
+silver	银
+lightgray	浅灰
+gainsboro	盖茨伯勒
+whitesmoke	烟白
+white	白
+snow	雪
+ghostwhite	幽灵白
+floralwhite	花白
+linen	亚麻布
+antiquewhite	仿古白
+papayawhip	番木
+blanchedalmond	杏仁白
+bisque	橘黄
+moccasin	莫卡辛色
+navajowhite	纳瓦白
+peachpuff	桃色
+mistyrose	迷迭香
+lavenderblush	薰衣草腮红
+seashell	贝壳
+oldlace	旧蕾丝
+ivory	象牙
+honeydew	甘露
+mintcream	薄荷糖
+azure	天蓝
+aliceblue	爱丽丝蓝
+lavender	薰衣草
+lightsteelblue	轻钢蓝
+lightslategray	灯石灰
+slategray	石板灰
+steelblue	钢蓝
+royalblue	宝蓝
+midnightblue	午夜蓝
+navy	海军蓝
+darkblue	深蓝
+mediumblue	中蓝
+blue	蓝
+dodgerblue	道奇蓝
+cornflowerblue	矢车菊蓝色
+deepskyblue	深天蓝
+lightskyblue	亮天蓝
+skyblue	天蓝
+lightblue	浅蓝
+powderblue	粉蓝
+paleturquoise	亮绿松石色
+lightcyan	浅青
+cyan	青
+aquamarine	蓝晶
+turquoise	绿松石色
+mediumturquoise	中绿松石色
+darkturquoise	深绿松石色
+lightseagreen	浅海绿
+cadetblue	学员蓝
+darkcyan	深青
+teal	蓝绿色
+darkslategray	暗板灰
+darkgreen	深绿
+green	绿
+forestgreen	森林绿
+seagreen	海绿
+mediumseagreen	中海
+mediumaquamarine	中海蓝
+darkseagreen	深海绿
+aquamarine	蓝晶色
+palegreen	淡绿
+lightgreen	浅绿
+springgreen	春绿
+mediumspringgreen	中春绿
+lawngreen	草坪绿
+chartreuse	荨麻色
+greenyellow	绿黄
+lime	酸橙
+limegreen	青柠
+yellowgreen	黄绿
+darkolivegreen	黑橄榄绿
+olivedrab	绿橄榄色
+olive	橄榄色
+darkkhaki	黑卡其色
+palegoldenrod	古金棒
+cornsilk	玉米丝
+beige	浅褐
+lightyellow	淡黄
+lightgoldenrodyellow	浅金黄
+lemonchiffon	柠檬雪纺
+wheat	小麦色
+burlywood	伯莱坞
+tan	棕褐
+khaki	卡其色
+yellow	黄
+gold	金色
+orange	橙
+sandybrown	沙褐
+darkorange	暗橙
+goldenrod	金麒麟色
+peru	秘鲁色
+darkgoldenrod	暗金
+chocolate	巧克力
+sienna	赭色
+saddlebrown	马鞍棕色
+maroon	栗色
+darkred	暗红
+brown	棕色
+firebrick	耐火砖
+indianred	印度红
+rosybrown	红褐色
+darksalmon	黑鲑鱼
+lightcoral	浅珊瑚
+salmon	三文鱼
+lightsalmon	光鲑鱼
+coral	珊瑚
+tomato	番茄
+orangered	橙红
+red	红
+crimson	赤红
+mediumvioletred	中紫红
+deeppink	深粉红
+hotpink	亮粉
+palevioletred	淡紫
+pink	粉
+lightpink	浅粉
+thistle	蓟色
+magenta	洋红
+fuchsia	紫红
+violet	罗兰紫
+plum	李子
+orchid	兰花紫
+mediumorchid	中兰花紫
+darkorchid	黑兰花紫
+darkviolet	深紫
+darkmagenta	深洋红
+purple	紫
+indigo	靛青
+darkslateblue	深石板蓝
+blueviolet	深罗兰紫
+mediumpurple	中紫
+slateblue	板岩蓝
+mediumslateblue	中板岩蓝
+【人物模块】	人设		性别		身体		头发样式		头发颜色		其他
+公主	princess	单人	solo	有光泽的皮肤	shiny_skin	直发	straight_hair	挑染	streaked_hair	长发	long_hair
+舞者	dancer	女人	female	苍白皮肤	pale_skin	卷发	curly_hair	内层挑染	xx_colored_inner_hair	很短的头发	very_short_hair
+啦啦队	cheerleader	男人	male	白皙皮肤	white_skin	波浪卷	wavy_hair	头发内变色	xx_and_xx_hair	短发	short_hair
+芭蕾舞女演员	ballerina	性转	genderswap	棕色皮肤	brown_skin	钻头(配双)	drill_hair	与原作不同的发色	alternate_hair_color	后短发，前长发	short_hair_with_long_locks
+体操队队长	gym_leader	扶她	futanari	深色皮肤	deep_skin	姬发式(齐刘海后长黑发	hime_cut	银发	silver_hair	中等头发	medium_hair
+女服务员	waitress	伪娘	otoko_no_ko	偏黑皮肤	dark_skin	齐而短头发(波波发	bob cut	灰发	grey_hair	很长的头发	very_long_hair
+和风女仆	wa_maid	伪娘	trap/crossdressing	偏黑皮肤	black_skin	公主发型	princess_head	金发	blonde_hair	超级长的头发	absurdly_long_hair
+女仆	maid	1个其他人	1other	晒日线	tan_lines	上半部分束起	Half-up	棕色头发	brown_hair		
+偶像	idol	1个女孩	1girl	泳装晒痕	pang		前发	黑发	black_hair	眼睛之间的头发	hair_between_eyes
+弓道	kyuudou	女_童	female_child	肌肉	muscle	额头	forehead	蓝发	blue_hair	头发覆盖一只眼	hair_over_one_eye
+女武神	valkyrie	萝_莉		如白色大理石般有光泽的肌肤	white_marble_glowing_skin	进气口发型	hair_intakes	绿头发	green_hair	头发遮住眉毛	hair_over_one_eyebrow
+办公室小姐	office_lady	雌小鬼	mesugaki	胸部	breasts	发瓣	hair_flaps	粉色头发	pink_hair	透过头发可见腮红	blush_visible_through_hair
+赛车女郎	race_queen	哥特萝莉	gothic_lolita	胸肌	pectorals	刘海	bangs	红头发	red_hair	透过头发可见眼睛	eyes_visible_through_hair
+魔女	Witch	和风萝莉	wa_lolita	大胸肌	large_pectorals	空气刘海	air_bangs	铂金色头发	platinum_blonde_hair	可以看到耳朵	ears_visible_through_hair
+巫女	miko	欧派萝莉	oppai_loli	贫乳(A_	flat_chest	齐刘海	blunt bangs	青色头发	azure_hair	头发穿过头饰	hair_through_headwear
+修女	nun	兽耳萝莉模式	kemonomimi_mode	小胸部(B	small_breasts	侧面空气刘海	side_blunt_bangs	水蓝色头发	aqua_hair	头发撩到耳后	hair_behind_ear
+牧师	priest	美少女	bishoujo	中等胸部(C	medium_breasts	中分刘海	parted_bangs	红宝石色头发	ruby_hair	披肩发	hair_over_shoulder
+神职人员(基督教)	cleric	痴女	female_pervert	大胸部(D	big_breasts	斜刘海	swept_bangs	两色头发	two-tone_hair	头发遮住三点	hair_censor
+忍者	ninja	辣妹	gyaru	巨乳(E	huge_breasts	不对称刘海	asymmetric bangs	多色的头发	multicolored_hair	头发披在胸上	hair_over_breasts
+女警	policewoman	小辣妹	kogal	魔乳(F	gigantic_breasts	刘海上绑辫子	braided_bangs	渐变头发	gradient_hair	头发过胯	hair_over_crotch
+警察	police	年龄		南半球	underboob		后发	分色头发	split-color_hair		状态
+医生	doctor	幼童	toddler	侧乳	sideboob.	马尾	ponytail	彩虹头发	rainbow_hair	凌乱的头发	messy_hair
+护士	nurse	儿_童	child	背后可见胸部	backboob	双马尾	twintails	"颜色+hair
+（有些不识别）"	调色板	凌乱的头发,蓬乱的头发	disheveled_hair
+眼镜娘	glasses	儿童的另一种形式	aged_down	乳沟	cleavage	高双马尾	canonicals			头发散开	hair_spread_out
+狐狸精	kitsune	娇小	petite	乳晕	areola	低双马尾	low_twintails			头发飘过	hair_flowing_over
+公交车	public_use	未成年	underage	乳头 	nipple	披肩单马尾	one_side_up		材质	强调发丝	hair_strand
+女王(SM中)	dominatrix	年轻	young	肋骨	ribs	披肩双马尾	two_side_up	有光泽的头发	shiny_hair	不对称的头发	asymmetrical_hair
+油库里(馒头样人物	yukkuri_shiteitte_ne	青年	teenage	乳帘	crop_top_overhang	短马尾	short_ponytail	发光的头发	glowing_hair	头发松散	hair_undone
+cos成雾雨魔理沙	kirisame_marisa_(cosplay)	熟女	teenage	裸单肩	single_bare_shoulder	侧马尾	side_ponytail	夜光的;_发光的;_	luminous	头发半松散	hair_half_undone
+美少女战士	sailor_senshi	熟女	mature_female	裸双肩	bare_shoulders	扎过的头发	tied_hair	渐变的头发	gradient_hair	蓬松的头发(用手弄乱头发)	ruffling_hair
+厨师	chef	老年	old	锁骨	collarbone	低扎头发	low_tied_hair	液态头发	liquid_hair	富有表现力的头发	expressive_hair
+		老年的另一种形式	aged_up	腋下	armpits	多扎头发	multi-tied_hair	星空头发	Starry_sky_adorns_hair	跳动的头发	bouncing_hair
+xx娘	xx_musume	清純的	innocent	腋窝皱痕	armpit_crease	辫子	braid	水晶头发	crystal_hair	翻转的头发(边缘翘起)	flipped_hair
+xx娘	xx_girl	2个女孩	2girls	腰	waist	法式辫子	french_braid	水晶材质头发	crystals_texture_Hair	活体头发|可念动的头发	prehensile_hair
+机甲	mecha	百合	yuri	腰窝	dimples_of_venus	辫子头发	braiding_hair	半透明的头发	translucent_hair	活头发	living_hair
+机娘	mecha_musume	姐妹	sisters	窄腰	narrow_waist	侧辫	 	头发在滴水	Hair_dripping	剪断的头发	severed_hair
+另一种机娘	gynoid	3个女孩	3girls	细腰	slender_waist	双辫子	twin_braids	头发上有血	blood_in_hair	背头发型	hair_slicked_back
+类人机器人	humanoid_robot_	4个女孩	4girls	腹部	stomach	三股辫	braid	条纹头发	streaked_hair	其他	
+半机械人	cyborg	多个女孩(往往>2)	multiple_girls	腹部	midriff	短辫子	short_braid	波点头发	polka_dot_hair	不对称的发型	asymmetrical_hair
+		后宫	harem	肚子	belly	长辫子	long_braid	丝带头发	ribbon_hair	头发很多的	big_hair
+人外娘	monster_girl	兄弟姐妹	siblings	腹肌	abs	辫子刘海	braided_bangs	斑点头发	spotted_hair	带蝴蝶结的发带	bow_hairband
+福瑞	furry	1个男孩	1boy	隆起的腹部	inflation	辫式发髻	braided_bun	触手头发	tentacle_hair	棕色发带	bow_hairband
+猫娘	cat_girl	2个男孩(其他同理	2boys	肚脐	belly_button	麻花辫马尾	braided_ponytail	头发藤蔓	hair_vines	云絮状发型	cloud_hair
+犬娘	dog_girl	搞基	yaoi	肚脐	navel	法式冠编发	crown_braid	头发武器	hair_weapon	外卷发型	flipped_hair
+狐娘	fox_girl	正太	shota	腹股沟(鼠蹊部)	groin	多股(麻花)辫	multiple_braids		动作	发珠	hair_beads
+妖狐	kitsune			臀部	hips	披在一侧的单条辫	side_braid	手放头发上	hand_in_own_hair	蝴蝶结发圈	hair_bow
+九尾|九尾狐	kyuubi			胯部	crotch	披在两侧的两条辫	side_braids			捆发珠	hair_cubes
+浣熊娘	raccoon_girl			宽胯	wide_hips	单股辫	single_braid	扎头发	tying_hair	发圈|发束	hair_scrunchie
+狼女孩	wolf_girl			髋骨	hipbone	两条辫子	twin_braids	调整头发	adjusting_hair	发簪	hair_stick
+兔娘	bunny_girl			屁股通过大腿可见	ass_visible_through_thigh	丸子头	double_bun	头发向后梳	hair_slicked_back	束发套	hair_tubes
+马娘	horse_girl			翘臀	buttock	圆发髻	hair_bun	头发向后拉	hair_pulled_back	hairband	hairband
+牛娘	cow_girl			屁股缝	butt_crack	芭蕾髻	ballet_hair_bun	托起头发	hair_lift	头发上有多只蝴蝶结	multiple_hair_bows
+龙娘	dragon_girl			大腿	thigh	尖头头发	pointy_hair	抬起来头发	hair_up	带着尖角的发型	pointy_hair
+人马	centaur			肉腿	thick_thigh	羽毛头发	feather_hair	头发垂下来	hair_down	扎起或卷起一部分长发	short_hair_with_long_locks
+蛇娘	lamia			绝对领域	zettai_ryouiki	弓形头发	bow-shaped_hair	头发收拢	hair_intakes	刺刺的头发	spiked_hair
+美人鱼	mermaid			大腿间隙	thigh_gap	孤颈头发	lone_nape_hair	玩头发	playing_with_hair	有其他颜色条纹的头发	streaked_hair
+史莱姆娘	slime_musume			膝盖	knee	变换发型	alternate_hairstyle	卷发	hair_tucking		
+蜘蛛娘	spider_girl			膝盖内侧	kneepits	与原设不同头发长度	alternate_hair_length	握头发	holding_hair		
+				脚	foot	顶发及鬓角		头发盖在嘴上	hair_over_mouth		
+非人				脚趾	toes	短呆毛	ahoge	亲吻头发	kissing_hair		
+天使与恶魔	angel_and_devil			脚底	feet_soles	心形呆毛	heart_ahoge	咬头发	biting_hair		
+天使	angel			身材		长呆毛(天线毛)	antenna_hair	吃头发	eating_hair		
+魔鬼（撒旦）	devil			骨感	skinny	鬓角	sideburns	嘴里有头发	hair_in_mouth		
+女神	goddess			肥胖(丰满)	plump	长鬓角	long_sideburns	吹头发	hair_blowing		
+妖精	elf			魔鬼身材	curvy	侧边发辫	sidelocks	闻头发	smelling_hair		
+小精灵	fairy			辣妹(日本太妹)	gyaru	秃头	bald	头发上的食物	food_on_hair		
+暗精灵	dark_elf			怀孕	pregnant	鸟窝头|爆炸头	afro	折叠头发	folded_hair		
+小恶魔	imp			体型		尖刺的头发	spiked_hair	抓别人的头发	grabbing_another's_hair		
+恶魔	demon_girl			巨人/女巨人	giant_/_giantess			调整别人的头发	adjusting_another's_hair		
+魅魔	succubus			迷你女孩	minigirl			玩弄别人的头发	playing_with_another's_hair		
+吸血鬼	vampire			肌肉	muscular			握着别人的头发	holding_another's_hair		
+魔法少女	magical_girl			肌肉发达的女性	muscular_female			剪头发	cutting_hair		
+人偶	doll			丰满	plump			编头发	hairdressing		
+女巨人	giantess			肥胖	fat				(例子)		
+迷你女孩	minigirl			瘦	skinny				messy_floating_hair		
+兽人	orc			曲线	curvy				((hairs_curling_in_the_water))		
+怪物	monster										
+不含有人类	no_humans										
+异性恋的	hetero										
+其它											
+白化病	albino										
+截肢者	amputee
                ]]"""}]}
     )
     # 添加用户输入到 his_messages
