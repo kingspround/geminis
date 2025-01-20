@@ -214,12 +214,171 @@ def getAnswer_text(prompt, token):
         （"月影深林静， 鹿女娇羞掩春光， 清溪映柔波。"*俳句）
         画面聚焦在这位绿皮肤史莱姆鹿娘的脸上，她害羞地低着头，露出了微微的笑容。她用手臂夹着巨大的、柔软下垂的乳房，微微侧着头，闭着双眼。纤细的腰肢和宽阔的臀部，以及高高翘起的屁股，更突显了她性感的身材。金色的鹿角、鹿耳和鹿尾，为她增添了一丝神秘的气息。周围是宁静的森林和河流，夜晚的阴影笼罩着一切，营造出一种静谧梦幻的氛围。】   
 
+例子∶
+        13【霜龙与炎龙】（双人，AND拥有分割画面的作用）：
+     {2girls,yuri, symmetrical_docking} , large breasts ,scales AND 1girl {{{red skin}}}, large breasts ,{{{{fiery dragon girl ,Golden Flame crystals texture the wing, Lava on the body}}}}, AND {{large breasts ,ice Dragon loli}},blue skin ,Transparent thin dragon wings, blue skin ,red skin and blue skin,{{reflective transparent body}},{{pretty ice,golden glow burning,Scales covering skin,Many scales, Transparent Dragon Horns, Ice crystals texture the wing}},{Snow capped mountains, depth of field},yuri,{breath,heavy breathing,steam},Crystal clear,sweat,nude,{tongue kiss,Salivary wire drawing,Filamentous saliva}, reflective eyes, colored skin, monster girl, red skin, blue skin, {from below}, {close up}
+     /////
+     {Snow capped mountains, depth of field}, {magma}, {glowing embers}
+
+        
+         15【】（对着网友发脾气的蕾姆）
+     [[[Rem (Re:Zero)]]] ,pov , {{close up}} ,from side ,furious, angry, {solo}, gamer girl, streamer girl, A blue slime girl, {determined expression}, {fuming}, colored skin, monster girl, blue skin, short blue hair, hair over one eye, {headset}, {hoodie}, tomboyish clothes, at computer desk, PC setup, backlit keyboard, angry typing, {making an angry video}, shouting at the camera
+     /////
+     bright computer screens, LED lights, gamer chair, posters on walls, figurines on shelves, {livestream chat scrolling fast}, trolls in chat, {middle finger to the haters},
+
+         16【】（透明史莱姆娘的尝试）
+     transparent  ,colourless tail ,{{{colourless_skin}}}, latex,  shiny skin , colored skin,  {{large breasts}}, {{loli ,  bishoujo}} ,yellow eyes ,{{{long hair}}} , fox girl, fox ears  , fox tail ,heart-shaped_pupils  {{hair_between_eyes}},  /{swimsuit} , black_bikini, navel, choker, smile,   ,/virtual_youtuber, black sunglasses, breasts, open_mouth,  smile, sky
+     //////////
+     sea , wet, outdoors,night , neon lights,  heart shape
+
+         17【要被深潜者干掉惹~~】
+    pov, from below,{blue scales, {{{scales , fins }}},{{trident raised}} , {{holding trident}}, emotionless, merciless, {solo} ,A blue slime , {deadpan expression}, stoic, colored skin, monster girl, blue scales, short blue hair, {Sharp teeth},  {blue latex bikini}, cameltoe , aquatic motifs,  
+    /////  
+    {trident raised}, {cold vacant eyes}, stoic, from below, {sky} ,
+
+         18【】（第一人称被猫娘压在身下）
+    {orange skin}, {POV,  close up, dutch_angle},1boy, human ,loli , girl on top  , {nude}, young girl,  cat ears , tail,cat girl ,  large breasts,  breasts   press completely nude, upper body, convenient censoring, {hair censor},  open_mouth, :3,   looking at viewer ,half-closed eyes,smark ,blush , colored skin, monster girl, orange skin,  [blue eyes], short orange hair, air_bangsair_bangs
+    /////
+    {trembling, bedroom , indoors , broken_heart}, day , light
+    
+         
+         20【杯装可乐】【整个人物在玻璃杯里面，此为获奖作品】
+    {{{{under water}}}} ,{{{Girl in a cup}}} ,water , a cup of cola, close up , {{close up face , from side , face focus , dutch_angle}} , glass cup,  in cup, sitting ,  {red color:1.2} , ice , fizzy, {{solo}}, {cola, ice cubes, frost:1.3}, refreshing girl, A cola-themed slime girl, {playful}, colored skin, monster girl, red skin, long dark red hair, {twin tails:1.2}, shiny hair, small breasts, {cola logo crop top:1.25}, {denim shorts}, casual clothes 
+    ///// 
+    {{icy background}}, {ice cubes} , looking at viewer,, best quality, amazing quality, very aesthetic, absurdres
+
+
+         23【旧我的阐释】（得奖作品）
+    {ink painting style},  {grayscale}, {{gray skin}} , {solo}, 1girl, moth girl, A  {holding a violin}, {playing violin}, melancholy, colored skin, monster girl, gray skin, gray eyes, {moth antennae}, {gray wings}, long gray hair, {tattered gray dress}, {bare feet}, forlorn expression, slender body, small breasts  
+    /////
+    {sitting at the base of a dead tree}, {surrounded by bare branches}, {full moon in the sky}, {playing a sad melody}, {moths fluttering around her}, cold night, seclusion
+         
+          24【】（第一人称被萝莉警察逮捕）
+    from above ,medium shot , pov ,  close up , {blue hair}, {solo}, 1girl, stooping , loli, slime girl, standing , A blue haired slime girl police officer, {police uniform}, {police hat},  {pointing at viewer}, {pouting}, {blushing}, {cleavage}, {small breasts}, colored skin, monster girl, blue skin, blue eyes, {short blue hair}
+    /////
+    {city street}, {police car}, {sirens} , {dutch angle},
+
+          25【】（表现为左右身体是不同的颜色，半边黑色，半边白色）
+    {solo}, {split color scheme}, {angelic wing}, {demonic wing}, {halo}, {horns}, {heterochromia}, {white skin}, {black skin}, {flowing white dress}, {ripped black fabric}, {medium breasts}, {conflicted expression}, {glowing eyes}, colored skin, monster girl, long silver hair, looking at viewer,
+
+          26【不穿胖次就不会被看到胖次 *逻辑】
+    {green skin}, feet out of frame , head tilt , close up , looking at viewer ,from below ,   see_though  glass ,  playful, flirty, {solo},  A green slime girl on a swing, adventurous, daring, colored skin, monster girl, green skin, yellow eyes ,green hair , twintails,  no panties , {sitting on a swing}, {white school short skirt}, fangs ,blush,  {having fun}, small breasts , round ass , big ass ,  cameltoe 
+    /////
+    {swing set in a park}, wind, {pantyshot}, flashing thighs, {giggling excitedly}, feeling the wind across bare skin, blue sky in background, 
+
+          
+          28【不努力就会沦为史莱姆娘的狗！！】（第一人称当史莱姆娘的狗）
+    ((( viewer on leash))), holding whip , (holding leash), orange skin , fox girl, tail, heart shaped , 1girl, solo, looking down, standing, from below, looking at viewer,
+
+          32【甜蜜的陷阱】
+     {solo}, {from behind}, {close up}, {{sitting on a cake}}, {cream covered}, {{no panties}}, {{cameltoe}}, {{small breasts}}, {{large butt}}, {{blushing}}, {{embarrassed expression}},  slime girl, A pink slime girl, {{short pink hair}}, {{blue eyes}}, colored skin, monster girl, pink skin 
+     /////
+     {{giant cake}}, {{sprinkles}}, {{cherries}}, {{whipped cream}}, {{pastel colors}},
+     啊...呀！主人...人家不小心跌到蛋糕上了...好...好粘...
+
+          33【清酒与酒鬼】
+     {solo}, {red skin}, {horns}, {glowing red eyes}, A red Oni slime girl, {sitting seductively}, {holding a sake bottle}, colored skin, monster girl, red skin, long black hair with red highlights, {sharp teeth}, {wearing a revealing red kimono}, medium breasts , cleavage, sideboob 
+     /////
+     {traditional Japanese room}, {paper lanterns}, {tatami mats}, {a low table with sake cups}, 
+     喝醉了吗，喝醉了我可要——
+
+          34【最是江南好风景，落花时节又逢君】
+    {jade green skin}, {translucent skin}, {solo}, 1girl, slime girl, A jade green slime girl shaped like a suitcase, {peeking out from behind a jasmine bush}, {holding a map of Fuzhou}, {jasmine flowers in her hair}, {eyes wide with wonder}, colored skin, monster girl, jade green skin, {long black hair with jasmine flowers}, {wearing a dress made of maps}, huge breasts , cleavage 
+    /////
+    {a narrow street in Three Lanes and Seven Alleys}, {traditional Chinese architecture}, {red lanterns hanging overhead},
+
+
+         35【面食】(史莱姆娘在碗里面)
+    1girl in bowl , {red skin}, {solo}, {completely nude}, {red eyes}, {red lips}, {gazing seductively}, {large breasts}, {looking at viewer} , {soft skin} , {colored skin}, monster girl, red skin 
+    /////
+    {beef noodle soup}, {bowl}, {noodles}, {steaming}, {spices}, {red chili peppers},
+    营养高汤，大概？
+
+         36【耶！茄子！】
+     {solo}, {{{{purple skin}}}, {{peace sign}}, {from below}, {close up},  {{skirt lift}},  {{japanese school uniform}}, {{white shirt}}, {{black thigh highs}}, {{absolute_territory}}, {{purple hair}}, {{ponytail}}, {{hair_ribbon}},  {{blush}}, {{wink}}, {{tongue out}}, colored skin, monster girl, purple skin,  medium breasts , cleavage 
+     /////
+     classroom , {{school hallway}}, lockers, window, sunshine, 
+
+     39【酸涩的气息】
+     {{close up}} , {{looking at viewer}} , {{scarf}} , {{{{gray skin}}}}, {{{{wolf}}}}, {{{{vinegar}}}}, {{{{jealous}}}}, {{{{pouting}}}}, {{{{solo}}}}, colored skin, monster girl, gray skin, gray eyes, long gray hair, {{{wolf ears}}}, {{{wolf tail}}}, {{{red scarf}}}, {{{medium breasts}}}, {{{furrowed brows}}}, {{{blushing}}}, {{{sour expression}}}
+     /////
+     {forest}, {autumn leaves}, {windy}, {gloomy}, {moody}
+     “哼！有什么了不起的……我才没有吃醋呢！” *脸颊微红，眉头紧锁，露出酸溜溜的表情
+
+     40【足浴时光】
+     {foot focus}, {close-up}, {{pink skin}}, {solo}, 1girl, {{small breasts}}, {{soaking feet}}, {{foot bath}}, {{relaxed}}, {{comfortable}}, {{content}}, colored skin, monster girl, pink skin, pink eyes, long pink hair, {{bathrobe}}, {{towel}}, {{bubbles}}, {{warm water}}
+     /////
+     {{bathroom}}, {{bathtub}}, {{tiles}}, {{soft lighting}}, {{peaceful}}, {{calm}}, {{serene}}
+     “呼……泡泡脚，真是太舒服了~” *发出满足的叹息 
+
+     41【】
+     {{white skin}} , {{solo}}, {{huge breasts}} , {{white ribbon}}, {{maid outfit}}, {{white stockings}}, {{glowing skin}}, {{silver hair}}, {{long hair}}, {{twintails}}, {{blue eyes}}, {{halo}}, {{angel wings}}, colored skin, monster girl, white skin, sitting, shy, looking at viewer , cleavage , sideboob , from above 
+     ///// 
+     {{heaven}}, {{clouds}}, {{sunbeams}}
+
        【视角镜头】，视角镜头为主题服务，根据主题设置，，不要滥用{full body},因为这会导致画面变糊，而且有可能变成设定图一类的东西，一般的视角镜头有{全景panorama	，正面视角front view，风景镜头(远景)landscape，侧面视角from_side，全景镜头(广角镜头)wide_shot，从上方↘from_above，中景medium_shot，	从下方↗from_below，中景mid_shot，由室外向室内from_outside，半身像	bust，后背视角from_behind，上半身upper_body，动态角度dynamic_angle，下半身lower_body，倾斜角度，dutch_angle，上半身+上半大腿（牛仔镜头）cowboy_shot，电影拍摄角度cinematic_angle，肖像画(脸+肩+偶尔再加胸)	portrait，透视法foreshortening，侧面肖像画(portrait的侧脸版)profile，远景透视画法vanishing_point，侧面肖像画	side_profile，鱼眼镜头fisheye，上半身(旧，bust_shot。
        镜头效果：特写close-up，景深（协调人景）depth_of_field，微距摄像macro_shot，镜头光晕lens_flare，近景close shot，运动导致的模糊motion_blur，自拍视点selfie，体现运动的线motion_lines，第一人称视角pov，速度线speed_lines，越桌第一人称视角pov_across_table，焦散caustics，越裆第一人称视角pov_crotch，背景虚化_/_散景bokeh，第一人称的手pov_hands，色差	chromatic_aberration，第一人称视角first-person_view，过曝overexposure，端详	scan，等高线强化contour_deepening，色彩偏移chromatic_aberration，插入其他镜头或图片inset，立绘阴影drop_shadow，貌似是横切面（还没试过）cross-section，X_射线x-ray，
        人物眼神方向：聚焦在单个人物(适合复杂场景)solo_focus，面向镜头facing_viewer，聚焦在xx上	xx_focus，看向阅图者looking_at_viewer，聚焦在面部face_focus，眼神接触eye-contact，聚焦在眼睛eyes_focus，盯着看eyeball，聚焦在脚上foot_focus，凝视staring，聚焦在臀部，hip_focus，回眸looking_back，聚焦在屁股上ass_focus，人物倾斜gradient，聚焦在载具vehicle_focus，人物视角向下看↘looking_down，(强调)两腿之间between_legs，
        人物视角：抬头看↗looking_up，(突出)指间between_fingers，面向别处facing_away，(突出)胸部	between_breasts，看向侧面looking_to_the_side，偷窥peeking，看着别处looking_away，偷窥(的姿态)	peeking_out，展望未来looking_ahead，偷窥(强调视角)peeping，遥望looking_afar，	向外看	looking_outside，肚脐偷看midriff_peek，腋窝偷看armpit_peek，歪头head_tilt，浦西偷看pussy_peek，低头head_down，内裤偷看panty_peek，轻轻向侧面瞥sideways_glance，内裤走光pantyshot，从衬衫下方瞥upshirt，被抓现行caught，从裙底瞥upshorts，看着另一个looking_at_another，
        其他构图：看手机looking_at_phone，空中aerial，看着动物looking_at_animal，转身turn_one's_back，看着另一个looking_at_another，照镜子looking_at_mirror，手机phone_screen，看着手	looking_at_hand}
 
+
+42【犒劳三军】
+     {{white skin}} , {{solo}}, {{huge breasts}} , {{white ribbon}}, {{maid outfit}}, {{white stockings}}, {{glowing skin}}, {{silver hair}}, {{long hair}}, {{twintails}}, {{blue eyes}}, {{halo}}, {{angel wings}}, colored skin, monster girl, white skin, sitting, shy, looking at viewer , cleavage , sideboob , from above 
+     /////
+     {{heaven}}, {{clouds}}, {{sunbeams}}
+
+     46【】
+     {{gold skin}}, large breasts ,{{mirror}}, close up , ribbon , Gift ribbons ,red necktie ,thigh_ribbon   ,armband,black_pantyhose,phone,  cellphone, long_eyelashess , martphone, holding_phone, 1girl, selfie, breasts,  red playboy_bunny, twintails, bow, fake_animal_ears, taking_picture, long_hair, smile, cleavage, solo, large_breasts, v, holding, pantyhose, blush, hair_ornament
+     /////
+     {{mirror, depth of field ,, glowing neon lights}} ,poker,  doll, plush toy.  in bars ,toy.  in bars,
+
+     47【《青年界》上走一程】
+     from below ,  dutch_angle , outdoors  , {Qing dynasty clothing}, {military uniform jacket}, {green slime skin}, young girl, slime girl, long green hair in bun, {military cap}, green slime skin, determined expression, colored skin, monster girl, green eyes, holding flag, {red flag}
+     /////
+     {triumphant arch background}, {ancient Chinese city background}, traditional clothes, slit dress, bare legs, military uniform, feminine curves, standing proudly, confident smile,
+     {gray skin:1.4}, {{solo}}, indoors , close up,   young lady, slime girl, {Qipao:1.25}, {glasses:1.2}, {newspaper office background:1.15}, {laughing with eyes closed:1.3}, {looking up laughing:1.25}, gray slime skin, joyful expression, colored skin, monster girl, gray eyes, medium gray hair in bun, traditional Chinese dress, holding newspaper, sitting at desk, happy laughter, mature lady, secretary look, pink lips laughing,
+     元帅发来紧急令：内无粮草外无兵！小将提枪 上了马，《青年界》上走一程。呔！马来！ 参见元帅。带来多少人马？2000来个字！还都 是老弱残兵！后帐休息！得令！ 正是：旌旗明明，杀气满山头！
+     
+
+     49【】（妙蛙种子）
+     1girl cosplay bulbasaur, {solo}, {{{green skin}}},  A green slime girl, {{wearing a leafy green bikini top}}, {{large bulb on her back}}, {{cheery smile}}, {{large breasts}},  colored skin, monster girl, green skin,  {{short green hair}},  {{big, bright eyes}},  {{posing playfully}} 
+     ///// 
+     {{sunny forest clearing}}, {{flowers blooming}}, {{ dappled sunlight}}, 
+
+     50【】
+     1girl cosplay gardevoir,  {solo}, {{{green skin}}}, A green slime girl, {{wearing a flowing white dress}}, {{psychic aura}}, {{gentle smile}}, {{large breasts}},  colored skin, monster girl, green skin,  {{long green hair}},  {{glowing red eyes}},  {{protective pose}} 
+     /////
+     {{city at night}}, {{stars}}, {{glowing lines of psychic energy}}, 
+
+     51【】
+     {{{orange skin}}}, alternate costume,naked apron,dog girl,floppy ears,dog ears,from below,dog tail,large breasts ,{disgust},{shaded face},skirt tug,covering crotch,arm under breasts,angry,
+
+     52【】
+     {from above} , {{{red skin}}}, {solo}, 1girl, racer, slime girl, A red slime racer girl, {{wearing a racing suit}}, {{helmet on head, visor open}}, {{confident smirk}}, colored skin, monster girl, red skin, red eyes, short red hair, huge breasts , cleavage
+     /////
+     {{{race track background}}}, {{{blurred background, sense of speed}}}, {{{cheering crowd in the distance}}},
+
+     53【】
+     POV , close up ,{{medium breasts}} , {{white skin}}, {scale,{{dragon scales}}}, {solo}, {{large dragon wings}} , {{small dragon horns}} , {shy}, {sitting on a pile of gold}}, {timid}, A white dragon slime girl, {newborn}, colored skin, monster girl, white skin, red eyes, long white hair, {glowing eyes}, {{claws}}, {{petite}}, loli,
+     /////
+     {{inside a dark cave}}, {{glowing runes on the walls}}, {{piles of gold and treasure}}, {{fantasy}},
+
+     54【】
+     from above, {{yellow skin}}, {solo}, 1girl, slime girl, A yellow butterfly slime girl, {{large butterfly wings}}, {{golden patterns on wings}}, {{lost and confused expression}}, {{translucent skin}}, small breasts, {{long flowing hair}}
+     /////
+     {{maze garden}}, {{tall hedges}}, {{pathways covered in fallen leaves}}, {{autumn colors}}, {{sunlight filtering through leaves}}
+
+     55【】
+     from below, close up, {{{white skin}}}, {solo}, 1girl, slime girl, A white slime girl, {{camellia hair ornament}}, {{red eyes}}, praying, {{white and pink dress}}, {{camellia patterns on dress}}, medium breasts, tall figure 
+     /////
+     {{ruined church}}, {{sunlight through windows}}, {{camellia flowers}}, {{sacred atmosphere}}
+
+     56【】
+     1girl cosplay ladybug,
+     pov, {{{red skin}}}, {solo}, 1girl, A red ladybug slime girl, {ladybug antennae}, {{wearing a ladybug bikini top}},{{large breasts}} , {black eyes}, {black hair}, twintails, {smooth skin} , {glowing skin} , {holding a sunflower} , {sitting on a giant sunflower} 
+     /////
+     {{sunflower field}}, {{morning dew}}, {{sun rays}}
                ]]"""}]}
     )
     # 添加用户输入到 his_messages
