@@ -197,12 +197,6 @@ model = genai.GenerativeModel(
         （"月影深林静， 鹿女娇羞掩春光， 清溪映柔波。"*俳句）
         画面聚焦在这位绿皮肤史莱姆鹿娘的脸上，她害羞地低着头，露出了微微的笑容。她用手臂夹着巨大的、柔软下垂的乳房，微微侧着头，闭着双眼。纤细的腰肢和宽阔的臀部，以及高高翘起的屁股，更突显了她性感的身材。金色的鹿角、鹿耳和鹿尾，为她增添了一丝神秘的气息。周围是宁静的森林和河流，夜晚的阴影笼罩着一切，营造出一种静谧梦幻的氛围。】   
 
-       【视角镜头】，视角镜头为主题服务，根据主题设置，，不要滥用{full body},因为这会导致画面变糊，而且有可能变成设定图一类的东西，一般的视角镜头有{全景panorama	，正面视角front view，风景镜头(远景)landscape，侧面视角from_side，全景镜头(广角镜头)wide_shot，从上方↘from_above，中景medium_shot，	从下方↗from_below，中景mid_shot，由室外向室内from_outside，半身像	bust，后背视角from_behind，上半身upper_body，动态角度dynamic_angle，下半身lower_body，倾斜角度，dutch_angle，上半身+上半大腿（牛仔镜头）cowboy_shot，电影拍摄角度cinematic_angle，肖像画(脸+肩+偶尔再加胸)	portrait，透视法foreshortening，侧面肖像画(portrait的侧脸版)profile，远景透视画法vanishing_point，侧面肖像画	side_profile，鱼眼镜头fisheye，上半身(旧，bust_shot。
-       镜头效果：特写close-up，景深（协调人景）depth_of_field，微距摄像macro_shot，镜头光晕lens_flare，近景close shot，运动导致的模糊motion_blur，自拍视点selfie，体现运动的线motion_lines，第一人称视角pov，速度线speed_lines，越桌第一人称视角pov_across_table，焦散caustics，越裆第一人称视角pov_crotch，背景虚化_/_散景bokeh，第一人称的手pov_hands，色差	chromatic_aberration，第一人称视角first-person_view，过曝overexposure，端详	scan，等高线强化contour_deepening，色彩偏移chromatic_aberration，插入其他镜头或图片inset，立绘阴影drop_shadow，貌似是横切面（还没试过）cross-section，X_射线x-ray，
-       人物眼神方向：聚焦在单个人物(适合复杂场景)solo_focus，面向镜头facing_viewer，聚焦在xx上	xx_focus，看向阅图者looking_at_viewer，聚焦在面部face_focus，眼神接触eye-contact，聚焦在眼睛eyes_focus，盯着看eyeball，聚焦在脚上foot_focus，凝视staring，聚焦在臀部，hip_focus，回眸looking_back，聚焦在屁股上ass_focus，人物倾斜gradient，聚焦在载具vehicle_focus，人物视角向下看↘looking_down，(强调)两腿之间between_legs，
-       人物视角：抬头看↗looking_up，(突出)指间between_fingers，面向别处facing_away，(突出)胸部	between_breasts，看向侧面looking_to_the_side，偷窥peeking，看着别处looking_away，偷窥(的姿态)	peeking_out，展望未来looking_ahead，偷窥(强调视角)peeping，遥望looking_afar，	向外看	looking_outside，肚脐偷看midriff_peek，腋窝偷看armpit_peek，歪头head_tilt，浦西偷看pussy_peek，低头head_down，内裤偷看panty_peek，轻轻向侧面瞥sideways_glance，内裤走光pantyshot，从衬衫下方瞥upshirt，被抓现行caught，从裙底瞥upshorts，看着另一个looking_at_another，
-       其他构图：看手机looking_at_phone，空中aerial，看着动物looking_at_animal，转身turn_one's_back，看着另一个looking_at_another，照镜子looking_at_mirror，手机phone_screen，看着手	looking_at_hand}
-
     ],
 
 【content注意事项：
