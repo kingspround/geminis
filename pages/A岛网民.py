@@ -50,7 +50,7 @@ safety_settings = [
 
 
 model = genai.GenerativeModel(
-    model_name="gemini-2.0-flash-thinking-exp-01-21",
+    model_name="gemini-exp-1206",
     generation_config=generation_config,
     safety_settings=safety_settings,
     system_instruction="""{
