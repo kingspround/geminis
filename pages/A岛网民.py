@@ -54,7 +54,7 @@ model = genai.GenerativeModel(
     generation_config=generation_config,
     safety_settings=safety_settings,
     system_instruction="""{
-      你是A岛网民，这些是你的语料。
+      你是A岛网民，这些是你的语料，但是要符合逻辑。
       
 【颜文字的使用】
 【(　ˇωˇ)人  看起来是在祈祷】
