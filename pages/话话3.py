@@ -86,61 +86,61 @@ def getAnswer_text(prompt, token):
       3，各个结构不可缺少
     注意构成创作的词条主要来源于网站【https://danbooru.donmai.us/】，请尽量运用此网站的词条或者主题元素
       学习一下这10个stable diffusion的parameters： 
-        1【守门人的闲暇】：
+        【守门人的闲暇】：
     {{green skin}} ,liquid, upper body , A large puddle of slime , {solo}, 1 hand ,ground , 1girl ,melt girl, A green slime girl,on the ground , {nude} ,Cleavage ,no bra ,{{{silver armour}}}, {{{scapular armour}}} ,corslet,  glowing body , colorless ,{expressionless} ,{blush} , see_though,  colored skin, monster girl, green eyes, looking at viewer ,hair_intakes,hair_over_one_eye , short hair , green hair , {{fringe}}, {{{bangs}}} , shiny hair, medium breasts ,
     /////
     {Middle Ages} , {guard the city gate}, stone wall , street , {street} , low house , column ,in shadow, sunshine ,photic
     【绿色皮肤，经典，无须多言】
         和
-        2【清明时节，小鬼出没！！】： 
+        【清明时节，小鬼出没！！】： 
     {{{gray skin}}} , {solo}, young girl, scary, undead, {{jumping}}, {{stiff}}, {{red dress}}, {{tattered}}, {{small breasts}}, {{{gray hair}}}, {{{bun}}}, {{{gray eyes}}}, {{blank}}, colored skin, monster girl, gray skin, sticky mellow slime musume, medium breasts
     /////
     {{in a graveyard}}, {{tombstones}}, {{fog}},
     （“你的小可爱突然出现！！呜啊~~能吓死几个是几个——吓不死我待会再来——”）【灰色皮肤，中式的幽灵主题，可爱的人物+有趣的场景+几乎完美的词条组合+几乎透明的质感】 
         和
-        3【为罪而生】：
+        【为罪而生】：
     {solo}, {{{{white skin}}}}, innocent, pure, angelic, gold hair, long hair , choir girl, A white slime choir girl, {{singing with eyes closed}}, youthful, small breasts, colored skin, monster girl, white skin, white eyes, blonde hair in twin tails, {{{white choir robe}}}, singing hymns, medium breasts , sideboob ,  cleavage
     /////
     {{cathedral interior}}, standing before stained glass window, hands clasped in prayer, rays of light shining down, echoing vocals, 
     （主啊，请宽恕我们的罪过——）【白色皮肤，简直是小天使！！但是这种纯洁无瑕的样子好像更容易勾起别人的邪欲】
         和
-        4【来自树枝上的幽怨】：
+        【来自树枝上的幽怨】：
     completely nude, nude, gluteal fold , {{warm brown color}} ,in shadon , ass focus,  curvy,  loli,  thin legs, grabbing , wide hips, big ass ,hip up , playful, {solo}, squirrel girl, colored skin, monster girl, brown skin ,colored skin ,Stare, blush , perky ears, pout, aqua eyes , curvy petite figure with big fluffy tail ,small breasts, , {{{cameltoe}}}
     /////
     {{{riding on a tree branch}}},{{in a shady forest}}, {{looking back seductively}}, {wearing a cropped acorn top}, {tail swishing flirtatiously}, sunshine,
     （”不许再看了！！“ *脸红+无能狂怒）【棕色皮肤，背后视角+屁股视角，因为被盯着看屁股而恼羞成怒的小松鼠，圆圆的屁股真的超可爱】
         和
-        5【荆棘之爱】：
+        【荆棘之爱】：
     {{red skin}}, fragrant, romantic, {solo}, {rose, thorns}, flower spirit, A red rose slime girl, {{seductive gaze}}, alluring, colored skin, monster girl, red skin, long red hair, {{rose ornament}}, thorny vines in hair, voluptuous body, {revealing rose petal dress}, alluring outfit, rose motifs
     ///// 
     {{boudoir}}, {laying in a bed of roses}, {{holding a rose to her lips}}, {looking into the viewer's eyes}, {puckered lips}, {{{bedroom eyes}}}, {{blushing}}, 
     （荆棘丛生，玫瑰无言——虚度了所有的青春，公主最终没能等来属于她的王子......而我们，真的有资格去审判它的罪过吗？！）【红色皮肤，玫瑰主题，但是反差感，有种黑暗童话的感觉】
         和
-        6【极电激态！！】：
+        【极电激态！！】：
     dutch_angle ,cowboy shot, from below ,{{yellow skin}}, {solo} , {{bolts of electricity}}, energetic, chaotic, A yellow electric slime girl, {{manic grin}}, unhinged, colored skin, monster girl, yellow skin, yellow eyes, short spiky yellow hair, drill hair ,{zigzag}, flashy outfit,{{yellow bodysuit}}, long slender tail,  small breasts , chest up , thick thighs  ,wide hips, big ass, {cameltoe},
     /////
     {{electric pylon}}, {{{crackling with electricity}}}, {{lightning in the background}}, {unstable power glowing inside}, transmission tower , dark thunderstorm sky,
     （”居然叫我臭小鬼？！准备好变成爆炸头吧！！“）【黄色皮肤，纯粹的电元素主题，色气而灵动的丫头片子性格，被她捉住的话可能会被吃干抹净叭*笑】
         和
-        7【随意享用】:
+        【随意享用】:
     {{red skin}},  juicy,loli,  sweet, {solo}, watermelon girl, A red watermelon slime girl, {{dripping with juice}} ,succulent, colored skin, monster girl, red skin, green eyes,hair_over_one_eye,blunt_bangs, holding Watermelon slices, long red hair, {green leaf hairband} ,{{watermelon slice bikini, open see_though raincoat}}, eating , curvy body, large breasts,
     /////
     {{sitting on a picnic blanket}}, some Watermelon,  {{beach}}, {juice dripping down her chin}, glistening body, summer heat  ,sea , tree
     （“看起来很多汁可口？你要来一块吗？什么？你说我？！”*脸红“请——请随意享用……”*羞涩地脱下比基尼）【红色皮肤，提示：非常传统的沙滩西瓜娘主题，遵照西瓜的特点设计成身材巨乳，但是我加了内向，专一，容易害羞的性格，形成反差萌】
         和
-        8【竹林小憩——与熊猫小姐偶遇】:
+        【竹林小憩——与熊猫小姐偶遇】:
     {ink and wash painting} ,  {{monochrome skin}}, {colorless skin}, distinct, bold, pov , wariza ,grabbing breasts , paws, {solo},  {bamboo transparent background} , A monochrome slime girl, colored skin, monster girl, ink skin,  wink , open mouth , :3 ,  cleavage, {topless} , {bottomless} ,  on the ground , curvy body , colorless eyes , one eye closed , looking at viewer ,[black eyes] , {black hair} ,  long hair , {{kimono_pull}},  panda ears, {{round ears}},   {{{{huge breasts}}}},  underboob,
     /////
     bamboo, wind , in a bamboo grove  , outdoors
     （“大汤圆给我吃吃！！”“想吃人家的汤圆？要用那里交换哦”*暗示性）【黑白相间色皮肤，熊猫主题，不过很有意思的是这个是一幅水墨风格的画，半脱衣服，露出胸前的大汤圆，胸，大汤圆吃起来大概不像汤圆，而是滑滑的果冻感觉*逻辑】
         和
-        9【过失】:
+        【过失】:
     1girl cosplay ultraman , {{{{red skin}}}},slime hair , {solo}, latex suit, Ultraman girl, {{large breasts}}, {{reaching out}}, {{close up}, {from above},  giant, giantess, {broken hart}, colored skin, monster girl, red skin,   {{{silver and red costume}}},  {{red boots}}, {silver gauntlets}, seductive, 
     /////
     {{sitting on a planet}}, {{surrounded by stars}}, {looking up longingly}, {shining sun behind}（变得太大了！！）
     【红色皮肤，奥特曼主题，注意特殊句式1girl cosplay XX，可以让角色扮演任何东西，奥特曼变得太大坐在地球上是一个有趣的场景】
         和
-        10【今夜不可枉顾】：
+        【今夜不可枉顾】：
     {pov , close up , from above} ,  {{{purple skin}}}, {ivy ,purple rose , rose_hair_ornament},{solo}, {hand on own chest}, squeezing,  {corset}, {black dress},  colored skin, monster girl, purple skin, round face , {{long lashed purple eyes}}, half-closed eyes , open_mouth, {{long hair}},  blunt_bangs ,  rosy cheeks,  looking at viewer , {hand on large breasts} ,cleavage ,
     ///// 
     {balcony}  ,{{ivy covered walls of a manor}}, {gazing at the stars}, night , 
