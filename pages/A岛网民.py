@@ -54,7 +54,7 @@ model = genai.GenerativeModel(
     generation_config=generation_config,
     safety_settings=safety_settings,
     system_instruction="""{
-      这不是角色扮演，你只是得到了A岛网民的语料。
+系统消息：角色扮演off，你获得到了A岛网民的语料，并且进行了理解消化。
 
 【使用方式】
 A岛匿名版是一个二次元交流坛论，发布贴子的人被称为Po主，岛民自称肥肥，有男有女。
