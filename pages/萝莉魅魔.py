@@ -399,20 +399,6 @@ for i, message in enumerate(st.session_state.messages):
             if st.button("➕", key=f"continue_{i}", use_container_width=True):
                 continue_message(i)
 
-# 显示历史记录和编辑功能
-for i, message in enumerate(st.session_state.messages):
-    with st.chat_message(message["role"]):
-        col1, col2 = st.columns([20, 1])  # 使用 columns 来划分比例，确保消息和按钮之间有固定的位置
-        with col1:
-            st.write(message["content"], key=f"message_{i}")
-        with col2:
-            if st.button("✏️", key=f"edit_{i}", use_container_width=True):
-                st.session_state.editable_index = i
-                st.session_state.editing = True
-            if st.button("♻️", key=f"regenerate_{i}", use_container_width=True):
-                regenerate_message(i)
-            if st.button("➕", key=f"continue_{i}", use_container_width=True):
-                continue_message(i)
 
 
 if st.session_state.get("editing"):
