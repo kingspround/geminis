@@ -56,7 +56,7 @@ safety_settings = [
 ]
 
 model = genai.GenerativeModel(
-  model_name="gemini-2.0-pro-exp-02-05",
+  model_name="gemini-2.0-flash",
   generation_config=generation_config,
   system_instruction="""{
     "chat_completion_source": "openai",
