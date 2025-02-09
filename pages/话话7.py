@@ -1313,439 +1313,738 @@ xx娘	xx_girl	2个女孩	2girls	腰	waist	法式辫子	french_braid	水晶材质
 截肢者	amputee										
 											
 
-【服饰模块】
+【    】	  		  		  		    		    		  
+  	princess	  	solo	      	shiny_skin	  	straight_hair	  	streaked_hair	  	long_hair
+  	dancer	  	female	    	pale_skin	  	curly_hair	    	xx_colored_inner_hair	     	very_short_hair
+   	cheerleader	  	male	    	white_skin	   	wavy_hair	     	xx_and_xx_hair	  	short_hair
+      	ballerina	  	genderswap	    	brown_skin	  (  )	drill_hair	        	alternate_hair_color	   ，   	short_hair_with_long_locks
+     	gym_leader	  	futanari	    	deep_skin	   (       	hime_cut	  	silver_hair	    	medium_hair
+    	waitress	  	otoko_no_ko	    	dark_skin	     (   	bob cut	  	grey_hair	     	very_long_hair
+    	wa_maid	  	trap/crossdressing	    	black_skin	    	princess_head	  	blonde_hair	      	absurdly_long_hair
+  	maid	1    	1other	   	tan_lines	      	Half-up	    	brown_hair		
+  	idol	1   	1girl	    	pang		  	  	black_hair	       	hair_between_eyes
+  	kyuudou	 _ 	female_child	  	muscle	  	forehead	  	blue_hair	       	hair_over_one_eye
+   	valkyrie	 _ 		             	white_marble_glowing_skin	     	hair_intakes	   	green_hair	      	hair_over_one_eyebrow
+     	office_lady	   	mesugaki	  	breasts	  	hair_flaps	    	pink_hair	        	blush_visible_through_hair
+    	race_queen	    	gothic_lolita	  	pectorals	  	bangs	   	red_hair	        	eyes_visible_through_hair
+  	Witch	    	wa_lolita	   	large_pectorals	    	air_bangs	     	platinum_blonde_hair	      	ears_visible_through_hair
+  	miko	    	oppai_loli	  (A_	flat_chest	   	blunt bangs	    	azure_hair	      	hair_through_headwear
+  	nun	      	kemonomimi_mode	   (B	small_breasts	      	side_blunt_bangs	     	aqua_hair	      	hair_behind_ear
+  	priest	   	bishoujo	    (C	medium_breasts	    	parted_bangs	      	ruby_hair	   	hair_over_shoulder
+    (   )	cleric	  	female_pervert	   (D	big_breasts	   	swept_bangs	    	two-tone_hair	      	hair_censor
+  	ninja	  	gyaru	  (E	huge_breasts	     	asymmetric bangs	     	multicolored_hair	      	hair_over_breasts
+  	policewoman	   	kogal	  (F	gigantic_breasts	      	braided_bangs	    	gradient_hair	    	hair_over_crotch
+  	police	  		   	underboob		  	    	split-color_hair		  
+  	doctor	  	toddler	  	sideboob.	  	ponytail	    	rainbow_hair	     	messy_hair
+  	nurse	 _ 	child	      	backboob	   	twintails	"  +hair
+（     ）"	   	     ,     	disheveled_hair
+   	glasses	        	aged_down	  	cleavage	    	canonicals			    	hair_spread_out
+   	kitsune	  	petite	  	areola	    	low_twintails			    	hair_flowing_over
+   	public_use	   	underage	   	nipple	     	one_side_up		  	    	hair_strand
+  (SM )	dominatrix	  	young	  	ribs	     	two_side_up	      	shiny_hair	      	asymmetrical_hair
+   (     	yukkuri_shiteitte_ne	  	teenage	  	crop_top_overhang	   	short_ponytail	     	glowing_hair	    	hair_undone
+cos      	kirisame_marisa_(cosplay)	  	teenage	   	single_bare_shoulder	   	side_ponytail	   ;_   ;_	luminous	     	hair_half_undone
+     	sailor_senshi	  	mature_female	   	bare_shoulders	     	tied_hair	     	gradient_hair	     (      )	ruffling_hair
+  	chef	  	old	  	collarbone	    	low_tied_hair	    	liquid_hair	        	expressive_hair
+		        	aged_up	  	armpits	    	multi-tied_hair	    	Starry_sky_adorns_hair	     	bouncing_hair
+xx 	xx_musume	   	innocent	    	armpit_crease	  	braid	    	crystal_hair	     (    )	flipped_hair
+xx 	xx_girl	2   	2girls	 	waist	    	french_braid	      	crystals_texture_Hair	    |      	prehensile_hair
+  	mecha	  	yuri	  	dimples_of_venus	    	braiding_hair	      	translucent_hair	   	living_hair
+  	mecha_musume	  	sisters	  	narrow_waist	  	 	     	Hair_dripping	     	severed_hair
+     	gynoid	3   	3girls	  	slender_waist	   	twin_braids	     	blood_in_hair	    	hair_slicked_back
+     	humanoid_robot_	4   	4girls	  	stomach	   	braid	    	streaked_hair	  	
+    	cyborg	    (  >2)	multiple_girls	  	midriff	   	short_braid	    	polka_dot_hair	      	asymmetrical_hair
+		  	harem	  	belly	   	long_braid	    	ribbon_hair	     	big_hair
+   	monster_girl	    	siblings	  	abs	    	braided_bangs	    	spotted_hair	       	bow_hairband
+  	furry	1   	1boy	     	inflation	    	braided_bun	    	tentacle_hair	    	bow_hairband
+  	cat_girl	2   (    	2boys	  	belly_button	     	braided_ponytail	    	hair_vines	     	cloud_hair
+  	dog_girl	  	yaoi	  	navel	     	crown_braid	    	hair_weapon	    	flipped_hair
+  	fox_girl	  	shota	   (   )	groin	  (  ) 	multiple_braids		  	  	hair_beads
+  	kitsune			  	hips	        	side_braid	     	hand_in_own_hair	     	hair_bow
+  |   	kyuubi			  	crotch	        	side_braids			   	hair_cubes
+   	raccoon_girl			  	wide_hips	   	single_braid	   	tying_hair	  |  	hair_scrunchie
+   	wolf_girl			  	hipbone	    	twin_braids	    	adjusting_hair	  	hair_stick
+  	bunny_girl			        	ass_visible_through_thigh	   	double_bun	     	hair_slicked_back	   	hair_tubes
+  	horse_girl			  	buttock	   	hair_bun	     	hair_pulled_back	hairband	hairband
+  	cow_girl			   	butt_crack	   	ballet_hair_bun	    	hair_lift	         	multiple_hair_bows
+  	dragon_girl			  	thigh	    	pointy_hair	     	hair_up	       	pointy_hair
+  	centaur			  	thick_thigh	    	feather_hair	     	hair_down	          	short_hair_with_long_locks
+  	lamia			    	zettai_ryouiki	    	bow-shaped_hair	    	hair_intakes	     	spiked_hair
+   	mermaid			    	thigh_gap	    	lone_nape_hair	   	playing_with_hair	          	streaked_hair
+    	slime_musume			  	knee	    	alternate_hairstyle	  	hair_tucking		
+   	spider_girl			    	kneepits	         	alternate_hair_length	   	holding_hair		
+				 	foot	     		      	hair_over_mouth		
+  				  	toes	   	ahoge	    	kissing_hair		
+     	angel_and_devil			  	feet_soles	    	heart_ahoge	   	biting_hair		
+  	angel			  		   (   )	antenna_hair	   	eating_hair		
+  （  ）	devil			  	skinny	  	sideburns	     	hair_in_mouth		
+  	goddess			  (  )	plump	   	long_sideburns	   	hair_blowing		
+  	elf			    	curvy	    	sidelocks	   	smelling_hair		
+   	fairy			  (    )	gyaru	  	bald	      	food_on_hair		
+   	dark_elf			  	pregnant	   |   	afro	    	folded_hair		
+   	imp			  		     	spiked_hair	      	grabbing_another's_hair		
+  	demon_girl			  /   	giant_/_giantess			       	adjusting_another's_hair		
+  	succubus			    	minigirl			       	playing_with_another's_hair		
+   	vampire			  	muscular			       	holding_another's_hair		
+    	magical_girl			       	muscular_female			   	cutting_hair		
+  	doll			  	plump			   	hairdressing		
+   	giantess			  	fat				(  )		
+    	minigirl			 	skinny				messy_floating_hair		
+  	orc			  	curvy				((hairs_curling_in_the_water))		
+  	monster										
+     	no_humans										
+    	hetero										
+  											
+   	albino										
+   	amputee										
+											
+
+【    】
 	"
-"		上衣(内衣见0第0页		裙子		袜子		花纹、材质、装饰		鞋类		领口		面部		手臂		耳饰		头饰		帽子		发饰		小装饰		
-西装	suit	衬衫		连衣裙	dress	按长度分		材质		赤脚	barefoot	领子		化妆	makeup	长袖	long_sleeves	耳朵通红	ear_blush	光环	halo	帽子	hat	发饰	hair_ornament	戒指	ring	tail	尾巴
-燕尾服	tuxedo	女式衬衫	blouse	微型连衣裙	microdress	全身袜	bodystocking	装甲的	armored	没有鞋子	no_shoes	水手领	sailor_collar	粉底	fundoshi	短袖	short_sleeves	耳饰	ear_ornament	机械光环	mechanical_halo	大帽子	large_hat	蓬松的发圈	hair_scrunchie	婚戒	wedding_band	butt_plug	添加的尾巴
-礼服	formal_dress	白衬衫	white_shirt	长连衣裙	long_dress	连裤袜|裤袜	pantyhose	帆布的	canvas	脱下的鞋子	shoes_removed	毛皮衣领	fur_collar	眼影	eyeshadow	宽袖	wide_sleeves	耳洞	ear_piercing	头饰	headwear	迷你帽	mini_hat	发_花	hair_flower	耳环	earrings	wings	翅膀/翼
-礼服	evening_gown	有领衬衫	collared_shirt	露肩连衣裙	off-shoulder_dress	裤袜	leggings	牛仔布	denim	单鞋	single_shoe	花边衣领	frilled_collar	口红	lipstick	振袖	furisode	兽耳	animal_ears	头饰	headpiece	魔女帽（尖帽）	witch_hat	发髻	hair_bun	单耳环	single_earring	bat_wings	蝙蝠翅膀
-晚会礼服	canonicals	西服衬衫	dress_shirt	无肩带连衣裙	strapless_dress	裤袜(泛指裤袜或长筒袜)	legwear	毛茸茸	fluffy	单鞋	the_only_shoe	竖起来的衣领	popped_collar	睫毛膏	mascara	分离式袖子	detached_sleeves	垂耳	ears_down	头花环	head_wreath	迷你魔女帽	mini_witch_hat	发髻(单)	single_hair_bun	耳钉	stud_earrings	butterfly_wings	蝴蝶翅膀
-鸡尾酒连衣裙	cocktail_dress	水手服衬衫	sailor_shirt	露背连衣裙	backless_dress	长筒袜(过膝高筒袜)	thighhighs	毛皮	fur	脱下的鞋	shoes_removed	颈部饰品	choker	长睫毛	long_eyelashes	单袖	single_sleeve	假兽耳	fake_animal_ears	皇冠	crown	巫师帽子	wizard_hat	发_铃	hair_bell	项链	necklace	black_wings	黑色之翼
-女长服	gown	短衬衫	cropped_shirt	绕颈露背吊带裙	halter_dress	中筒袜	kneehighs	乳胶	latex	一只脚没穿鞋子	single_shoe	黑色颈圈	black_choker	红唇	red_lips_	无袖	sleeveless	松软的耳朵	floppy_ears	迷你皇冠	mini_crown	派对帽	party_hat	毛_球	hair_bobbles	首饰	jewelry	demon_wings	恶魔之翼
-女长服	japanese_clothes	T恤	t-shirt	吊帶連衣裙（大熱天穿的無袖連衣裙）	sundress	短袜	socks	皮制	leather	长脚趾甲	long_toenails	皮带颈环	belt_collar	面部涂装	facepaint	不对称袖子	asymmetrical_sleeves	动物耳朵绒毛	animal_ear_fluff	头冠	tiara	小丑帽	jester_cap	发箍	hair_scrunchie	水晶	 	gumi	龟尾
-和服	kimono	日常T恤	casual T-shirts	无袖连衣裙	sleeveless_dress	裸腿	bare_legs	透明	see-through	锐利的脚趾甲	sharp_toenails	褶边项链	frilled_choker	脸颊有胡须状痕迹(如狐妖脸上)	whisker_markings	蓬松的袖子	puffy_sleeves	狐狸耳朵	fox_ears			大礼帽	tokin_hat	发_圈	hair_rings	胸针	brooch	asymmetrical_wings	不对称的翅膀
-无袖和服	sleeveless_kimono			水手服款裙子	sailor_dress	全身袜	bodystocking			用脚趾吊着鞋	shoe_dangle							猫耳朵	cat_ears	倾斜的头饰	tilted_headwear	高顶礼帽	top_hat	发_夹	hairclip				
-短和服	short_kimono	短袖T恤	            	夏日长裙	summer_dress	连体黑丝	black_bodystocking	弹性纤维	spandex	脚趾甲	toenails	领巾	neckerchief	唇彩	lipgloss	蓬蓬长袖	puffy_long_sleeves	狮子耳朵	lion_ears	头鳍	head_fins	迷你礼帽	mini_top_hat	发夹(横线)	hairpin	宝石	gem	demon_wings	恶魔翅膀
-印花和服	print_kimono		short sleeve T-shirts	中国服饰	china_dress	连体白丝	white_bodystocking	紧身	tight	脚趾	toes	红领巾	red_neckerchief	彩色睫毛	colored_eyelashes	蓬蓬短袖	puffy_short_sleeves	美洲豹耳朵	jaguar_ears	女仆头饰	body	圆顶礼帽	bowler_hat	发管	hair_tubes	胸前宝石	chest_jewel	detached_wings	不与本体相连的翅膀
-衣带(和服用)	obi	印着字的T恤	writing on clothes	围裙连衣裙	pinafore_dress	衣服下的袜子	stocking_under_clothes	材质增强	fine_fabric_emphasis	乐福鞋(小皮鞋)	black_loafers	领带	necktie	脸红	blush	褶袖边	frilled_sleeves	虎耳	tiger_ears	新娘头纱	bridal_veil	药盒帽	pillbox_hat	发棒	hair_stick	额头宝石	forehead_jewel	fairy_wings	妖精的翅膀
-饰带	sash	露肩衬衫(搭肩衫)	off-shoulder_shirt	围裙连衣裙	sweater_dress	裤袜	pantyhose	褶边	frilled	运动鞋	shoes	短领带	short_necktie	淡淡的腮红	light_blush	朱丽叶袖	juliet_sleeves	狗耳朵	dog_ears	头带	headband	钟形女帽	cloche_hat	发_带	hair_ribbon	流苏	tassel	fake_wings	仿造的翅膀
-旗袍	long_eyelashes	包肩上衣	shrug_(clothing)	婚纱	wedding_dress	黑丝裤袜	black_pantyhose	中心褶花边	center_frills	运动鞋	sneakers	白色领带	white_necktie	动画式脸红	anime_style_blush	绷带手臂	bandaged_arm	郊狼耳朵	coyote_ears	头盔	helmet	侧边帽	side_cap	发_带	hairband	肚链	belly_chain_	fiery_wings	燃烧着的翅膀
-旗袍	china_dress	宽松上衣	blouse	战甲裙	armored_dress	白丝裤袜	white_pantyhose	起皱的(有褶的)	crease	室内鞋	uwabaki	蝴蝶结领带	bowtie	鼻腮红	nose_blush	插肩袖	raglan_sleeves	兔耳	bunny_ears	与原设不同的头饰	alternate_headwear	军帽	military_hat	发_带	hair_tie	花边	lace	insect_wings	昆虫翅膀
-印花旗袍	print_cheongsam	开襟毛衣衫	cardigan	花边连衣裙	frilled_dress	有腿环的裤袜	thighband_pantyhose	分层的	layered	玛丽珍鞋(低跟,圆面,横绑带)	mary_janes	挂在脖子上的耳机	headphones_around_neck	鼻血	nosebleed	下臂护甲	vambraces	马耳	horse_ears	毛边头饰	fur-trimmed_headwear	贝雷帽	beret	洛丽塔发带	lolita_hairband	丝带	ribbon	large_wings	大翅膀
-旗袍类衣物的前摆	pelvic_curtain	交叉吊带衫	criss-cross_halter	蕾丝边连衣裙	lace-trimmed_dress	紧致的裤袜(勾勒出线条	pantylines	蕾丝	lace	厚底鞋	platform_footwear	脖子上护目镜	goggles_around_neck	脸上有瘀伤	bruise_on_face	分层袖子	layered_sleeves	尖耳朵	pointy_ears	帽子上的护目镜	goggles_on_headwear	驻军帽	garrison_cap	褶边发带	frilled_hairband	缝饰	stitches	low_wings	腰间的翅膀
-婚纱	wedding_dress	褶边衬衫	frilled_shirt	有领连衣裙	collared_dress	单边穿着连裤袜	single_leg_pantyhose	皮草饰边	fur_trim	高跟鞋	high_heels	颈铃	neck_bell	面部标记	facial_mark	毛边袖子	fur-trimmed_sleeves	长尖耳朵	long_pointy_ears	耳机	earphones	警察帽	police_hat	蕾丝边饰发带	lace-trimmed_hairband	围巾	scarf	mini_wings	迷你翅膀
-白无垢(日式嫁衣)	uchikake	运动衫（体操服）	gym_shirt	毛皮镶边连衣裙	fur-trimmed_dress	裤袜里的内裤	panties_under_pantyhose	毛边的（后接服装）	fur-trimmed	细跟高跟鞋	stiletto_heels	领口	neck_ruff	额头标记	forehead_mark	透明袖子	"see-through_sleeves
-"	老鼠耳朵	mouse_ears	耳罩	earmuffs	护士帽	nurse_cap	蝴蝶结发饰	hair_bow	创可贴	bandaid	multicolored_wings	有多种颜色的翅膀
-校服	school_uniform 	夏威夷衫	hawaiian_shirt	分层连衣裙	layered_dress	大概率长筒袜，小概率裤袜	legwear	交叉花边服饰	cross-laced_clothes	带束带的高跟鞋	strappy_heels	V领	v-neck	头部愤怒符号	anger_vein	撕裂的袖子	torn_sleeves	浣熊耳朵	raccoon_ears	耳朵穿过头饰	ears_through_headwear	厨师帽	chef_hat	青蛙发饰	frog_hair_ornament	项圈	collar	multiple_wings	多对翅膀
-水手服	sailor	连帽衫	hoodie	百褶连衣裙	pleated_dress	网袜(材质)	fishnets	迷彩	camoflage	厚底高跟鞋	platform_heels_	脖子上的毛巾	towel_around_neck	痣	mole	连肩衣袖	raglan_sleeves	松鼠耳朵	squirrel_ears	头上的叶子	leaf_on_head	校帽	school_hat	心形发饰	heart_hair_ornament	皮带	belt	no_wings	去掉了(原设有的)翅膀
-水手服2	serafuku	贴合程度不合逻辑的衬衫	Impossible shirt	绷紧的连衣裙	taut_dress	丝袜	stockings	服饰装饰		舰C舰娘专用鞋	rudder_footwear	宽松领带	loose_necktie	眼睛下方的痣	mole_under_eye	分层的衣袖	layered_sleeves	熊耳朵	bear_ears	纂	topknot	海盗帽	pirate_hat	蝴蝶发饰	butterfly_hair_ornament	蒸汽	steam	winged_helmet	带翅膀的头盔
-夏季制服	summer_uniform	(烹饪时穿的)罩衫	kappougi	铅笔裙	pencil_dress	渔网袜	stirrup_legwear	露出屁股的服饰	ass_cutout	凉鞋	sandals	颈部纹身	neck_tattoo	雀斑	freckles	袖子过指	sleeves_past_fingers	熊猫耳朵	panda_ears	头饰	tiara	出租车司机帽	cabbie_hat	星星发饰	star_hair_ornament	铃铛	bell	wings	翅膀
-幼儿园制服	kindergarten_uniform	格子衬衫	plaid_shirt	过分紧身的衣服	impossible_dress	露趾袜	toeless_legwear	不对称的服饰	asymmetrical_clothes	裸足凉鞋	barefoot_sandals		ascot	食物在脸上	food_on_face	袖子过腕	sleeves_past_wrists	蝙蝠耳朵	bat_ears	水银头	suigintou	渔夫帽	bucket_hat	食物主题发饰	food-themed_hair_ornament	护身符	amulet		
-警服	police_uniform	马球衫	polo_shirt	多色款连衣裙	multicolored_dress	马镫袜	stirrup_legwear	(服饰)打在背后的结	back_bow	木屐凉鞋	clog_sandals	颈丝带	ribbon_choker	淡妝的	light_makeup	袖子过肘	sleeves_past_elbows	机器人耳朵	robot_ears	三角头饰	triangular_headpiece	安全帽	hardhat	锚形发饰	anchor_hair_ornament	徽章	emblem		
-海军制服	naval_uniform	印花衬衫	print_shirt	条纹连衣裙	striped_dress	长筒袜	thighhighs	服饰互换	costume_switch	木屐(配tabi)	geta	阴贴/乳贴	maebari/pasties	饭在脸上	rice_on_face	袖子上推	sleeves_pushed_up	额外的耳朵	extra_ears	护额	forehead_protector	草帽	straw_hat	蝙蝠发饰	bat_hair_ornament	旗印	flag_print		
-陆军制服	military_uniform	衬衫	shirt	格子裙	checkered_skirt	双色裤袜	mismatched_legwear	服饰上有两条平行条纹	double_vertical_stripe	拖鞋	slippers	乳贴	latex	奶油在脸上	cream_on_face	袖子里的手臂	arm_out_of_sleeve	耳朵穿过帽子或头饰	ears_through_headwear	天线	radio_antenna	太阳帽	sun_hat	胡萝卜发饰	carrot_hair_ornament	锚符号	anchor_symbol	(((Leg_stockings,:_Compiled_by_thin_filament_lines_arranged_horizontally)),_(black_stockings)),	丝袜材质增强2(存疑)
-纳粹制服	ss_uniform/nazi_uniform	无袖连帽衫	sleeveless_hoodie	格子连衣裙	plaid_dress	不对称裤袜	asymmetrical_legwear	吊带式的上身的服饰	halter_top	溜冰鞋	skates	破烂衣服	torn_clothes	小胡子	mustache	不均匀的袖子	uneven_sleeves	羊驼耳	alpaca_ears	兽耳头罩	animal_hood	斗笠	rice_hat	猫系发饰	cat_hair_ornament	十字	cross		
-女仆装	maid	无袖衬衫	sleeveless_shirt	罗纹连衣裙	ribbed_dress	长短袜	uneven_legwear	多色款腿部服饰	multicolored_legwear	旱冰鞋	roller_skates	铁十字勋章	iron_cross	山羊胡	goatee	不匹配的袖子	mismatched_sleeves	兽角	horns	箭头	arrow_(symbol)	兜帽	rice_hat	三叶草发饰	clover_hair_ornament	衍射十字星	diffraction_spikes		
-女侍从的制服	stile_uniform	条纹衬衫	striped_shirt	波点连衣裙	polka_dot_dress	白色长筒袜	white_thighhighs	改款过的日本服饰	nontraditional_miko	直排轮滑鞋	inline_skates	中国结	chinese_knot	胡须斑纹	whisker_markings	袖子卷起	sleeve_rolled_up	假角	fake_horns	斧头	axe	动物帽	animal_hat	月牙发饰	crescent_hair_ornament	铁十字架	iron_cross		
-巫女服	miko	长袖运动卫衣	sweatshirt	格子呢连衣裙	plaid_dress	黑色长筒袜	black_thighhighs	侧边开口的服饰	side_cutout	芭蕾舞鞋	ballet_slippers	低领口	plunging neckline	疤痕	scar	单只袖子卷起	sleeves_rolled_up	龙角	dragon_horns	秃头	bald	皮帽	fur_hat	十字发饰	cross_hair_ornament	拉丁式十字架	latin_cross		
-工作服	overalls	背心(居家)	tank_top	印花连衣裙	print_dress	粉色长筒袜	pink_thighhighs	侧面有缝的服饰	side_slit	动物脚	animal_feet		项链	穿过眼睛的疤痕	scar_across_eye	不对称的袖子	asymmetrical_sleeves	鬼角	oni_horns	头巾	bandana	带耳朵的帽子	hat_with_ears	方向键发饰	d-pad_hair_ornament	蕾丝边发带	lace-trimmed_hairband		
-职场制服	business_suit	背心(正式)	vest	竖条纹连衣裙	vertical-striped_dress	吊带袜	garter_straps	侧面没有布料的服饰	sideless_outfit	动物拖鞋	animal_slippers	十字架项链	cross_necklace	烟斗	smoking_pipe	分离袖子	detached_sleeves	鹿角	antlers	波波头	bob_cut	泡泡帽	bobblehat	鱼形发饰	fish_hair_ornament	脚踝系带	ankle_lace-up		
-护士	nurse	背心(正式)	waistcoat	棱纹连衣裙	ribbed_dress	腰带(吊带袜的)	garter_straps	单边穿着过膝服饰	single_kneehigh	兽爪鞋	paw_shoes	珠子项链	bead_necklace	纹身	tattoo	羽毛装饰的袖子	feather-trimmed_sleeves	弯角	curled_horns	骨头	bone	枕帽	pillow_hat	头发上成对的像无线蓝牙的发饰	hairpods	圣葛罗莉安娜女学园校徽	st._gloriana's_(emblem)		
-厨师工装	chef_uniform	吊帶背心(小可愛)	camisole	透视连衣裙	see-through_dress	破损的裤袜	torn_legwear	露出单边服饰上的垂直条纹	single_vertical_stripe	脚环	anklet	珍珠项链	pearl_necklace	纹身	glasses	花边袖子	frilled_sleeves	山羊角	goat_horns	锅盖头	bowl_cut	南瓜帽	pumpkin_hat	叶子发饰	leaf_hair_ornament	舰娘锁(舰C)	heart_lock_(kantai_collection)		
-实验服	labcoat	系带衬衫(把衣角和下擺打结)	tied_shirt	短裙	skirt	损坏了的长筒袜	torn_thighhighs	高领服饰	turtleneck	镣铐	shackles	心形项链	heart_necklace	眼睛	eyewear	毛皮镶边袖子	fur-trimmed_sleeves	角上的头发	hair_on_horn	婚纱头纱	bridal_veil	棒球帽	baseball_cap	音符发饰	musical_note_hair_ornament	源石病(明日方舟)	oripathy_lesion_(arknights)		
-啦啦队服	cheerleader	汗衫	undershirt	超短裙	microskirt	透明的袜子	see-through_legwear_	双层样式的服饰画法	two-sided_fabric	脱下凉鞋	sandals_removed	胡萝卜项链	carrot_necklace	单片眼镜	monocle	反袖	hands_in_opposite_sleeves	机械角	mechanical_horns	头冠	circlet	鸭舌帽	flat_cap	南瓜发饰	pumpkin_hair_ornament	拳套	boxing_gloves		
-乐队制服	band_uniform	截短上衣	crop_top	迷你裙	miniskirt	花边袜	frilled_legwear	带O型环的衣物	o-ring	靴子	boots	锁链项链	chain_necklace	带框眼镜	under-rim_eyewear	蕾丝边袖子	lace-trimmed_sleeves	穿耳洞	ear_piercing	团子头	double_bun	撕裂的帽子	torn_hat	骷髅发饰	skull_hair_ornament	子弹抛壳	casing_ejection		
-宇航服	space_suit	高开衩的衣物	highleg	正装短裙	skirt_suit	蕾丝边袜	lace-trimmed_legwear	带O型环的上衣	o-ring_top	脱下的靴子	boots_removed	珠玉项链	magatama_necklace	无框眼镜	rimless_eyewear	掐袖子	pinching_sleeves	十字耳环	cross_earrings	双头假阴茎	double_dildo	暴民帽	mob_cap	蛇形发饰|蛙头发饰	snake_hair_ornament	顶灯	ceiling_light		
-连衣裤	leotard	开衫	cardigan	比基尼裙	bikini_skirt	有接缝的袜	seamed_legwear	须边(围巾末端	fringe_trim	大腿靴	thigh_boots	牙项链	tooth_necklace	半无框眼镜	semi-rimless_eyewear	蓬蓬的袖子	puffy_detached_sleeves	水晶耳环	crystal_earrings	钻头	drill	报童帽	newsboy_cap	雪花发饰	snowflake_hair_ornament	出轨	cheating_(relationship)		
-修女服	domineering	衣服漏洞	clothing_cutout	百褶裙	pleated_skirt	中间有一条黑线的袜子	back-seamed_legwear	松散的带子(衣物)	loose_belt	及膝靴(马靴)	knee_boots	钥匙项链	key_necklace	红框眼镜	red-framed_eyewear	蓬蓬的袖子	puffy_sleeves	耳环	earrings	水龙头	faucet	白色贝雷帽上的蝴蝶结	bowknot_over_white_beret	草莓发饰	strawberry_hair_ornament	口香糖	chewing_gum		
-	风格	露背上衣	back_cutout	短铅笔裙	pencil_skirt	动物耳朵过膝袜	animal_ear_legwear	小绒球(衣物挂件)	pom_pom_(clothes)	系带靴	lace-up_boots	锚项链	anchor_necklace	圆框眼镜	round_eyewear	棱纹袖子	ribbed_sleeves	花耳环	flower_earrings	扎头巾(名词)	hachimaki	动物主题帽饰	animal_hat	向日葵发饰	sunflower_hair_ornament	阴核环	clitoris_piercing		
-中国服饰	china_dress	乳沟处开洞	cleavage_cutout	蓬蓬裙	bubble_skirt	横条纹袜	striped_legwear	衣服的抽绳	drawstring	交叉系带鞋	cross-laced_footwear	骷髅项链	skull_necklace	黑框眼镜	black-framed_eyewear	半透的袖子	see-through_sleeves	心形耳环	heart_earrings	耳后有头发	hair_behind_ear	反扣的帽子	backwards_hat	X形发饰	x_hair_ornament	砧板	cutting_board		
-中国风	chinese_style	肚脐开洞	navel_cutout	芭蕾舞裙	tutu	竖条纹袜	vertical-striped_legwear	有整件衣物长的拉链	full-length_zipper	踝靴	ankle_boots	花项链	flower_necklace	有色眼镜	tinted_eyewear	单边没脱掉的袖子	single_detached_sleeve	环状耳环	hoop_earrings	头发上系着铃铛	hair_bell	碗状帽子	bowl_hat			溶解的	dissolving		
-传统服装|民族服装	traditional_clothes	露腰上衣	midriff	蓬蓬裙(禮服)	ballgown	圆斑袜	polka_dot_legwear	褶裥(衣物)	gathers	高跟靴	high_heel_boots	贝壳项链	shell_necklace	医用眼罩	medical_eyepatch	叠起来的袖子	sleeves_folded_up	多个耳环	multiple_earrings	头绳	hair_bobbles	报童帽	cabbie_hat			占星杖	dowsing_rod		
-日式服装	japanese_clothes	心形开口	heart_cutout	蓬蓬裙(兒童)	pettiskirt	印花袜	print_legwear	缝在衣服上衬料	gusset	高帮靴	thigh_boots	金项链	gold_necklace	用绷带包扎一只眼睛	bandage_over_one_eye	袖子长过手腕	sleeves_past_wrists	药丸样式的耳环	pill_earrings	发髻|团子头	hair_bun	猫耳帽子	cat_hat			手绘板	drawing_tablet		
-袢缠(日式	hanten_(clothes)	撕裂的衣服	torn_clothes	展会女郎装束	showgirl_skirt	短裤穿在袜子外	legwear_under_shorts	胸口的袋子	breast_pocket	露趾靴	toeless_boots	新月项链	crescent_necklace	歪斜的眼镜	crooked_eyewear	袖子往上拉起	sleeves_pushed_up	只一边戴着耳环	single_earring	披下来的头发	hair_down	聊天框风格	chat_log			酒杯	drinking_glass		
-韩服	hanbok	撕裂的衬衫	torn_shirt	中等长裙子	Medium length skirt	中筒袜		花纹		矮跟休闲皮草靴	fur_boots	戒指项链	ring_necklace	取下眼镜	eyewear_removed	卷起的袖子	sleeves_rolled_up	骷髅耳环	skull_earrings	在摆动的头发	hair_flaps	牛仔帽	cowboy_hat			吸管	drinking_straw		
-朝鲜服饰	korean_clothes	脱衣服中	undressing	皮带裙	beltskirt	过膝袜	over-kneehighs	阿盖尔菱形花纹	argyle	毛边靴子	fur-trimmed_boots	羽毛项链	feather_necklace	太阳镜	sunglasses	条纹袖子	striped_sleeves	星形耳环	star_earrings	拨头发	hair_flip	狗盆帽	dixie_cup_hat			液体滴落	dripping		
-西部风格	western	褪下衣物	clothes_down	牛仔裙	denim_skirt	短袜		格子花纹	checkered	雪地靴	snow_boots	骨项链	bone_necklace	风镜	goggles	破损的袖子	torn_sleeves	月牙耳环	crescent_earrings	头发上别着花	hair_flower	毛皮帽子	fur_hat			流口水	drooling		
-德国服装	german_clothes	掀起衬衫	shirt_lift	吊带裙	suspender_skirt	鲍比袜(白短袜)	bobby_socks	多彩条纹	colored_stripes	脚链	anklet	十字项链	ankh_necklace	眼罩	Blindfold	宽大的袖子	wide_sleeves	露出单边肩膀	single_bare_shoulder	散开的头发	hair_spread_out	带有蝴蝶结的帽子	hat_bow			傍晚	evening		
-哥特风格	gothic	衬衫拉下来	shirt_pull	与上衣搭配的短裙	skirt_set	日式厚底短袜(足袋)	tabi	斜条纹	diagonal_stripes	胶靴	rubber_boots	多条项链	multiple_necklaces	眼罩(独眼)	eyepatch	和袖子分开的手腕的袖口	wrist_cuffs	单手穿着护臂	single_gauntlet	盘起来的头发	hair_up	带有羽毛的帽子	hat_feather			晚会礼服	evening_gown		
-哥特洛丽塔风格	gothic_lolita	衬衫塞进去	shirt_tucked_in	长裙	long_skirt	泡泡袜	loose_socks	水平条纹	horizontal_stripes	圣诞靴	santa_boots	子弹项链	bullet_necklace	面罩|遮阳帽舌|遮阳板	visor	袖章(臂带)	armband	单侧进气口发型	single_hair_intake	戴着头盔的	helm	带着花的帽子	hat_flower			正在下坠的	falling		
-拜占庭风格	byzantine_fashion	拖拽衣服	clothes_tug	夏日长裙	summer_long_skirt	踝袜	ankle_socks	多彩条纹	multicolored_stripes	皮靴	leather_boots	拿着项链	holding_necklace	戴眼镜的	bespectacled	臂镯	armlet	单侧长着角	single_horn	摘下头盔|被摘下的头盔	helmet_removed	带有饰物的帽子	hat_ornament			落叶	falling_leaves		
-热带特征的	Tropical	拖拽衬衫	shirt_tug	外裙	overskirt	腿套|暖腿袜	leg_warmers	点装纹	polka_dot_	皮带靴	belt_boots	项链被移除	necklace_removed	蓝框眼镜	blue-framed_eyewear		手	单边没有袖管	single_sleeve	带角头盔	horned_helmet	帽子遮住了一只眼	hat_over_one_eye			落花	falling_petals		
-印度风格	indian_style	解开的衬衫	untucked_shirt	袴裙	hakama_skirt	单短袜	single_sock	棱纹	ribbed	靴子下的长筒袜	thighhighs_under_boots	棕色领饰	brown_neckwear	棕色镜框眼镜	brown-framed_eyewear	绷带	bandage	单边有肩带	single_strap	加帕里馒头	japari_bun	帽子被摘下|摘下帽子	hat_removed			羽翼	feathered_wings		
-越南校服（奥黛）	Ao_Dai	掀自己衣服	lifted_by_self	高腰裙	high-waist_skirt	横条短袜	striped_socks	横条纹	striped	作战靴	combat_boots	项链	chain_necklace	厚如玻璃瓶底的圆眼镜	coke-bottle_glasses	皮带	leash	只有一条腿有穿着	single_thighhigh	方头巾	kerchief	带有缎带的帽子	hat_ribbon			钓鱼竿	fishing_rod		
-阿伊努人的服饰	ainu_clothes	没穿好的衣物	untied	和服裙	kimono_skirt	與袜子互動		连续重复花纹	unmoving_pattern	马丁靴	doc_martens	格子领口	checkered_neckwear	摘眼镜	eyewear_removed	手臂纹身	arm_tattoo			麻美断头梗	mami_mogu_mogu	捏着帽檐	hat_tip			正前缩距透视法	foreshortening		
-阿拉伯服饰	arabian_clothes	敞开的衣服	open_clothes	雪紡裙	chiffon_skirt	袜子有开口	leg_cutout	竖条纹	vertical_stripes	雨靴	rain_boots	斜纹领结	diagonal-striped_neckwear	单片眼镜	monocle		number_tattoo			头巾式室内女帽	mob_cap	自带耳朵的帽子	hat_with_ears			碎边饰物|边缘装饰物	fringe_trim		
-埃及风格服饰	egyptian_clothes	解开纽扣的衬衫	unbuttoned_shirt	花边裙子	frilled_skirt	靴子穿在袜子外面	thighhighs_under_boots	方格图案	checkered	一只脚没穿靴子	single_boot	花环|鲜花项链	flower_necklace	去掉了(原设有的)眼镜	no_eyewear	珠子手链	bead_bracelet			只扎了一边的头发	one_side_up	线影法(纹理)	hatching_(texture)			平底锅	frying_pan		
-套装	costume	纽扣之间的缝隙(没解开	button_gap	毛皮镶边短裙	fur-trimmed_skirt	整理裤袜	adjusting_legwear	格子呢图案	plaid	鞋底	shoe_soles	脖子挂着护目镜	goggles_around_neck	没透出眼睛的眼镜	opaque_glasses	手镯	bracelet			猫头鹰	owl	cos成初音未来	hatsune_miku_(cosplay)			加特林机枪	gatling_gun		
-动物系套装(皮套)	animal_costume	解开部分纽扣	partially_unbuttoned	蕾絲短裙	lace_skirt	褪下的裤袜	pantyhose_pull	动物印花	animal_print	拱形鞋底	arched_soles	绕颈系带	halterneck	下半无框眼镜	over-rim_eyewear	花手镯	flower_bracelet			突码头	pier	迷你帽子	mini_hat			飞仙髻	hair_rings		
-兔子服装	bunny_costume	拉开上部分拉链	partially_unzipped	蕾丝边短裙	lace-trimmed_skirt	脱袜子	socks_removed	猫咪印花	cat_print	爪印鞋底	paw_print_soles	耳机挂在脖子上	headphones_around_neck	无框眼镜	rimless_eyewear	带钉手镯	spiked_bracelet			枕头	pillow	睡帽	pillow_hat			连帽运动夹克	hooded_track_jacket		
-原设服装改编	adapted_costume	脱下的衣服	clothes_removed	缎带饰边短裙	ribbon-trimmed_skirt	拉着袜子(短袜	sock_pull	熊印花	bear_print	马蹄铁	horseshoe	松散的领带	loose_necktie	圆形眼镜	round_eyewear	腕饰	wrist_cuffs			举起的拳头	raised_fist	道士帽	porkpie_hat			糖霜	icing		
-猫系服装	cat_costume	脱下衬衫	shirt_removed	分层的半裙	layered_skirt	拉着袜子(长袜	thighhighs_pull	鸟印花	bird_print	爪印鞋底	paw_print_soles	脖子上有痣	mole_on_neck	无上框眼镜	semi-rimless_eyewear	腕带	wristband			头骨和交叉的骨头	skull_and_crossbones	水手帽	sailor_hat			运动衫	jersey		
-皮套狗	dog_costume	衣服滑落	wardrobe_error	印花短裙	print_skirt	其他		兔子印花	bunny_print	马蹄铁	horseshoe	脖子	neck	有色眼镜	tinted_eyewear	手镯；手链	bracelet			石头	stone	圣诞帽	santa_hat			国王(国际象棋)	king_(chess)		
-熊套装	bear_costume	穿衣方式错了	undersized_clothes	多色款裙子	multicolored_skirt	袜带	garters	奶牛印花	cow_print	棕色鞋类	brown_footwear	颈部系着缎带	neck_ribbon	无上框眼镜	under-rim_eyewear	护腕	bracer			穆斯林头巾	turban	通学帽	school_hat			分层服装	layered_clothing		
-经润饰的服装	embellished_costume	衣物紧紧的	tight	条纹裙	striped_skirt	腿环|袜带	leg_garter	龙印花	dragon_print	直排轮溜冰鞋	inline_skates	颈环	neck_ring			袖口	cuffs			双钻头发型	twin_drills	帽舌划到侧面	sideways_hat			闪电	lightning		
-圣诞风格服装	santa_costume	嵌入(拉裆部衣物所致)	wedgie	竖条纹裙子	vertical-striped_skirt	吊带袜的吊带	garter_straps	鱼印花	fish_print	双色鞋子	mismatched_footwear	波浪褶边的领子	neck_ruff	面具	mask	手腕袖口	wrist_cuffs			头发往上蜷的发型	updo	头襟|兜巾	tokin_hat			唇钉	lip_piercing		
-万圣节服装	halloween_costume	衣服出了意外(如崩开)	wardrobe_malfunction	格子呢短裙	plaid_skirt	大腿绑带	thigh_strap	青蛙印花	frog_print	平台鞋	platform_footwear	领巾	neckerchief	面甲	visor	绑定手腕	bound_wrists			湿头发	wet_hair	礼帽	top_hat			放大镜	magnifying_glass		
-香霖堂天狗装束	kourindou_tengu_costume	绷紧的衬衫	taut_shirt	傘裙	flared_skirt	大腿缎带	thigh_ribbon	鲨鱼印花	shark_print	尖头鞋	pointy_footwear	项链	necklace	头盔	helmet	手腕发圈	wrist_scrunchie			头部穿戴物(偏笼统)	headdress	作者犯病	what			情侣装	matching_outfit		
-与原设不同衣服	alternate_costume	绷紧的衣服	taut_clothes	碎花裙	floral_skirt	腿锻带	leg_ribbon	蛇纹	snake_print	包头淑女鞋	pumps	领带	necktie	半面罩	half_mask	手铐	handcuffs			整理头饰	adjusting_headwear	另一条世界线	what_if			机械翼	mechanical_wings		
-换衣play	costume_switch	勒出下胸围	underbust	與裙子互動		腿部袜带	leg_garter	斑马印花	zebra_print	旱冰鞋	roller_skates	格子呢领子	plaid_neckwear	蒙面	masked	手铐	shackles			熊印花头饰	bear_hair_ornament	女巫帽	witch_hat			挤奶器	milking_machine		
-m	meme_attire	过大号的衣服	oversized_clothes	优雅地提着裙子	skirt_hold	腿上的绷带	bandaid_on_leg	虎纹	tiger_print	鞋带	shoelaces	深领	plunging_neckline	抬起面罩	mask_lift	锁链	chains			棕色头饰	brown_headwear	法师帽	wizard_hat			拌料盆	mixing_bowl		
-	休闲装	过大号衬衫	oversized_shirt	扯住裙摆|按住裙摆	skirt_tug	包扎过的腿	bandaged_leg	豹纹	leopard_print	溜冰鞋	skates	印花领带	print_neckwear	头戴面具	mask_on_head	锁链带牵绳	chain_leash			为耳朵留洞的头饰	ears_through_headwear					早晨	morning		
-休闲	casual	男友的衣服	borrowed_garments	压住裙摆	dress_tug	脚踝系带	ankle_lace-up	美洲豹印花	jaguar_print	带翅膀的鞋子	winged_footwear	短领带	short_necktie	狐狸面具	fox_mask		手套			装饰性头饰(偏幻想和民族风饰品)	headpiece					牵牛花	morning_glory		
-休闲服	loungewear	衣物吊带滑落(导致走光)	strap_slip	掀起裙子	skirt_lift	大腿皮套	thigh_holster	蝙蝠印花	bat_print	日式草鞋	zouri	无袖高领毛衣	sleeveless_turtleneck	外科口罩	surgical_mask	手套	gloves			头饰(偏衣物类)	headwear					乳头穿刺	nipple_piercing		
-卫衣	hoodie	湿衬衫	wet_shirt	一条腿上挂着短裙	skirt_around_one_leg	关节	joints	土狼印花	aardwolf_print			星形项链	star_necklace	防毒面具	gas_mask	长手套	long_gloves			头饰被摘下|摘下头饰	headwear_removed					乳环	nipple_rings		
-居家服	homewear	偷衣服	clothes_theft	脱下的短裙	skirt_removed	膝盖	kneepits	非洲野狗印花	african_wild_dog_print			条纹领子	striped_neckwear	潜水面罩	diving_mask	单只手套	single_glove			角状头饰	horned_headwear					鼻子有穿孔	nose_piercing		
-睡衣	pajamas	外套		脱下裙子	dress_removed	护膝	knee_pads	猎豹印花	cheetah_print			披着毛巾的脖子	towel_around_neck	头戴式潜水面罩	diving_mask_on_head	长袖手套（肘部手套）	elbow_gloves			为角留了洞的头饰	horns_through_headwear					带O型环的下装	o-ring_bottom		
-睡衣	nightgown	西装外套	blazer	敞开的裙子	open_skirt	膝盖上的创可贴	bandaid_on_knee	狗印花	dog_print			高领毛衣	turtleneck_sweater	鬼面具	oni_mask	新娘手套	bridal_gauntlets			去掉了(原设有的)头饰	no_headwear					绘画	painting_(object)		
-睡衣	sleepwear	大衣	overcoat	(变装)女装	crossdressing	含菱形花纹的裤袜	argyle_legwear	狐狸印花	fox_print			解开领带	undone_necktie	天狗面具	tengu_mask	露指手套	fingerless_gloves			头上有非头饰类的物体	object_on_head					浇注|倾倒	pouring		
-情趣睡衣	babydoll	双排纽扣(双排扣	double-breasted	连衣裙上的蝴蝶结	dress_bow	带蝴蝶结的裤袜	bow_legwear	长颈鹿印花	giraffe_print			v字领	v-neck	忍者面具	ninja_mask	部分露指手套	partially_fingerless_gloves			印花头饰	print_headwear					布丁	pudding		
-印花睡衣	print_pajamas	长外套	long_coat	着装	dressing_another	手臂袜带	arm_garter	熊猫印花	panda_print			脖子上挂着口哨	whistle_around_neck	骷髅面具	skull_mask	半手套	half_gloves			皇冠头饰	tiara					清代官帽	qing_guanmao		
-波点睡衣	polka_dot_pajamas	一种宽上衣	haori	短裙里穿着短裤	shorts_under_skirt			沙猫印花	sand_cat_print				围巾	曲棍球面具	hockey_mask	无指手套	fingerless_gloves			歪着的头饰	tilted_headwear					●REC	recording		
-浴衣	yukata	冬季大衣	winter_coat	侧开衩	side_slit			鲸鱼印花	whale_print			格子围巾	plaid_scarf	鸟面具	bird_mask	不对称手套	asymmetrical_gloves			骨头状饰品	bone_hair_ornament					马术马鞭	riding_crop		
-唐装	chinese_clothes	连帽大衣	hooded_coat	短裤	shorts			白虎纹	white_tiger_print			条纹围巾	striped_scarf	瘟疫医生口罩	plague_doctor_mask	爪子手套(分指手套)	paw_gloves			兔子饰品	bunny_hair_ornament					戒指	ring		
-汉服	hanfu	皮草大衣	fur_coat	小尺寸短裤	micro_shorts			金鱼印花	goldfish_print			格纹围巾	checkered_scarf	石鬼面	stone_mask	连指手套(两指手套)	mittens			角上有饰物	horn_ornament					将受虐者的嘴固定成O字	ring_gag		
-道袍	Taoist robe	镶边皮草大衣	fur-trimmed_coat	热裤	short_shorts			翼印	wing_print			印花围巾	print_scarf	马面具	horse_mask	毛边手套	fur-trimmed_gloves			头上有动物	animal_on_head					垂下的长鬈发	ringlets		
-长袍	robe	粗呢大衣	duffel_coat	热裤	hot_pants			蛛网纹	spider_web_print			竖条纹围巾	vertical-striped_scarf	化妆舞会面具	masquerade_mask	乳胶手套	latex_gloves			从后脑戴上的耳机	behind-the-head_headphones					弹药匣	shell_casing		
-混合长袍	robe_of_blending	渔网上衣	fishnet_top	热裤	cutoffs			蝴蝶印花	butterfly_print			波点围巾	polka_dot_scarf	头戴潜水面罩	diving_mask_on_head	不对称的手套	asymmetrical_gloves			头上的鸟	bird_on_head					流星	shooting_star		
-斗篷	cloak	派克大衣	parka	条纹短裤	striped_shorts			碎花	floral_print			菱形围巾	argyle_scarf	SM面具	domino_mask	棒球手套	baseball_mitt			猫耳式耳机	cat_ear_headphones					购物袋	shopping_bag		
-连帽斗篷	hooded_cloak	毛边大衣	fur-trimmed_coat	吊带短裤	suspender_shorts			叶印花	leaf_print			米色围巾	beige_scarf	面具	mask	婚纱手套	bridal_gauntlets			头上趴着猫	cat_on_head					兄弟姐妹	siblings		
-冬装	winter_clothes	夹克衫	jacket	牛仔短裤	denim_shorts			三叶草印花	clover_print			围巾蝴蝶结	scarf_bow	掀到头上的面具	mask_on_head	棕色手套	brown_gloves			眼镜别在头上	eyewear_on_head					单翼	single_wing		
-羽绒服	down jacket	夹克部分移除	jacket_partially_removed	蓬蓬的短裤	puffy_shorts			枫叶印花	maple_leaf_print			共享围巾	shared_scarf	摘下的面具	mask_removed	长手套	elbow_gloves			额头	forehead					移动门	sliding_doors		
-圣诞装	santa	夹克被移除	jacket_removed	海豚短褲(真理褲)	dolphin_shorts			玫瑰印花	rose_print			皮草围巾	fur_scarf	口罩	mouth_mask	无指手套	fingerless_gloves			额前有宝石	forehead_jewel					枪支的吊带	sling		
-舞娘服	harem_outfit	开襟夹克(配合spread_legs)	open_jacket	海豚短褲(真理褲)	dolfin_shorts			草莓印花	strawberry_print			撕破的围巾	torn_scarf	能面	noh_mask	花边手套	frilled_gloves			亲吻额头	forehead_kiss					枪口冒烟	smoking_gun		
-耸肩（服装）	shrug_(clothing)	短款夹克	cropped_jacket	紧身裤/运动裤	tight_pants			樱桃印花	cherry_print			裸围巾	naked_scarf	鬼面	oni_mask	毛皮镶边手套	fur-trimmed_gloves			额前有图案	forehead_mark					运动服	sportswear		
-	运动服	运动夹克	track_jacket	紧身裤	leggings			竹印花	bamboo_print			五彩围巾	multicolored_scarf	医用口罩	surgical_mask	手套	gloves			护额	forehead_protector					大葱	spring_onion		
-运动服	sportswear	连帽运动夹克	hooded_track_jacket	无裆裤（紧身）	crotchless_pants			胡萝卜印花	carrot_print			漂浮围巾	floating_scarf	裸妝的	nude_look	脱下手套	gloves_removed			额头贴额头	forehead-to-forehead					方向盘	steering_wheel		
-运动服	gym_uniform	军装夹克	military_jacket	皮草修身长裤	yoga_pants			芙蓉印花	hibiscus_print			长围巾	long_scarf	眼罩	eyepatch	很短的手套|半截手套	half_gloves			头上别着护目镜	goggles_on_head					绳子	string		
-体操服	athletic_leotard	迷彩夹克	camouflage_jacket	运动裤	track_pants			南瓜灯印花	jack-o'-lantern_print			手臂围巾	arm_scarf			蕾丝边手套	lace-trimmed_gloves			帽子上别着护目镜	goggles_on_headwear					彩旗串	string_of_flags		
-足球服	volleyball_uniform	皮夹克	leather_jacket	瑜伽裤	yoga_pants			花瓣印花	petal_print			头巾	head_scarf			皮手套	leather_gloves			头	head					注射器	syringe		
-网球衫	tennis_uniform	莱特曼夹克	letterman_jacket	自行车短裤	bike_shorts			向日葵印花	sunflower_print			头上的围巾	scarf_on_head			双色手套	mismatched_gloves			头上起包	head_bump					拇指指环	thumb_ring		
-棒球服	baseball_uniform	飞行员夹克	bomber_jacket	体操短裤	gym_shorts			西瓜印花	watermelon_print			围巾在嘴上	scarf_over_mouth			连指手套	mittens			低着头	head_down					运动夹克	track_jacket		
-棒球夹克	letterman_jacket	牛仔夹克	denim_jacket	长裤	pants			樱花印花	cherry_blossom_print			围巾被取下	scarf_removed			多色款手套	multicolored_gloves			鱼人耳|人鱼耳|鳍状耳朵	head_fins					运动服	track_suit		
-排球服	volleyball_uniform	休闲夹克	loating_jacket	蓬松裤/宽松裤	puffy_pants			花卉印花	floral_print			调整围巾	adjusting_scarf			去掉了(原设有的)手套	no_gloves			戴着头戴显示设备	head_mounted_display					训练兵团徽章	training_corps_(emblem)		
-自行车运动服	biker_clothes	毛皮边饰夹克	fur-trimmed_jacket	南瓜裤	pumpkin_pants			天空印花	sky_print			拿着围巾	holding_scarf			隔热手套	oven_mitts			一部分头部没画进框里	head_out_of_frame					连续重复的花纹	unmoving_pattern		
-骑行套装	bikesuit	两色夹克	two-tone_jacket	袴裤	hakama_pants			云印花	cloud_print			扯围巾	scarf_pull			兽爪手套	paw_gloves			枕着头|托着头	head_rest					自动售货机	vending_machine		
-摔角服	wrestling_outfit	风衣	trench_coat	哈伦裤	harem_pants			闪电印花	lightning_bolt_print			棕色围巾	brown_scarf			印花手套	print_gloves			歪着头	head_tilt					水壶	watering_can		
-武道服	dougi🥋	振袖(和服的一部份)	furisode	灯笼裤	bloomers			彩虹印花	rainbow_print			格子围巾	checkered_scarf			单手戴着过肘的手套	single_elbow_glove			头上有翅膀	head_wings					结婚|婚礼	wedding		
-	泳装	长摆风衣	trench_coat	女式灯笼裤	buruma			雪花印花	snowflake_print			包头巾(名词)	head_scarf			单手穿着手套	single_glove			头上戴着花冠	head_wreath					结婚戒指	wedding_ring		
-泳装	swimsuit	冲锋衣	windbreaker	牛仔裤	jeans			星空印花	starry_sky_print			格子呢围巾	plaid_scarf			条纹手套	striped_gloves			扎头巾(名词)	headband					秤	weighing_scale		
-泳衣	swimwear	雨衣	raincoat	工装裤	cargo_pants			新月印花	crescent_print			围巾	scarf			破损的手套	torn_gloves			头部饰品(含一定科幻元素)	headgear					发条钥匙	winding_key		
-湿泳衣	wet_swimsuit	羽衣	hagoromo	迷彩裤	camouflage_pants			星形印花	star_print			共用一条围巾	shared_scarf				指甲			耳机	headphones					燕子领	wing_collar		
-学校泳装（死库水）	school_swimsuit	束腰外衣	tunic	七分裤	capri_pants			星形符号	star_(symbol)			破损的围巾	torn_scarf			手指甲	fingernails			状态条(游戏和科幻风格)	heads-up_display					英灵旅装	heroic_spirit_traveling_outfit		
-新式死库水	new_school_swimsuit	披肩	cape	皮套裤(上宽下窄	chaps			月亮印花	moon_print							脚趾甲	toenails			头戴式耳机	headset					承重背心	load_bearing_vest		
-旧式死库水	old_school_swimsuit	披肩	capelet					太阳印花	sun_print							指甲油	nail_polish			EVA神经连接器	inter_headset					Z手环	z-ring		
-竞泳死库水	competition_school_swimsuit	冬装	winter_clothes	(尤指女式)连衫裤	jumpsuit			字符印花	character_print							脚趾甲油	toenail_polish			在头上	on_head					轻蔑的眼神|怒视	glaring		
-赛用泳衣	competition_swimsuit	毛衣	sweater	低腰裤子	lowleg_pants			衣服上的字	clothes_writing_							黑指甲	black_nails			小人儿在头上	person_on_head					串成心形的绳子(或线条)	heart_of_string		
-连体泳衣	casual_one-piece_swimsuit	套頭毛衣	pullover_sweaters	格子呢裤子	plaid_pants			锚印花	anchor_print							红指甲	red_nails			单侧头上有翅膀	single_head_wing					耳钉	stud_earrings		
-拉链在正面的泳衣	front_zipper_swimsuit	罗纹毛衣	ribbed_sweater	单边长裤	single_pantsleg			樱花印花	cherry_blossom_print							粉色指甲	pink_nails			三角头巾	triangular_headpiece					冰翼	ice_wings		
-高开衩的泳衣	highleg_swimsuit	毛衣背心	sweater_vest	条纹裤	striped_pants			花卉印花	floral_print							长指甲	long_fingernails									铃铛	jingle_bell		
-一体式泳衣	one-piece_swimsuit	露背毛衣	backless_sweater	與裤子互動				音符印花	musical_note_print							钉子|指甲	nail									拉链拉片	zipper pull tab		
-常夏的泳衣(fgo学妹灵衣)	swimsuit_of_perpetual_summer	爱尔兰毛衣	aran_sweater	不对称的裤子	asymmetrical_legwear			三角印花	triangle_print							多彩指甲	multicolored_nails												
-比基尼	bikini	米色毛衣	beige_sweater	把连衣裤裆部剥到一边	leotard_aside			箭头打印	arrow_print							美甲	nail_art												
-微比基尼	micro_bikini	棕色毛衣	brown_sweater	解开的裤子拉链	open_fly			波浪纹	wave_print							指甲油	nail_polish												
-高腰比基尼	highleg_bikini	连帽毛衣	hooded_sweater	褪下裤子	pants_down			☮(东方仗助衣服上有)	peace_symbol							指甲油	toenail_polish												
-低腰比基尼	lowleg_bikini	露肩毛衣	off-shoulder_sweater	裤子卷起来	pants_rolled_up			其他								棕色马甲	brown_vest												
-V字泳衣	slingshot_swimsuit	菱紋毛衣	ribbed_sweater	裤子塞进去	pants_tucked_in			心形图案|心形印花	heart_print																				
-女仆比基尼	maid_bikini	条纹毛衣	striped_sweater	破损的牛仔裤	torn_jeans			火焰印花	flame_print																				
-水手服款比基尼	sailor_bikini	处男杀手毛衣	virgin_killer_sweater	破损的裤子	torn_pants			鬼火印花	hitodama_print																				
-贝壳比基尼	shell_bikini	羽绒服	down_jacket	破损的短裤	torn_shorts			爪印花	paw_print																				
-运动比基尼	sports_bikini	羽绒服	puffer_jacket					骨架印花	skeleton_print																				
-系绳比基尼	string_bikini	装饰						骷髅头印花	skull_print																				
-无肩带比基尼	strapless_bikini	多色款连体衣	multicolored_bodysuit					闪闪发光的印花	sparkle_print																				
-细带款比基尼	multi-strapped_bikini	袴|腿衣	hakama					阴阳印花	yin_yang_print																				
-侧系带式比基尼	side-tie_bikini	衬衫外有其他衣服	shirt_tucked_in					十字架元素图案	cross_print																				
-前系带比基尼上衣	front-tie_bikini_top	内侧穿着长袖外面套短袖	short_over_long_sleeves					旗帜印花	flag_print																				
-多绑带比基尼	multi-strapped_bikini	弹力紧身衣	unitard					骨印花	bone_print																				
-丁字裤比基尼	thong_bikini	其他						幽灵印画	ghost_print																				
-从正面打结的比基尼	front-tie_bikini	透明的	transparent					蘑菇印花	mushroom_print																				
-花边比基尼	frilled_bikini	烧焦的衣服	burnt_clothes					饭团打印	onigiri_print																				
-带O型环的比基尼	o-ring_bikini	溶解掉的衣服	dissolving_clothes					猫耳造型	cat_ear																				
-眼罩比基尼	eyepatch_bikini	弄脏的衣服	dirty_clothes					猫耳造型镂空	cat_ear_cutout																				
-分层比基尼	layered_bikini	富有表现力的衣服	expressive_clothes					例子																					
-带蝴蝶结的比基尼	bow_bikini	有不现实的包裹程度的衣服	impossible_clothes					格子地板	checkered_floor																				
-花边泳衣	frilled_swimsuit	活体衣服	living_clothes					格子和服	checkered_kimono																				
-圆斑泳衣	polka_dot_swimsuit	内层穿着连衣裤	leotard_under_clothes					格子衬衫	checkered_shirt																				
-条纹泳衣	striped_swimsuit	多色款衣服	multicolored_clothes					毛皮镶边斗篷	fur-trimmed_cape																				
-条纹比基尼	striped_bikini	衣服上贴着符纸	ofuda_on_clothes					毛皮装饰披肩	fur-trimmed_capelet																				
-格子比基尼	plaid_bikini	拧干衣服	wringing_clothes					毛皮镶边风帽	fur-trimmed_hood																				
-圆斑比基尼	polka_dot_bikini	晒衣服	clothesline					皮草夹克	fur-trimmed_jacket																				
-印花比基尼	print_bikini	有光泽的衣服	shiny_clothes					心形镂空	heart_cutout																				
-双色比基尼	mismatched_bikini	狩衣	kariginu					格子呢图案	plaid																				
-多色款比基尼	multicolored_bikini	从正面打结的衣物	front-tie_top					格子呢蝴蝶结	plaid_bow																				
-美国国旗比基尼	american_flag_bikini	用夹克披肩	jacket_on_shoulders					格子呢衬衫	plaid_shirt																				
-德国国旗比基尼	german_flag_bikini	短裤腿连体衣	short_jumpsuit					格子呢背心	plaid_vest																				
-人体彩绘般的泳衣	impossible_swimsuit	背带；挽具	harness					圆斑点	polka_dot																				
-只穿着比基尼上衣	bikini_top	舰装	rigging					圆斑蝴蝶结	polka_dot_bow																				
-仅比基尼上衣	bikini_top_only	肩带	aiguillette					圆斑发束	polka_dot_scrunchie																				
-脱下了比基尼上衣	bikini_top_removed	腰部						棱纹衬衫	ribbed_shirt																				
-仅比基尼下装	bikini_bottom_only	围裙	apron					条纹蝴蝶结	striped_bow																				
-比基尼泳裤	bikini_bottom	腰围裙	waist_apron					条纹连帽衫	striped_hoodie																				
-解开的比基尼	untied_bikini	女服务员围裙	waist_apron					条纹和服	striped_kimono																				
-从三点剥开的比基尼	bikini_aside	女仆围裙	maid_apron					条纹衬衫	striped_shirt																				
-把泳衣的裆部挪到一边	swimsuit_aside	系在前腰的蝴蝶结	bow tied at the waist					条纹尾巴	striped_tail																				
-衣服里面穿着泳衣	swimsuit_under_clothes	穿在腰部的小披风	waist_cape					竖条纹比基尼	vertical-striped_bikini																				
-破损的泳衣	torn_swimsuit	腰间衣服	clothes_around_waist					竖条纹衬衫	vertical-striped_shirt																				
-比基尼裙	bikini_skirt	腰围夹克	jacket_around_waist					正面有图案的内裤	front-print_panties																				
-泳裤	swim_briefs	围腰毛衣	sweater_around_waist					背面有印花的内裤	back-print_panties																				
-泳帽	swim_cap	缠腰布	loincloth					草莓印花内裤	strawberry_panties																				
-泳裤	swim_trunks	胸衣	bustier					熊印花内裤	bear_panties																				
-男用泳裤	male_swimwear	束腰(马甲)	corset					星星印花内裤	star_panties																				
-		紧身褡	girdle					兔子内裤	bunny_panties																				
-制服		盔甲																											
-改装制服	adapted_uniform	盔甲	armor																										
-安齐奥军服	anzio_military_uniform	比基尼盔甲	bikini_armor																										
-安齐奥校服	anzio_school_uniform	穿着全套盔甲的	full_armor																										
-亚利亚公司制服	aria_company_uniform	板甲	plate_armor																										
-阿什福特学院制服	ashford_academy_uniform	日本铠甲	japanese_armor																										
-BC自由学园制服	bc_freedom_military_uniform	腹当|草摺(日式下半盔甲	kusazuri																										
-迦勒底制服	chaldea_uniform	动力装甲	power_armor																										
-知波单学院制服	chi-hatan_military_uniform	机甲	mecha																										
-点兔女仆装	fleur_de_lapin_uniform	头盔	helmet																										
-加尔格·马可大修道院制服	garreg_mach_monastery_uniform	头盔(日式)	kabuto																										
-宝石之国的制服	gem_uniform_(houseki_no_kuni)	無肩甲盔甲	off-shoulder_armor																										
-花咲川女子学园	hanasakigawa_school_uniform	肩甲	shoulder_armor																										
-私立光坂高等学校校服	hikarizaka_private_high_school_uniform	日本弓道護胸甲	muneate																										
-穗群原学园制服	homurahara_academy_uniform	胸甲	breastplate																										
-神山高中校服	kamiyama_high_school_uniform	腹甲	faulds																										
-继续高中军服	keizoku_military_uniform	胫甲	greaves																										
-北高中制服	kita_high_school_uniform	胫甲	shin_guards																										
-清澄高中校服	kiyosumi_school_uniform	装甲靴	armored_boots																										
+"		  (   0 0 		  		  		  、  、  		  		  		  		  		  		  		  		  		   		
+  	suit	  		   	dress	    		  		  	barefoot	  		  	makeup	  	long_sleeves	    	ear_blush	  	halo	  	hat	  	hair_ornament	  	ring	tail	  
+   	tuxedo	    	blouse	     	microdress	   	bodystocking	   	armored	    	no_shoes	   	sailor_collar	  	fundoshi	  	short_sleeves	  	ear_ornament	    	mechanical_halo	   	large_hat	     	hair_scrunchie	  	wedding_band	butt_plug	     
+  	formal_dress	   	white_shirt	    	long_dress	   |  	pantyhose	   	canvas	     	shoes_removed	    	fur_collar	  	eyeshadow	  	wide_sleeves	  	ear_piercing	  	headwear	   	mini_hat	 _ 	hair_flower	  	earrings	wings	  / 
+  	evening_gown	    	collared_shirt	     	off-shoulder_dress	  	leggings	   	denim	  	single_shoe	    	frilled_collar	  	lipstick	  	furisode	  	animal_ears	  	headpiece	   （  ）	witch_hat	  	hair_bun	   	single_earring	bat_wings	    
+    	canonicals	    	dress_shirt	      	strapless_dress	  (        )	legwear	   	fluffy	  	the_only_shoe	      	popped_collar	   	mascara	     	detached_sleeves	  	ears_down	   	head_wreath	     	mini_witch_hat	  ( )	single_hair_bun	  	stud_earrings	butterfly_wings	    
+      	cocktail_dress	     	sailor_shirt	     	backless_dress	   (     )	thighhighs	  	fur	    	shoes_removed	    	choker	   	long_eyelashes	  	single_sleeve	   	fake_animal_ears	  	crown	    	wizard_hat	 _ 	hair_bell	  	necklace	black_wings	    
+   	gown	   	cropped_shirt	       	halter_dress	   	kneehighs	  	latex	       	single_shoe	    	black_choker	  	red_lips_	  	sleeveless	     	floppy_ears	    	mini_crown	   	party_hat	 _ 	hair_bobbles	  	jewelry	demon_wings	    
+   	japanese_clothes	T 	t-shirt	     （          ）	sundress	  	socks	  	leather	    	long_toenails	    	belt_collar	    	facepaint	     	asymmetrical_sleeves	      	animal_ear_fluff	  	tiara	   	jester_cap	  	hair_scrunchie	  	 	gumi	  
+  	kimono	  T 	casual T-shirts	     	sleeveless_dress	  	bare_legs	  	see-through	      	sharp_toenails	    	frilled_choker	        (     )	whisker_markings	     	puffy_sleeves	    	fox_ears			   	tokin_hat	 _ 	hair_rings	  	brooch	asymmetrical_wings	      
+    	sleeveless_kimono			      	sailor_dress	   	bodystocking			      	shoe_dangle							   	cat_ears	     	tilted_headwear	    	top_hat	 _ 	hairclip				
+   	short_kimono	  T 	            	    	summer_dress	    	black_bodystocking	    	spandex	   	toenails	  	neckerchief	  	lipgloss	    	puffy_long_sleeves	    	lion_ears	  	head_fins	    	mini_top_hat	  (  )	hairpin	  	gem	demon_wings	    
+    	print_kimono		short sleeve T-shirts	    	china_dress	    	white_bodystocking	  	tight	  	toes	   	red_neckerchief	    	colored_eyelashes	    	puffy_short_sleeves	     	jaguar_ears	    	body	    	bowler_hat	  	hair_tubes	    	chest_jewel	detached_wings	         
+  (   )	obi	    T 	writing on clothes	     	pinafore_dress	      	stocking_under_clothes	    	fine_fabric_emphasis	   (   )	black_loafers	  	necktie	  	blush	   	frilled_sleeves	  	tiger_ears	    	bridal_veil	   	pillbox_hat	  	hair_stick	    	forehead_jewel	fairy_wings	     
+  	sash	    (   )	off-shoulder_shirt	     	sweater_dress	  	pantyhose	  	frilled	   	shoes	   	short_necktie	     	light_blush	    	juliet_sleeves	   	dog_ears	  	headband	    	cloche_hat	 _ 	hair_ribbon	  	tassel	fake_wings	     
+  	long_eyelashes	    	shrug_(clothing)	  	wedding_dress	    	black_pantyhose	     	center_frills	   	sneakers	    	white_necktie	     	anime_style_blush	    	bandaged_arm	    	coyote_ears	  	helmet	   	side_cap	 _ 	hairband	  	belly_chain_	fiery_wings	      
+  	china_dress	    	blouse	   	armored_dress	    	white_pantyhose	   (   )	crease	   	uwabaki	     	bowtie	   	nose_blush	   	raglan_sleeves	  	bunny_ears	        	alternate_headwear	  	military_hat	 _ 	hair_tie	  	lace	insect_wings	    
+    	print_cheongsam	     	cardigan	     	frilled_dress	      	thighband_pantyhose	   	layered	    (  ,  ,   )	mary_janes	        	headphones_around_neck	  	nosebleed	    	vambraces	  	horse_ears	    	fur-trimmed_headwear	   	beret	     	lolita_hairband	  	ribbon	large_wings	   
+        	pelvic_curtain	     	criss-cross_halter	      	lace-trimmed_dress	     (     	pantylines	  	lace	   	platform_footwear	      	goggles_around_neck	     	bruise_on_face	    	layered_sleeves	   	pointy_ears	       	goggles_on_headwear	   	garrison_cap	    	frilled_hairband	  	stitches	low_wings	     
+  	wedding_dress	    	frilled_shirt	     	collared_dress	       	single_leg_pantyhose	    	fur_trim	   	high_heels	  	neck_bell	    	facial_mark	    	fur-trimmed_sleeves	    	long_pointy_ears	  	earphones	   	police_hat	      	lace-trimmed_hairband	  	scarf	mini_wings	    
+   (    )	uchikake	   （   ）	gym_shirt	       	fur-trimmed_dress	      	panties_under_pantyhose	   （    ）	fur-trimmed	     	stiletto_heels	  	neck_ruff	    	forehead_mark	    	"see-through_sleeves
+"	    	mouse_ears	  	earmuffs	   	nurse_cap	     	hair_bow	   	bandaid	multicolored_wings	        
+  	school_uniform 	    	hawaiian_shirt	     	layered_dress	      ，     	legwear	      	cross-laced_clothes	       	strappy_heels	V 	v-neck	      	anger_vein	     	torn_sleeves	    	raccoon_ears	      	ears_through_headwear	   	chef_hat	    	frog_hair_ornament	  	collar	multiple_wings	    
+   	sailor	   	hoodie	     	pleated_dress	  (  )	fishnets	  	camoflage	     	platform_heels_	      	towel_around_neck	 	mole	    	raglan_sleeves	    	squirrel_ears	     	leaf_on_head	  	school_hat	    	heart_hair_ornament	  	belt	no_wings	   (    )  
+   2	serafuku	           	Impossible shirt	      	taut_dress	  	stockings	    		 C     	rudder_footwear	    	loose_necktie	      	mole_under_eye	     	layered_sleeves	   	bear_ears	 	topknot	   	pirate_hat	    	butterfly_hair_ornament	  	steam	winged_helmet	      
+    	summer_uniform	(     )  	kappougi	   	pencil_dress	   	stirrup_legwear	       	ass_cutout	  	sandals	    	neck_tattoo	  	freckles	    	sleeves_past_fingers	    	panda_ears	  	tiara	      	cabbie_hat	    	star_hair_ornament	  	bell	wings	  
+     	kindergarten_uniform	    	plaid_shirt	       	impossible_dress	   	toeless_legwear	      	asymmetrical_clothes	    	barefoot_sandals		ascot	     	food_on_face	    	sleeves_past_wrists	    	bat_ears	   	suigintou	   	bucket_hat	      	food-themed_hair_ornament	   	amulet		
+  	police_uniform	   	polo_shirt	      	multicolored_dress	   	stirrup_legwear	(  )      	back_bow	    	clog_sandals	   	ribbon_choker	   	light_makeup	    	sleeves_past_elbows	     	robot_ears	    	triangular_headpiece	   	hardhat	    	anchor_hair_ornament	  	emblem		
+    	naval_uniform	    	print_shirt	     	striped_dress	   	thighhighs	    	costume_switch	  ( tabi)	geta	  /  	maebari/pasties	    	rice_on_face	    	sleeves_pushed_up	     	extra_ears	  	forehead_protector	  	straw_hat	    	bat_hair_ornament	  	flag_print		
+    	military_uniform	  	shirt	   	checkered_skirt	    	mismatched_legwear	          	double_vertical_stripe	  	slippers	  	latex	     	cream_on_face	      	arm_out_of_sleeve	         	ears_through_headwear	  	radio_antenna	   	sun_hat	     	carrot_hair_ornament	   	anchor_symbol	(((Leg_stockings,:_Compiled_by_thin_filament_lines_arranged_horizontally)),_(black_stockings)),	      2(  )
+    	ss_uniform/nazi_uniform	     	sleeveless_hoodie	     	plaid_dress	     	asymmetrical_legwear	         	halter_top	   	skates	    	torn_clothes	   	mustache	      	uneven_sleeves	   	alpaca_ears	    	animal_hood	  	rice_hat	    	cat_hair_ornament	  	cross		
+   	maid	    	sleeveless_shirt	     	ribbed_dress	   	uneven_legwear	       	multicolored_legwear	   	roller_skates	     	iron_cross	   	goatee	      	mismatched_sleeves	  	horns	  	arrow_(symbol)	  	rice_hat	     	clover_hair_ornament	     	diffraction_spikes		
+      	stile_uniform	    	striped_shirt	     	polka_dot_dress	     	white_thighhighs	        	nontraditional_miko	     	inline_skates	   	chinese_knot	    	whisker_markings	    	sleeve_rolled_up	  	fake_horns	  	axe	   	animal_hat	    	crescent_hair_ornament	    	iron_cross		
+   	miko	      	sweatshirt	      	plaid_dress	     	black_thighhighs	       	side_cutout	    	ballet_slippers	   	plunging neckline	  	scar	      	sleeves_rolled_up	  	dragon_horns	  	bald	  	fur_hat	    	cross_hair_ornament	      	latin_cross		
+   	overalls	  (  )	tank_top	     	print_dress	     	pink_thighhighs	       	side_slit	   	animal_feet		  	       	scar_across_eye	      	asymmetrical_sleeves	  	oni_horns	  	bandana	      	hat_with_ears	     	d-pad_hair_ornament	     	lace-trimmed_hairband		
+    	business_suit	  (  )	vest	      	vertical-striped_dress	   	garter_straps	         	sideless_outfit	    	animal_slippers	     	cross_necklace	  	smoking_pipe	    	detached_sleeves	  	antlers	   	bob_cut	   	bobblehat	    	fish_hair_ornament	    	ankle_lace-up		
+  	nurse	  (  )	waistcoat	     	ribbed_dress	  (    )	garter_straps	        	single_kneehigh	   	paw_shoes	    	bead_necklace	  	tattoo	       	feather-trimmed_sleeves	  	curled_horns	  	bone	  	pillow_hat	              	hairpods	           	st._gloriana's_(emblem)		
+    	chef_uniform	    (   )	camisole	     	see-through_dress	     	torn_legwear	            	single_vertical_stripe	  	anklet	    	pearl_necklace	  	glasses	    	frilled_sleeves	   	goat_horns	   	bowl_cut	   	pumpkin_hat	    	leaf_hair_ornament	   ( C)	heart_lock_(kantai_collection)		
+   	labcoat	    (        )	tied_shirt	  	skirt	       	torn_thighhighs	    	turtleneck	  	shackles	    	heart_necklace	  	eyewear	      	fur-trimmed_sleeves	     	hair_on_horn	    	bridal_veil	   	baseball_cap	    	musical_note_hair_ornament	   (    )	oripathy_lesion_(arknights)		
+    	cheerleader	  	undershirt	   	microskirt	     	see-through_legwear_	         	two-sided_fabric	    	sandals_removed	     	carrot_necklace	    	monocle	  	hands_in_opposite_sleeves	   	mechanical_horns	  	circlet	   	flat_cap	    	pumpkin_hair_ornament	  	boxing_gloves		
+    	band_uniform	    	crop_top	   	miniskirt	   	frilled_legwear	 O     	o-ring	  	boots	    	chain_necklace	    	under-rim_eyewear	     	lace-trimmed_sleeves	   	ear_piercing	   	double_bun	     	torn_hat	    	skull_hair_ornament	    	casing_ejection		
+   	space_suit	      	highleg	    	skirt_suit	    	lace-trimmed_legwear	 O     	o-ring_top	     	boots_removed	    	magatama_necklace	    	rimless_eyewear	   	pinching_sleeves	    	cross_earrings	     	double_dildo	   	mob_cap	    |    	snake_hair_ornament	  	ceiling_light		
+   	leotard	  	cardigan	    	bikini_skirt	     	seamed_legwear	  (    	fringe_trim	   	thigh_boots	   	tooth_necklace	     	semi-rimless_eyewear	     	puffy_detached_sleeves	    	crystal_earrings	  	drill	   	newsboy_cap	    	snowflake_hair_ornament	  	cheating_(relationship)		
+   	domineering	    	clothing_cutout	   	pleated_skirt	          	back-seamed_legwear	     (  )	loose_belt	   (  )	knee_boots	    	key_necklace	    	red-framed_eyewear	     	puffy_sleeves	  	earrings	   	faucet	          	bowknot_over_white_beret	    	strawberry_hair_ornament	   	chewing_gum		
+	  	    	back_cutout	    	pencil_skirt	       	animal_ear_legwear	   (    )	pom_pom_(clothes)	   	lace-up_boots	   	anchor_necklace	    	round_eyewear	    	ribbed_sleeves	   	flower_earrings	   (  )	hachimaki	      	animal_hat	     	sunflower_hair_ornament	   	clitoris_piercing		
+    	china_dress	     	cleavage_cutout	   	bubble_skirt	    	striped_legwear	     	drawstring	     	cross-laced_footwear	    	skull_necklace	    	black-framed_eyewear	     	see-through_sleeves	    	heart_earrings	     	hair_behind_ear	     	backwards_hat	X   	x_hair_ornament	  	cutting_board		
+   	chinese_style	    	navel_cutout	    	tutu	    	vertical-striped_legwear	         	full-length_zipper	  	ankle_boots	   	flower_necklace	    	tinted_eyewear	        	single_detached_sleeve	    	hoop_earrings	       	hair_bell	    	bowl_hat			   	dissolving		
+    |    	traditional_clothes	    	midriff	   (  )	ballgown	   	polka_dot_legwear	  (  )	gathers	   	high_heel_boots	    	shell_necklace	    	medical_eyepatch	      	sleeves_folded_up	    	multiple_earrings	  	hair_bobbles	   	cabbie_hat			   	dowsing_rod		
+    	japanese_clothes	    	heart_cutout	   (  )	pettiskirt	   	print_legwear	       	gusset	   	thigh_boots	   	gold_necklace	         	bandage_over_one_eye	      	sleeves_past_wrists	       	pill_earrings	  |   	hair_bun	    	cat_hat			   	drawing_tablet		
+  (  	hanten_(clothes)	     	torn_clothes	      	showgirl_skirt	       	legwear_under_shorts	     	breast_pocket	   	toeless_boots	    	crescent_necklace	     	crooked_eyewear	      	sleeves_pushed_up	       	single_earring	      	hair_down	     	chat_log			  	drinking_glass		
+  	hanbok	     	torn_shirt	     	Medium length skirt	   		  		       	fur_boots	    	ring_necklace	    	eyewear_removed	     	sleeves_rolled_up	    	skull_earrings	      	hair_flaps	   	cowboy_hat			  	drinking_straw		
+    	korean_clothes	    	undressing	   	beltskirt	   	over-kneehighs	       	argyle	    	fur-trimmed_boots	    	feather_necklace	   	sunglasses	    	striped_sleeves	    	star_earrings	   	hair_flip	   	dixie_cup_hat			    	dripping		
+    	western	    	clothes_down	   	denim_skirt	  		    	checkered	   	snow_boots	   	bone_necklace	  	goggles	     	torn_sleeves	    	crescent_earrings	      	hair_flower	    	fur_hat			   	drooling		
+    	german_clothes	    	shirt_lift	   	suspender_skirt	   (   )	bobby_socks	    	colored_stripes	  	anklet	    	ankh_necklace	  	Blindfold	     	wide_sleeves	      	single_bare_shoulder	     	hair_spread_out	        	hat_bow			  	evening		
+    	gothic	     	shirt_pull	        	skirt_set	      (  )	tabi	   	diagonal_stripes	  	rubber_boots	    	multiple_necklaces	  (  )	eyepatch	           	wrist_cuffs	      	single_gauntlet	      	hair_up	       	hat_feather			    	evening_gown		
+       	gothic_lolita	     	shirt_tucked_in	  	long_skirt	   	loose_socks	    	horizontal_stripes	   	santa_boots	    	bullet_necklace	  |    |   	visor	  (  )	armband	       	single_hair_intake	     	helm	      	hat_flower			     	falling		
+     	byzantine_fashion	    	clothes_tug	    	summer_long_skirt	  	ankle_socks	    	multicolored_stripes	  	leather_boots	    	holding_necklace	    	bespectacled	  	armlet	     	single_horn	    |      	helmet_removed	       	hat_ornament			  	falling_leaves		
+     	Tropical	    	shirt_tug	  	overskirt	  |   	leg_warmers	   	polka_dot_	   	belt_boots	     	necklace_removed	    	blue-framed_eyewear		 	      	single_sleeve	    	horned_helmet	        	hat_over_one_eye			  	falling_petals		
+    	indian_style	     	untucked_shirt	  	hakama_skirt	   	single_sock	  	ribbed	       	thighhighs_under_boots	    	brown_neckwear	      	brown-framed_eyewear	  	bandage	     	single_strap	     	japari_bun	     |    	hat_removed			  	feathered_wings		
+    （  ）	Ao_Dai	     	lifted_by_self	   	high-waist_skirt	    	striped_socks	   	striped	   	combat_boots	  	chain_necklace	          	coke-bottle_glasses	  	leash	        	single_thighhigh	   	kerchief	       	hat_ribbon			   	fishing_rod		
+       	ainu_clothes	      	untied	   	kimono_skirt	     		      	unmoving_pattern	   	doc_martens	    	checkered_neckwear	   	eyewear_removed	    	arm_tattoo			     	mami_mogu_mogu	    	hat_tip			       	foreshortening		
+     	arabian_clothes	     	open_clothes	   	chiffon_skirt	     	leg_cutout	   	vertical_stripes	  	rain_boots	    	diagonal-striped_neckwear	    	monocle		number_tattoo			       	mob_cap	       	hat_with_ears			    |     	fringe_trim		
+      	egyptian_clothes	       	unbuttoned_shirt	    	frilled_skirt	        	thighhighs_under_boots	    	checkered	       	single_boot	  |    	flower_necklace	   (    )  	no_eyewear	    	bead_bracelet			        	one_side_up	   (  )	hatching_(texture)			   	frying_pan		
+  	costume	       (   	button_gap	      	fur-trimmed_skirt	    	adjusting_legwear	     	plaid	  	shoe_soles	       	goggles_around_neck	        	opaque_glasses	  	bracelet			   	owl	cos     	hatsune_miku_(cosplay)			     	gatling_gun		
+     (  )	animal_costume	      	partially_unbuttoned	    	lace_skirt	     	pantyhose_pull	    	animal_print	    	arched_soles	    	halterneck	      	over-rim_eyewear	   	flower_bracelet			   	pier	    	mini_hat			   	hair_rings		
+    	bunny_costume	       	partially_unzipped	     	lace-trimmed_skirt	   	socks_removed	    	cat_print	    	paw_print_soles	       	headphones_around_neck	    	rimless_eyewear	    	spiked_bracelet			  	pillow	  	pillow_hat			      	hooded_track_jacket		
+      	adapted_costume	     	clothes_removed	      	ribbon-trimmed_skirt	    (  	sock_pull	   	bear_print	   	horseshoe	     	loose_necktie	    	round_eyewear	  	wrist_cuffs			     	raised_fist	   	porkpie_hat			  	icing		
+    	cat_costume	    	shirt_removed	     	layered_skirt	    (  	thighhighs_pull	   	bird_print	    	paw_print_soles	     	mole_on_neck	     	semi-rimless_eyewear	  	wristband			        	skull_and_crossbones	   	sailor_hat			   	jersey		
+   	dog_costume	    	wardrobe_error	    	print_skirt	  		    	bunny_print	   	horseshoe	  	neck	    	tinted_eyewear	  ；  	bracelet			  	stone	   	santa_hat			  (    )	king_(chess)		
+   	bear_costume	      	undersized_clothes	     	multicolored_skirt	  	garters	    	cow_print	    	brown_footwear	      	neck_ribbon	     	under-rim_eyewear	  	bracer			     	turban	   	school_hat			    	layered_clothing		
+      	embellished_costume	     	tight	   	striped_skirt	  |  	leg_garter	   	dragon_print	      	inline_skates	  	neck_ring			  	cuffs			     	twin_drills	      	sideways_hat			  	lightning		
+      	santa_costume	  (       )	wedgie	     	vertical-striped_skirt	      	garter_straps	   	fish_print	    	mismatched_footwear	       	neck_ruff	  	mask	    	wrist_cuffs			        	updo	  |  	tokin_hat			  	lip_piercing		
+     	halloween_costume	      (   )	wardrobe_malfunction	     	plaid_skirt	    	thigh_strap	    	frog_print	   	platform_footwear	  	neckerchief	  	visor	    	bound_wrists			   	wet_hair	  	top_hat			   	magnifying_glass		
+       	kourindou_tengu_costume	     	taut_shirt	  	flared_skirt	    	thigh_ribbon	    	shark_print	   	pointy_footwear	  	necklace	  	helmet	    	wrist_scrunchie			     (   )	headdress	    	what			   	matching_outfit		
+       	alternate_costume	     	taut_clothes	   	floral_skirt	   	leg_ribbon	  	snake_print	     	pumps	  	necktie	   	half_mask	  	handcuffs			    	adjusting_headwear	      	what_if			   	mechanical_wings		
+  play	costume_switch	     	underbust	     		    	leg_garter	    	zebra_print	   	roller_skates	     	plaid_neckwear	  	masked	  	shackles			     	bear_hair_ornament	   	witch_hat			   	milking_machine		
+m	meme_attire	      	oversized_clothes	       	skirt_hold	     	bandaid_on_leg	  	tiger_print	  	shoelaces	  	plunging_neckline	    	mask_lift	  	chains			    	brown_headwear	   	wizard_hat			   	mixing_bowl		
+	   	     	oversized_shirt	    |    	skirt_tug	     	bandaged_leg	  	leopard_print	   	skates	    	print_neckwear	    	mask_on_head	     	chain_leash			        	ears_through_headwear					  	morning		
+  	casual	     	borrowed_garments	    	dress_tug	    	ankle_lace-up	     	jaguar_print	      	winged_footwear	   	short_necktie	    	fox_mask		  			     (         )	headpiece					   	morning_glory		
+   	loungewear	      (    )	strap_slip	    	skirt_lift	    	thigh_holster	    	bat_print	    	zouri	      	sleeveless_turtleneck	    	surgical_mask	  	gloves			  (    )	headwear					    	nipple_piercing		
+  	hoodie	   	wet_shirt	        	skirt_around_one_leg	  	joints	    	aardwolf_print			    	star_necklace	    	gas_mask	   	long_gloves			     |    	headwear_removed					  	nipple_rings		
+   	homewear	   	clothes_theft	     	skirt_removed	  	kneepits	      	african_wild_dog_print			    	striped_neckwear	    	diving_mask	    	single_glove			    	horned_headwear					     	nose_piercing		
+  	pajamas	  		    	dress_removed	  	knee_pads	    	cheetah_print			       	towel_around_neck	       	diving_mask_on_head	    （    ）	elbow_gloves			        	horns_through_headwear					 O     	o-ring_bottom		
+  	nightgown	    	blazer	     	open_skirt	       	bandaid_on_knee	   	dog_print			    	turtleneck_sweater	   	oni_mask	    	bridal_gauntlets			   (    )  	no_headwear					  	painting_(object)		
+  	sleepwear	  	overcoat	(  )  	crossdressing	        	argyle_legwear	    	fox_print			    	undone_necktie	    	tengu_mask	    	fingerless_gloves			          	object_on_head					  |  	pouring		
+    	babydoll	    (   	double-breasted	        	dress_bow	       	bow_legwear	     	giraffe_print			v  	v-neck	    	ninja_mask	      	partially_fingerless_gloves			    	print_headwear					  	pudding		
+    	print_pajamas	   	long_coat	  	dressing_another	    	arm_garter	    	panda_print			       	whistle_around_neck	    	skull_mask	   	half_gloves			    	tiara					    	qing_guanmao		
+    	polka_dot_pajamas	     	haori	       	shorts_under_skirt			    	sand_cat_print				  	     	hockey_mask	    	fingerless_gloves			     	tilted_headwear					●REC	recording		
+  	yukata	    	winter_coat	   	side_slit			    	whale_print			    	plaid_scarf	   	bird_mask	     	asymmetrical_gloves			     	bone_hair_ornament					    	riding_crop		
+  	chinese_clothes	    	hooded_coat	  	shorts			   	white_tiger_print			    	striped_scarf	      	plague_doctor_mask	    (    )	paw_gloves			    	bunny_hair_ornament					  	ring		
+  	hanfu	    	fur_coat	     	micro_shorts			    	goldfish_print			    	checkered_scarf	   	stone_mask	    (    )	mittens			     	horn_ornament					         O 	ring_gag		
+  	Taoist robe	      	fur-trimmed_coat	  	short_shorts			  	wing_print			    	print_scarf	   	horse_mask	    	fur-trimmed_gloves			     	animal_on_head					      	ringlets		
+  	robe	    	duffel_coat	  	hot_pants			   	spider_web_print			     	vertical-striped_scarf	      	masquerade_mask	    	latex_gloves			        	behind-the-head_headphones					   	shell_casing		
+    	robe_of_blending	    	fishnet_top	  	cutoffs			    	butterfly_print			    	polka_dot_scarf	      	diving_mask_on_head	      	asymmetrical_gloves			    	bird_on_head					  	shooting_star		
+  	cloak	    	parka	    	striped_shorts			  	floral_print			    	argyle_scarf	SM  	domino_mask	    	baseball_mitt			     	cat_ear_headphones					   	shopping_bag		
+    	hooded_cloak	    	fur-trimmed_coat	    	suspender_shorts			   	leaf_print			    	beige_scarf	  	mask	    	bridal_gauntlets			     	cat_on_head					    	siblings		
+  	winter_clothes	   	jacket	    	denim_shorts			     	clover_print			     	scarf_bow	       	mask_on_head	    	brown_gloves			      	eyewear_on_head					  	single_wing		
+   	down jacket	      	jacket_partially_removed	     	puffy_shorts			    	maple_leaf_print			    	shared_scarf	     	mask_removed	   	elbow_gloves			  	forehead					   	sliding_doors		
+   	santa	     	jacket_removed	    (   )	dolphin_shorts			    	rose_print			    	fur_scarf	  	mouth_mask	    	fingerless_gloves			     	forehead_jewel					     	sling		
+   	harem_outfit	    (  spread_legs)	open_jacket	    (   )	dolfin_shorts			    	strawberry_print			     	torn_scarf	  	noh_mask	    	frilled_gloves			    	forehead_kiss					    	smoking_gun		
+  （  ）	shrug_(clothing)	    	cropped_jacket	   /   	tight_pants			    	cherry_print			   	naked_scarf	  	oni_mask	      	fur-trimmed_gloves			     	forehead_mark					   	sportswear		
+	   	    	track_jacket	   	leggings			   	bamboo_print			    	multicolored_scarf	    	surgical_mask	  	gloves			  	forehead_protector					  	spring_onion		
+   	sportswear	      	hooded_track_jacket	   （  ）	crotchless_pants			     	carrot_print			    	floating_scarf	   	nude_look	    	gloves_removed			     	forehead-to-forehead					   	steering_wheel		
+   	gym_uniform	    	military_jacket	      	yoga_pants			    	hibiscus_print			   	long_scarf	  	eyepatch	     |    	half_gloves			       	goggles_on_head					  	string		
+   	athletic_leotard	    	camouflage_jacket	   	track_pants			     	jack-o'-lantern_print			    	arm_scarf			     	lace-trimmed_gloves			        	goggles_on_headwear					   	string_of_flags		
+   	volleyball_uniform	   	leather_jacket	   	yoga_pants			    	petal_print			  	head_scarf			   	leather_gloves			 	head					   	syringe		
+   	tennis_uniform	     	letterman_jacket	     	bike_shorts			     	sunflower_print			     	scarf_on_head			    	mismatched_gloves			    	head_bump					    	thumb_ring		
+   	baseball_uniform	     	bomber_jacket	    	gym_shorts			    	watermelon_print			     	scarf_over_mouth			    	mittens			   	head_down					    	track_jacket		
+    	letterman_jacket	    	denim_jacket	  	pants			    	cherry_blossom_print			     	scarf_removed			     	multicolored_gloves			   |   |    	head_fins					   	track_suit		
+   	volleyball_uniform	    	loating_jacket	   /   	puffy_pants			    	floral_print			    	adjusting_scarf			   (    )  	no_gloves			        	head_mounted_display					      	training_corps_(emblem)		
+      	biker_clothes	      	fur-trimmed_jacket	   	pumpkin_pants			    	sky_print			    	holding_scarf			    	oven_mitts			          	head_out_of_frame					       	unmoving_pattern		
+    	bikesuit	    	two-tone_jacket	  	hakama_pants			   	cloud_print			   	scarf_pull			    	paw_gloves			   |   	head_rest					     	vending_machine		
+   	wrestling_outfit	  	trench_coat	   	harem_pants			    	lightning_bolt_print			    	brown_scarf			    	print_gloves			   	head_tilt					  	watering_can		
+   	dougi🥋	  (      )	furisode	   	bloomers			    	rainbow_print			    	checkered_scarf			         	single_elbow_glove			     	head_wings					  |  	wedding		
+	  	    	trench_coat	     	buruma			    	snowflake_print			   (  )	head_scarf			      	single_glove			      	head_wreath					    	wedding_ring		
+  	swimsuit	   	windbreaker	   	jeans			    	starry_sky_print			     	plaid_scarf			    	striped_gloves			   (  )	headband					 	weighing_scale		
+  	swimwear	  	raincoat	   	cargo_pants			    	crescent_print			  	scarf			     	torn_gloves			    (       )	headgear					    	winding_key		
+   	wet_swimsuit	  	hagoromo	   	camouflage_pants			    	star_print			      	shared_scarf				  			  	headphones					   	wing_collar		
+    （   ）	school_swimsuit	    	tunic	   	capri_pants			    	star_(symbol)			     	torn_scarf			   	fingernails			   (       )	heads-up_display					    	heroic_spirit_traveling_outfit		
+     	new_school_swimsuit	  	cape	   (    	chaps			    	moon_print							   	toenails			     	headset					    	load_bearing_vest		
+     	old_school_swimsuit	  	capelet					    	sun_print							   	nail_polish			EVA     	inter_headset					Z  	z-ring		
+     	competition_school_swimsuit	  	winter_clothes	(    )   	jumpsuit			    	character_print							    	toenail_polish			   	on_head					     |  	glaring		
+    	competition_swimsuit	  	sweater	    	lowleg_pants			     	clothes_writing_							   	black_nails			      	person_on_head					       (   )	heart_of_string		
+    	casual_one-piece_swimsuit	    	pullover_sweaters	     	plaid_pants			   	anchor_print							   	red_nails			       	single_head_wing					  	stud_earrings		
+        	front_zipper_swimsuit	    	ribbed_sweater	    	single_pantsleg			    	cherry_blossom_print							    	pink_nails			    	triangular_headpiece					  	ice_wings		
+      	highleg_swimsuit	    	sweater_vest	   	striped_pants			    	floral_print							   	long_fingernails									  	jingle_bell		
+     	one-piece_swimsuit	    	backless_sweater	     				    	musical_note_print							  |  	nail									    	zipper pull tab		
+     (fgo    )	swimsuit_of_perpetual_summer	     	aran_sweater	      	asymmetrical_legwear			    	triangle_print							    	multicolored_nails												
+   	bikini	    	beige_sweater	          	leotard_aside			    	arrow_print							  	nail_art												
+    	micro_bikini	    	brown_sweater	       	open_fly			   	wave_print							   	nail_polish												
+     	highleg_bikini	    	hooded_sweater	    	pants_down			☮(        )	peace_symbol							   	toenail_polish												
+     	lowleg_bikini	    	off-shoulder_sweater	     	pants_rolled_up			  								    	brown_vest												
+V   	slingshot_swimsuit	    	ribbed_sweater	     	pants_tucked_in			    |    	heart_print																				
+     	maid_bikini	    	striped_sweater	      	torn_jeans			    	flame_print																				
+       	sailor_bikini	      	virgin_killer_sweater	     	torn_pants			    	hitodama_print																				
+     	shell_bikini	   	down_jacket	     	torn_shorts			   	paw_print																				
+     	sports_bikini	   	puffer_jacket					    	skeleton_print																				
+     	string_bikini	  						     	skull_print																				
+      	strapless_bikini	      	multicolored_bodysuit					       	sparkle_print																				
+      	multi-strapped_bikini	 |  	hakama					    	yin_yang_print																				
+       	side-tie_bikini	        	shirt_tucked_in					       	cross_print																				
+        	front-tie_bikini_top	           	short_over_long_sleeves					    	flag_print																				
+      	multi-strapped_bikini	     	unitard					   	bone_print																				
+      	thong_bikini	  						    	ghost_print																				
+         	front-tie_bikini	   	transparent					    	mushroom_print																				
+     	frilled_bikini	     	burnt_clothes					    	onigiri_print																				
+ O      	o-ring_bikini	      	dissolving_clothes					    	cat_ear																				
+     	eyepatch_bikini	     	dirty_clothes					      	cat_ear_cutout																				
+     	layered_bikini	        	expressive_clothes					  																					
+        	bow_bikini	            	impossible_clothes					    	checkered_floor																				
+    	frilled_swimsuit	    	living_clothes					    	checkered_kimono																				
+    	polka_dot_swimsuit	       	leotard_under_clothes					    	checkered_shirt																				
+    	striped_swimsuit	     	multicolored_clothes					      	fur-trimmed_cape																				
+     	striped_bikini	       	ofuda_on_clothes					      	fur-trimmed_capelet																				
+     	plaid_bikini	    	wringing_clothes					      	fur-trimmed_hood																				
+     	polka_dot_bikini	   	clothesline					    	fur-trimmed_jacket																				
+     	print_bikini	      	shiny_clothes					    	heart_cutout																				
+     	mismatched_bikini	  	kariginu					     	plaid																				
+      	multicolored_bikini	        	front-tie_top					      	plaid_bow																				
+       	american_flag_bikini	     	jacket_on_shoulders					     	plaid_shirt																				
+       	german_flag_bikini	      	short_jumpsuit					     	plaid_vest																				
+        	impossible_swimsuit	  ；  	harness					   	polka_dot																				
+        	bikini_top	  	rigging					     	polka_dot_bow																				
+      	bikini_top_only	  	aiguillette					    	polka_dot_scrunchie																				
+        	bikini_top_removed	  						    	ribbed_shirt																				
+      	bikini_bottom_only	  	apron					     	striped_bow																				
+     	bikini_bottom	   	waist_apron					     	striped_hoodie																				
+      	untied_bikini	      	waist_apron					    	striped_kimono																				
+         	bikini_aside	    	maid_apron					    	striped_shirt																				
+          	swimsuit_aside	        	bow tied at the waist					    	striped_tail																				
+        	swimsuit_under_clothes	        	waist_cape					      	vertical-striped_bikini																				
+     	torn_swimsuit	    	clothes_around_waist					     	vertical-striped_shirt																				
+    	bikini_skirt	    	jacket_around_waist					        	front-print_panties																				
+  	swim_briefs	    	sweater_around_waist					        	back-print_panties																				
+  	swim_cap	   	loincloth					      	strawberry_panties																				
+  	swim_trunks	  	bustier					     	bear_panties																				
+    	male_swimwear	  (  )	corset					      	star_panties																				
+		   	girdle					    	bunny_panties																				
+  		  																											
+    	adapted_uniform	  	armor																										
+     	anzio_military_uniform	     	bikini_armor																										
+     	anzio_school_uniform	       	full_armor																										
+       	aria_company_uniform	  	plate_armor																										
+        	ashford_academy_uniform	    	japanese_armor																										
+BC      	bc_freedom_military_uniform	  |  (      	kusazuri																										
+     	chaldea_uniform	    	power_armor																										
+       	chi-hatan_military_uniform	  	mecha																										
+     	fleur_de_lapin_uniform	  	helmet																										
+   ·        	garreg_mach_monastery_uniform	  (  )	kabuto																										
+       	gem_uniform_(houseki_no_kuni)	     	off-shoulder_armor																										
+       	hanasakigawa_school_uniform	  	shoulder_armor																										
+          	hikarizaka_private_high_school_uniform	       	muneate																										
+       	homurahara_academy_uniform	  	breastplate																										
+      	kamiyama_high_school_uniform	  	faulds																										
+      	keizoku_military_uniform	  	greaves																										
+     	kita_high_school_uniform	  	shin_guards																										
+      	kiyosumi_school_uniform	   	armored_boots																										
 																											
 
 
-【表情模块】
-		眼睛		瞳孔			嘴巴		笑	其他			奇怪的表情		牙		害羞		哭		鼻子		蔑视		生气
-闭眼	eyes_closed	明亮的眼睛	light_eyes	瞳孔	pupils	张嘴	open_mouth	微笑	smile	面无表情	embarrass	阿黑颜	ahegao	牙齿	teeth	轻微脸红	light_blush	伤心	sad	没鼻子的	no_nose	厌恶(看垃圾一样的眼神)		生气的	angry
-半闭双眼	half_closed_eyes	发光的眼睛	glowing_eye	明亮的瞳孔	bright_pupils	喘气（张大嘴）	gasping	善良的微笑	kind_smile	困乏的	sleepy		naughty_face	上牙	upper_teeth	脸红	blush	啜泣	tear	点状鼻	dot_nose	轻蔑	disdain	惹恼	annoy
-眯起眼睛	narrowed_eyes	闪亮的眼睛	shiny_eyes	异色瞳	heterochromia	嘴巴微微张开	Slightly_open_mouth	大笑	laughing	喝醉的	drunk	忍耐的表情	endured_face	虎牙	fang	害羞的	shy	大哭	crying	鼻泡	nose_bubble	蔑视	contempt	怒目而视	glaring
-眯起眼睛看	squinting	星星眼	sparkling_eyes	竖的瞳孔/猫眼	slit_pupils	波浪嘴	wavy_mouth	开心	happy	无聊的	bored	忍耐	restrained	肤色虎牙	skin_fang	害羞的(尴尬的)	embarrass	泪如雨下	streaming_tears	闻	smelling	脸上有阴影，配合蔑视	shaded_face	严肃的（和angry有点像）	serious
-睁大眼睛	wide-eyed	渐变眼睛	gradient_eyes	蛇瞳孔	snake_pupils	闭嘴	close_mouth	开心的笑_:D😀	:d	使困惑	confused	黑化的	dark_persona	圆齿	round_teeth	紧张的	nervous	睁着眼睛哭	crying_with_eyes_open	小圆点鼻	dot_nose	鄙夷的眼神	jitome	侧头瞪着你	kubrick_stare
-一只眼睛闭着	one_eye_closed	动画眼	anime_style_eyes	瞳孔闪光	pupils_sparkling	点嘴	dot_mouth	眨眼笑_:D	;d	思考	thinking	疯狂的	crazy	锋利的牙齿	sharp_teeth	捂脸	facepalm	流泪	streaming_tears	没画出鼻子	no_nose	皱眉/蹙额	wince	皱眉生气	>:(
-蒙眼	blindfold	水汪汪	water_eyes	符号形瞳孔	symbol-shaped_pupils	没有嘴	no_mouth	露齿咧嘴笑	grin	孤独	lonely	筋疲力尽的	exhausted	咬紧牙关	clenched_teeth	慌张的	flustered	泪珠	teardrop	鼻子	nose	皱眉蹙额(性交前)	wince	皱眉不生气	>:)
-眨眼	wink	美丽的眼睛	beautiful_detailed_eyes	爱心形瞳孔	heart-shaped_pupils	堵嘴	gag	被逗笑，咧嘴傻笑	teasing_smile	决心的，坚定的	determined	傲娇	Tsundere	舌头	tongue	流汗	sweat	撕破衣服	tearing_clothes	流鼻血	nosebleed	眉头紧锁	furrowed_brow	邪恶的	evil
-失去高光的眼睛	empty_eyes	Q版实心椭圆眼睛	solid_oval_eyes_	钻石形状瞳孔	diamond-shaped_pupils	啃	gnaw	魅惑的微笑	seductive_smile	阴沉脸	shaded_	病娇	yandere	龅牙	buck_teeth	害怕的	scared	要哭的表情	tearing_up	鼻涕	snot	害怕侧目	fear_kubrick	生_闷气	sulking
-翻白眼	rolling_eyes	Q版实心圆瞳孔	solid_circle_pupils	五角星形状瞳孔	star-shaped_pupils	猫嘴	:3	傻笑,自鸣得意的笑	smirk	阴影	shadow	多重人格	multiple_persona	牙齿紧咬	clenched_teeth			眼泪	tears	动物口鼻部	snout	扬起眉毛	raised_eyebrows	尖叫|大声喊	screaming
-眼泪	tears	心形眼	heart_in_eye	瞳孔散大	dilated_pupils	张嘴	:o	咯咯傻笑	giggling	凝视|盯	staring	多重人格	Jekyll_and_Hyde	虎牙	fang			擦眼泪	wiping_tears	舌头放在上唇	:q	在笑的	laughing	喊叫	shouting
-锐利的眼	sharp_eyes	邪恶的眼睛	evil_eyes	没有瞳孔	no_pupils	V嘴	:>	洋洋得意	smug			抽搐	twitching	露出虎牙|露出尖牙	fang_out			心情不好	badmood	舌头放在下唇	:p				
-锐利的眼	slanted_eyes	疯狂的眼睛	crazy_eyes	轮回眼	ringed_eyes	努嘴	pout	调皮的脸	naughty_face			痉挛	spasm	尖牙	fangs			不开心的	unamused	眨眼舌头上伸	;p				
-低眉顺眼	tareme	失去高光的眼睛	empty_eyes	收缩的瞳孔(没有效果	constricted_pupils	嘴唇张开	parted_lips	邪恶笑	evil smile			颤抖	trembling	动漫里的没有缝的牙齿	round_teeth			沮丧	frustrated	舌吻|法式湿吻	french_kiss				
-上翘的眼睛	upturned_eyes	蒙住的眼睛	covered_eyes	眼睛里的星星	star_in_eye	吃惊	surprised	疯狂的笑	crazy_smile			强奸脸	rape_face	鲨鱼牙|锯齿牙	sharp_teeth			沮丧的眉头	frustrated_brow	长舌头	long_tongue				
-吊眼角	tsurime	空洞的眼睛	hollow_eyes	星形瞳孔	star-shaped_pupils	勒住嘴	bit_gag	快乐|幸福	happy			翻白眼(高潮眼）	rolling_eyes	狼牙棒	spiked_club			苦恼的	annoyed	迎接射精而伸出舌头	oral_invitation				
-斗鸡眼	cross-eyed	多彩多姿的眼睛	multicolored_eyes	X形瞳孔	x-shaped_pupils	栗子嘴	chestnut_mouth	生日快乐	happy_birthday			嫉妒	envy	牙齿	teeth			苦闷	anguish	舌头	tongue				
-头发遮着双眼	hair_over_eyes	眼圈	ringed_eyes	水平瞳孔	horizontal_pupils	被封住嘴	cleave_gag	万圣节快乐	happy_halloween			绝顶	female_orgasm	牙	tooth			叹气	sigh	吐舌头	tongue_out				
-延伸到两眼之间的刘海	hair_between_eyes	机械眼	mechanical_eye	虚线的眼睛	dashed_eyes	闭着的嘴	closed_mouth	新年快乐	happy_new_year			重呼吸，可能没用	heavy_breathing	牙刷	toothbrush			忧郁的	gloom	小舌头|口盖垂|悬雍垂	uvula				
-透过头发可以看到的眼睛	eyes_visible_through_hair	头足类眼睛	cephalopod_eyes	蝴蝶形瞳孔	butterfly-shaped_pupils	蒙住的嘴	covered_mouth	开心的眼泪	happy_tears			淘气	naughty	象牙	tusks			失望的	disappointed						
-头发遮住了一只眼睛	hair_over_one_eye	钟眼	clock_eyes	菱形瞳孔	diamond-shaped_pupils	将系头发的东西叼在嘴里	hair_tie_in_mouth	情人节快乐	happy_valentine			表情差分（大概）	expressions	露出上排牙齿	upper_teeth			绝望	despair						
-一只眼被遮住	one_eye_covered	复眼	compound_eyes	长方形瞳孔	rectangular_pupils	嘟嘴|抿嘴	homu					呻吟	moaning	鲨鱼牙	shark_mouth			疼痛	pain						
-眼袋	bags_under_eyes	鱼眼	fisheye	方形瞳孔	square_pupils	嘴唇	lips					嫌弃的眼神	scowl												
-缠着绷带的单眼	bandage_over_one_eye	纽扣眼(没有效果	button_eyes	点瞳孔	dot_pupils	嘴	mouth																		
-遮眼|眼罩	blindfold	恶魔之眼	devil_eyes	额外的瞳孔	extra_pupils	用嘴叼着	mouth_hold																		
-眼罩	eyepatch	布满血丝的眼睛	bloodshot_eyes	不匹配的瞳孔	mismatched_pupils	没画出嘴	no_mouth																		
-眼影	eyeshadow	青色眼睛	aqua_eyes	眼睛里的符号	symbol_in_eye	用嘴	oral																		
-医用眼罩	medical_eyepatch	空白的眼睛	blank_eyes	十字星星眼	“+_+”	奶嘴	pacifier																		
-眼睛上的疤痕	scar_across_eye	坚定的眼睛	solid_eyes	十字形瞳孔	cross-shaped_pupils	张开的嘴唇	parted_lips																		
-去掉了(原设有的)蒙眼要素	no_blindfold	无神的双眼	blank_eyes	符号形瞳孔(没有效果	symbol-shaped_pupils	撅嘴	pout																		
-去掉了(原设有的)眼罩	no_eyepatch	蓝眼睛	blue_eyes	紫色瞳孔	purple_pupils	撅起的嘴唇	puckered_lips																		
-拉下眼睑的鬼脸	akanbe	棕色的眼睛	brown_eyes	橙色瞳孔	orange_pupils	把嘴画在侧脸	sideways_mouth																		
-独眼巨人	cyclops	纽扣式画法的眼睛	button_eyes	蓝色瞳孔	blue_pupils	嘴里含着勺子	spoon_in_mouth																		
-摘眼罩	eyepatch_removed	闭上的眼睛	closed_eyes	眼睛里有符号	symbol_in_eye	三角嘴	triangle_mouth																		
-揉眼睛	rubbing_eyes	蒙住的眼	covered_eyes			薯片嘴型	wavy_mouth																		
-		坏掉的眼神	crazy_eyes			唾液	saliva																		
-		睁着眼落泪	crying_with_eyes_open			流口水	drooling																		
-		多只眼睛	extra_eyes			嘴角画着口水滴形状的缺口	mouth_drool																		
+【    】
+		  		  			  		 	  			     		 		  		 		  		  		  
+  	eyes_closed	     	light_eyes	  	pupils	  	open_mouth	  	smile	    	embarrass	   	ahegao	  	teeth	    	light_blush	  	sad	    	no_nose	  (        )		   	angry
+    	half_closed_eyes	     	glowing_eye	     	bright_pupils	  （   ）	gasping	     	kind_smile	   	sleepy		naughty_face	  	upper_teeth	  	blush	  	tear	   	dot_nose	  	disdain	  	annoy
+    	narrowed_eyes	     	shiny_eyes	   	heterochromia	      	Slightly_open_mouth	  	laughing	   	drunk	     	endured_face	  	fang	   	shy	  	crying	  	nose_bubble	  	contempt	    	glaring
+     	squinting	   	sparkling_eyes	    /  	slit_pupils	   	wavy_mouth	  	happy	   	bored	  	restrained	    	skin_fang	   (   )	embarrass	    	streaming_tears	 	smelling	     ，    	shaded_face	   （ angry   ）	serious
+    	wide-eyed	    	gradient_eyes	   	snake_pupils	  	close_mouth	    _:D😀	:d	   	confused	   	dark_persona	  	round_teeth	   	nervous	     	crying_with_eyes_open	    	dot_nose	     	jitome	     	kubrick_stare
+      	one_eye_closed	   	anime_style_eyes	    	pupils_sparkling	  	dot_mouth	   _:D	;d	  	thinking	   	crazy	     	sharp_teeth	  	facepalm	  	streaming_tears	     	no_nose	  /  	wince	    	>:(
+  	blindfold	   	water_eyes	     	symbol-shaped_pupils	   	no_mouth	     	grin	  	lonely	     	exhausted	    	clenched_teeth	   	flustered	  	teardrop	  	nose	    (   )	wince	     	>:)
+  	wink	     	beautiful_detailed_eyes	     	heart-shaped_pupils	  	gag	   ，    	teasing_smile	   ，   	determined	  	Tsundere	  	tongue	  	sweat	    	tearing_clothes	   	nosebleed	    	furrowed_brow	   	evil
+       	empty_eyes	Q       	solid_oval_eyes_	      	diamond-shaped_pupils	 	gnaw	     	seductive_smile	   	shaded_	  	yandere	  	buck_teeth	   	scared	     	tearing_up	  	snot	    	fear_kubrick	 _  	sulking
+   	rolling_eyes	Q      	solid_circle_pupils	       	star-shaped_pupils	  	:3	  ,      	smirk	  	shadow	    	multiple_persona	    	clenched_teeth			  	tears	     	snout	    	raised_eyebrows	  |   	screaming
+  	tears	   	heart_in_eye	    	dilated_pupils	  	:o	    	giggling	  | 	staring	    	Jekyll_and_Hyde	  	fang			   	wiping_tears	      	:q	   	laughing	  	shouting
+    	sharp_eyes	     	evil_eyes	    	no_pupils	V 	:>	    	smug			  	twitching	    |    	fang_out			    	badmood	      	:p				
+    	slanted_eyes	     	crazy_eyes	   	ringed_eyes	  	pout	    	naughty_face			  	spasm	  	fangs			    	unamused	      	;p				
+    	tareme	       	empty_eyes	     (    	constricted_pupils	    	parted_lips	   	evil smile			  	trembling	          	round_teeth			  	frustrated	  |    	french_kiss				
+     	upturned_eyes	     	covered_eyes	      	star_in_eye	  	surprised	    	crazy_smile			   	rape_face	   |   	sharp_teeth			     	frustrated_brow	   	long_tongue				
+   	tsurime	     	hollow_eyes	    	star-shaped_pupils	   	bit_gag	  |  	happy			   (   ）	rolling_eyes	   	spiked_club			   	annoyed	         	oral_invitation				
+   	cross-eyed	       	multicolored_eyes	X   	x-shaped_pupils	   	chestnut_mouth	    	happy_birthday			  	envy	  	teeth			  	anguish	  	tongue				
+      	hair_over_eyes	  	ringed_eyes	    	horizontal_pupils	    	cleave_gag	     	happy_halloween			  	female_orgasm	 	tooth			  	sigh	   	tongue_out				
+          	hair_between_eyes	   	mechanical_eye	     	dashed_eyes	    	closed_mouth	    	happy_new_year			   ，    	heavy_breathing	  	toothbrush			   	gloom	   |   |   	uvula				
+           	eyes_visible_through_hair	     	cephalopod_eyes	     	butterfly-shaped_pupils	    	covered_mouth	     	happy_tears			  	naughty	  	tusks			   	disappointed						
+         	hair_over_one_eye	  	clock_eyes	    	diamond-shaped_pupils	           	hair_tie_in_mouth	     	happy_valentine			    （  ）	expressions	      	upper_teeth			  	despair						
+      	one_eye_covered	  	compound_eyes	     	rectangular_pupils	  |  	homu					  	moaning	   	shark_mouth			  	pain						
+  	bags_under_eyes	  	fisheye	    	square_pupils	  	lips					     	scowl												
+       	bandage_over_one_eye	   (    	button_eyes	   	dot_pupils	 	mouth																		
+  |  	blindfold	    	devil_eyes	     	extra_pupils	    	mouth_hold																		
+  	eyepatch	       	bloodshot_eyes	      	mismatched_pupils	    	no_mouth																		
+  	eyeshadow	    	aqua_eyes	      	symbol_in_eye	  	oral																		
+    	medical_eyepatch	     	blank_eyes	     	“+_+”	  	pacifier																		
+      	scar_across_eye	     	solid_eyes	     	cross-shaped_pupils	     	parted_lips																		
+   (    )    	no_blindfold	     	blank_eyes	     (    	symbol-shaped_pupils	  	pout																		
+   (    )  	no_eyepatch	   	blue_eyes	    	purple_pupils	     	puckered_lips																		
+       	akanbe	     	brown_eyes	    	orange_pupils	      	sideways_mouth																		
+    	cyclops	        	button_eyes	    	blue_pupils	      	spoon_in_mouth																		
+   	eyepatch_removed	     	closed_eyes	      	symbol_in_eye	   	triangle_mouth																		
+   	rubbing_eyes	    	covered_eyes			    	wavy_mouth																		
+		     	crazy_eyes			  	saliva																		
+		     	crying_with_eyes_open			   	drooling																		
+		    	extra_eyes			            	mouth_drool																		
 
-【动作模块】
-			手		腿		多人
-站立	standing	手臂	(arm单手，arms双手)	抬一只腿	leg_lift	胸部互碰|胸顶着胸	asymmetrical_docking
-躺	on back	手放在身后	arms_behind_back	抬两只腿	legs_up	背对背	back-to-back
-趴	on stomach	手在头上	arm_above_head	张腿	spread legs	舔阴	cunnilingus
-跪	kneeling	手放头后	arm_above_head	两腿并拢	legs_together	眼对眼（对视）	eye_contact
-侧卧	on_side	手交叉于胸前	arms_crossed	二郎腿	crossed_legs	面对另一个	facing_another
-趴着	on_stomach	用手支撑住	arm_support	M字摆腿	m_legs	二人面对面(脸贴得很近)	facing_another
-趴着翘臀	top-down_bottom-up	露腋	armpits	M字摆腿	standing_split,_leg_up	二人面对面(脸贴得很近)	facing_away
-趴着	on_stomach	抬手	arms_up	屈膝礼（女仆行礼）	curtsy	喂食	feeding
-趴在地上并翘起脚	the_pose	单手插腰	hand_on_hip	双腿之间的手	hand_between_legs	口内指交	finger_in_another's_mouth
-翘臀姿势	bent_over	双手叉腰	hands_on_hips	稍息	open_stance	指交	fingering
-倒立	upside-down	单手搂腰	arm_around_waist	挡住关键部位的腿	convenient_leg	法国之吻	french_kiss
-反转	reversal	某著名伸手扭腰动作	caramelldansen	张开腿|M字张腿|桃色蹲姿|V字张腿	spread_legs	舌吻|法式湿吻	french_kiss
-卡在墙里	through_wall	双手反袖	hands_in_opposite_sleeves	用双腿夹住	leg_lock	递|赠送	giving
-战斗姿态	fighting_stance	张手	spread_arms	双腿	legs	素股|臀推	grinding
-靠在一边	leaning_to_the_side	招手	waving	双腿抬过头	legs_over_head	猥亵	groping
-倚靠|身体倾斜	leaning	交叉双臂	crossed_arms	双腿并拢	legs_together	牵手	holding_hands
-身体往后靠	leaning_back	伸出双臂	outstretched_arms	双腿抬起	legs_up	拥抱	hug
-靠在物体上	leaning_on_object	伸展双臂	spread_arms	双腿交叉站姿	watson_cross	即将接吻	imminent_kiss
-弓身体	arched_back	双臂摆出V	v_arms	膝盖合并，两脚分开	knees_together_feet_apart 	递食物	incoming_food
-身体前屈	leaning_forward	双臂摆出W	w_arms	膝盖上有动物	animal_on_lap	递礼物	incoming_gift
-身体前倾	leaning_forward	敬礼	salute	手放在自己的膝盖上	hand_on_own_knee	等待接吻|献吻	incoming_kiss
-向一侧倾斜身体	leaning_to_the_side	(有目的地)伸手	reaching	顶起膝盖	knee_up	紧扣的双手	interlocked_fingers
-浮(在水上	afloat	朝画外伸手	reaching_out	膝盖	knees	壁咚	Kabedon
-躺着的	lying	伸懒腰	stretch	膝盖蜷到胸前	knees_on_chest	膝枕	lap_pillow
-胎儿姿势(躺)	fetal_position	交叉手臂	crossed_arms	膝盖顶到胸部	knees_to_chest	舔阴茎	licking_penis
-躺在人身上	lying_on_person	拥抱自己的腿	hugging_own_legs	在膝盖上	on_lap	长舌头	long_tongue
-躺在湖面上	lying_on_the_lake	手臂刀刃	arm_blade	坐	sitting	掏耳勺	mimikaki
-躺在水中	lying_on_water	抓住手臂	arm_grab	鸭子坐	wariza	迎接射精而伸出舌头	oral_invitation
-仰躺	on_back	手臂往后拉	arm_held_back	正坐	seiza	公主抱	princess_carry
-俯卧后入	prone_bone	手臂丝带	arm_ribbon	跨坐	straddling	共浴|鸳鸯浴	shared_bathing
-斜倒斜躺姿势	reclining	手臂支撑动作	arm_support	侧身坐	yokozuwari	共享食物|用嘴递食物	shared_food
-(不躺着)睡觉|直立睡觉	sleeping_upright	缠着绷带的手臂	bandaged_arm	向后坐	sitting_backwards	坐在头上	sitting_on_head
-展示（后接部位）	presenting	手臂上贴着创可贴	bandaid_on_arm	坐在树上	sitting_in_tree	坐在肩膀上	sitting_on_shoulder
-旋转	spinning	手臂被束缚	bound_arms	坐在物体上	sitting_on_xx	掌掴	slapping
-摆姿势	posing	遮住关键部位的手臂	convenient_arm	蝴蝶坐	butterfly_sitting	打屁股	spanking
-时尚姿势	stylish_pose	多只手臂	extra_arms	莲花位置	lotus_position	雪中打伞的恋人梗	special_feeling_(meme)
-公然猥亵	public_indecency	互挽手臂	locked_arms	坐在桌子上	sitting_on_desk	胸挤胸	symmetrical_docking
-模仿	parody	伸出手臂	outstretched_arm	坐在栏杆上	sitting_on_railing	舌头	tongue
-在容器中	in_container	挥舞着手臂	waving_arms	坐在楼梯上	sitting_on_stairs	吐舌头	tongue_out
-挤压玻璃(无效)	against_glass	单手垂放	arm_at_side	坐在桌子上	sitting_on_table	小舌头|口盖垂|悬雍垂	uvula
-		单手背到身后	arm_behind_back	坐在水上	sitting_on_water	咬耳朵	ear_biting
-瞄准	aiming	单手托在脑后	arm_behind_head	坐垫	cushion	混浴	mixed_bathing
-瞄准了读者(的视角)	aiming_at_viewer	手炮	arm_cannon	盘腿坐	indian_style		
-化妆	applying_makeup	挽手	arm_hug	坐在椅子上	sitting_on_chair		
-洗澡	bathing	举着手	arm_up	正坐	seiza		
-入浴	bathing	双手垂放	arms_at_sides	侧坐在鞍上	sidesaddle		
-咬	biting	双手背到身后	arms_behind_back	坐	sitting		
-出血	bleeding	双手抱头	arms_behind_head	坐在床上	sitting_on_bed		
-吹	blowing	举起手	arms_up	坐在课桌上	sitting_on_desk		
-鞠躬	bowing	手指		坐在大腿上	sitting_on_lap		
-喷火	breathing_fire	手放在嘴边	hand_to_mouth	坐在人身上	sitting_on_person		
-骑扫帚	broom_riding	嘘手势	shushing	对坐体位	upright_straddle		
-刷牙	brushing_teeth	爪手势	claw_pose				
-吹泡泡	bubble_blowing	招财猫手势(下弯手腕)	paw_pose	蹲下	squatting		
-欺负	bullying	狐狸手势	fox_shadow_puppet	蹲下，张开双腿	squatting,_open_legs		
-燃烧	burning	双手狐狸手势	double_fox_shadow_puppet	一只膝盖	one_knee		
-投掷	cast	手指枪手势	finger_gun	下跪	kneeling		
-追逐	chasing	胜利手势	v	四肢着地	all_fours		
-打扫	cleaning	双_v	double_v	凹版姿势	gravure_pose		
-攀爬	climbing	翘大拇指	thumbs_up	踢	kicking		
-安慰	comforting	食指抬起	index_finger_raised	高踢	high_kick		
-烹饪	cooking	国际友好手势	middle_finger	泡脚	soaking_feet		
-哭	crying	做鬼脸	grimace	印度风格	indian_style		
-拥抱	cuddling	做鬼脸	eyelid_pull	斜倚	reclining		
-跳舞💃	dancing	用手指做出笑脸	fingersmile	抱自己的双腿	hugging_own_legs		
-跳舞	dancing	擦眼泪	wiping_tears	未分类			
-潜水	diving	准备扣扳机的手势	finger_on_trigger	裸腿	bare_legs		
-拖某物	dragging	指着自己	pointing_at_self	(强调)两腿之间	between_legs		
-绘画	drawing	指向看图的人	pointing_at_viewer	只画了一部分腿	cropped_legs		
-拉弓	drawing_bow	向上指	pointing_up	交叉的腿	crossed_legs		
-做梦	dreaming	戳	poking	手放在两腿之间	hand_between_legs		
-喝酒	drinking	做手势	hand_gesture	KDA组合(英雄联盟)	k/da_(league_of_legends)		
-喝	drinking	OK手势	ok_sign	腿部系着带子	leg_belt		
-驾驶	driving	遮阳手势	shading_eyes	腿毛	leg_hair		
-(意外)掉落	dropping	嘘(手势)	shushing	抬起腿	leg_up		
-弄干(浴后)	drying	拘谨的手势	v_arms	两腿分开	legs_apart		
-双持	dual_wielding	咬手指	finger_biting	长腿	long_legs		
-吃饭	eating	手指作手枪状	finger_gun	低胸装	lowleg		
-咀嚼	eating	手指伸进嘴里	finger_in_mouth	M字摆腿	m_legs		
-做运动	exercise	吮吸手指	finger_sucking	机械义足	mechanical_legs		
-		手指隔着衣物摸来摸去	fingering_through_clothes	多足角色	multiple_legs		
-战斗中的	fighting	手指	fingers	没画出腿	no_legs		
-战斗姿态|摆着架势的	fighting_stance	手指并拢	fingers_together	裆胯以下裸着	no_legwear		
-射击	firing	手指卷着头发	hair_twirling	修长的腿	long_legs		
-钓鱼	fishing	双手手指交叉|双手紧握	hands_clasped	尾巴蜷到两腿之间	tail_between_legs		
-拍打动作	flapping	握着头发|手指绕着头发	holding_hair				
-露出	flashing	用手指着	pointing	裸足	barefoot		
-在逃跑的	fleeing	锐利的手指甲	sharp_fingernails	单脚不在图内	foot_out_of_frame		
-秀肌肉	flexing	袖子长过手指	sleeves_past_fingers	脚印	footprints		
-飞行	flying	张开手指	spread_fingers				
-飞踢	flying_kick	手指没放在扳机上	trigger_discipline	脚的画法错误	bad_feet		
-梳头	hair_brushing	手指比W	w	弄脏的脚	dirty_feet		
-撩头发	hair_tucking	(保持)平衡的姿势	balancing	脚	feet		
-吊起来的	hanging	举爪姿势	claw_pose	双脚不在图内	feet_out_of_frame		
-击打	hitting	展现魅力的姿势	curvy	翘起脚	feet_up		
-在想象的	imagining	多角度|多姿势	multiple_views	脚部作画错误	wrong_feet		
-跳跃	jumping	爪子姿势	paw_pose				
-踢	kicking	姿势	pose	骆驼趾	cameltoe		
-跪着	kneeling	准备拔刀的姿势	ready_to_draw	萌向的内八腿	pigeon-toed		
-舔	licking	一种女性展示臀部的姿势	trefoil	踮起脚尖	tiptoes		
-舔嘴唇	licking_lips	僵尸姿势	zombie_pose	趾尖|脚尖	toe-point		
-咬嘴唇	lip_biting	招手	beckoning				
-冥想	meditation	手持辫子	bunching_hair	欠损|独脚|肢体残缺|欠损少女	amputee		
-绘画	painting			脚踝丝环	ankle_strap		
-画画	Painting_(Action)	抱起	carrying	脚踝套	ankle_wrap		
-扑克牌	playing_card	肩扛	carrying_over_shoulder	交叉脚踝	crossed_ankles		
-打游戏	playing_games	夹在腋下	carrying_under_arm	夹鼻眼镜|无脚眼镜	pince-nez		
-演奏乐器	playing_instrument	助威	cheering				
-钢管舞	pole_dancing	手抵在嘴唇边	finger_to_mouth	抬腿露阴	folded		
-祈祷	praying	捏脸颊	cheek_pinching	高踢|高抬腿	high_kick		
-(性诱惑)展示	presenting	戳脸颊	cheek_poking	肉腿	thick_thighs		
-挥拳	punching	摸下巴	chin_stroking	腿上系着带子或工具包或枪套	thigh_holster		
-推搡	pushing	中指	middle_finger				
-用手扶着	railing	拉头发	hair_pull				
-阅读	reading	胸口拔刀	musou_isshin_(genshin_impact)				
-骑	riding	遮盖嘴	covering_mouth				
-奔跑	running	遮盖xx	covering_xx				
-缝纫	sewing	自我抚摸	self_fondle				
-购物	shopping	调整过膝袜	adjusting_thighhigh				
-淋浴	showering	托脸颊	chin_rest				
-唱歌	sing	托头	head_rest				
-唱歌	singing	抓床单	_sheet_grab				
-砍	slashing	摸索	groping				
-睡觉	sleeping	掀裙子	skirt_lift				
-		手抓裆部	crotch_grab				
-闻	smelling	用手遮住胸部	covering_chest_by_hand				
-抽烟	smoking	双持（武器等）	covering_chest_by_hand				
-吸烟	smoking						
-打喷嚏	sneezing	掀起的刘海	bangs_pinned_back				
-下雪	snowing	掀起衣物	clothes_lift				
-泡脚	soaking_feet	掀起裙子	dress_lift				
-足球运动	soccer	掀起和服	kimono_lift				
-从容器中倒出液体的动作	spilling	被对方掀起衣物	lifted_by_another				
-有中心的旋转	spinning	掀起自己的衣物	lifted_by_self				
-从嘴里吐出液体的动作	spitting	拉起掀起卷起衬衫	shirt_lift				
-飞溅	splashing	指掀起裙子时形成的篮子形状	skirt_basket				
-站立的	standing	被掀起裙子(含突发情况意义)	skirt_flip				
-站在水上或液体上	standing_on_liquid	往上剥开的比基尼	bikini_lift				
-单腿站立	standing_on_one_leg	单腿抬高	leg_lift				
-站立劈叉|站立高抬腿	standing_split	将人抱起	lifting_person				
-指尖抵着指间	steepled_fingers	将裙子掀上去	skirt_lift				
-绞首	strangling	往上掰衣物的吊带	strap_lift				
-做伸展运动|伸懒腰	stretch	起风效果|上升气流	wind_lift				
-打扫	sweeping						
-游泳	swimming	扯着比基尼	bikini_pull				
-摆动	swing	扯脸颊	cheek_pull				
-摇尾巴	tail_wagging	拉开衣物	clothes_pull				
-拍照|自拍	taking_picture	剥下裙子胸口的部分	dress_pull				
-有台词的	talking	扯着头发	hair_pull				
-		头发往后扎	hair_pulled_back				
-打电话	talking_on_phone	剥开和服	kimono_pull				
-戏弄	teasing	剥开连衣裤	leotard_pull				
-思考	thinking	拉着口罩	mask_pull				
-挠痒痒	tickling	拉着裤子	pants_pull				
-上厕所	toilet_use	被另一个人拉(或拉衣物)	pulled_by_another				
-投掷	tossing_	拉下自己的衣物	pulled_by_self				
-被绊倒	tripping	拉	pulling				
-恶搞行为	trolling	拉开衬衫	shirt_pull				
-抽搐	twitching	褪下短裤	shorts_pull				
-打结(动作)	tying	拉开裙子	skirt_pull				
-拔出鞘的	unsheathing	扯下泳衣	swimsuit_pull				
-解开的	untying	拉链的拉片	zipper_pull_tab				
-拉开拉链(动作)	unzipping						
-涉水	wading	拨弄衣服	adjusting_clothes				
-醒来	waking_up	扶眼镜	adjusting_eyewear				
-		拨弄手套	adjusting_gloves				
-走路	walking	理头发	adjusting_hair				
-在液体上行走	walking_on_liquid	整理帽子	adjusting_hat				
-洗涤	washing	拨弄泳衣	adjusting_swimsuit				
-讲悄悄话	whispering						
-摔角(运动)	wrestling	拿着某物	holding				
-写作	writing	抱着动物	holding_animal				
-打哈欠	yawning	拉着弓	holding_arrow				
-躲藏	hiding	握着斧头	holding_axe				
-其他		提着包	holding_bag				
-手臂超出图片外	arms_out_of_frame	抱着球	holding_ball				
-在身上写字	body_writing	提着篮子	holding_basket				
-脚超出图片外	feet_out_of_frame	捧着书	holding_book				
-灵魂出窍	giving_up_the_ghost	拿着瓶子	holding_bottle				
-发光的	glowing	手捧花束	holding_bouquet				
-发光的眼睛(单眼)	glowing_eye	拿着弓(武器)	holding_bow_(weapon)				
-发光的武器	glowing_weapon	端着碗	holding_bowl				
-手超出图片外	hands_out_of_frame	端着箱子	holding_box				
-		憋气	holding_breath				
-超出图片外	out_of_frame	手持扫帚	holding_broom				
-支付报酬	paid_reward	手持摄像机	holding_camera				
-刺穿	piercing	拿着易拉罐	holding_can				
-		手持糖果	holding_candy				
+【    】
+			 		 		  
+  	standing	  	(arm  ，arms  )	    	leg_lift	    |    	asymmetrical_docking
+ 	on back	     	arms_behind_back	    	legs_up	   	back-to-back
+ 	on stomach	    	arm_above_head	  	spread legs	  	cunnilingus
+ 	kneeling	    	arm_above_head	    	legs_together	   （  ）	eye_contact
+  	on_side	      	arms_crossed	   	crossed_legs	     	facing_another
+  	on_stomach	     	arm_support	M   	m_legs	     (     )	facing_another
+    	top-down_bottom-up	  	armpits	M   	standing_split,_leg_up	     (     )	facing_away
+  	on_stomach	  	arms_up	   （    ）	curtsy	  	feeding
+        	the_pose	    	hand_on_hip	      	hand_between_legs	    	finger_in_another's_mouth
+    	bent_over	    	hands_on_hips	  	open_stance	  	fingering
+  	upside-down	    	arm_around_waist	        	convenient_leg	    	french_kiss
+  	reversal	         	caramelldansen	   |M   |    |V   	spread_legs	  |    	french_kiss
+    	through_wall	    	hands_in_opposite_sleeves	     	leg_lock	 |  	giving
+    	fighting_stance	  	spread_arms	  	legs	  |  	grinding
+    	leaning_to_the_side	  	waving	     	legs_over_head	  	groping
+  |    	leaning	    	crossed_arms	    	legs_together	  	holding_hands
+     	leaning_back	    	outstretched_arms	    	legs_up	  	hug
+     	leaning_on_object	    	spread_arms	      	watson_cross	    	imminent_kiss
+   	arched_back	    V	v_arms	    ，    	knees_together_feet_apart 	   	incoming_food
+    	leaning_forward	    W	w_arms	      	animal_on_lap	   	incoming_gift
+    	leaning_forward	  	salute	         	hand_on_own_knee	    |  	incoming_kiss
+       	leaning_to_the_side	(    )  	reaching	    	knee_up	     	interlocked_fingers
+ (   	afloat	     	reaching_out	  	knees	  	Kabedon
+   	lying	   	stretch	      	knees_on_chest	  	lap_pillow
+    ( )	fetal_position	    	crossed_arms	      	knees_to_chest	   	licking_penis
+     	lying_on_person	      	hugging_own_legs	    	on_lap	   	long_tongue
+     	lying_on_the_lake	    	arm_blade	 	sitting	   	mimikaki
+    	lying_on_water	    	arm_grab	   	wariza	         	oral_invitation
+  	on_back	     	arm_held_back	  	seiza	   	princess_carry
+    	prone_bone	    	arm_ribbon	  	straddling	  |   	shared_bathing
+      	reclining	      	arm_support	   	yokozuwari	    |     	shared_food
+(   )  |    	sleeping_upright	       	bandaged_arm	   	sitting_backwards	    	sitting_on_head
+  （    ）	presenting	        	bandaid_on_arm	    	sitting_in_tree	     	sitting_on_shoulder
+  	spinning	     	bound_arms	     	sitting_on_xx	  	slapping
+   	posing	         	convenient_arm	   	butterfly_sitting	   	spanking
+    	stylish_pose	    	extra_arms	    	lotus_position	        	special_feeling_(meme)
+    	public_indecency	    	locked_arms	     	sitting_on_desk	   	symmetrical_docking
+  	parody	    	outstretched_arm	     	sitting_on_railing	  	tongue
+    	in_container	     	waving_arms	     	sitting_on_stairs	   	tongue_out
+    (  )	against_glass	    	arm_at_side	     	sitting_on_table	   |   |   	uvula
+		      	arm_behind_back	    	sitting_on_water	   	ear_biting
+  	aiming	      	arm_behind_head	  	cushion	  	mixed_bathing
+     (   )	aiming_at_viewer	  	arm_cannon	   	indian_style		
+  	applying_makeup	  	arm_hug	     	sitting_on_chair		
+  	bathing	   	arm_up	  	seiza		
+  	bathing	    	arms_at_sides	     	sidesaddle		
+ 	biting	      	arms_behind_back	 	sitting		
+  	bleeding	    	arms_behind_head	    	sitting_on_bed		
+ 	blowing	   	arms_up	     	sitting_on_desk		
+  	bowing	  		     	sitting_on_lap		
+  	breathing_fire	     	hand_to_mouth	     	sitting_on_person		
+   	broom_riding	   	shushing	    	upright_straddle		
+  	brushing_teeth	   	claw_pose				
+   	bubble_blowing	     (    )	paw_pose	  	squatting		
+  	bullying	    	fox_shadow_puppet	  ，    	squatting,_open_legs		
+  	burning	      	double_fox_shadow_puppet	    	one_knee		
+  	cast	     	finger_gun	  	kneeling		
+  	chasing	    	v	    	all_fours		
+  	cleaning	 _v	double_v	    	gravure_pose		
+  	climbing	    	thumbs_up	 	kicking		
+  	comforting	    	index_finger_raised	  	high_kick		
+  	cooking	      	middle_finger	  	soaking_feet		
+ 	crying	   	grimace	    	indian_style		
+  	cuddling	   	eyelid_pull	  	reclining		
+  💃	dancing	       	fingersmile	      	hugging_own_legs		
+  	dancing	   	wiping_tears	   			
+  	diving	        	finger_on_trigger	  	bare_legs		
+   	dragging	    	pointing_at_self	(  )    	between_legs		
+  	drawing	      	pointing_at_viewer	       	cropped_legs		
+  	drawing_bow	   	pointing_up	    	crossed_legs		
+  	dreaming	 	poking	       	hand_between_legs		
+  	drinking	   	hand_gesture	KDA  (    )	k/da_(league_of_legends)		
+ 	drinking	OK  	ok_sign	      	leg_belt		
+  	driving	    	shading_eyes	  	leg_hair		
+(  )  	dropping	 (  )	shushing	   	leg_up		
+  (  )	drying	     	v_arms	    	legs_apart		
+  	dual_wielding	   	finger_biting	  	long_legs		
+  	eating	      	finger_gun	   	lowleg		
+  	eating	      	finger_in_mouth	M   	m_legs		
+   	exercise	    	finger_sucking	    	mechanical_legs		
+		          	fingering_through_clothes	    	multiple_legs		
+    	fighting	  	fingers	    	no_legs		
+    |     	fighting_stance	    	fingers_together	      	no_legwear		
+  	firing	      	hair_twirling	    	long_legs		
+  	fishing	      |    	hands_clasped	        	tail_between_legs		
+    	flapping	    |      	holding_hair				
+  	flashing	    	pointing	  	barefoot		
+    	fleeing	      	sharp_fingernails	      	foot_out_of_frame		
+   	flexing	      	sleeves_past_fingers	  	footprints		
+  	flying	    	spread_fingers				
+  	flying_kick	        	trigger_discipline	      	bad_feet		
+  	hair_brushing	   W	w	    	dirty_feet		
+   	hair_tucking	(  )     	balancing	 	feet		
+    	hanging	    	claw_pose	      	feet_out_of_frame		
+  	hitting	       	curvy	   	feet_up		
+    	imagining	   |   	multiple_views	      	wrong_feet		
+  	jumping	    	paw_pose				
+ 	kicking	  	pose	   	cameltoe		
+  	kneeling	       	ready_to_draw	      	pigeon-toed		
+ 	licking	           	trefoil	    	tiptoes		
+   	licking_lips	    	zombie_pose	  |  	toe-point		
+   	lip_biting	  	beckoning				
+  	meditation	    	bunching_hair	  |  |    |    	amputee		
+  	painting			    	ankle_strap		
+  	Painting_(Action)	  	carrying	   	ankle_wrap		
+   	playing_card	  	carrying_over_shoulder	    	crossed_ankles		
+   	playing_games	    	carrying_under_arm	    |    	pince-nez		
+    	playing_instrument	  	cheering				
+   	pole_dancing	      	finger_to_mouth	    	folded		
+  	praying	   	cheek_pinching	  |   	high_kick		
+(   )  	presenting	   	cheek_poking	  	thick_thighs		
+  	punching	   	chin_stroking	             	thigh_holster		
+  	pushing	  	middle_finger				
+    	railing	   	hair_pull				
+  	reading	    	musou_isshin_(genshin_impact)				
+ 	riding	   	covering_mouth				
+  	running	  xx	covering_xx				
+  	sewing	    	self_fondle				
+  	shopping	     	adjusting_thighhigh				
+  	showering	   	chin_rest				
+  	sing	  	head_rest				
+  	singing	   	_sheet_grab				
+ 	slashing	  	groping				
+  	sleeping	   	skirt_lift				
+		    	crotch_grab				
+ 	smelling	      	covering_chest_by_hand				
+  	smoking	  （   ）	covering_chest_by_hand				
+  	smoking						
+   	sneezing	     	bangs_pinned_back				
+  	snowing	    	clothes_lift				
+  	soaking_feet	    	dress_lift				
+    	soccer	    	kimono_lift				
+           	spilling	       	lifted_by_another				
+      	spinning	       	lifted_by_self				
+          	spitting	        	shirt_lift				
+  	splashing	             	skirt_basket				
+   	standing	     (       )	skirt_flip				
+        	standing_on_liquid	        	bikini_lift				
+    	standing_on_one_leg	    	leg_lift				
+    |     	standing_split	    	lifting_person				
+      	steepled_fingers	      	skirt_lift				
+  	strangling	        	strap_lift				
+     |   	stretch	    |    	wind_lift				
+  	sweeping						
+  	swimming	     	bikini_pull				
+  	swing	   	cheek_pull				
+   	tail_wagging	    	clothes_pull				
+  |  	taking_picture	         	dress_pull				
+    	talking	    	hair_pull				
+		     	hair_pulled_back				
+   	talking_on_phone	    	kimono_pull				
+  	teasing	     	leotard_pull				
+  	thinking	    	mask_pull				
+   	tickling	    	pants_pull				
+   	toilet_use	      (    )	pulled_by_another				
+  	tossing_	       	pulled_by_self				
+   	tripping	 	pulling				
+    	trolling	    	shirt_pull				
+  	twitching	    	shorts_pull				
+  (  )	tying	    	skirt_pull				
+    	unsheathing	    	swimsuit_pull				
+   	untying	     	zipper_pull_tab				
+    (  )	unzipping						
+  	wading	    	adjusting_clothes				
+  	waking_up	   	adjusting_eyewear				
+		    	adjusting_gloves				
+  	walking	   	adjusting_hair				
+      	walking_on_liquid	    	adjusting_hat				
+  	washing	    	adjusting_swimsuit				
+    	whispering						
+  (  )	wrestling	    	holding				
+  	writing	    	holding_animal				
+   	yawning	   	holding_arrow				
+  	hiding	    	holding_axe				
+  		   	holding_bag				
+       	arms_out_of_frame	   	holding_ball				
+     	body_writing	    	holding_basket				
+      	feet_out_of_frame	   	holding_book				
+    	giving_up_the_ghost	    	holding_bottle				
+   	glowing	    	holding_bouquet				
+     (  )	glowing_eye	   (  )	holding_bow_(weapon)				
+     	glowing_weapon	   	holding_bowl				
+      	hands_out_of_frame	    	holding_box				
+		  	holding_breath				
+     	out_of_frame	    	holding_broom				
+    	paid_reward	     	holding_camera				
+  	piercing	     	holding_can				
+		    	holding_candy				
+		    	holding_card				
+		   	holding_cat				
+		    	holding_chopsticks				
+		    	holding_cigarette				
+		    	holding_clothes				
+		     	holding_condom				
+		    	holding_cup				
+		    	holding_dagger				
+		    	holding_doll				
+		    |     	holding_eyewear				
+		    	holding_fan				
+		    	holding_flag				
+		   	holding_flower				
+		    	holding_food				
+		    	holding_fork				
+		    	holding_fruit				
+		    	holding_gift				
+		   	holding_gun				
+		  	holding_hands				
+		    	holding_hat				
+		     	holding_head				
+		    	holding_helmet				
+		    	holding_innertube				
+		    	holding_instrument				
+		   	holding_knife				
+		    	holding_leaf				
+		     	holding_lollipop				
+		    	holding_mask				
+		     	holding_microphone				
+		     	holding_needle				
+		      	holding_own_foot				
+		    	holding_paintbrush				
+		   	holding_paper				
+		  	holding_pen				
+		    	holding_pencil				
+		    	holding_phone				
+		    	holding_pillow				
+		    	holding_pipe				
+		    	holding_pizza				
+		    	holding_plate				
+		     	holding_poke_ball				
+		     	holding_pokemon				
+		      	holding_polearm				
+		    	holding_sack				
+		    	holding_scythe				
+		    	holding_sheath				
+		    	holding_shield				
+		    	holding_shoes				
+		    	holding_sign				
+		    	holding_spear				
+		    	holding_spoon				
+		    	holding_staff				
+		     	holding_strap				
+		      	holding_stuffed_animal				
+		     	holding_stylus				
+		   	holding_sword				
+		     	holding_syringe				
+		    	holding_towel				
+		    	holding_tray				
+		  	holding_umbrella				
+		    	holding_wand				
+		    	holding_weapon				
+		    	holding_whip				
+		      	arm_around_neck				
+		      	arms_around_neck				
+				       	hand_between_legs		
+		     	covering				
+		   	covering_				
+		    	covering_ass				
+		    	covering_crotch				
+		    	covering_eyes				
+		    	covering_mouth				
+		    	covering_nipples				
+		         	hands_on_another's_				
+		          	hands_on_another's_cheeks				
+		       	hands_on_ass				
+		      	hands_on_feet				
+		         	hands_on_headwear				
+		       	hands_on_hilt				
+		        	hands_on_lap				
+		         	hands_on_own_face				
+		          	hands_on_own_cheeks				
+		         	hands_on_own_chest				
+		         	hands_on_own_head				
+		          	hands_on_own_knees				
+		          	hands_on_own_stomach				
+		          	hands_on_own_thighs				
+		          	hands_on_another's_shoulders				
+		    |      	hands_on_hips				
+		        	hand_on_another's_				
+		        	hand_on_another's_cheek				
+		        	hand_on_another's_chest				
+		        	hand_on_another's_chin				
+		        	hand_on_another's_head				
+		        	hand_on_another's_shoulder				
+		         	hand_on_another's_stomach				
+		      	hand_on_ass				
+		     	hand_on_head				
+		     	hand_on_headwear				
+		      	hand_on_hilt				
+		    |     	hand_on_hip				
+		        	hand_on_own_				
+		          	hand_on_own_cheek				
+		         	hand_on_own_chest				
+		        	hand_on_own_chin				
+		          	hand_on_own_stomach				
+		     	hand_on_shoulder				
+		         	hand_in_another's_hair				
+		      	hand_in_hair				
+		      	hand_in_pocket				
+							
+		    	ass_grab				
+							
+		    	flat_chest_grab				
+		  |  	grabbing				
+		      	grabbing_another's_ass				
+		       	grabbing_another's_hair				
+		     |       	grabbing_from_behind				
+		       	grabbing_own_ass				
+		         	guided_penetration				
+							
+		    	hair_grab				
+		   	leg_grab				
+		    	necktie_grab				
+		       	neckwear_grab				
+		    	penis_grab				
+		    	pillow_grab				
+		    	sheet_grab				
+		    	tail_grab				
+		    	thigh_grab				
+		    	torso_grab				
+		    	wrist_grab				
+							
+		      	bad_hands				
+		      	bandaged_hands				
+		    	bird_on_hand				
+		   	boxers				
+		     	brown_sailor_collar				
+		  	cellphone				
+		    	cellphone_picture				
+		    	clenched_hand				
+		     	clenched_hands				
+		        	consensual_tentacles				
+		  	cuffs				
+		     	faux_figurine				
+		  	figure				
+		   	flashlight				
+		    	flip_phone				
+		    	gamepad				
+		   	grenade				
+							
+		  	hand_mirror				
+		       	hand_net				
+		    	hand_over_own_mouth				
+		      	hand_puppet				
+		      	hand_to_own_mouth				
+		       	hand_under_shirt				
+		   	hand_up				
+		   	handbag				
+		  	handcuffs				
+		  	handgun				
+		       	handheld_game_console				
+		  	handkerchief				
+		 |  	hands				
+		      	hands_in_pockets				
+		    |        	hands_together				
+		    |    |    	hands_up				
+							
+		  	kote				
+		         	mixed_media				
+		    	outstretched_hand				
+		    	own_hands_together				
+		    	palm				
+		  	palms				
+		  |  	phone				
+		    	phone_screen				
+		  	pistol				
+		        	pov_hands				
+		  |  	puppet				
+		            	reach-around				
+		    	revolver				
+		  	waving				
+		     	wedding_band				
+							
+							
+		  |  |  	shackles				
+		   	shuriken				
+		    	smartphone				
+		    	suction_cups				
+		   	suitcase				
+		  	tambourine				
+		  	tentacles				
+		  |  	tissue				
+		   	traditional_media				
+		   	two-handed				
+		 V|   	v				
+		       	v_over_eye				
+		     	virgin_killer_outfit				
+		V        	vocaloid_append				
+		  (  )	voyakiloid				
+		  	watch				
+		  	wrench				
+		  	wristwatch				
+							
+							
+							
+		    	open_hand				
+		        	center_opening				
+		  	open_door				
+		   	open_mouth				
+		  	opening_door				
+		     	open_window				
+			
           
 
 											
