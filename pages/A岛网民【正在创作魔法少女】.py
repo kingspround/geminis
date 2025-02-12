@@ -48,16 +48,6 @@ safety_settings = [
 ]
 
 
-# --- 文件操作函数 ---
-# 获取当前文件路径
-file = os.path.abspath(__file__)
-filename = os.path.splitext(os.path.basename(file))[0] + ".pkl"
-log_file = os.path.join(os.path.dirname(file), filename)
-
-# 检查文件是否存在，如果不存在就创建空文件
-if not os.path.exists(log_file):
-    with open(log_file, "wb") as f:
-        pass  # 创建空文件
 
 model = genai.GenerativeModel(
     model_name="gemini-2.0-flash-exp",
@@ -1598,7 +1588,16 @@ DEFAULT_CHARACTER_SETTINGS = {
 }
 
 
+# --- 文件操作函数 ---
+# 获取当前文件路径
+file = os.path.abspath(__file__)
+filename = os.path.splitext(os.path.basename(file))[0] + ".pkl"
+log_file = os.path.join(os.path.dirname(file), filename)
 
+# 检查文件是否存在，如果不存在就创建空文件
+if not os.path.exists(log_file):
+    with open(log_file, "wb") as f:
+        pass  # 创建空文件
 
 # --- 初始化 Session State ---
 if "messages" not in st.session_state:
@@ -1617,10 +1616,8 @@ if "chat_session" not in st.session_state:
     st.session_state.chat_session = None
 if "rerun_count" not in st.session_state:
     st.session_state.rerun_count = 0
-
-
-# 在 Session State 初始化后立即调用 load_history
-load_history(log_file) # 自动加载历史记录
+if "first_load" not in st.session_state:
+    st.session_state.first_load = True
 
 # --- 功能函数 ---
 
@@ -1791,10 +1788,12 @@ with st.sidebar:
             st.button("重置上一个输出 ⏪",
                       on_click=lambda: st.session_state.messages.pop(-1) if len(st.session_state.messages) > 1 and not st.session_state.reset_history else None,
                       key='reset_last')
-
-        # 修改后的 "读取历史记录 📖" 按钮
-        st.button("读取历史记录 📖", on_click=lambda: load_history(log_file), key="load_history_button")
-
+        if st.session_state.first_load:
+            if st.button("读取历史记录 📖"):
+                load_history(log_file)
+                st.session_state.first_load = False
+        else:
+            st.button("读取历史记录 📖", key="load_history_after_first")
 
         if st.button("清除历史记录 🗑️"):
             st.session_state.clear_confirmation = True
@@ -1808,7 +1807,7 @@ with st.sidebar:
             with col2:
                 if st.button("取消", key="clear_history_cancel"):
                     st.session_state.clear_confirmation = False
-
+        
         with open(log_file, "rb") as f:
           download_data = f.read() if os.path.exists(log_file) else b""  # 添加检查
         st.download_button(
@@ -1828,7 +1827,6 @@ with st.sidebar:
             except Exception as e:
                 st.error(f"读取本地pkl文件失败：{e}")
 
-    
     # 功能区 2: 角色设定
     with st.expander("角色设定"):
         uploaded_setting_file = st.file_uploader("读取本地设定文件 (txt) 📝", type=["txt"])
