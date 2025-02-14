@@ -1681,7 +1681,7 @@ def getAnswer(prompt):
    )
 
 
-    for msg in st.session_state.messages[-20:]:
+    for msg in st.session_state.messages[-10000:]:
       if msg and msg.get("role") and msg.get("content"): # 只有当msg不为空，并且有 role 和 content 属性的时候才去处理
           if msg["role"] == "user":
             history_messages.append({"role": "user", "parts": [{"text": msg["content"]}]})
