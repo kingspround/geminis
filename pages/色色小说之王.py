@@ -33,7 +33,7 @@ genai.configure(api_key=API_KEYS[st.session_state.selected_api_key])
 
 # --- 模型设置 ---
 generation_config = {
-  "temperature": 1.6,
+  "temperature": 1.3,
   "top_p": 0.95,
   "top_k": 40,
   "max_output_tokens": 8192,
@@ -50,7 +50,7 @@ safety_settings = [
 
 
 model = genai.GenerativeModel(
-    model_name="gemini-2.0-flash",
+    model_name="gemini-2.0-flash-exp",
     generation_config=generation_config,
     safety_settings=safety_settings,
     system_instruction="""{
