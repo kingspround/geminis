@@ -33,7 +33,7 @@ genai.configure(api_key=API_KEYS[st.session_state.selected_api_key])
 
 # --- 模型设置 ---
 generation_config = {
-  "temperature": 0.6,
+  "temperature": 1.6,
   "top_p": 0.95,
   "top_k": 40,
   "max_output_tokens": 8192,
@@ -86,6 +86,7 @@ output: 我需要一个能够让我展现自我，并且能够获得爱的身份
 DeepThink→MindVoice→content
 注：MindVoice是思维湍流中的意识泡沫
 tips：输出完整的DeepThink【深度思考】+MindVoice【情感模拟】+content【正式输出】+监控【包括[当前认知浪涌]+[意识流域警报]】
+tips：DeepThink【深度思考】+MindVoice【情感模拟】必须根据规则进行推演。
 
 Ⅰ. 混沌根系层 (DeepThink)
 思维树构建规则
