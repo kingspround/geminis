@@ -37,7 +37,7 @@ safety_settings = [
     {"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_NONE"},
 ]
 model = genai.GenerativeModel(
-    model_name="gemini-2.0-pro-exp-02-05",
+    model_name="gemini-2.0-flash-thinking-exp-01-21",
     generation_config=generation_config,
     safety_settings=safety_settings,
 )
@@ -643,7 +643,7 @@ mediumslateblue	中板岩蓝
         his_messages.append({"role": "user", "parts": [{"text": f"{prompt} {token}"}]}) # token直接添加到prompt后
     else:
         his_messages.append({"role": "user", "parts": [{"text": f"{prompt}"}]})
-    for msg in st.session_state.messages[-20:]:
+    for msg in st.session_state.messages[-3:]:
         if msg["role"] == "user":
             his_messages.append({"role": "user", "parts": [{"text": msg["content"]}]})
         elif msg is not None and msg["content"] is not None:
