@@ -45,9 +45,9 @@ safety_settings = [
     {"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_NONE"},
 ]
 
-#  模型 1: 用于设定选择的 Gemini 1.5 Flash 模型 (更正后的模型名称)
+#  模型 1: 用于设定选择的 Gemini 2.0 Flash Exp 模型 (更换模型为 gemini-2.0-flash-exp)
 setting_selection_model = genai.GenerativeModel(
-    model_name="gemini-1.5-flash", #  **更正为 gemini-1.5-flash (不带 -exp)**
+    model_name="gemini-2.0-flash-exp", #  **更换为 gemini-2.0-flash-exp**
     generation_config=generation_config,
     safety_settings=safety_settings
 )
@@ -67,7 +67,7 @@ DeepThink→MindVoice→content→思维监控面板
 思维监控面板
 [当前认知浪涌]：
 ██████████░░ 诗意解构力 82%
-███░░░░░░░░░ 逻辑锚定力 19%
+███░░░░░░░░░░ 逻辑锚定力 19%
 ████████░░░░ 悖论耐受值 65%
 
 [意识流域警报]：
@@ -161,7 +161,7 @@ def getAnswer(prompt, update_message, continue_mode=False):
         if st.session_state.get("test_text"): # 可选的全局 system message
             system_message += st.session_state.test_text + "\n"
 
-        # ---  使用 Gemini 1.5 Flash 模型进行设定选择  ---
+        # ---  使用 Gemini 2.0 Flash Exp 模型进行设定选择  ---
         setting_selection_prompt = f"""
             你是一个角色设定选择助手。你的任务是根据用户输入的消息，从以下提供的角色设定列表中选择出最相关的设定，以便用于后续的对话生成。
 
@@ -175,7 +175,7 @@ def getAnswer(prompt, update_message, continue_mode=False):
             输出请只包含选定的角色设定名称列表，用逗号分隔。如果没有合适的设定，请输出 "无"。
         """
 
-        setting_selection_response = setting_selection_model.generate_content(setting_selection_prompt) #  使用 setting_selection_model (Gemini 1.5 Flash)
+        setting_selection_response = setting_selection_model.generate_content(setting_selection_prompt) #  使用 setting_selection_model (Gemini 2.0 Flash Exp)
         selected_setting_names_str = setting_selection_response.text.strip()
         selected_setting_names = [name.strip() for name in selected_setting_names_str.split(',') if name.strip() != "无"] # 解析模型返回的设定名称列表
 
