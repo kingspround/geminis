@@ -45,9 +45,9 @@ safety_settings = [
     {"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_NONE"},
 ]
 
-#  模型 1: 用于设定选择的 Gemini 1.5 Flash 模型
+#  模型 1: 用于设定选择的 Gemini 1.5 Flash 模型 (更正后的模型名称)
 setting_selection_model = genai.GenerativeModel(
-    model_name="gemini-1.5-flash-exp", #  使用 Gemini 1.5 Flash 模型进行设定选择
+    model_name="gemini-1.5-flash", #  **更正为 gemini-1.5-flash (不带 -exp)**
     generation_config=generation_config,
     safety_settings=safety_settings
 )
