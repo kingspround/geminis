@@ -29,7 +29,7 @@ if "selected_api_key" not in st.session_state:
     st.session_state.selected_api_key = list(API_KEYS.keys())[0]  # 默认使用第一个密钥
 genai.configure(api_key=API_KEYS[st.session_state.selected_api_key])
 
-# --- 模型设置 ---
+# --- 模型设置 (基础配置) ---
 generation_config = {
   "temperature": 1.6,
   "top_p": 0.95,
@@ -45,19 +45,14 @@ safety_settings = [
     {"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_NONE"},
 ]
 
-#  模型 1: 用于设定选择的 Gemini 2.0 Flash Exp 模型
+#  模型 1: 用于设定选择的 Gemini 2.0 Flash Exp 模型 (保持不变)
 setting_selection_model = genai.GenerativeModel(
     model_name="gemini-2.0-flash-exp",
     generation_config=generation_config,
     safety_settings=safety_settings
 )
 
-# 模型 2: 用于对话生成的模型
-dialogue_model = genai.GenerativeModel(
-    model_name="gemini-2.0-flash-exp",
-    generation_config=generation_config,
-    safety_settings=safety_settings
-)
+# 模型 2: 对话模型 (dialogue_model) 将在 getAnswer 中动态创建
 
 # --- 角色设定 ---
 DEFAULT_CHARACTER_SETTINGS = {
@@ -93,6 +88,8 @@ if "reset_history" not in st.session_state:
     st.session_state.reset_history = False
 if "chat_session" not in st.session_state:
     st.session_state.chat_session = None
+if "dialogue_model" not in st.session_state: #  用于存储 dialogue_model 对象
+    st.session_state.dialogue_model = None
 if "rerun_count" not in st.session_state:
     st.session_state.rerun_count = 0
 if "first_load" not in st.session_state:
@@ -109,6 +106,7 @@ def load_history(log_file):
             st.session_state.messages = pickle.load(f)
         st.success(f"成功读取历史记录！({os.path.basename(log_file)})")
         st.session_state.chat_session = None  # 加载历史记录会重置聊天会话
+        st.session_state.dialogue_model = None #  同时重置 dialogue_model
         st.session_state.rerun_count += 1
     except FileNotFoundError:
         st.warning(f"没有找到历史记录文件。({os.path.basename(log_file)})")
@@ -121,6 +119,7 @@ def clear_history(log_file):
     # 清除历史记录函数
     st.session_state.messages.clear()
     st.session_state.chat_session = None
+    st.session_state.dialogue_model = None #  同时重置 dialogue_model
     if os.path.exists(log_file):
         os.remove(log_file)
     st.success("历史记录已清除！")
@@ -153,8 +152,8 @@ DeepThink→MindVoice→content→思维监控面板
 
     current_enabled_settings = frozenset(name for name, enabled in st.session_state.enabled_settings.items() if enabled) # 获取当前启用的设定名称集合
 
-    if st.session_state.chat_session is None or st.session_state.get("last_enabled_settings") != current_enabled_settings:
-        #  如果会话是新的，或者启用的设定列表发生了变化，则需要重新构建 system_instruction 并开始新会话
+    if st.session_state.chat_session is None or st.session_state.get("last_enabled_settings") != current_enabled_settings or st.session_state.dialogue_model is None:
+        #  如果会话是新的，或者启用的设定列表发生了变化，或者 dialogue_model 不存在，则需要重新构建 system_instruction 和 dialogue_model
 
         # ---  使用 Gemini 2.0 Flash Exp 模型进行设定选择  ---
         setting_selection_prompt = f"""
@@ -183,7 +182,15 @@ DeepThink→MindVoice→content→思维监控面板
         if st.session_state.get("test_text"): # 可选的全局 system message (仍然添加到 system_instruction 中)
             full_system_instruction += "\n\n全局设定:\n" + st.session_state.test_text + "\n"
 
-        st.session_state.chat_session = dialogue_model.start_chat(history=[], system_instruction=full_system_instruction) #  创建新的聊天会话，**并传入完整的 system_instruction**
+        # ---  创建 dialogue_model，并传入完整的 system_instruction ---
+        st.session_state.dialogue_model = genai.GenerativeModel( #  重新创建 dialogue_model 对象
+            model_name="gemini-2.0-flash-exp",
+            generation_config=generation_config,
+            safety_settings=safety_settings,
+            system_instruction=full_system_instruction #  **在这里设置 system_instruction**
+        )
+        st.session_state.chat_session = st.session_state.dialogue_model.start_chat(history=[]) #  使用新创建的 dialogue_model 启动会话 (不再传递 system_instruction)
+
 
         st.session_state.last_enabled_settings = current_enabled_settings # 更新 session state 中的启用设定列表
 
