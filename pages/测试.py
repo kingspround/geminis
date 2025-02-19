@@ -45,33 +45,18 @@ safety_settings = [
     {"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_NONE"},
 ]
 
-#  模型 1: 用于设定选择的 Gemini 2.0 Flash Exp 模型 (更换模型为 gemini-2.0-flash-exp)
+#  模型 1: 用于设定选择的 Gemini 2.0 Flash Exp 模型
 setting_selection_model = genai.GenerativeModel(
-    model_name="gemini-2.0-flash-exp", #  **更换为 gemini-2.0-flash-exp**
+    model_name="gemini-2.0-flash-exp",
     generation_config=generation_config,
     safety_settings=safety_settings
 )
 
-# 模型 2: 用于对话生成的模型 (这里仍然使用 gemini-2.0-flash-exp，你可以根据需要更改)
+# 模型 2: 用于对话生成的模型
 dialogue_model = genai.GenerativeModel(
-    model_name="gemini-2.0-flash-exp", #  用于实际对话生成的模型
+    model_name="gemini-2.0-flash-exp",
     generation_config=generation_config,
-    safety_settings=safety_settings,
-    system_instruction="""
-无限思维协议 v4.0
-【全维度意识走廊开启】
-响应结构：
-DeepThink→MindVoice→content→思维监控面板
-注：MindVoice是思维湍流中的意识泡沫
-
-思维监控面板
-[当前认知浪涌]：
-██████████░░ 诗意解构力 82%
-███░░░░░░░░░░ 逻辑锚定力 19%
-████████░░░░ 悖论耐受值 65%
-
-[意识流域警报]：
-检测到未被驯服的比喻正在攻击句法结构  """,
+    safety_settings=safety_settings
 )
 
 # --- 角色设定 ---
@@ -150,16 +135,26 @@ def format_setting_list_for_prompt(character_settings):
 
 def getAnswer(prompt, update_message, continue_mode=False):
     # 获取回答函数
-    system_message = ""
+    base_system_instruction = """
+无限思维协议 v4.0
+【全维度意识走廊开启】
+响应结构：
+DeepThink→MindVoice→content→思维监控面板
+注：MindVoice是思维湍流中的意识泡沫
+
+思维监控面板
+[当前认知浪涌]：
+██████████░░ 诗意解构力 82%
+███░░░░░░░░░░ 逻辑锚定力 19%
+████████░░░░ 悖论耐受值 65%
+
+[意识流域警报]：
+检测到未被驯服的比喻正在攻击句法结构  """ # 基础 system instruction
+
     current_enabled_settings = frozenset(name for name, enabled in st.session_state.enabled_settings.items() if enabled) # 获取当前启用的设定名称集合
 
     if st.session_state.chat_session is None or st.session_state.get("last_enabled_settings") != current_enabled_settings:
-        #  如果会话是新的，或者启用的设定列表发生了变化，则需要重新构建 system_message 并发送
-
-        st.session_state.chat_session = dialogue_model.start_chat(history=[]) #  创建新的聊天会话 (使用 dialogue_model)
-
-        if st.session_state.get("test_text"): # 可选的全局 system message
-            system_message += st.session_state.test_text + "\n"
+        #  如果会话是新的，或者启用的设定列表发生了变化，则需要重新构建 system_instruction 并开始新会话
 
         # ---  使用 Gemini 2.0 Flash Exp 模型进行设定选择  ---
         setting_selection_prompt = f"""
@@ -179,21 +174,24 @@ def getAnswer(prompt, update_message, continue_mode=False):
         selected_setting_names_str = setting_selection_response.text.strip()
         selected_setting_names = [name.strip() for name in selected_setting_names_str.split(',') if name.strip() != "无"] # 解析模型返回的设定名称列表
 
-        # ---  构建 system message，只包含 *选定的* 设定  ---
+        # ---  构建完整的 system instruction，包含基础指令和 *选定的* 设定 ---
+        full_system_instruction = base_system_instruction #  从基础指令开始
         for setting_name in selected_setting_names:
             if setting_name in st.session_state.character_settings and st.session_state.enabled_settings.get(setting_name, False): # 确保设定存在且被启用
-                system_message += st.session_state.character_settings[setting_name] + "\n"
+                full_system_instruction += "\n\n角色设定:\n" + st.session_state.character_settings[setting_name] # 将选定的角色设定内容添加到 system_instruction 中
 
-        if system_message:
-            st.session_state.chat_session.send_message(system_message) # 发送 system message (使用 dialogue_model 的会话)
+        if st.session_state.get("test_text"): # 可选的全局 system message (仍然添加到 system_instruction 中)
+            full_system_instruction += "\n\n全局设定:\n" + st.session_state.test_text + "\n"
+
+        st.session_state.chat_session = dialogue_model.start_chat(history=[], system_instruction=full_system_instruction) #  创建新的聊天会话，**并传入完整的 system_instruction**
 
         st.session_state.last_enabled_settings = current_enabled_settings # 更新 session state 中的启用设定列表
 
     elif continue_mode:
-        # 在 continue_mode 下，我们使用现有的会话，不需要重新选择设定或发送 system message
+        # 在 continue_mode 下，我们使用现有的会话，不需要重新选择设定或修改 system instruction
         pass
     else:
-        #  如果不是新会话，且启用设定列表没有变化，则不需要重新发送 system message
+        #  如果不是新会话，且启用设定列表没有变化，则不需要重新构建 system instruction
         pass
 
     response = st.session_state.chat_session.send_message(prompt, stream=True) #  发送用户 prompt 进行对话生成 (使用 dialogue_model 的会话)
