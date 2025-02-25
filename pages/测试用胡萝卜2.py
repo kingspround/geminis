@@ -438,7 +438,7 @@ for i, message in enumerate(st.session_state.messages):
             )
             cols = st.columns(2)  # 使用两列，第一列放保存/取消按钮
             with cols[0]:
-                if st.button("✅ 保存", key=f"save_{i}"):
+                if st.button("✅", key=f"save_{i}"): # Icon only
                     st.session_state.messages[i]["content"] = new_content
                     try:
                         with open(log_file, "wb") as f:
@@ -449,7 +449,7 @@ for i, message in enumerate(st.session_state.messages):
                     st.session_state.editing = False
                     st.experimental_rerun()
             with cols[1]:
-                if st.button("❌ 取消", key=f"cancel_{i}"):
+                if st.button("❌", key=f"cancel_{i}"): # Icon only
                     st.session_state.editing = False
         else:
             message_placeholder = st.empty() # 创建占位符
@@ -459,29 +459,29 @@ for i, message in enumerate(st.session_state.messages):
     # 按钮区域 - 放在每个消息的 chat_message 容器结束后
     if i >= len(st.session_state.messages) - 2 and message["role"] == "assistant": # 按钮条件：最后两条助手消息
         with st.container(): # 使用 st.container() 创建按钮区域，与消息容器分离
-            cols_buttons = st.columns([1,1,1]) # 创建三列用于按钮布局
+            cols_buttons = st.columns(3) # 使用 3 列 for 편집, 재생성, 계속쓰기 buttons
             with cols_buttons[0]:
-                if st.button("✏️ 编辑", key=f"edit_{i}_msg_below", use_container_width=True): # 修改 key
+                if st.button("✏️", key=f"edit_{i}_icon_only", use_container_width=False): # Icon only, use_container_width=False
                     st.session_state.editable_index = i
                     st.session_state.editing = True
             with cols_buttons[1]:
-                if st.button("♻️ 重生成", key=f"regenerate_{i}_msg_below", use_container_width=True, on_click=lambda idx=i: regenerate_message(idx)): # 修改 key
+                if st.button("♻️", key=f"regenerate_{i}_icon_only", use_container_width=False, on_click=lambda idx=i: regenerate_message(idx)): # Icon only, use_container_width=False
                     pass
             with cols_buttons[2]:
-                if st.button("➕ 继续写", key=f"continue_{i}_msg_below", use_container_width=True, on_click=lambda idx=i: continue_message(idx)): # 修改 key
+                if st.button("➕", key=f"continue_{i}_icon_only", use_container_width=False, on_click=lambda idx=i: continue_message(idx)): # Icon only, use_container_width=False
                     pass
     elif message["role"] == "user" and i == len(st.session_state.messages) - 1: # 撤回按钮，只在最后一条用户消息下显示
         with st.container(): #  使用 st.container() 创建按钮区域
-            cols_buttons_undo = st.columns([1, 1]) # 创建两列，用于 撤回 和 撤销撤回 按钮
+            cols_buttons_undo = st.columns(2) # 使用 2 열 for 撤回 and 撤销撤回 buttons
             with cols_buttons_undo[0]:
-                if st.session_state.messages and st.button("⏪ 撤回", key=f"reset_last_user_msg_below", use_container_width=True): # 修改 key
+                if st.session_state.messages and st.button("⏪", key=f"reset_last_user_icon_only", use_container_width=False): # Icon only, use_container_width=False
                     st.session_state.reset_history = True
                     st.session_state.messages.pop(-1) if len(st.session_state.messages) > 1 else None
                     if st.session_state.reset_history: # 撤回后立即显示 ↩️
                         st.experimental_rerun() # 立即刷新显示撤回按钮
             with cols_buttons_undo[1]:
                 if st.session_state.reset_history:
-                    if st.button("↩️ 撤销撤回", key=f"undo_reset_user_msg_below", use_container_width=True): # 修改 key
+                    if st.button("↩️", key=f"undo_reset_user_icon_only", use_container_width=False): # Icon only, use_container_width=False
                         st.session_state.reset_history = False
                         st.experimental_rerun() # 撤销撤回后刷新
                                 
