@@ -430,14 +430,16 @@ if not st.session_state.messages:
     load_history(log_file)
 
 # 显示历史记录和编辑功能
+cols_main = st.columns(20) # 创建 20 列 grid OUTSIDE the message loop
+
 for i, message in enumerate(st.session_state.messages):
     with st.chat_message(message["role"]):
         if st.session_state.get("editing") == True and i == st.session_state.editable_index:
             new_content = st.text_area(
                 f"{message['role']}:", message["content"], key=f"message_edit_{i}"
             )
-            cols = st.columns(2)  # 使用两列，第一列放保存/取消按钮
-            with cols[0]:
+            edit_cols = st.columns(2) # Columns for edit buttons
+            with edit_cols[0]:
                 if st.button("✅", key=f"save_{i}"): # Icon only
                     st.session_state.messages[i]["content"] = new_content
                     try:
@@ -448,43 +450,44 @@ for i, message in enumerate(st.session_state.messages):
                     st.success("已保存更改！")
                     st.session_state.editing = False
                     st.experimental_rerun()
-            with cols[1]:
+            with edit_cols[1]:
                 if st.button("❌", key=f"cancel_{i}"): # Icon only
                     st.session_state.editing = False
         else:
-            message_placeholder = st.empty() # 创建占位符
-            message_placeholder.write(message["content"], key=f"message_{i}") # 使用占位符显示消息
-            st.session_state.messages[i]["placeholder_widget"] = message_placeholder # 保存占位符
+            message_placeholder = st.empty()
+            with cols_main[0]: # Message content in the FIRST column of the 20-column grid
+                message_placeholder.write(message["content"], key=f"message_{i}")
+                st.session_state.messages[i]["placeholder_widget"] = message_placeholder
 
-    # 按钮区域 - 放在每个消息的 chat_message 容器结束后
-    if i >= len(st.session_state.messages) - 2 and message["role"] == "assistant": # 按钮条件：最后两条助手消息
-        with st.container(): # 使用 st.container() 创建按钮区域，与消息容器分离
-            cols_buttons = st.columns(3) # 使用 3 列 for 편집, 재생성, 계속쓰기 buttons
-            with cols_buttons[0]:
-                if st.button("✏️", key=f"edit_{i}_icon_only", use_container_width=False): # Icon only, use_container_width=False
+    # Button area - BELOW each message, using columns from cols_main
+    if i >= len(st.session_state.messages) - 2 and message["role"] == "assistant":
+        with st.container(): # Container for buttons below message
+            button_cols = st.columns([1, 1, 1, 17]) # Adjust column widths as needed.  Last one for spacing.
+            with button_cols[0]:
+                if st.button("✏️", key=f"edit_{i}_icon_col", use_container_width=False): # Icon only
                     st.session_state.editable_index = i
                     st.session_state.editing = True
-            with cols_buttons[1]:
-                if st.button("♻️", key=f"regenerate_{i}_icon_only", use_container_width=False, on_click=lambda idx=i: regenerate_message(idx)): # Icon only, use_container_width=False
+            with button_cols[1]:
+                if st.button("♻️", key=f"regenerate_{i}_icon_col", use_container_width=False, on_click=lambda idx=i: regenerate_message(idx)): # Icon only
                     pass
-            with cols_buttons[2]:
-                if st.button("➕", key=f"continue_{i}_icon_only", use_container_width=False, on_click=lambda idx=i: continue_message(idx)): # Icon only, use_container_width=False
+            with button_cols[2]:
+                if st.button("➕", key=f"continue_{i}_icon_col", use_container_width=False, on_click=lambda idx=i: continue_message(idx)): # Icon only
                     pass
-    elif message["role"] == "user" and i == len(st.session_state.messages) - 1: # 撤回按钮，只在最后一条用户消息下显示
-        with st.container(): #  使用 st.container() 创建按钮区域
-            cols_buttons_undo = st.columns(2) # 使用 2 열 for 撤回 and 撤销撤回 buttons
-            with cols_buttons_undo[0]:
-                if st.session_state.messages and st.button("⏪", key=f"reset_last_user_icon_only", use_container_width=False): # Icon only, use_container_width=False
+    elif message["role"] == "user" and i == len(st.session_state.messages) - 1:
+        with st.container(): # Container for undo buttons below user message
+            undo_button_cols = st.columns([1, 1, 18]) # Adjust column widths. Last one for spacing
+            with undo_button_cols[0]:
+                 if st.session_state.messages and st.button("⏪", key=f"reset_last_user_icon_col", use_container_width=False): # Icon only
                     st.session_state.reset_history = True
                     st.session_state.messages.pop(-1) if len(st.session_state.messages) > 1 else None
-                    if st.session_state.reset_history: # 撤回后立即显示 ↩️
-                        st.experimental_rerun() # 立即刷新显示撤回按钮
-            with cols_buttons_undo[1]:
+                    if st.session_state.reset_history:
+                        st.experimental_rerun()
+            with undo_button_cols[1]:
                 if st.session_state.reset_history:
-                    if st.button("↩️", key=f"undo_reset_user_icon_only", use_container_width=False): # Icon only, use_container_width=False
+                    if st.button("↩️", key=f"undo_reset_user_icon_col", use_container_width=False): # Icon only
                         st.session_state.reset_history = False
-                        st.experimental_rerun() # 撤销撤回后刷新
-                                
+                        st.experimental_rerun()
+
 # 聊天输入和响应
 if prompt := st.chat_input("输入你的消息:"):
     st.session_state.messages.append({"role": "user", "content": prompt})
@@ -501,8 +504,14 @@ if prompt := st.chat_input("输入你的消息:"):
           st.session_state.messages.append({"role": "assistant", "content": full_response})
         except Exception as e:
           st.error(f"发生错误：{type(e).__name__} - {e}。  请检查你的 API 密钥和消息格式。")
-    with open(log_file, "wb") as f:
-        pickle.dump(st.session_state.messages, f)
+        # IMMEDIATELY save history after each response
+        try:
+            with open(log_file, "wb") as f:
+                pickle.dump(st.session_state.messages, f)
+        except Exception as e:
+            st.error(f"保存历史记录失败 (聊天响应后, CRITICAL): {e}") # CRITICAL error message
+
+
 col1, col2 = st.columns(2)
 with col1:
     st.write("")
