@@ -429,7 +429,7 @@ with st.sidebar:
 if not st.session_state.messages:
     load_history(log_file)
 
-# 显示历史记录和编辑功能 (修改模块)
+# 显示历史记录和编辑功能
 for i, message in enumerate(st.session_state.messages):
     with st.chat_message(message["role"]):
         if st.session_state.get("editing") == True and i == st.session_state.editable_index:
@@ -440,8 +440,11 @@ for i, message in enumerate(st.session_state.messages):
             with cols[0]:
                 if st.button("✅ 保存", key=f"save_{i}"):
                     st.session_state.messages[i]["content"] = new_content
-                    with open(log_file, "wb") as f:
-                        pickle.dump(st.session_state.messages, f)
+                    try:
+                        with open(log_file, "wb") as f:
+                            pickle.dump(st.session_state.messages, f)
+                    except Exception as e:
+                        st.error(f"保存历史记录失败 (编辑保存): {e}")
                     st.success("已保存更改！")
                     st.session_state.editing = False
                     st.experimental_rerun()
