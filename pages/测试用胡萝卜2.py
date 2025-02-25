@@ -454,10 +454,9 @@ for i, message in enumerate(st.session_state.messages):
                 if st.button("❌", key=f"cancel_{i}"): # Icon only
                     st.session_state.editing = False
         else:
-            # *** 直接使用 st.markdown 显示消息内容，移除 placeholder ***
+            # *** 强制类型转换为字符串 ***
             with cols_main[0]: # Message content in the FIRST column of the 20-column grid
-                st.markdown(message["content"], key=f"message_{i}")
-                # *** 彻底移除 placeholder 相关的代码 ***
+                st.markdown(str(message["content"]), key=f"message_{i}") # 强制转换为字符串
 
 
     # Button area - BELOW each message, using columns from cols_main
