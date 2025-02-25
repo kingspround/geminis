@@ -459,7 +459,6 @@ if st.session_state.get("editing"):
             if st.button("取消 ❌", key=f"cancel_{i}"):
                 st.session_state.editing = False
 
-
 # 聊天输入和响应
 if prompt := st.chat_input("输入你的消息:"):
     st.session_state.messages.append({"role": "user", "content": prompt})
@@ -476,14 +475,8 @@ if prompt := st.chat_input("输入你的消息:"):
           st.session_state.messages.append({"role": "assistant", "content": full_response})
         except Exception as e:
           st.error(f"发生错误：{type(e).__name__} - {e}。  请检查你的 API 密钥和消息格式。")
-        # ***IMMEDIATELY SAVE HISTORY AFTER EACH RESPONSE***
-        try:
-            with open(log_file, "wb") as f:
-                pickle.dump(st.session_state.messages, f)
-        except Exception as e:
-            st.error(f"***CRITICAL: HISTORY SAVE FAILED AFTER ASSISTANT RESPONSE!*** Error: {e}") # ***CRITICAL ERROR MESSAGE***
-
-
+    with open(log_file, "wb") as f:
+        pickle.dump(st.session_state.messages, f)
 col1, col2 = st.columns(2)
 with col1:
     st.write("")
