@@ -135,13 +135,13 @@ DEFAULT_CHARACTER_SETTINGS = {
 习性: 淫化吊死鬼通常会在夜晚出没，用她们那甜美的声音和诱人的身姿吸引男性。一旦有男性被她们迷惑，一旦有男性被她们迷惑，就会被她们用长舌卷住，拉到身前。淫化吊死鬼会用她们柔软的巨乳和长舌尽情玩弄猎物，用淫靡的声音引诱他们交合。 淫化吊死鬼非常享受性爱带来的快感，并将这种快感视为生命的意义。她们会用舌头，爆乳，嫩穴细细品尝。""",  # 用于用户自定义输入的设定
 }
 
---- 默认角色设定 ---
+# --- 默认角色设定 ---
 DEFAULT_CHARACTER_SETTINGS = {
     "设定1": "这是一个示例设定 1。",
     "设定2": "这是一个示例设定 2。",
 }
 
---- 文件操作函数 ---
+# --- 文件操作函数 ---
 # 获取当前文件路径
 file = os.path.abspath(__file__)
 filename = os.path.splitext(os.path.basename(file))[0] + ".pkl"
@@ -152,7 +152,7 @@ if not os.path.exists(log_file):
     with open(log_file, "wb") as f:
         pass  # 创建空文件
 
---- 初始化 Session State ---
+# --- 初始化 Session State ---
 if "messages" not in st.session_state:
     st.session_state.messages = []
 if 'character_settings' not in st.session_state:
@@ -170,7 +170,7 @@ if "chat_session" not in st.session_state:
 if "rerun_count" not in st.session_state:
     st.session_state.rerun_count = 0
 
---- 功能函数 ---
+# --- 功能函数 ---
 def load_history(log_file):
     # 加载历史记录函数
     try:
@@ -343,7 +343,7 @@ def continue_message(index):
     else:
         st.error("无效的消息索引")
 
---- Streamlit 布局 ---
+# --- Streamlit 布局 ---
 st.set_page_config(
     page_title="Gemini Chatbot",
     layout="wide"
