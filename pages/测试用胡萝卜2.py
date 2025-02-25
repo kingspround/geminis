@@ -295,19 +295,21 @@ def continue_message(index):
         original_message = st.session_state.messages[index]["content"]
 
         # 提取最后几个字符
-        last_chars_length = 10  # 可以根据需求调整截取的字符数
+        last_chars_length = 10
         if len(original_message) > last_chars_length:
           last_chars = original_message[-last_chars_length:] + "..."
         else:
           last_chars = original_message
 
-        new_prompt = f"请务必从 '{last_chars}' 无缝衔接自然地继续写，不要重复，不要输出任何思考过程" # 使用更强有力的提示词
+        new_prompt = f"请务必从 '{last_chars}' 无缝衔接自然地继续写，不要重复，不要输出任何思考过程"
 
-        full_response = original_message  # 初始化 full_response
+        full_response = original_message  # 初始化 full_response 仍然保留原始消息
+        full_continued_response = "" # 新增变量来存储续写内容
         for chunk in getAnswer(new_prompt):
-            full_response += chunk
+            full_continued_response += chunk # 累积续写内容
+            full_response = original_message + full_continued_response # 每次chunk都更新完整消息，确保实时显示续写效果
 
-        st.session_state.messages[index]["content"] = full_response
+        st.session_state.messages[index]["content"] = full_response # 最终更新消息内容为 原始消息 + 完整续写内容
         with open(log_file, "wb") as f:
             pickle.dump(st.session_state.messages, f)
         st.experimental_rerun()
