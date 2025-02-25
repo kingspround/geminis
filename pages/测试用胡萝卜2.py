@@ -429,31 +429,6 @@ with st.sidebar:
 if not st.session_state.messages:
     load_history(log_file)
 
-# 显示历史记录和编辑功能 (修改模块)
-for i, message in enumerate(st.session_state.messages):
-    with st.chat_message(message["role"]):
-        if st.session_state.get("editing") == True and i == st.session_state.editable_index:
-            new_content = st.text_area(
-                f"{message['role']}:", message["content"], key=f"message_edit_{i}"
-            )
-            cols = st.columns(2)  # 使用两列，第一列放保存/取消按钮
-            with cols[0]:
-                if st.button("✅ 保存", key=f"save_{i}"):
-                    st.session_state.messages[i]["content"] = new_content
-                    with open(log_file, "wb") as f:
-                        pickle.dump(st.session_state.messages, f)
-                    st.success("已保存更改！")
-                    st.session_state.editing = False
-                    st.experimental_rerun()
-            with cols[1]:
-                if st.button("❌ 取消", key=f"cancel_{i}"):
-                    st.session_state.editing = False
-        else:
-            message_placeholder = st.empty() # 创建占位符
-            message_placeholder.write(message["content"], key=f"message_{i}") # 使用占位符显示消息
-            st.session_state.messages[i]["placeholder_widget"] = message_placeholder # 保存占位符
-
-
 # 按钮区域 - 在消息显示循环结束后，但在 chat_message 上下文之外
 if st.session_state.messages: # 确保有消息才显示按钮
     last_message_index = len(st.session_state.messages) - 1
@@ -468,7 +443,7 @@ if st.session_state.messages: # 确保有消息才显示按钮
                 # 编辑按钮 (只在助手消息时显示)
                 if last_message["role"] == "assistant":
                     with cols_buttons[button_col_index]:
-                        if st.button("✏️ 编辑", key=f"edit_last", use_container_width=True): # 修改 key
+                        if st.button("✏️ 编辑", key=f"edit_last_msg_area", use_container_width=True): # 修改 key
                             st.session_state.editable_index = last_message_index
                             st.session_state.editing = True
                     button_col_index += 1
@@ -476,20 +451,20 @@ if st.session_state.messages: # 确保有消息才显示按钮
                 # 重新生成按钮 (只在助手消息时显示)
                 if last_message["role"] == "assistant":
                     with cols_buttons[button_col_index]:
-                        if st.button("♻️ 重生成", key=f"regenerate_last", use_container_width=True, on_click=lambda idx=last_message_index: regenerate_message(idx)): # 修改 key
+                        if st.button("♻️ 重生成", key=f"regenerate_last_msg_area", use_container_width=True, on_click=lambda idx=last_message_index: regenerate_message(idx)): # 修改 key
                             pass
                     button_col_index += 1
 
                 # 继续生成按钮 (只在助手消息时显示)
                 if last_message["role"] == "assistant":
                     with cols_buttons[button_col_index]:
-                        if st.button("➕ 继续写", key=f"continue_last", use_container_width=True, on_click=lambda idx=last_message_index: continue_message(idx)): # 修改 key
+                        if st.button("➕ 继续写", key=f"continue_last_msg_area", use_container_width=True, on_click=lambda idx=last_message_index: continue_message(idx)): # 修改 key
                             pass
                     button_col_index += 1
 
                 # 重置上一个输出按钮 (始终显示，如果消息历史不为空)
                 with cols_buttons[button_col_index]:
-                    if st.session_state.messages and st.button("⏪ 撤回", key=f"reset_last", use_container_width=True): # 修改 key
+                    if st.session_state.messages and st.button("⏪ 撤回", key=f"reset_last_msg_area", use_container_width=True): # 修改 key
                         st.session_state.reset_history = True
                         st.session_state.messages.pop(-1) if len(st.session_state.messages) > 1 else None
                         if st.session_state.reset_history: # 撤回后立即显示 ↩️
@@ -499,7 +474,7 @@ if st.session_state.messages: # 确保有消息才显示按钮
                 # 撤销撤回按钮 (只在 reset_history 为 True 时显示)
                 if st.session_state.reset_history:
                     with cols_buttons[button_col_index]:
-                        if st.button("↩️ 撤销撤回", key=f"undo_reset_last", use_container_width=True): # 修改 key
+                        if st.button("↩️ 撤销撤回", key=f"undo_reset_last_msg_area", use_container_width=True): # 修改 key
                             st.session_state.reset_history = False
                             st.experimental_rerun() # 撤销撤回后刷新
                                 
