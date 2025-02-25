@@ -292,29 +292,54 @@ def regenerate_message(index):
 def continue_message(index):
     """继续生成指定索引的消息"""
     if 0 <= index < len(st.session_state.messages):
-        original_message = st.session_state.messages[index]["content"]
+        message_to_continue = st.session_state.messages[index] # 获取要继续的消息对象
+        original_message_content = message_to_continue["content"] # 获取原始消息内容
 
-        # 提取最后几个字符
+        # 提取最后几个字符作为续写的上下文提示
         last_chars_length = 10
-        if len(original_message) > last_chars_length:
-          last_chars = original_message[-last_chars_length:] + "..."
+        if len(original_message_content) > last_chars_length:
+          last_chars = original_message_content[-last_chars_length:] + "..."
         else:
-          last_chars = original_message
+          last_chars = original_message_content
 
         new_prompt = f"请务必从 '{last_chars}' 无缝衔接自然地继续写，不要重复，不要输出任何思考过程"
 
-        full_response = original_message  # 初始化 full_response 仍然保留原始消息
-        full_continued_response = "" # 新增变量来存储续写内容
-        for chunk in getAnswer(new_prompt):
-            full_continued_response += chunk # 累积续写内容
-            full_response = original_message + full_continued_response # 每次chunk都更新完整消息，确保实时显示续写效果
+        full_continued_response = "" # 存储续写的内容
+        message_placeholder = None # 初始化消息占位符
 
-        st.session_state.messages[index]["content"] = full_response # 最终更新消息内容为 原始消息 + 完整续写内容
-        with open(log_file, "wb") as f:
-            pickle.dump(st.session_state.messages, f)
-        st.experimental_rerun()
+        # 查找消息显示占位符，如果不存在则创建
+        for msg_index, msg in enumerate(st.session_state.messages):
+            if msg_index == index and msg.get("placeholder_widget"): # 找到对应索引且有占位符的消息
+                message_placeholder = msg["placeholder_widget"]
+                break
+        if message_placeholder is None: # 如果没有找到占位符，可能是第一次续写，需要重新渲染消息并创建占位符
+            st.experimental_rerun() # 强制重新渲染，确保消息被正确显示和创建占位符 (这是一种简化的处理方式，更完善的方案可能需要更精细的状态管理)
+            return # 退出当前函数，等待rerun后再次执行
+
+        try:
+            for chunk in getAnswer(new_prompt):
+                full_continued_response += chunk
+                updated_content = original_message_content + full_continued_response # 合并原始内容和续写内容
+                if message_placeholder:
+                    message_placeholder.markdown(updated_content + "▌") # 使用占位符更新消息显示 (流式效果)
+                st.session_state.messages[index]["content"] = updated_content # 实时更新session_state中的消息内容
+
+            if message_placeholder:
+                message_placeholder.markdown(updated_content) # 最终显示完整内容 (移除流式光标)
+            st.session_state.messages[index]["content"] = updated_content # 确保最终内容被保存
+
+            with open(log_file, "wb") as f:
+                pickle.dump(st.session_state.messages, f)
+
+        except Exception as e:
+            st.error(f"发生错误: {type(e).__name__} - {e}。 续写消息失败。")
+
     else:
         st.error("无效的消息索引")
+
+
+# --- 在显示历史记录部分，需要修改以保存消息的占位符 ---
+
 
 
 # --- Streamlit 布局 ---
@@ -408,12 +433,13 @@ with st.sidebar:
 if not st.session_state.messages:
     load_history(log_file)
 
-# 显示历史记录和编辑功能
 for i, message in enumerate(st.session_state.messages):
     with st.chat_message(message["role"]):
-        col1, col2 = st.columns([20, 1])  # 使用 columns 来划分比例，确保消息和按钮之间有固定的位置
+        col1, col2 = st.columns([20, 1])
         with col1:
-            st.write(message["content"], key=f"message_{i}")
+            message_placeholder = st.empty() # 创建一个占位符
+            message_placeholder.write(message["content"], key=f"message_{i}") # 使用占位符显示消息内容
+            st.session_state.messages[i]["placeholder_widget"] = message_placeholder # **保存占位符到消息对象中**
         with col2:
             if st.button("✏️", key=f"edit_{i}", use_container_width=True):
                 st.session_state.editable_index = i
