@@ -32,14 +32,15 @@ if "selected_api_key" not in st.session_state:
 genai.configure(api_key=API_KEYS[st.session_state.selected_api_key])
 
 
---- 模型设置 ---
+# --- 模型设置 ---
 generation_config = {
-    "temperature": 1.6,
-    "top_p": 0.95,
-    "top_k": 40,
-    "max_output_tokens": 8192,
-    "response_mime_type": "text/plain",
+  "temperature": 1.6,
+  "top_p": 0.95,
+  "top_k": 40,
+  "max_output_tokens": 8192,
+  "response_mime_type": "text/plain",
 }
+
 
 safety_settings = [
     {"category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_NONE"},
