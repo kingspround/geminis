@@ -429,11 +429,9 @@ with st.sidebar:
 # 显示历史记录和编辑功能
 for i, message in enumerate(st.session_state.messages):
     with st.chat_message(message["role"]):
-        col1, col2 = st.columns([20, 1])
+        col1, col2 = st.columns([20, 1])  # 使用 columns 来划分比例，确保消息和按钮之间有固定的位置
         with col1:
-            message_placeholder = st.empty() # 创建一个占位符
-            message_placeholder.write(message["content"], key=f"message_{i}") # 使用占位符显示消息内容
-            st.session_state.messages[i]["placeholder_widget"] = message_placeholder # **保存占位符到消息对象中**
+            st.write(message["content"], key=f"message_{i}")
         with col2:
             if st.button("✏️", key=f"edit_{i}", use_container_width=True):
                 st.session_state.editable_index = i
@@ -453,11 +451,8 @@ if st.session_state.get("editing"):
         with col1:
             if st.button("保存 ✅", key=f"save_{i}"):
                 st.session_state.messages[i]["content"] = new_content
-                try:
-                    with open(log_file, "wb") as f:
-                        pickle.dump(st.session_state.messages, f)
-                except Exception as e:
-                    st.error(f"CRITICAL: 保存历史记录失败 (编辑保存): {e}") # CRITICAL error message
+                with open(log_file, "wb") as f:
+                    pickle.dump(st.session_state.messages, f)
                 st.success("已保存更改！")
                 st.session_state.editing = False
         with col2:
