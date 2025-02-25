@@ -429,21 +429,12 @@ with st.sidebar:
 if not st.session_state.messages:
     load_history(log_file)
 
-# 显示历史记录和编辑功能
+# 显示历史记录和编辑功能 (消息显示部分不变)
 for i, message in enumerate(st.session_state.messages):
     with st.chat_message(message["role"]):
-        message_placeholder = st.empty() # 创建一个占位符
-        message_placeholder.write(message["content"], key=f"message_{i}") # 使用占位符显示消息内容
-        st.session_state.messages[i]["placeholder_widget"] = message_placeholder # 保存占位符到消息对象中
-        # **移除消息旁边的按钮**
-        # col2:
-        #     if st.button("✏️", key=f"edit_{i}", use_container_width=True):
-        #         st.session_state.editable_index = i
-        #         st.session_state.editing = True
-        #     if st.button("♻️", key=f"regenerate_{i}", use_container_width=True):
-        #         regenerate_message(i)
-        #     if st.button("➕", key=f"continue_{i}", use_container_width=True):
-        #         continue_message(i)
+        message_placeholder = st.empty()
+        message_placeholder.write(message["content"], key=f"message_{i}")
+        st.session_state.messages[i]["placeholder_widget"] = message_placeholder
 
     if st.session_state.get("editing"):
         i = st.session_state.editable_index
@@ -462,28 +453,24 @@ for i, message in enumerate(st.session_state.messages):
                 if st.button("取消 ❌", key=f"cancel_{i}"):
                     st.session_state.editing = False
 
-# **在最后两个消息下方添加按钮**
-if len(st.session_state.messages) >= 2: # 确保至少有两条消息才显示按钮
+# 在最后一条消息下方添加紧凑图标按钮 (使用 20 列布局)
+if len(st.session_state.messages) >= 1: # 至少有一条消息时显示按钮
     last_message_index = len(st.session_state.messages) - 1
-    second_last_message_index = len(st.session_state.messages) - 2
 
-    # 为了将按钮放在 "最后两个消息" 下方,  但Streamlit 的布局更倾向于从上到下,
-    # 这里简化为放在 "最后一条消息" 下方， 如果需要精确放在 "最后两个消息" 下方，布局会更复杂，需要更多容器和占位符管理。
-    # 当前简化实现为按钮组放在最后一条消息下方
+    with st.container():
+        cols = st.columns(20) # 创建 20 列
 
-    with st.container(): # 使用一个容器来组织按钮，可以根据需要调整布局
-
-        col_edit, col_regenerate, col_continue = st.columns(3) # 使用 columns 来水平排列按钮
-        with col_edit:
-            if st.button("✏️ 编辑最后一条消息", key="edit_last", use_container_width=True):
+        with cols[0]: # 将 "编辑" 按钮放在第 1 列 (索引 0)
+            if st.button("✏️", key="edit_last", use_container_width=True, label_visibility="collapsed"):
                 st.session_state.editable_index = last_message_index
                 st.session_state.editing = True
-        with col_regenerate:
-            if st.button("♻️ 重新生成最后一条消息", key="regenerate_last", use_container_width=True):
+        with cols[1]: # 将 "重新生成" 按钮放在第 2 列 (索引 1)
+            if st.button("♻️", key="regenerate_last", use_container_width=True, label_visibility="collapsed"):
                 regenerate_message(last_message_index)
-        with col_continue:
-            if st.button("➕ 继续最后一条消息", key="continue_last", use_container_width=True):
+        with cols[2]: # 将 "继续" 按钮放在第 3 列 (索引 2)
+            if st.button("➕", key="continue_last", use_container_width=True, label_visibility="collapsed"):
                 continue_message(last_message_index)
+
 
 
 # 聊天输入和响应 (保持不变)
