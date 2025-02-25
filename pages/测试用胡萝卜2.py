@@ -425,9 +425,6 @@ with st.sidebar:
         if st.button("刷新 🔄"):  # 添加刷新按钮
             st.experimental_rerun()
 
-# 自动加载历史记录 (如果消息列表为空)
-if not st.session_state.messages:
-    load_history(log_file)
 
 # 显示历史记录和编辑功能
 for i, message in enumerate(st.session_state.messages):
