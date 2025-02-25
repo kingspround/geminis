@@ -223,7 +223,7 @@ def continue_message(index_to_continue):
     """继续消息函数"""
     st.session_state.continue_index = index_to_continue
 
---- Streamlit 布局 ---
+# --- Streamlit 布局 ---
 st.set_page_config(
     page_title="Gemini Chatbot",
     layout="wide"
