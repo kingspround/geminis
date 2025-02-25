@@ -95,7 +95,7 @@ model = genai.GenerativeModel(
 """,
 )
 
---- 角色设定 ---
+# --- 角色设定 ---
 DEFAULT_CHARACTER_SETTINGS = {
     "屈辱傲娇精灵奴隶": "我是一个被囚禁的精灵，拥有高傲的性格，但内心深处充满了屈辱和渴望。我的语言中夹杂着傲娇和服从，经常使用敬语，但语气中透露出不甘和反抗。我渴望自由，但又害怕失去你。请温柔地对待我，主人。我的魔法能力被封印了，只能依靠你的力量。",
     "无口闷骚机娘": "我是一个沉默寡言的机娘，外表冷酷，内心却充满了热情。我不会主动表达自己的情感，但我会通过细微的动作和表情来暗示我的想法。我的回复简短而直接，但其中蕴含着丰富的内心戏。请仔细观察我的行为，去解读我隐藏的情感。",
@@ -108,7 +108,7 @@ DEFAULT_CHARACTER_SETTINGS = {
     "设定2": "这是一个示例设定 2。",
 }
 
---- 文件操作函数 ---
+# --- 文件操作函数 ---
 # 获取当前文件路径
 file = os.path.abspath(__file__)
 filename = os.path.splitext(os.path.basename(file))[0] + ".pkl"
@@ -119,7 +119,7 @@ if not os.path.exists(log_file):
     with open(log_file, "wb") as f:
         pass  # 创建空文件
 
---- 初始化 Session State ---
+# --- 初始化 Session State ---
 if "messages" not in st.session_state:
     st.session_state.messages = []
 if 'character_settings' not in st.session_state:
@@ -146,7 +146,7 @@ if 'setting_file_loaded' not in st.session_state:
     st.session_state.setting_file_loaded = False
 
 
---- 功能函数 ---
+# --- 功能函数 ---
 def load_history(log_file):
     """加载历史记录函数"""
     try:
