@@ -135,14 +135,13 @@ DEFAULT_CHARACTER_SETTINGS = {
 习性: 淫化吊死鬼通常会在夜晚出没，用她们那甜美的声音和诱人的身姿吸引男性。一旦有男性被她们迷惑，一旦有男性被她们迷惑，就会被她们用长舌卷住，拉到身前。淫化吊死鬼会用她们柔软的巨乳和长舌尽情玩弄猎物，用淫靡的声音引诱他们交合。 淫化吊死鬼非常享受性爱带来的快感，并将这种快感视为生命的意义。她们会用舌头，爆乳，嫩穴细细品尝。""",  # 用于用户自定义输入的设定
 }
 
-# --- 默认角色设定 ---
+--- 默认角色设定 ---
 DEFAULT_CHARACTER_SETTINGS = {
     "设定1": "这是一个示例设定 1。",
     "设定2": "这是一个示例设定 2。",
 }
 
-
-# --- 文件操作函数 ---
+--- 文件操作函数 ---
 # 获取当前文件路径
 file = os.path.abspath(__file__)
 filename = os.path.splitext(os.path.basename(file))[0] + ".pkl"
@@ -153,7 +152,7 @@ if not os.path.exists(log_file):
     with open(log_file, "wb") as f:
         pass  # 创建空文件
 
-# --- 初始化 Session State ---
+--- 初始化 Session State ---
 if "messages" not in st.session_state:
     st.session_state.messages = []
 if 'character_settings' not in st.session_state:
@@ -171,9 +170,7 @@ if "chat_session" not in st.session_state:
 if "rerun_count" not in st.session_state:
     st.session_state.rerun_count = 0
 
-
-# --- 功能函数 ---
-
+--- 功能函数 ---
 def load_history(log_file):
     # 加载历史记录函数
     try:
@@ -204,8 +201,6 @@ def ensure_enabled_settings_exists():
 
 ensure_enabled_settings_exists() # 在任何操作前确保 enabled_settings 存在
 
-
-
 def getAnswer(prompt):
     prompt = prompt or ""
 
@@ -229,17 +224,16 @@ def getAnswer(prompt):
         {
             "role": "model",
             "parts":[{"text": """
-
+ Use code with caution.
 """}]}
-   )
-
+    )
 
     for msg in st.session_state.messages[-20:]:
-      if msg and msg.get("role") and msg.get("content"): # 只有当msg不为空，并且有 role 和 content 属性的时候才去处理
-          if msg["role"] == "user":
-            history_messages.append({"role": "user", "parts": [{"text": msg["content"]}]})
-          elif msg["role"] == "assistant" and msg["content"] is not None:  # 使用 elif 确保只添加 role 为 assistant 的消息
-            history_messages.append({"role": "model", "parts": [{"text": msg["content"]}]})
+        if msg and msg.get("role") and msg.get("content"): # 只有当msg不为空，并且有 role 和 content 属性的时候才去处理
+            if msg["role"] == "user":
+                history_messages.append({"role": "user", "parts": [{"text": msg["content"]}]})
+            elif msg["role"] == "assistant" and msg["content"] is not None:  # 使用 elif 确保只添加 role 为 assistant 的消息
+                history_messages.append({"role": "model", "parts": [{"text": msg["content"]}]})
 
 
     history_messages = [msg for msg in history_messages if msg["role"] in ["user", "model"]]
@@ -258,10 +252,11 @@ def getAnswer(prompt):
             yield chunk.text
         return full_response
     except Exception as e:
-      if full_response:
-          st.session_state.messages.append({"role": "assistant", "content": full_response}) # 保存不完整输出
-      st.error(f"发生错误: {type(e).__name__} - {e}。 Prompt: {prompt}。 请检查你的API密钥、模型配置和消息格式。")
-      return ""
+        if full_response:
+            st.session_state.messages.append({"role": "assistant", "content": full_response}) # 保存不完整输出
+        st.error(f"发生错误: {type(e).__name__} - {e}。 Prompt: {prompt}。 请检查你的API密钥、模型配置和消息格式。")
+        return ""
+
 def download_all_logs():
     # 下载所有日志函数
     zip_buffer = BytesIO()
@@ -283,11 +278,16 @@ def regenerate_message(index):
             full_response += chunk
         st.session_state.messages.append({"role": "assistant", "content": full_response})
         with open(log_file, "wb") as f:
-            pickle.dump(st.session_state.messages, f)
+            messages_to_pickle = []
+            for msg in st.session_state.messages:
+                msg_copy = msg.copy()
+                if "placeholder_widget" in msg_copy:
+                    del msg_copy["placeholder_widget"]
+                messages_to_pickle.append(msg_copy)
+            pickle.dump(messages_to_pickle, f)
         st.experimental_rerun()
     else:
         st.error("无效的消息索引")
-
 
 def continue_message(index):
     """继续生成指定索引的消息"""
@@ -298,9 +298,9 @@ def continue_message(index):
         # 提取最后几个字符作为续写的上下文提示
         last_chars_length = 10
         if len(original_message_content) > last_chars_length:
-          last_chars = original_message_content[-last_chars_length:] + "..."
+            last_chars = original_message_content[-last_chars_length:] + "..."
         else:
-          last_chars = original_message_content
+            last_chars = original_message_content
 
         new_prompt = f"请务必从 '{last_chars}' 无缝衔接自然地继续写，不要重复，不要输出任何思考过程"
 
@@ -329,7 +329,13 @@ def continue_message(index):
             st.session_state.messages[index]["content"] = updated_content # 确保最终内容被保存
 
             with open(log_file, "wb") as f:
-                pickle.dump(st.session_state.messages, f)
+                messages_to_pickle = []
+                for msg in st.session_state.messages:
+                    msg_copy = msg.copy()
+                    if "placeholder_widget" in msg_copy:
+                        del msg_copy["placeholder_widget"]
+                    messages_to_pickle.append(msg_copy)
+                pickle.dump(messages_to_pickle, f)
 
         except Exception as e:
             st.error(f"发生错误: {type(e).__name__} - {e}。 续写消息失败。")
@@ -337,8 +343,7 @@ def continue_message(index):
     else:
         st.error("无效的消息索引")
 
-
-# --- Streamlit 布局 ---
+--- Streamlit 布局 ---
 st.set_page_config(
     page_title="Gemini Chatbot",
     layout="wide"
@@ -364,7 +369,7 @@ with st.sidebar:
                       on_click=lambda: st.session_state.messages.pop(-1) if len(st.session_state.messages) > 1 and not st.session_state.reset_history else None,
                       key='reset_last')
         # 移除首次加载判断，总是显示 "读取历史记录" 按钮
-        st.button("读取历史记录 📖", key="load_history_button")
+        st.button("读取历史记录 📖", key="load_history_button", on_click=lambda: load_history(log_file))
 
         if st.button("清除历史记录 🗑️"):
             st.session_state.clear_confirmation = True
@@ -380,7 +385,7 @@ with st.sidebar:
                     st.session_state.clear_confirmation = False
 
         with open(log_file, "rb") as f:
-          download_data = f.read() if os.path.exists(log_file) else b""  # 添加检查
+            download_data = f.read() if os.path.exists(log_file) else b""  # 添加检查
         st.download_button(
             label="下载当前聊天记录 ⬇️",
             data=download_data,
@@ -416,7 +421,6 @@ with st.sidebar:
                 st.session_state.character_settings[setting_name] = DEFAULT_CHARACTER_SETTINGS[setting_name]
             st.session_state.enabled_settings[setting_name] = st.checkbox(setting_name, st.session_state.enabled_settings.get(setting_name, False),key=f"checkbox_{setting_name}") #直接显示checkbox
 
-
         st.session_state.test_text = st.text_area("System Message (Optional):", st.session_state.get("test_text", ""), key="system_message")
         # 显示已加载的设定
         enabled_settings_display = [setting_name for setting_name, enabled in st.session_state.enabled_settings.items() if enabled]
@@ -429,12 +433,12 @@ with st.sidebar:
 if not st.session_state.messages:
     load_history(log_file)
 
-# 显示历史记录和编辑功能 (消息显示部分不变)
+# 显示历史记录和编辑功能
 for i, message in enumerate(st.session_state.messages):
     with st.chat_message(message["role"]):
-        message_placeholder = st.empty()
-        message_placeholder.write(message["content"], key=f"message_{i}")
-        st.session_state.messages[i]["placeholder_widget"] = message_placeholder
+        message_placeholder = st.empty() # 创建一个占位符
+        message_placeholder.write(message["content"], key=f"message_{i}") # 使用占位符显示消息内容
+        st.session_state.messages[i]["placeholder_widget"] = message_placeholder # 保存占位符到消息对象中
 
     if st.session_state.get("editing"):
         i = st.session_state.editable_index
@@ -446,7 +450,13 @@ for i, message in enumerate(st.session_state.messages):
                 if st.button("保存 ✅", key=f"save_{i}"):
                     st.session_state.messages[i]["content"] = new_content
                     with open(log_file, "wb") as f:
-                        pickle.dump(st.session_state.messages, f)
+                        messages_to_pickle = []
+                        for msg in st.session_state.messages:
+                            msg_copy = msg.copy()
+                            if "placeholder_widget" in msg_copy:
+                                del msg_copy["placeholder_widget"]
+                            messages_to_pickle.append(msg_copy)
+                        pickle.dump(messages_to_pickle, f)
                     st.success("已保存更改！")
                     st.session_state.editing = False
             with col2:
@@ -461,20 +471,18 @@ if len(st.session_state.messages) >= 1: # 至少有一条消息时显示按钮
         cols = st.columns(20) # 创建 20 列
 
         with cols[0]: # 将 "编辑" 按钮放在第 1 列 (索引 0)
-            if st.button("✏️", key="edit_last", use_container_width=True): # 移除 label_visibility
+            if st.button("✏️", key="edit_last", use_container_width=True):
                 st.session_state.editable_index = last_message_index
                 st.session_state.editing = True
         with cols[1]: # 将 "重新生成" 按钮放在第 2 列 (索引 1)
-            if st.button("♻️", key="regenerate_last", use_container_width=True): # 移除 label_visibility
+            if st.button("♻️", key="regenerate_last", use_container_width=True):
                 regenerate_message(last_message_index)
         with cols[2]: # 将 "继续" 按钮放在第 3 列 (索引 2)
-            if st.button("➕", key="continue_last", use_container_width=True): # 移除 label_visibility
+            if st.button("➕", key="continue_last", use_container_width=True):
                 continue_message(last_message_index)
 
 
-
-
-# 聊天输入和响应 (保持不变)
+# 聊天输入和响应
 if prompt := st.chat_input("输入你的消息:"):
     st.session_state.messages.append({"role": "user", "content": prompt})
     with st.chat_message("user"):
@@ -491,7 +499,13 @@ if prompt := st.chat_input("输入你的消息:"):
         except Exception as e:
             st.error(f"发生错误：{type(e).name} - {e}。  请检查你的 API 密钥和消息格式。")
     with open(log_file, "wb") as f:
-        pickle.dump(st.session_state.messages, f)
+        messages_to_pickle = []
+        for msg in st.session_state.messages:
+            msg_copy = msg.copy()
+            if "placeholder_widget" in msg_copy:
+                del msg_copy["placeholder_widget"]
+            messages_to_pickle.append(msg_copy)
+        pickle.dump(messages_to_pickle, f)
     col1, col2 = st.columns(2)
     with col1:
         st.write("")
