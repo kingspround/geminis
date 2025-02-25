@@ -8,39 +8,36 @@ from datetime import datetime
 from io import BytesIO
 import zipfile
 
-
 # --- API 密钥设置 ---
 API_KEYS = {
-    "主密钥": "AIzaSyCBjZbA78bPusYmUNvfsmHpt6rPx6Ur0QE",  # 替换成你的主 API 密钥
-    "备用1号": "AIzaSyAWfFf6zqy1DizINOwPfxPD8EF2ACdwCaQ",  # 替换成你的备用 API 密钥
-    "备用2号":"AIzaSyD4UdMp5wndOAKxtO1CWpzuZEGEf78YKUQ",
-    "备用3号":"AIzaSyBVbA7tEyyy_ASp7l9P60qSh1xOM2CSMNw",
-    "备用4号":"AIzaSyDezEpxvtY1AKN6JACMU9XHte5sxATNcUs",
-    "备用5号":"AIzaSyBgyyy2kTTAdsLB53OCR2omEbj7zlx1mjw",
-    "备用6号":"AIzaSyDPFZ7gRba9mhKTqbXA_Y7fhAxS8IEu0bY",
-    "备用7号":"AIzaSyDdyhqcowl0ftcbK9pMObXzM7cIOQMtlmA",
-    "备用8号":"AIzaSyAA7Qs9Lzy4UxxIqCIQ4RknchiWQt_1hgI",
-    "备用9号":"AIzaSyCj_CCwQua1mfq3EjzqV6Up6NHsxtb9dy8",
-    "备用10号":"AIzaSyDOI2e-I1RdXBnk99jY2H00A3aymXREETA"
-    # 可以继续添加更多 API key
-}
+"主密钥": "AIzaSyCBjZbA78bPusYmUNvfsmHpt6rPx6Ur0QE",  # 替换成你的主 API 密钥
+"备用1号": "AIzaSyAWfFf6zqy1DizINOwPfxPD8EF2ACdwCaQ",  # 替换成你的备用 API 密钥
+"备用2号":"AIzaSyD4UdMp5wndOAKxtO1CWpzuZEGEf78YKUQ",
+"备用3号":"AIzaSyBVbA7tEyyy_ASp7l9P60qSh1xOM2CSMNw",
+"备用4号":"AIzaSyDezEpxvtY1AKN6JACMU9XHte5sxATNcUs",
+"备用5号":"AIzaSyBgyyy2kTTAdsLB53OCR2omEbj7zlx1mjw",
+"备用6号":"AIzaSyDPFZ7gRba9mhKTqbXA_Y7fhAxS8IEu0bY",
+"备用7号":"AIzaSyDdyhqcowl0ftcbK9pMObXzM7cIOQMtlmA",
+"备用8号":"AIzaSyAA7Qs9Lzy4UxxIqCIQ4RknchiWQt_1hgI",
+"备用9号":"AIzaSyCj_CCwQua1mfq3EjzqV6Up6NHsxtb9dy8",
+"备用10号":"AIzaSyDOI2e-I1RdXBnk99jY2H00A3aymXREETA"
 
+# 可以继续添加更多 API key
+}
 
 # --- 配置 API 密钥 ---
 if "selected_api_key" not in st.session_state:
     st.session_state.selected_api_key = list(API_KEYS.keys())[0]  # Default to the first key
 genai.configure(api_key=API_KEYS[st.session_state.selected_api_key])
 
-
 # --- 模型设置 ---
 generation_config = {
-  "temperature": 1.6,
-  "top_p": 0.95,
-  "top_k": 40,
-  "max_output_tokens": 8192,
-  "response_mime_type": "text/plain",
+    "temperature": 1.6,
+    "top_p": 0.95,
+    "top_k": 40,
+    "max_output_tokens": 8192,
+    "response_mime_type": "text/plain",
 }
-
 
 safety_settings = [
     {"category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_NONE"},
@@ -235,8 +232,8 @@ def getAnswer(prompt, update_message, continue_mode=False):
     except Exception as e:
         st.error(f"**API 调用出错：** {e}")  # 输出错误信息到 Streamlit 界面
         print(f"API Error: {e}") # 打印到控制台，方便查看详细错误日志
-        st.session_state.chat_session = None # 出错时，重置会话
-        return "**对话过程中出现错误，请重试或检查 API 密钥。**" # 返回友好的错误提示
+        #  移除  st.session_state.chat_session = None  这一行， **不要重置会话**
+        return "**对话过程中出现错误，请重试或检查 API 密钥/网络连接。**" # 返回更友好的错误提示
 
 
 def download_all_logs():
