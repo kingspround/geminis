@@ -461,15 +461,16 @@ if len(st.session_state.messages) >= 1: # 至少有一条消息时显示按钮
         cols = st.columns(20) # 创建 20 列
 
         with cols[0]: # 将 "编辑" 按钮放在第 1 列 (索引 0)
-            if st.button("✏️", key="edit_last", use_container_width=True, label_visibility="collapsed"):
+            if st.button("✏️", key="edit_last", use_container_width=True): # 移除 label_visibility
                 st.session_state.editable_index = last_message_index
                 st.session_state.editing = True
         with cols[1]: # 将 "重新生成" 按钮放在第 2 列 (索引 1)
-            if st.button("♻️", key="regenerate_last", use_container_width=True, label_visibility="collapsed"):
+            if st.button("♻️", key="regenerate_last", use_container_width=True): # 移除 label_visibility
                 regenerate_message(last_message_index)
         with cols[2]: # 将 "继续" 按钮放在第 3 列 (索引 2)
-            if st.button("➕", key="continue_last", use_container_width=True, label_visibility="collapsed"):
+            if st.button("➕", key="continue_last", use_container_width=True): # 移除 label_visibility
                 continue_message(last_message_index)
+
 
 
 
