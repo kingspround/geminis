@@ -457,7 +457,8 @@ for i, message in enumerate(st.session_state.messages):
             message_placeholder = st.empty()
             with cols_main[0]: # Message content in the FIRST column of the 20-column grid
                 message_placeholder.write(message["content"], key=f"message_{i}")
-                st.session_state.messages[i]["placeholder_widget"] = message_placeholder
+                # *** 移除错误代码：不再将 placeholder_widget 保存到 session_state ***
+                # st.session_state.messages[i]["placeholder_widget"] = message_placeholder
 
     # Button area - BELOW each message, using columns from cols_main
     if i >= len(st.session_state.messages) - 2 and message["role"] == "assistant":
