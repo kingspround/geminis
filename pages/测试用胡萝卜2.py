@@ -338,10 +338,6 @@ def continue_message(index):
         st.error("无效的消息索引")
 
 
-# --- 在显示历史记录部分，需要修改以保存消息的占位符 ---
-
-
-
 # --- Streamlit 布局 ---
 st.set_page_config(
     page_title="Gemini Chatbot",
@@ -433,40 +429,62 @@ with st.sidebar:
 if not st.session_state.messages:
     load_history(log_file)
 
+# 显示历史记录和编辑功能 (修改模块)
 for i, message in enumerate(st.session_state.messages):
     with st.chat_message(message["role"]):
-        col1, col2 = st.columns([20, 1])
-        with col1:
-            message_placeholder = st.empty() # 创建一个占位符
-            message_placeholder.write(message["content"], key=f"message_{i}") # 使用占位符显示消息内容
-            st.session_state.messages[i]["placeholder_widget"] = message_placeholder # **保存占位符到消息对象中**
-        with col2:
-            if st.button("✏️", key=f"edit_{i}", use_container_width=True):
-                st.session_state.editable_index = i
-                st.session_state.editing = True
-            if st.button("♻️", key=f"regenerate_{i}", use_container_width=True):
-                regenerate_message(i)
-            if st.button("➕", key=f"continue_{i}", use_container_width=True):
-                continue_message(i)
+        if st.session_state.get("editing") == True and i == st.session_state.editable_index:
+            new_content = st.text_area(
+                f"{message['role']}:", message["content"], key=f"message_edit_{i}"
+            )
+            cols = st.columns(2)  # 使用两列，第一列放保存/取消按钮
+            with cols[0]:
+                if st.button("✅ 保存", key=f"save_{i}"):
+                    st.session_state.messages[i]["content"] = new_content
+                    with open(log_file, "wb") as f:
+                        pickle.dump(st.session_state.messages, f)
+                    st.success("已保存更改！")
+                    st.session_state.editing = False
+                    # st.session_state.rerun_count += 1 # 移除不必要的 rerun 计数
+                    st.experimental_rerun() # 保存后重新渲染
+            with cols[1]:
+                if st.button("❌ 取消", key=f"cancel_{i}"):
+                    st.session_state.editing = False
+        else:
+            col1, col2 = st.columns([20, 2]) # 调整列比例，让消息内容更宽
+            with col1:
+                message_placeholder = st.empty() # 创建占位符
+                message_placeholder.write(message["content"], key=f"message_{i}") # 使用占位符显示消息
+                st.session_state.messages[i]["placeholder_widget"] = message_placeholder # 保存占位符
 
+            with col2: # 按钮列放在 col2
+                if i >= len(st.session_state.messages) - 2 and message["role"] == "assistant": # 按钮条件 (可以根据需要调整)
+                    cols_buttons = st.columns([1,1,1]) # 按钮均分列宽
+                    with cols_buttons[0]:
+                        if st.button("✏️", key=f"edit_{i}", use_container_width=True):
+                            st.session_state.editable_index = i
+                            st.session_state.editing = True
+                    with cols_buttons[1]:
+                        if st.button("♻️", key=f"regenerate_{i}", use_container_width=True, on_click=lambda idx=i: regenerate_message(idx)):  # 传递当前索引
+                            pass
+                    with cols_buttons[2]:
+                        if st.button("➕", key=f"continue_{i}", use_container_width=True, on_click=lambda idx=i: continue_message(idx)):  # 传递当前索引
+                            pass
+                elif message["role"] == "user": # 撤回按钮只在用户消息显示
+                    cols_buttons = st.columns(1)
+                    with cols_buttons[0]:
+                        if st.session_state.messages and st.button("⏪", key=f"reset_last_{i}", use_container_width=True):
+                            st.session_state.reset_history = True
+                            st.session_state.messages.pop(-1) if len(st.session_state.messages) > 1 else None
+                            if st.session_state.reset_history: # 撤回后立即显示 ↩️
+                                st.experimental_rerun() # 立即刷新显示撤回按钮
 
-if st.session_state.get("editing"):
-    i = st.session_state.editable_index
-    message = st.session_state.messages[i]
-    with st.chat_message(message["role"]):
-        new_content = st.text_area(f"{message['role']}:", message["content"], key=f"message_edit_{i}")
-        col1, col2 = st.columns(2)
-        with col1:
-            if st.button("保存 ✅", key=f"save_{i}"):
-                st.session_state.messages[i]["content"] = new_content
-                with open(log_file, "wb") as f:
-                    pickle.dump(st.session_state.messages, f)
-                st.success("已保存更改！")
-                st.session_state.editing = False
-        with col2:
-            if st.button("取消 ❌", key=f"cancel_{i}"):
-                st.session_state.editing = False
-
+                    if st.session_state.reset_history and i >= len(st.session_state.messages) - 2 and message["role"] == "user": # 撤回的撤回按钮
+                        cols_undo = st.columns(1)
+                        with cols_undo[0]:
+                            if st.button("↩️", key=f"undo_reset_{i}", use_container_width=True):
+                                st.session_state.reset_history = False
+                                # st.session_state.rerun_count += 1 #  移除不必要的 rerun 计数
+                                st.experimental_rerun() # 撤销撤回后刷新
 # 聊天输入和响应
 if prompt := st.chat_input("输入你的消息:"):
     st.session_state.messages.append({"role": "user", "content": prompt})
