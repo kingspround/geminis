@@ -430,63 +430,37 @@ if not st.session_state.messages:
     load_history(log_file)
 
 # 显示历史记录和编辑功能
-cols_main = st.columns(20) # 创建 20 列 grid OUTSIDE the message loop
-
 for i, message in enumerate(st.session_state.messages):
     with st.chat_message(message["role"]):
-        if st.session_state.get("editing") == True and i == st.session_state.editable_index:
-            new_content = st.text_area(
-                f"{message['role']}:", message["content"], key=f"message_edit_{i}"
-            )
-            edit_cols = st.columns(2) # Columns for edit buttons
-            with edit_cols[0]:
-                if st.button("✅", key=f"save_{i}"): # Icon only
-                    st.session_state.messages[i]["content"] = new_content
-                    try:
-                        with open(log_file, "wb") as f:
-                            pickle.dump(st.session_state.messages, f)
-                    except Exception as e:
-                        st.error(f"CRITICAL: 保存历史记录失败 (编辑保存): {e}") # CRITICAL error message
-                    st.success("已保存更改！")
-                    st.session_state.editing = False
-                    st.experimental_rerun()
-            with edit_cols[1]:
-                if st.button("❌", key=f"cancel_{i}"): # Icon only
-                    st.session_state.editing = False
-        else:
-            # *** 强制类型转换为字符串 ***
-            with cols_main[0]: # Message content in the FIRST column of the 20-column grid
-                st.markdown(str(message["content"]), key=f"message_{i}") # 强制转换为字符串
+        col1, col2 = st.columns([20, 1])  # 使用 columns 来划分比例，确保消息和按钮之间有固定的位置
+        with col1:
+            st.write(message["content"], key=f"message_{i}")
+        with col2:
+            if st.button("✏️", key=f"edit_{i}", use_container_width=True):
+                st.session_state.editable_index = i
+                st.session_state.editing = True
+            if st.button("♻️", key=f"regenerate_{i}", use_container_width=True):
+                regenerate_message(i)
+            if st.button("➕", key=f"continue_{i}", use_container_width=True):
+                continue_message(i)
 
 
-    # Button area - BELOW each message, using columns from cols_main
-    if i >= len(st.session_state.messages) - 2 and message["role"] == "assistant":
-        with st.container(): # Container for buttons below message
-            button_cols = st.columns([1, 1, 1, 17]) # Adjust column widths as needed.  Last one for spacing.
-            with button_cols[0]:
-                if st.button("✏️", key=f"edit_{i}_icon_col", use_container_width=False): # Icon only
-                    st.session_state.editable_index = i
-                    st.session_state.editing = True
-            with button_cols[1]:
-                if st.button("♻️", key=f"regenerate_{i}_icon_col", use_container_width=False, on_click=lambda idx=i: regenerate_message(idx)): # Icon only
-                    pass
-            with button_cols[2]:
-                if st.button("➕", key=f"continue_{i}_icon_col", use_container_width=False, on_click=lambda idx=i: continue_message(idx)): # Icon only
-                    pass
-    elif message["role"] == "user" and i == len(st.session_state.messages) - 1:
-        with st.container(): # Container for undo buttons below user message
-            undo_button_cols = st.columns([1, 1, 18]) # Adjust column widths. Last one for spacing
-            with undo_button_cols[0]:
-                 if st.session_state.messages and st.button("⏪", key=f"reset_last_user_icon_col", use_container_width=False): # Icon only
-                    st.session_state.reset_history = True
-                    st.session_state.messages.pop(-1) if len(st.session_state.messages) > 1 else None
-                    if st.session_state.reset_history:
-                        st.experimental_rerun()
-            with undo_button_cols[1]:
-                if st.session_state.reset_history:
-                    if st.button("↩️", key=f"undo_reset_user_icon_col", use_container_width=False): # Icon only
-                        st.session_state.reset_history = False
-                        st.experimental_rerun()
+if st.session_state.get("editing"):
+    i = st.session_state.editable_index
+    message = st.session_state.messages[i]
+    with st.chat_message(message["role"]):
+        new_content = st.text_area(f"{message['role']}:", message["content"], key=f"message_edit_{i}")
+        col1, col2 = st.columns(2)
+        with col1:
+            if st.button("保存 ✅", key=f"save_{i}"):
+                st.session_state.messages[i]["content"] = new_content
+                with open(log_file, "wb") as f:
+                    pickle.dump(st.session_state.messages, f)
+                st.success("已保存更改！")
+                st.session_state.editing = False
+        with col2:
+            if st.button("取消 ❌", key=f"cancel_{i}"):
+                st.session_state.editing = False
 
 
 # 聊天输入和响应
