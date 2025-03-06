@@ -169,6 +169,7 @@ if "chat_session" not in st.session_state:
     st.session_state.chat_session = None
 if "rerun_count" not in st.session_state:
     st.session_state.rerun_count = 0
+st.session_state.setdefault("first_load", True) # 使用 setdefault 初始化 first_load
 
 # --- 功能函数 ---
 def load_history(log_file):
