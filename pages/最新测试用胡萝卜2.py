@@ -220,10 +220,6 @@ def getAnswer(prompt):
 
     # 构建历史消息列表
     history_messages = []
-
-    # 添加固定的系统消息
-    history_messages.append({"role": "system", "parts": [{"text": "这是一个系统消息"}]}) #  <---  新增的代码行
-
     history_messages.append(
         {
             "role": "model",
@@ -231,6 +227,13 @@ def getAnswer(prompt):
 
 """}]}
    )
+
+    # --- 添加额外的提示信息作为用户消息 ---
+    history_messages.append({
+        "role": "user",  #  使用 "user" 角色
+        "parts": [{"text": "这是一个系统消息"}] #  提示信息内容
+    })
+    # --- 提示信息添加完成 ---
 
 
     for msg in st.session_state.messages[-20:]:
@@ -241,7 +244,7 @@ def getAnswer(prompt):
             history_messages.append({"role": "model", "parts": [{"text": msg["content"]}]})
 
 
-    history_messages = [msg for msg in history_messages if msg["role"] in ["user", "model", "system"]] #  <---  修改了 role 过滤，包含 "system"
+    history_messages = [msg for msg in history_messages if msg["role"] in ["user", "model"]] #  只保留 "user" 和 "model" 角色
 
     if enabled_settings_content:
         history_messages.append({"role": "user", "parts": [{"text": enabled_settings_content}]})
