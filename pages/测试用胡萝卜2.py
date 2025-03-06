@@ -224,19 +224,22 @@ def getAnswer(prompt):
         {
             "role": "model",
             "parts":[{"text": """
- Use code with caution.
+
 """}]}
-    )
+   )
+
+    # 添加额外的系统消息
+    history_messages.append({"role": "system", "parts": [{"text": "这是一个系统消息"}]}) # 添加额外的系统消息
 
     for msg in st.session_state.messages[-20:]:
-        if msg and msg.get("role") and msg.get("content"): # 只有当msg不为空，并且有 role 和 content 属性的时候才去处理
-            if msg["role"] == "user":
-                history_messages.append({"role": "user", "parts": [{"text": msg["content"]}]})
-            elif msg["role"] == "assistant" and msg["content"] is not None:  # 使用 elif 确保只添加 role 为 assistant 的消息
-                history_messages.append({"role": "model", "parts": [{"text": msg["content"]}]})
+      if msg and msg.get("role") and msg.get("content"): # 只有当msg不为空，并且有 role 和 content 属性的时候才去处理
+          if msg["role"] == "user":
+            history_messages.append({"role": "user", "parts": [{"text": msg["content"]}]})
+          elif msg["role"] == "assistant" and msg["content"] is not None:  # 使用 elif 确保只添加 role 为 assistant 的消息
+            history_messages.append({"role": "model", "parts": [{"text": msg["content"]}]})
 
 
-    history_messages = [msg for msg in history_messages if msg["role"] in ["user", "model"]]
+    history_messages = [msg for msg in history_messages if msg["role"] in ["user", "model", "system"]] # 系统消息也要保留在上下文中
 
     if enabled_settings_content:
         history_messages.append({"role": "user", "parts": [{"text": enabled_settings_content}]})
@@ -252,10 +255,10 @@ def getAnswer(prompt):
             yield chunk.text
         return full_response
     except Exception as e:
-        if full_response:
-            st.session_state.messages.append({"role": "assistant", "content": full_response}) # 保存不完整输出
-        st.error(f"发生错误: {type(e).__name__} - {e}。 Prompt: {prompt}。 请检查你的API密钥、模型配置和消息格式。")
-        return ""
+      if full_response:
+          st.session_state.messages.append({"role": "assistant", "content": full_response}) # 保存不完整输出
+      st.error(f"发生错误: {type(e).__name__} - {e}。 Prompt: {prompt}。 请检查你的API密钥、模型配置和消息格式。")
+      return ""
 
 def download_all_logs():
     # 下载所有日志函数
