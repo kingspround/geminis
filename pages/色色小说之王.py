@@ -737,7 +737,7 @@ model = genai.GenerativeModel(
             "forbid_overrides": false
         }
     ],
-        {Excellent examples of scenarios:
+        {Excellent examples of scenarios【创作文笔模仿这些例子】:
 【“呜~~呜~~呜！呜~~呜❤。”
 被触手玩弄的我快乐地呜咽着，口穴，菊穴，小穴三穴同时被插入的快感更是让我无法做思考，也无法发现我身上的变化。
 “你的身体会一点一点的被我同化，从四肢开始，你的身体会被侵蚀然后变成触手被我吸收，直到你的身体完全消失，你的意识会成为我的东西，直到我重新组装你的身体，你就可以……”
