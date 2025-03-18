@@ -687,7 +687,7 @@ log_file = os.path.join(os.path.dirname(file), filename)
 # 检查文件是否存在，如果不存在就创建空文件
 if not os.path.exists(log_file):
     with open(log_file, "wb") as f:
-        pass  # 创建空文件
+        pickle.dump([], f)  # 创建一个空列表
 
 # --- 初始化 Session State ---
 if "messages" not in st.session_state:
