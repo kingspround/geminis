@@ -799,16 +799,14 @@ if "test_text" in st.session_state and st.session_state.test_text and not any(
     
     # --- 提示信息添加完成 ---
 
-
     for msg in st.session_state.messages[-20:]:
-      if msg and msg.get("role") and msg.get("content"): # 只有当msg不为空，并且有 role 和 content 属性的时候才去处理
-          if msg["role"] == "user":
-            history_messages.append({"role": "user", "parts": [{"text": msg["content"]}]})
-          elif msg["role"] == "assistant" and msg["content"] is not None:  # 使用 elif 确保只添加 role 为 assistant 的消息
-            history_messages.append({"role": "model", "parts": [{"text": msg["content"]}]})
+        if msg and msg.get("role") and msg.get("content"):  # 只有当msg不为空，并且有 role 和 content 属性的时候才去处理
+            if msg["role"] == "user":
+                history_messages.append({"role": "user", "parts": [{"text": msg["content"]}]})
+            elif msg["role"] == "assistant" and msg["content"] is not None:  # 使用 elif 确保只添加 role 为 assistant 的消息
+                history_messages.append({"role": "model", "parts": [{"text": msg["content"]}]})
 
-
-    history_messages = [msg for msg in history_messages if msg["role"] in ["user", "model"]] #  只保留 "user" 和 "model" 角色
+    history_messages = [msg for msg in history_messages if msg["role"] in ["user", "model"]]  # 只保留 "user" 和 "model" 角色
 
     if enabled_settings_content:
         history_messages.append({"role": "user", "parts": [{"text": enabled_settings_content}]})
@@ -944,6 +942,7 @@ if st.session_state.first_load:
     load_history(log_file)
     st.session_state.first_load = False
 
+# 显示历史记录和编辑按钮
 i = -1
 message = None
 
@@ -987,7 +986,6 @@ for i, message in enumerate(st.session_state.messages):
             else:
                 st.write(message_content, key=f"message_{i}")
 
-# 确保这段代码不在 for 循环内部
 if i >= len(st.session_state.messages) - 2 and message is not None and message["role"] == "assistant":
     with st.container():
         cols = st.columns(20)  # 创建20列
@@ -1031,7 +1029,6 @@ if st.session_state.continue_index is not None:
             pickle.dump(st.session_state.messages, f)
         st.session_state.continue_index = None
         st.experimental_rerun()
-
 
 if prompt := st.chat_input("输入你的消息:"):
     token = generate_token()
