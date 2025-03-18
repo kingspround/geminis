@@ -757,7 +757,7 @@ def clear_history(log_file):
         os.remove(log_file)
     st.success("历史记录已清除！")
 
-def getAnswer(prompt):
+def getAnswer(prompt, update_callback):
     prompt = prompt or ""
 
     # 处理 test_text (这个部分保持不变)
@@ -822,6 +822,7 @@ def getAnswer(prompt):
           st.session_state.messages.append({"role": "assistant", "content": full_response}) # 保存不完整输出
       st.error(f"发生错误: {type(e).__name__} - {e}。 Prompt: {prompt}。 请检查你的API密钥、模型配置和消息格式。")
       return ""
+
 
 def download_all_logs():
     # 下载所有日志函数
