@@ -818,11 +818,7 @@ def getAnswer(prompt, update_callback):
             yield chunk.text
         return full_response
     except Exception as e:
-      if full_response:
-          st.session_state.messages.append({"role": "assistant", "content": full_response}) # 保存不完整输出
-      st.error(f"发生错误: {type(e).__name__} - {e}。 Prompt: {prompt}。 请检查你的API密钥、模型配置和消息格式。")
       return ""
-
 
 def download_all_logs():
     # 下载所有日志函数
@@ -982,30 +978,49 @@ for i, message in enumerate(st.session_state.messages):
             else:
                 st.write(message_content, key=f"message_{i}")
 
-        if i >= len(st.session_state.messages) - 2 and message["role"] == "assistant":
-            with st.container():
-                cols = st.columns(20)  # 创建20列
-                with cols[0]:
-                    if st.button("✏️", key=f"edit_{i}"):
-                        st.session_state.editable_index = i
-                        st.session_state.editing = True
-                with cols[1]:
-                    if st.button("♻️", key=f"regenerate_{i}", on_click=lambda i=i: regenerate_message(i)):  # 传递当前索引
-                        pass
-                with cols[2]:
-                    if st.button("➕", key=f"continue_{i}", on_click=lambda i=i: continue_message(i)):  # 传递当前索引
-                        pass
-                with cols[3]:
-                    if st.session_state.messages and st.button("⏪", key=f"reset_last_{i}"):
-                        st.session_state.reset_history = True
-                        st.session_state.messages.pop(-1) if len(st.session_state.messages) > 1 else None
+if i >= len(st.session_state.messages) - 2 and message["role"] == "assistant":
+    with st.container():
+        cols = st.columns(20)  # 创建20列
+        with cols[0]:
+            if st.button("✏️", key=f"edit_{i}"):
+                st.session_state.editable_index = i
+                st.session_state.editing = True
+        with cols[1]:
+            if st.button("♻️", key=f"regenerate_{i}", on_click=lambda i=i: regenerate_message(i)):  # 传递当前索引
+                pass
+        with cols[2]:
+            if st.button("➕", key=f"continue_{i}", on_click=lambda i=i: continue_message(i)):  # 传递当前索引
+                pass
+        with cols[3]:
+            if st.session_state.messages and st.button("⏪", key=f"reset_last_{i}"):
+                st.session_state.reset_history = True
+                st.session_state.messages.pop(-1) if len(st.session_state.messages) > 1 else None
 
-                if st.session_state.reset_history and i >= len(st.session_state.messages) - 2:
-                    with cols[4]:
-                        if st.button("↩️", key=f"undo_reset_{i}"):
-                            st.session_state.reset_history = False
-                            st.session_state.rerun_count += 1
-                            st.experimental_rerun()
+        if st.session_state.reset_history and i >= len(st.session_state.messages) - 2:
+            with cols[4]:
+                if st.button("↩️", key=f"undo_reset_{i}"):
+                    st.session_state.reset_history = False
+                    st.session_state.rerun_count += 1
+                    st.experimental_rerun()
+
+# 处理消息的继续
+if st.session_state.continue_index is not None:
+    i = st.session_state.continue_index
+    if 0 <= i < len(st.session_state.messages) and st.session_state.messages[i]['role'] == 'assistant':
+        message_content = st.session_state.messages[i]['content']
+        continuation_prompt = f"请继续，之前说的是：【{message_content[-10:]}】" if len(message_content) >= 10 else f"请继续，之前说的是：【{message_content}】"
+        message_placeholder = st.empty()
+        full_response = message_content
+        def update_message(current_response):
+                message_placeholder.markdown(current_response + "▌")
+        for chunk in getAnswer(continuation_prompt, update_message):
+            pass # consume the generator
+
+        st.session_state.messages[i]['content'] = full_response
+        with open(log_file, "wb") as f:
+            pickle.dump(st.session_state.messages, f)
+        st.session_state.continue_index = None
+        st.experimental_rerun()
 
 # 处理重新生成消息
 if st.session_state.regenerate_index is not None:
@@ -1049,12 +1064,15 @@ if prompt := st.chat_input("输入你的消息:"):
         def update_message(current_response):
             message_placeholder.markdown(current_response + "▌")
 
-        full_response = getAnswer(full_prompt, update_message)
+        full_response = ""
+        for chunk in getAnswer(full_prompt, update_message):
+            pass # consume the generator
         message_placeholder.markdown(full_response)
 
     st.session_state.messages.append({"role": "assistant", "content": full_response})
     with open(log_file, "wb") as f:
         pickle.dump(st.session_state.messages, f)
+
 
 col1, col2 = st.columns(2)
 with col1:
