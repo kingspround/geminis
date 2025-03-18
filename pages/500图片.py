@@ -944,11 +944,9 @@ if st.session_state.first_load:
     load_history(log_file)
     st.session_state.first_load = False
 
-# 初始化 i 和 message
 i = -1
 message = None
 
-# 移除这句的缩进
 for i, message in enumerate(st.session_state.messages):
     with st.chat_message(message["role"]):
         if st.session_state.get("editing") == True and i == st.session_state.editable_index:
@@ -988,9 +986,9 @@ for i, message in enumerate(st.session_state.messages):
                 st.session_state.continue_index = None
             else:
                 st.write(message_content, key=f"message_{i}")
-# 将后续代码放在if语句中，确保消息存在
 
-if i >= len(st.session_state.messages) - 2 and message["role"] == "assistant":
+# 确保这段代码不在 for 循环内部
+if i >= len(st.session_state.messages) - 2 and message is not None and message["role"] == "assistant":
     with st.container():
         cols = st.columns(20)  # 创建20列
         with cols[0]:
