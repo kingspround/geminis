@@ -986,6 +986,8 @@ for i, message in enumerate(st.session_state.messages):
             else:
                 st.write(message_content, key=f"message_{i}")
 
+    
+
 if i >= len(st.session_state.messages) - 2 and message is not None and message["role"] == "assistant":
     with st.container():
         cols = st.columns(20)  # 创建20列
