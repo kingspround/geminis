@@ -814,6 +814,7 @@ def getAnswer(prompt):
         response = model.generate_content(contents=history_messages, stream=True)
         for chunk in response:
             full_response += chunk.text
+            update_callback(full_response)  # 在每个 chunk 后调用 update_callback
             yield chunk.text
         return full_response
     except Exception as e:
