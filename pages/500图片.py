@@ -859,7 +859,6 @@ with st.sidebar:
         key="api_selector"
     )
     genai.configure(api_key=API_KEYS[st.session_state.selected_api_key])
-    model = genai.GenerativeModel(MODEL_NAME) #在这里使用model_name
 
 # 在左侧边栏创建 token 复选框
 with st.sidebar:
