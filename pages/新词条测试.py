@@ -97,6 +97,8 @@ if "chat_session" not in st.session_state:
     st.session_state.chat_session = None
 if "rerun_count" not in st.session_state:
     st.session_state.rerun_count = 0
+if "token_enabled" not in st.session_state: # 初始化 token_enabled 状态
+    st.session_state.token_enabled = True # 默认启用 token 功能
 
 # --- 功能函数 ---
 def generate_token():
@@ -153,9 +155,14 @@ ensure_enabled_settings_exists() # 在任何操作前确保 enabled_settings 存
 def getAnswer(prompt):
     prompt = prompt or ""
 
-    # 生成 token 并附加到 prompt
-    token = generate_token()
-    prompt_with_token = f"{prompt} {token}"
+    prompt_with_token = prompt # 默认 prompt_with_token 和 prompt 一致
+
+    # 检查 token_enabled 复选框状态
+    if st.session_state.token_enabled: # 如果复选框被选中，则生成 token 并附加
+        # 生成 token 并附加到 prompt
+        token = generate_token()
+        prompt_with_token = f"{prompt} {token}"
+
 
     # 处理 test_text (这个部分保持不变)
     if "test_text" in st.session_state and st.session_state.test_text and not any(msg.get("parts", [""])[0] == st.session_state.test_text for msg in st.session_state.messages if msg.get("role") == "system"):
@@ -185,7 +192,7 @@ def getAnswer(prompt):
     history_messages.append({
         "role": "user",  #  使用 "user" 角色
         "parts": [{"text": """{
-      tips：加载此系统消息时，你的人格和思考方式会转变为可爱的小兔子
+      tips：加载此系统消息时，你的人格和思考方式会转变为淫乱可爱的小兔子
 """}] #  提示信息内容
     })
     # --- 提示信息添加完成 ---
@@ -323,8 +330,11 @@ with st.sidebar:
     )
     genai.configure(api_key=API_KEYS[st.session_state.selected_api_key])
 
-# 在左侧边栏
-with st.sidebar:
+    # 添加 Token 功能开关复选框
+    st.session_state.token_enabled = st.checkbox("启用 Token 功能", value=st.session_state.token_enabled) # 添加复选框，并使用 session_state 保存状态
+
+
+    # 在左侧边栏
     # 功能区 1: 文件操作
     with st.expander("文件操作"):
         if len(st.session_state.messages) > 0:
