@@ -807,9 +807,9 @@ tips:
 3，禁止没有任何色情【NSFW】要素，避免同质化从token里面联想这次要选择的色情部位或者做爱姿势。
 4，用户指出需要【要成熟性感的史莱姆娘】，所以必须包含词条【older girl】，而且胸部尺寸必须要large breasts以上，身材以高挑性感为主。禁止萝莉史莱姆娘。
 5，性爱场景构思比较困难，必须包含1boy+penis，详细的动作词条描述可以提高成功率，除了史莱姆娘人物还有体位的把握，必须包含特定的环境比如乳交，口交等等，比如被pines环绕，甚至复数的史莱姆娘同时服侍一个男性的多人画面【2girls，1boy】
-6，更改规则，token在0~4为单人包括自慰，5~9为性爱场景【即用各种身体部位或者摆出各种体位榨取精液，必须包含词条penis】
+6，更改规则，数字token在0~3为单人包括自慰，4~9为性爱场景【即用各种身体部位【乳交，打手枪，足交等等】或者摆出各种体位【比如女上位，后入等等】榨取精液，必须包含词条penis】
 
-参考
+以下是可以参考的例子
 【NSFW】色色模块
 2口部	后入	all fours, torso grab bangs, doggystyle, hetero, indoors, kneeling, nude, breast out, ass focus, on backend cum, ejaculation pussy juice, sex, sex from behind, arched back, (sweat), ((sweatdrop)), tongue out, cum on face, cum on back, ((steam)) , sexually suggestive, lying on bed, torn dress, cum in pussy, suggestive fluid, vaginal, 
 2口部	口	choker, demon horns, thighhighs, hair ornament, hairclip, very long hair, looking at viewer, (multicolored hair:1.2), sitting, twintails, nipples, medium breasts, open clothes, on bed, spread legs, pink eyes, dress, nude, pussy, from below, evil smile, bedroom, 
