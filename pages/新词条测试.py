@@ -1090,44 +1090,12 @@ if prompt := st.chat_input("输入你的消息:"):
             messages_to_pickle.append(msg_copy)
         pickle.dump(messages_to_pickle, f)
 
-# 在聊天输入框之前添加 Token Checkbox 和刷新按钮
 col1, col2 = st.columns(2)
 with col1:
-    if st.checkbox("使用 Token", value=True, key="token_checkbox"):
+    if st.checkbox("使用 Token", value=st.session_state.use_token, key="token_checkbox"): # 使用 session_state 的值初始化
         st.session_state.use_token = True
     else:
         st.session_state.use_token = False
 with col2:
     if st.button("🔄", key="refresh_button"):
         st.experimental_rerun()
-
-# 聊天输入和响应
-if prompt := st.chat_input("输入你的消息:"):
-    token = generate_token()
-    if st.session_state.use_token:
-        full_prompt = f"{prompt} (token: {token})"
-    else:
-        full_prompt = prompt
-    st.session_state.messages.append({"role": "user", "content": full_prompt})
-    with st.chat_message("user"):
-        st.markdown(prompt if not st.session_state.use_token else f"{prompt} (token: {token})")
-
-    with st.chat_message("assistant"):
-        message_placeholder = st.empty()
-        full_response = ""
-        try:
-            for chunk in getAnswer(full_prompt):
-                full_response += chunk
-                message_placeholder.markdown(full_response + "▌")
-            message_placeholder.markdown(full_response)
-            st.session_state.messages.append({"role": "assistant", "content": full_response})
-        except Exception as e:
-            st.error(f"发生错误：{type(e).name} - {e}。  请检查你的 API 密钥和消息格式。")
-    with open(log_file, "wb") as f:
-        messages_to_pickle = []
-        for msg in st.session_state.messages:
-            msg_copy = msg.copy()
-            if "placeholder_widget" in msg_copy:
-                del msg_copy["placeholder_widget"]
-            messages_to_pickle.append(msg_copy)
-        pickle.dump(messages_to_pickle, f)
