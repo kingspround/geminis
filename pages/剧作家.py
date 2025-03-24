@@ -29,15 +29,7 @@ API_KEYS = {
 # --- 配置 API 密钥 ---
 if "selected_api_key" not in st.session_state:
     st.session_state.selected_api_key = list(API_KEYS.keys())[0]  # Default to the first key
-
-# 调试：打印初始选择的 API Key
-print(f"Debug: Initial selected API Key: {st.session_state.selected_api_key}")
-
 genai.configure(api_key=API_KEYS[st.session_state.selected_api_key])
-
-# 调试：打印配置后的 API Key
-print(f"Debug: Configured API Key: {genai.api_key}")
-
 
 # --- 模型设置 ---
 generation_config = {
@@ -147,7 +139,7 @@ if "chat_session" not in st.session_state:
 if "rerun_count" not in st.session_state:
     st.session_state.rerun_count = 0
 if "playwright_mode" not in st.session_state:
-    st.session_state.playwright_mode = False # 确保 playwright_mode 被初始化
+    st.session_state.playwright_mode = False
 if "ai_agents" not in st.session_state:
     st.session_state.ai_agents = AI_AGENTS # 初始化 session_state 中的 ai_agents
 
@@ -368,30 +360,14 @@ with st.sidebar:
         label_visibility="visible",
         key="api_selector"
     )
-
-    # 调试：在选择器后再次打印 session_state 中的 API Key
-    print(f"Debug: API Key after selector: {st.session_state.selected_api_key}")
     genai.configure(api_key=API_KEYS[st.session_state.selected_api_key])
-    # 调试：再次打印配置后的 API Key
-    print(f"Debug: Configured API Key after selector: {genai.api_key}")
 
-
+# 在左侧边栏
+with st.sidebar:
     # 剧作家模式开关
     st.checkbox("启用剧作家模式", key="playwright_mode")
-    # 调试：打印 playwright_mode 的状态
-    print(f"Debug: Playwright Mode Checkbox Value: {st.session_state.playwright_mode}")
 
-
-    # 功能区 3: 剧作家模式 - AI 角色管理 (仅在剧作家模式下显示)
-    if st.session_state.playwright_mode: # 确保条件判断基于 session_state
-        with st.expander("剧作家模式 - AI 角色管理", expanded=True): # 设置默认展开
-            st.write("已加载 AI 角色:")
-            for role_name in st.session_state.ai_agents: # 循环角色名称
-                st.write(f"- {role_name}") # 显示角色名称
-            st.write("提示: 在对话中输入 `【角色名称】` 来调用 AI 角色。")
-            # 移除刷新 AI 角色列表按钮，因为角色现在是内部定义的
-
-    # 功能区 1: 文件操作 (移动到剧作家模式下方，方便查看)
+    # 功能区 1: 文件操作
     with st.expander("文件操作", expanded=False): # 设置默认不展开
         if len(st.session_state.messages) > 0:
             st.button("重置上一个输出 ⏪",
@@ -458,6 +434,14 @@ with st.sidebar:
             if enabled_settings_display:
                 st.write("已加载设定:", ", ".join(enabled_settings_display))
 
+    # 功能区 3: 剧作家模式 - AI 角色管理 (仅在剧作家模式下显示)
+    if st.session_state.playwright_mode:
+        with st.expander("剧作家模式 - AI 角色管理", expanded=True): # 设置默认展开
+            st.write("已加载 AI 角色:")
+            for role_name in st.session_state.ai_agents: # 循环角色名称
+                st.write(f"- {role_name}") # 显示角色名称
+            st.write("提示: 在对话中输入 `【角色名称】` 来调用 AI 角色。")
+            # 移除刷新 AI 角色列表按钮，因为角色现在是内部定义的
 
     if st.button("刷新页面 🔄", key="refresh_page_button"): # 添加 key
         st.experimental_rerun()
