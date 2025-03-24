@@ -450,6 +450,8 @@ with st.sidebar:
 if not st.session_state.messages:
     load_history(log_file)
 
+print("DEBUG: Messages BEFORE display loop:", st.session_state.messages) # 添加这行 - DEBUG PRINT
+
 # 显示历史记录和编辑功能
 for i, message in enumerate(st.session_state.messages):
     with st.chat_message(message["role"]):
@@ -502,6 +504,7 @@ if len(st.session_state.messages) >= 1: # 至少有一条消息时显示按钮
 # 聊天输入和响应
 if prompt := st.chat_input("输入你的消息:"):
     st.session_state.messages.append({"role": "user", "content": prompt})
+    print("DEBUG: User message appended:", st.session_state.messages[-1]) # 添加这行 - DEBUG PRINT
     with st.chat_message("user"):
         st.markdown(prompt)
     with st.chat_message("assistant"):
@@ -533,8 +536,9 @@ if prompt := st.chat_input("输入你的消息:"):
                     message_placeholder.markdown(full_response + "▌")
                 message_placeholder.markdown(full_response)
                 st.session_state.messages.append({"role": "assistant", "content": full_response})
+                print("DEBUG: Assistant message appended (agent mode):", st.session_state.messages[-1]) # 添加这行 - DEBUG PRINT
             except Exception as e:
-                st.error(f"调用 AI 角色 {called_agent_role_name} 时发生错误：{type(e).__name__} - {e}。 请检查你的 AI 角色定义。") # 修改错误提示
+                st.error(f"调用 AI 角色 {called_agent_role_name} 时发生错误：{type(e).__name__} - {e}。 请检查你的 AI 角色定义。")
 
         else: # 正常对话模式
             try:
@@ -543,6 +547,7 @@ if prompt := st.chat_input("输入你的消息:"):
                     message_placeholder.markdown(full_response + "▌")
                 message_placeholder.markdown(full_response)
                 st.session_state.messages.append({"role": "assistant", "content": full_response})
+                print("DEBUG: Assistant message appended (normal mode):", st.session_state.messages[-1]) # 添加这行 - DEBUG PRINT
             except Exception as e:
                 st.error(f"发生错误：{type(e).__name__} - {e}。  请检查你的 API 密钥和消息格式。")
 
