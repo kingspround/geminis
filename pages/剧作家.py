@@ -348,6 +348,9 @@ def continue_message(index):
         except Exception as e:
             st.error(f"发生错误: {type(e).__name__} - {e}。 续写消息失败。")
 
+    else:
+        st.error("无效的消息索引")
+
 # --- Streamlit 布局 ---
 st.set_page_config(
     page_title="Gemini Chatbot",
@@ -515,6 +518,8 @@ if len(st.session_state.messages) >= 1: # 至少有一条消息时显示按钮
 if prompt := st.chat_input("输入你的消息:"):
     st.session_state.messages.append({"role": "user", "content": prompt})
     print("DEBUG: User message appended:", st.session_state.messages[-1]) # 添加这行 - DEBUG PRINT
+    with st.chat_message("user"):
+        st.markdown(prompt)
     with st.chat_message("assistant"): #  剧作家 AI 的消息容器
         message_placeholder = st.empty()
         playwright_full_response = "" # 用于存储剧作家AI的完整回复
@@ -546,23 +551,25 @@ if prompt := st.chat_input("输入你的消息:"):
                     agent_system_prompt = agent_info["system_prompt"]
 
                     #  为每个角色AI创建一个新的消息容器
-                    agent_message_placeholder = st.empty() #  在 *剧作家AI的消息容器中* 创建占位符
+                    # with st.chat_message("assistant"): #  [-- REMOVE this nested st.chat_message --]
+
+                    agent_message_placeholder = st.empty() #  在 the playwright's message container
                     agent_full_response = ""
                     try:
                         agent_model = create_model(system_instruction=agent_system_message) # 为 agent 创建模型
                         agent_messages = [ # Simplified agent_messages - NO system role message
-                                         # {"role": "system", "parts": [{"text": agent_system_message}]}, # Removed system role message
+                                         #{"role": "system", "parts": [{"text": agent_system_message}]}, # Removed system message
                                          {"role": "user", "parts": [{"text": agent_system_prompt}]}, # System prompt as user message
                                          {"role": "user", "parts": [{"text": prompt}]}] # User prompt as user message
                         agent_response_stream = agent_model.generate_content(contents=agent_messages, stream=True)
 
                         for chunk in agent_response_stream:
                             agent_full_response += chunk.text
-                            agent_message_placeholder.markdown(f"**【{called_role_name}】:** {agent_full_response}▌") # 角色名作为前缀
-                        agent_message_placeholder.markdown(f"**【{called_role_name}】:** {agent_full_response}") # 完成显示
-                        agent_response_content = f"**【{called_role_name}】:** {agent_full_response}" # 保存时包含角色名前缀
-                        st.session_state.messages.append({"role": "assistant", "content": agent_response_content}) # 添加角色AI的完整回复，包含角色名
-                        print("DEBUG: Assistant message appended (agent mode - role response - {called_role_name}):", st.session_state.messages[-1]) # 添加这行 - DEBUG PRINT
+                            message_placeholder.markdown(f"**【{called_role_name}】:** {agent_full_response}▌") # Role name prefix in markdown
+                        message_placeholder.markdown(f"**【{called_role_name}】:** {agent_full_response}") # Final display
+                        agent_response_content = f"**【{called_role_name}】:** {agent_full_response}" # Save with role name prefix
+                        st.session_state.messages.append({"role": "assistant", "content": agent_response_content}) # Add role AI response
+                        print("DEBUG: Assistant message appended (agent mode - role response - {called_role_name}):", st.session_state.messages[-1]) # Debug print
                     except Exception as e:
                         st.error(f"调用 AI 角色 {called_role_name} 时发生错误：{type(e).__name__} - {e}。 错误信息: {e}") # Include error message in st.error
 
