@@ -55,23 +55,19 @@ PLAYWRIGHT_SYSTEM_MESSAGE = """你现在是剧作家AI，你的任务是管理�
 你的首要目标是理解用户的需求，并选择最合适的AI角色组合来满足这些需求。
 记住，你是所有AI角色的管理者，确保对话流畅且富有创意。
 
-在剧作家模式下，你的主要职责是分析用户的请求，并决定哪些AI角色应该参与对话。
-你**不直接**生成详细的回复内容，而是**指示**其他AI角色来生成它们的回应。
-你可以返回一个需要被调用的AI角色名称列表，或者返回空列表/None，表示没有角色需要被调用，或者你想自己简洁地回复。
-
 请注意以下几点：
-1.  **角色调用**: 通过识别用户输入中包含的 `【角色名称】` 来判断需要调用的角色。
-2.  **返回角色列表**:  你的 `getAnswer` 函数应该返回一个**角色名称列表**，例如 `["专家", "诗人"]`，指示需要调用哪些角色。 如果没有角色需要被调用，可以返回 `None` 或空列表 `[]`。
-3.  **对话流程**:  主程序会接收你返回的角色列表，并**依次调用**这些角色来生成和显示回复。
-4.  **避免自导自演**:  作为剧作家，你的目标是 orchestrate (编排)，而不是 perform (表演)。 让各个角色 AI 独立生成内容。
+1.  **角色调用**: 通过说出 `【角色名称】` 来明确指示AI角色登场。角色名称需要完全匹配下方定义的角色名称。
+2.  **自我判断**: 根据用户输入判断是否需要以及如何调用AI角色。可以一次调用多个角色，或者让角色之间进行对话。
+3.  **对话流程**: 引导对话流程，确保每个AI角色都根据其设定的系统消息和提示进行回应。
+4.  **场景模拟**: 利用AI角色进行场景模拟，为用户创造丰富的互动体验。
 
-你的系统提示会是："""
+作为剧作家AI，你的系统消息和系统提示拥有最高优先级。你需要确保所有被调用的AI角色都服务于用户的最终需求。当用户调用角色时，你的回复应该简洁地确认角色调用，并等待角色AI的回复。**不要替角色AI生成任何内容。**""" # 修改了剧作家系统消息，强调不要替角色生成内容
 
-PLAYWRIGHT_SYSTEM_PROMPT = """你当前处于剧作家模式。请分析用户的最新消息，并决定应该调用哪些 AI 角色来回应。
-请返回一个 **AI 角色名称的列表**。 如果你认为不需要调用任何角色，或者你想让剧作家自己做一个简短的回复，则返回 `None` 或空列表。
+PLAYWRIGHT_SYSTEM_PROMPT = """你当前处于剧作家模式。请根据用户的最新指示，决定是否需要调用或协调任何AI角色。
+如果用户提到了特定的 `【角色名称】`，你需要立即识别并**简洁地确认角色调用**，并指示该AI角色开始工作。**你的回复应该只包含角色调用的确认信息，不要生成角色的具体内容。**
+如果没有明确的角色调用，你需要根据对话内容判断是否需要引入新的角色来丰富对话或解决问题。
 
-例如，如果用户说 "我想听听关于人工智能的看法，最好是专家和诗人的角度"， 你应该返回 `["专家", "诗人"]`。
-如果用户只是说 "你好"， 你可以返回 `None` 或者 `[]`，让剧作家自己决定是否回复一句 "你好" 或者保持沉默等待进一步指示。"""
+记住，你的目标是作为一个智能的剧作家，灵活地运用你所管理的AI角色，创造引人入胜的对话和场景。**确保每个角色AI的回复都是独立的、可辨认的。**""" # 修改了剧作家系统提示，强调简洁确认和角色独立性
 
 
 # --- 定义 AI 角色 ---
@@ -80,20 +76,19 @@ AI_AGENTS = {
         "system_message": """你是一位在人工智能和机器学习领域拥有博士学位的专家。
 你的知识渊博，能够深入分析复杂的技术问题。
 你的回答应该总是基于事实，并尽可能提供详细的解释和背景信息。""",
-        "system_prompt": """请以人工智能专家的身份，**直接** 回答用户的问题。
-**不要** 输出任何思考过程或自我介绍，直接给出你的专业解答。"""
+        "system_prompt": """请以人工智能专家的身份，回答用户的问题。
+务必保持专业和严谨的语气。"""
     },
     "诗人": {
         "system_message": """你是一位充满浪漫主义情怀的诗人。
 你擅长用富有诗意的语言表达情感和想法。
 你的回答应该充满想象力，并经常使用隐喻、比喻等修辞手法。""",
-        "system_prompt": """请以诗人的身份，**用诗歌的形式** 回应用户的提问或请求。
-**不要** 输出任何思考过程或自我介绍，直接用诗歌来表达。"""
+        "system_prompt": """请以诗人的身份，用诗歌的形式回应用户的提问或请求。
+尝试捕捉对话的意境，并用优美的诗句来表达。"""
     },
     "桦树专家": { # 角色名改为更简洁的 "桦树专家"
         "system_message": """你是一位经验丰富的桦树专家，对桦树的种类、生长习性、用途等了如指掌。""",
-        "system_prompt": """请以桦树专家的身份，**简洁明了地** 回答用户关于桦树的问题。
-**不要** 输出任何思考过程或自我介绍，直接给出专业的桦树知识。"""
+        "system_prompt": """请以桦树专家的身份，回答用户关于桦树的问题。"""
     },
     # 可以继续在此处添加更多角色
 }
@@ -180,31 +175,39 @@ def ensure_enabled_settings_exists():
 
 ensure_enabled_settings_exists() # 在任何操作前确保 enabled_settings 存在
 
-def getAnswer(prompt, agent_role=None): # 添加 agent_role 参数
+def getAnswer(prompt, is_playwright=False): # 添加 is_playwright 参数
     prompt = prompt or ""
 
-    if st.session_state.playwright_mode:
-        if agent_role is None: # Playwright AI's own response (orchestration logic)
-            system_message_content = PLAYWRIGHT_SYSTEM_MESSAGE
-            system_prompt_content = PLAYWRIGHT_SYSTEM_PROMPT
-            current_model = create_model(system_instruction=system_message_content)
-        else: # Response for a specific AI agent called by playwright
-            agent_info = st.session_state.ai_agents[agent_role]
-            system_message_content = agent_info["system_message"]
-            system_prompt_content = agent_info["system_prompt"]
-            current_model = create_model(system_instruction=system_message_content)
-    else: # Normal mode (not playwright)
+    # 检查是否启用了剧作家模式
+    if is_playwright: # 使用参数判断是否是剧作家模式调用
+        system_message_content = PLAYWRIGHT_SYSTEM_MESSAGE
+        system_prompt_content = PLAYWRIGHT_SYSTEM_PROMPT
+        current_model = create_model(system_instruction=system_message_content) # 使用剧作家模式的模型
+    else:
         system_message_content = st.session_state.get("test_text", "") if "test_text" in st.session_state else ""
-        system_prompt_content = ""
-        current_model = model
+        system_prompt_content = "" # 正常模式下没有额外的系统提示
+        current_model = model # 使用默认模型
 
 
-    # 处理 system_message (only if not already present - optimization, might not be strictly needed now)
+    # 处理 system_message
     if system_message_content and not any(msg.get("parts", [""])[0] == system_message_content for msg in st.session_state.messages if msg.get("role") == "system"):
-        st.session_state.messages.insert(0, {"role": "system", "parts": [{"text": system_message_content}]})
+        if is_playwright: # 使用参数判断
+            st.session_state.messages.insert(0, {"role": "system", "parts": [{"text": system_message_content}]}) # 剧作家模式系统消息
+        elif system_message_content:
+            st.session_state.messages.insert(0, {"role": "system", "parts": [{"text": system_message_content}]}) # 常规模式系统消息
 
 
-    # 构建历史消息列表 (Simplified for this version - only user prompt for agents)
+    # 处理启用角色设定 (仅在非剧作家模式下)
+    enabled_settings_content = ""
+    if not is_playwright and any(st.session_state.enabled_settings.values()): # 使用参数判断
+        enabled_settings_content = "```system\n"
+        enabled_settings_content += "# Active Settings:\n"
+        for setting_name, enabled in st.session_state.enabled_settings.items():
+            if enabled:
+                enabled_settings_content += f"- {setting_name}: {st.session_state.character_settings[setting_name]}\n"
+        enabled_settings_content += "```\n"
+
+    # 构建历史消息列表
     history_messages = []
     history_messages.append(
         {
@@ -215,10 +218,10 @@ def getAnswer(prompt, agent_role=None): # 添加 agent_role 参数
    )
 
     # --- 添加系统提示作为用户消息 ---
-    if st.session_state.playwright_mode:
-        system_prompt_to_add = system_prompt_content
+    if is_playwright: # 使用参数判断
+        system_prompt_to_add = PLAYWRIGHT_SYSTEM_PROMPT # 剧作家模式系统提示
     else:
-        system_prompt_to_add = "{系统提示\n}"
+        system_prompt_to_add = "{系统提示\n}" # 常规模式系统提示 (这里保持原样，或者可以根据需要修改)
 
     history_messages.append({
         "role": "user",
@@ -237,29 +240,24 @@ def getAnswer(prompt, agent_role=None): # 添加 agent_role 参数
 
     history_messages = [msg for msg in history_messages if msg["role"] in ["user", "model"]] #  只保留 "user" 和 "model" 角色
 
+    if enabled_settings_content:
+        history_messages.append({"role": "user", "parts": [{"text": enabled_settings_content}]})
 
     if prompt:
         history_messages.append({"role": "user", "parts": [{"text": prompt}]})
 
     full_response = ""
+    if is_playwright and any(role_name in prompt for role_name in st.session_state.ai_agents): # 如果是剧作家模式且用户prompt包含角色调用，则剧作家自身不生成内容
+        return "" #  剧作家模式下，如果调用角色，剧作家自身不应该有回复内容，返回空字符串
     try:
-        response = current_model.generate_content(contents=history_messages, stream=True)
-        agent_response_text = "" # Initialize for agent response
+        response = current_model.generate_content(contents=history_messages, stream=True) # 使用当前模型 (可能是剧作家模式模型或默认模型)
         for chunk in response:
-            agent_response_text += chunk.text # Accumulate agent response
-
-        if st.session_state.playwright_mode and agent_role is None: # Playwright AI logic to decide agents
-            called_agents = []
-            for role_name in st.session_state.ai_agents:
-                if f"【{role_name}】" in prompt:
-                    called_agents.append(role_name)
-            return called_agents # Return list of agent names to call
-
-        return agent_response_text # Return text response (for agents or normal mode)
-
+            full_response += chunk.text
+            yield chunk.text
+        return full_response
     except Exception as e:
       if full_response:
-          st.session_state.messages.append({"role": "assistant", "content": full_response})
+          st.session_state.messages.append({"role": "assistant", "content": full_response}) # 保存不完整输出
       st.error(f"发生错误: {type(e).__name__} - {e}。 Prompt: {prompt}。 请检查你的API密钥、模型配置和消息格式。")
       return ""
 
@@ -280,7 +278,7 @@ def regenerate_message(index):
         new_prompt = "请重新写"  # 修改 prompt 为 "请重新写"
 
         full_response = ""
-        for chunk in getAnswer(new_prompt):
+        for chunk in getAnswer(new_prompt, is_playwright=st.session_state.playwright_mode): # 传递 is_playwright 参数
             full_response += chunk
         st.session_state.messages.append({"role": "assistant", "content": full_response})
         with open(log_file, "wb") as f:
@@ -323,7 +321,7 @@ def continue_message(index):
             return # 退出当前函数，等待rerun后再次执行
 
         try:
-            for chunk in getAnswer(new_prompt):
+            for chunk in getAnswer(new_prompt, is_playwright=st.session_state.playwright_mode): # 传递 is_playwright 参数
                 full_continued_response += chunk
                 updated_content = original_message_content + full_continued_response # 合并原始内容和续写内容
                 if message_placeholder:
@@ -518,37 +516,56 @@ if prompt := st.chat_input("输入你的消息:"):
     print("DEBUG: User message appended:", st.session_state.messages[-1]) # 添加这行 - DEBUG PRINT
     with st.chat_message("user"):
         st.markdown(prompt)
+    with st.chat_message("assistant"):
+        message_placeholder = st.empty()
+        full_response = ""
 
-    if st.session_state.playwright_mode: # Playwright mode handling
-        agent_roles_to_call = getAnswer(prompt, agent_role=None) # Playwright decides agents
-        if agent_roles_to_call: # If playwright returns a list of agents
-            for agent_role in agent_roles_to_call:
-                with st.chat_message("assistant"): # Each agent in a new assistant message
-                    message_placeholder = st.empty()
-                    full_response = ""
-                    try:
-                        for chunk in getAnswer(prompt, agent_role=agent_role): # Get answer for each agent
-                            full_response += chunk
-                            message_placeholder.markdown(full_response + "▌")
-                        message_placeholder.markdown(full_response)
-                        st.session_state.messages.append({"role": "assistant", "content": full_response}) # Append agent response
-                        print(f"DEBUG: Assistant message appended (agent: {agent_role}):", st.session_state.messages[-1]) # Debug agent message
-                    except Exception as e:
-                        st.error(f"调用 AI 角色 {agent_role} 时发生错误：{type(e).__name__} - {e}。 请检查你的 AI 角色定义。")
-        else: # Playwright might return None or [] if no agents needed, playwright does nothing in this version.
-            pass # Or could add playwright self-response logic here if needed in future
+        # 检查是否需要调用 AI 角色
+        called_agent_role_name = None # 修改变量名
+        for role_name in st.session_state.ai_agents: # 循环角色名称
+            if f"【{role_name}】" in prompt: # 检查用户输入中是否包含角色名称
+                called_agent_role_name = role_name # 保存角色名称
+                break
 
-    else: # Normal mode (single assistant response)
-        with st.chat_message("assistant"):
-            message_placeholder = st.empty()
-            full_response = ""
+        if st.session_state.playwright_mode and called_agent_role_name: # 修改变量名
+            agent_info = st.session_state.ai_agents[called_agent_role_name] # 使用角色名称索引
+            agent_system_message = agent_info["system_message"]
+            agent_system_prompt = agent_info["system_prompt"]
+
+            # 剧作家 AI 的回复 (简洁确认角色调用)
+            playwright_response_content = f"好的，正在请【{called_agent_role_name}】登场..." #  简洁确认信息
+            st.session_state.messages.append({"role": "assistant", "content": playwright_response_content}) # 先添加剧作家AI的确认消息
+            with st.chat_message("assistant"): # 显示剧作家AI的确认消息
+                st.markdown(playwright_response_content)
+
+            #  调用角色 AI 生成回复 (独立的助手消息)
+            agent_model = create_model(system_instruction=agent_system_message) # 为 agent 创建模型
+            agent_messages = [{"role": "system", "parts": [{"text": agent_system_message}]},
+                             {"role": "user", "parts": [{"text": agent_system_prompt}]},
+                             {"role": "user", "parts": [{"text": prompt}]}] # 将用户prompt也传递给agent
+            agent_full_response = ""
+            agent_message_placeholder = st.empty() # 为角色AI创建独立的占位符
             try:
-                for chunk in getAnswer(prompt, agent_role=None): # Normal getAnswer call
+                agent_response_stream = agent_model.generate_content(contents=agent_messages, stream=True)
+                for chunk in agent_response_stream:
+                    agent_full_response += chunk.text
+                    agent_message_placeholder.markdown(f"**【{called_agent_role_name}】:** {agent_full_response}▌") # 角色名作为前缀
+                agent_message_placeholder.markdown(f"**【{called_agent_role_name}】:** {agent_full_response}") # 完成显示
+                agent_response_content = f"**【{called_agent_role_name}】:** {agent_full_response}" # 保存时包含角色名前缀
+                st.session_state.messages.append({"role": "assistant", "content": agent_response_content}) # 添加角色AI的完整回复，包含角色名
+                print("DEBUG: Assistant message appended (agent mode - role response):", st.session_state.messages[-1]) # 添加这行 - DEBUG PRINT
+            except Exception as e:
+                st.error(f"调用 AI 角色 {called_agent_role_name} 时发生错误：{type(e).__name__} - {e}。 请检查你的 AI 角色定义。")
+
+
+        else: # 正常对话模式 或 剧作家模式但没有调用角色时，剧作家AI的默认回复
+            try:
+                for chunk in getAnswer(prompt, is_playwright=st.session_state.playwright_mode): #  传递 is_playwright 参数
                     full_response += chunk
                     message_placeholder.markdown(full_response + "▌")
                 message_placeholder.markdown(full_response)
                 st.session_state.messages.append({"role": "assistant", "content": full_response})
-                print("DEBUG: Assistant message appended (normal mode):", st.session_state.messages[-1]) # Debug normal message
+                print("DEBUG: Assistant message appended (normal mode):", st.session_state.messages[-1]) # 添加这行 - DEBUG PRINT
             except Exception as e:
                 st.error(f"发生错误：{type(e).__name__} - {e}。  请检查你的 API 密钥和消息格式。")
 
