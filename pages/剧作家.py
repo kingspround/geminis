@@ -449,7 +449,7 @@ with st.sidebar:
             st.write("提示: 在对话中输入消息，剧作家AI会决定是否以及如何调用这些角色。") # 修改提示信息
             # 移除刷新 AI 角色列表按钮，因为角色现在是内部定义的
 
-    if st.button("刷新页面 🔄", key="refresh_button"): # 添加 key
+    if st.button("刷新页面 🔄", key="refresh_page_button"): # 添加 key
         st.experimental_rerun()
 
 # 自动加载历史记录 (如果消息列表为空)
@@ -479,7 +479,7 @@ for i, message in enumerate(st.session_state.messages):
             new_content = st.text_area(f"{message['role']}:", message["content"], key=f"message_edit_{i}")
             col1, col2 = st.columns(2)
             with col1:
-                if st.button("保存 ✅", key="save_{i}"):
+                if st.button("保存 ✅", key=f"save_{i}"):
                     st.session_state.messages[i]["content"] = new_content
                     with open(log_file, "wb") as f:
                         messages_to_pickle = []
@@ -547,29 +547,25 @@ if prompt := st.chat_input("输入你的消息:"):
             for called_role_name in called_agent_roles:
                 if called_role_name in st.session_state.ai_agents:
                     agent_info = st.session_state.ai_agents[called_role_name]
-                    agent_system_message = agent_info["system_message"]
+                    agent_system_message = agent_info["system_message"] # Still using system_message - you can remove if not needed
                     agent_system_prompt = agent_info["system_prompt"]
 
-                    #  为每个角色AI创建一个新的消息容器 - NO NESTING NOW
-                    with st.chat_message("assistant"): #  [-- ADDED back chat_message, but OUTSIDE try block --]
-                        agent_message_placeholder = st.empty() #  Create placeholder INSIDE chat_message for correct scope
+                    #  为每个角色AI创建一个新的消息容器 - Outside playwright's container
+                    with st.chat_message("assistant"): # No nesting here - separate message containers
+                        agent_message_placeholder = st.empty()
                         agent_full_response = ""
                         try:
-                            agent_model = create_model(system_instruction=agent_system_message) # 为 agent 创建模型
+                            agent_model = create_model(system_instruction="") # IMPORTANT: No system instruction for agent model
                             agent_messages = [ # Simplified agent_messages - NO system role message
-                                             #{"role": "system", "parts": [{"text": agent_system_message}]}, # Removed system role message causing error
                                              {"role": "user", "parts": [{"text": agent_system_prompt}]}, # System prompt as user message
                                              {"role": "user", "parts": [{"text": prompt}]}] # User prompt as user message
                             agent_response_stream = agent_model.generate_content(contents=agent_messages, stream=True)
-
                             for chunk in agent_response_stream:
                                 agent_full_response += chunk.text
                                 agent_message_placeholder.markdown(f"**【{called_role_name}】:** {agent_full_response}▌") # 角色名作为前缀
-                            agent_message_placeholder.markdown(f"**【{called_role_name}】:** {agent_full_response}") # Complete display
-
-
+                            agent_message_placeholder.markdown(f"**【{called_role_name}】:** {agent_full_response}") # 完成显示
                             agent_response_content = f"**【{called_role_name}】:** {agent_full_response}" # 保存时包含角色名前缀
-                            st.session_state.messages.append({"role": "assistant", "content": agent_response_content}) # 添加角色AI的完整回复, with role name
+                            st.session_state.messages.append({"role": "assistant", "content": agent_response_content}) # 添加角色AI的完整回复，包含角色名
                             print("DEBUG: Assistant message appended (agent mode - role response - {called_role_name}):", st.session_state.messages[-1]) # 添加这行 - DEBUG PRINT
                         except Exception as e:
                             st.error(f"调用 AI 角色 {called_role_name} 时发生错误：{type(e).__name__} - {e}。 错误信息: {e}") # Include error message in st.error
