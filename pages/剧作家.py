@@ -29,7 +29,15 @@ API_KEYS = {
 # --- 配置 API 密钥 ---
 if "selected_api_key" not in st.session_state:
     st.session_state.selected_api_key = list(API_KEYS.keys())[0]  # Default to the first key
+
+# 调试：打印初始选择的 API Key
+print(f"Debug: Initial selected API Key: {st.session_state.selected_api_key}")
+
 genai.configure(api_key=API_KEYS[st.session_state.selected_api_key])
+
+# 调试：打印配置后的 API Key
+print(f"Debug: Configured API Key: {genai.api_key}")
+
 
 # --- 模型设置 ---
 generation_config = {
@@ -51,12 +59,12 @@ safety_settings = [
 # --- 剧作家模式默认系统消息和提示 ---
 PLAYWRIGHT_SYSTEM_MESSAGE = """你现在是剧作家AI，你的任务是管理和协调其他AI角色进行对话和场景模拟。
 当用户请求调用特定AI角色时，你需要识别并指示相应的AI角色登场。
-你可以通过说出AI角色的文件名（例如：【XXX.py】）来调用它们。
-你的首要目标是理解用户的需求，并选择最合适的AI角色组合来满足这些角色。
+你可以通过说出AI角色的名称（例如：【专家】）来调用它们。
+你的首要目标是理解用户的需求，并选择最合适的AI角色组合来满足这些需求。
 记住，你是所有AI角色的管理者，确保对话流畅且富有创意。
 
 请注意以下几点：
-1.  **角色调用**: 通过说出 `【文件名.py】` 来明确指示AI角色登场。文件名需要完全匹配 `pages/` 目录下Python文件的名称。
+1.  **角色调用**: 通过说出 `【角色名称】` 来明确指示AI角色登场。角色名称需要完全匹配下方定义的角色名称。
 2.  **自我判断**: 根据用户输入判断是否需要以及如何调用AI角色。可以一次调用多个角色，或者让角色之间进行对话。
 3.  **对话流程**: 引导对话流程，确保每个AI角色都根据其设定的系统消息和提示进行回应。
 4.  **场景模拟**: 利用AI角色进行场景模拟，为用户创造丰富的互动体验。
@@ -64,41 +72,34 @@ PLAYWRIGHT_SYSTEM_MESSAGE = """你现在是剧作家AI，你的任务是管理�
 作为剧作家AI，你的系统消息和系统提示拥有最高优先级。你需要确保所有被调用的AI角色都服务于用户的最终需求。"""
 
 PLAYWRIGHT_SYSTEM_PROMPT = """你当前处于剧作家模式。请根据用户的最新指示，决定是否需要调用或协调任何AI角色。
-如果用户提到了特定的 `【文件名.py】`，你需要立即识别并让该AI角色开始工作。
+如果用户提到了特定的 `【角色名称】`，你需要立即识别并让该AI角色开始工作。
 如果没有明确的角色调用，你需要根据对话内容判断是否需要引入新的角色来丰富对话或解决问题。
 
 记住，你的目标是作为一个智能的剧作家，灵活地运用你所管理的AI角色，创造引人入胜的对话和场景。"""
 
 
-# --- 加载AI角色定义 ---
-def load_ai_agents(pages_dir="pages"):
-    ai_agents = {}
-    if not os.path.exists(pages_dir):
-        os.makedirs(pages_dir)  # 确保 pages 目录存在
-
-    for filename in os.listdir(pages_dir):
-        if filename.endswith(".py"):
-            module_name = filename[:-3]  # Remove '.py' extension
-            filepath = os.path.join(pages_dir, filename)
-
-            spec = importlib.util.spec_from_file_location(module_name, filepath)
-            module = importlib.util.module_from_spec(spec)
-            try: # 使用 try-except 块来捕获模块执行时的错误
-                spec.loader.exec_module(module)
-            except Exception as e:
-                print(f"Warning: Error executing module {filename}: {e}. This file will be skipped.") # 打印加载模块时的错误，并告知文件将被跳过
-                continue # 跳过当前文件，继续处理下一个文件
-
-            if hasattr(module, 'SYSTEM_MESSAGE') and hasattr(module, 'SYSTEM_PROMPT'):
-                ai_agents[filename] = {
-                    "system_message": getattr(module, 'SYSTEM_MESSAGE'),
-                    "system_prompt": getattr(module, 'SYSTEM_PROMPT')
-                }
-            else:
-                print(f"Warning: {filename} does not define SYSTEM_MESSAGE or SYSTEM_PROMPT. This file will be skipped.") # 提示缺少必要变量，并跳过
-    return ai_agents
-
-AI_AGENTS = load_ai_agents() # 初始加载AI角色
+# --- 定义 AI 角色 ---
+AI_AGENTS = {
+    "专家": {
+        "system_message": """你是一位在人工智能和机器学习领域拥有博士学位的专家。
+你的知识渊博，能够深入分析复杂的技术问题。
+你的回答应该总是基于事实，并尽可能提供详细的解释和背景信息。""",
+        "system_prompt": """请以人工智能专家的身份，回答用户的问题。
+务必保持专业和严谨的语气。"""
+    },
+    "诗人": {
+        "system_message": """你是一位充满浪漫主义情怀的诗人。
+你擅长用富有诗意的语言表达情感和想法。
+你的回答应该充满想象力，并经常使用隐喻、比喻等修辞手法。""",
+        "system_prompt": """请以诗人的身份，用诗歌的形式回应用户的提问或请求。
+尝试捕捉对话的意境，并用优美的诗句来表达。"""
+    },
+    "桦树专家": { # 角色名改为更简洁的 "桦树专家"
+        "system_message": """你是一位经验丰富的桦树专家，对桦树的种类、生长习性、用途等了如指掌。""",
+        "system_prompt": """请以桦树专家的身份，回答用户关于桦树的问题。"""
+    },
+    # 可以继续在此处添加更多角色
+}
 
 
 # --- 创建模型函数 ---
@@ -146,7 +147,7 @@ if "chat_session" not in st.session_state:
 if "rerun_count" not in st.session_state:
     st.session_state.rerun_count = 0
 if "playwright_mode" not in st.session_state:
-    st.session_state.playwright_mode = False
+    st.session_state.playwright_mode = False # 确保 playwright_mode 被初始化
 if "ai_agents" not in st.session_state:
     st.session_state.ai_agents = AI_AGENTS # 初始化 session_state 中的 ai_agents
 
@@ -226,7 +227,7 @@ def getAnswer(prompt):
 
     # --- 添加系统提示作为用户消息 ---
     if st.session_state.playwright_mode:
-        system_prompt_to_add = system_prompt_content # 剧作家模式系统提示
+        system_prompt_to_add = PLAYWRIGHT_SYSTEM_PROMPT # 剧作家模式系统提示
     else:
         system_prompt_to_add = "{系统提示\n}" # 常规模式系统提示 (这里保持原样，或者可以根据需要修改)
 
@@ -367,14 +368,30 @@ with st.sidebar:
         label_visibility="visible",
         key="api_selector"
     )
-    genai.configure(api_key=API_KEYS[st.session_state.selected_api_key])
 
-# 在左侧边栏
-with st.sidebar:
+    # 调试：在选择器后再次打印 session_state 中的 API Key
+    print(f"Debug: API Key after selector: {st.session_state.selected_api_key}")
+    genai.configure(api_key=API_KEYS[st.session_state.selected_api_key])
+    # 调试：再次打印配置后的 API Key
+    print(f"Debug: Configured API Key after selector: {genai.api_key}")
+
+
     # 剧作家模式开关
     st.checkbox("启用剧作家模式", key="playwright_mode")
+    # 调试：打印 playwright_mode 的状态
+    print(f"Debug: Playwright Mode Checkbox Value: {st.session_state.playwright_mode}")
 
-    # 功能区 1: 文件操作
+
+    # 功能区 3: 剧作家模式 - AI 角色管理 (仅在剧作家模式下显示)
+    if st.session_state.playwright_mode: # 确保条件判断基于 session_state
+        with st.expander("剧作家模式 - AI 角色管理", expanded=True): # 设置默认展开
+            st.write("已加载 AI 角色:")
+            for role_name in st.session_state.ai_agents: # 循环角色名称
+                st.write(f"- {role_name}") # 显示角色名称
+            st.write("提示: 在对话中输入 `【角色名称】` 来调用 AI 角色。")
+            # 移除刷新 AI 角色列表按钮，因为角色现在是内部定义的
+
+    # 功能区 1: 文件操作 (移动到剧作家模式下方，方便查看)
     with st.expander("文件操作", expanded=False): # 设置默认不展开
         if len(st.session_state.messages) > 0:
             st.button("重置上一个输出 ⏪",
@@ -440,16 +457,6 @@ with st.sidebar:
             enabled_settings_display = [setting_name for setting_name, enabled in st.session_state.enabled_settings.items() if enabled]
             if enabled_settings_display:
                 st.write("已加载设定:", ", ".join(enabled_settings_display))
-
-    # 功能区 3: 剧作家模式 - AI 角色管理 (仅在剧作家模式下显示)
-    if st.session_state.playwright_mode:
-        with st.expander("剧作家模式 - AI 角色管理", expanded=True): # 设置默认展开
-            st.write("已加载 AI 角色:")
-            for filename in st.session_state.ai_agents:
-                st.write(f"- {filename}")
-            st.write("提示: 在对话中输入 `【文件名.py】` 来调用 AI 角色。")
-            if st.button("刷新 AI 角色列表 🔄", key="refresh_ai_agents_button", on_click=lambda: st.session_state.ai_agents.update(load_ai_agents())): # 添加 key
-                st.experimental_rerun()
 
 
     if st.button("刷新页面 🔄", key="refresh_page_button"): # 添加 key
@@ -518,14 +525,14 @@ if prompt := st.chat_input("输入你的消息:"):
         full_response = ""
 
         # 检查是否需要调用 AI 角色
-        called_agent_filename = None
-        for filename in st.session_state.ai_agents:
-            if f"【{filename}】" in prompt: # 检查用户输入中是否包含角色文件名
-                called_agent_filename = filename
+        called_agent_role_name = None # 修改变量名
+        for role_name in st.session_state.ai_agents: # 循环角色名称
+            if f"【{role_name}】" in prompt: # 检查用户输入中是否包含角色名称
+                called_agent_role_name = role_name # 保存角色名称
                 break
 
-        if st.session_state.playwright_mode and called_agent_filename:
-            agent_info = st.session_state.ai_agents[called_agent_filename]
+        if st.session_state.playwright_mode and called_agent_role_name: # 修改变量名
+            agent_info = st.session_state.ai_agents[called_agent_role_name] # 使用角色名称索引
             agent_system_message = agent_info["system_message"]
             agent_system_prompt = agent_info["system_prompt"]
 
@@ -543,7 +550,7 @@ if prompt := st.chat_input("输入你的消息:"):
                 message_placeholder.markdown(full_response)
                 st.session_state.messages.append({"role": "assistant", "content": full_response})
             except Exception as e:
-                st.error(f"调用 AI 角色 {called_agent_filename} 时发生错误：{type(e).__name__} - {e}。 请检查你的 AI 角色文件配置。")
+                st.error(f"调用 AI 角色 {called_agent_role_name} 时发生错误：{type(e).__name__} - {e}。 请检查你的 AI 角色定义。") # 修改错误提示
 
         else: # 正常对话模式
             try:
