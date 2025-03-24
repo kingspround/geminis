@@ -456,7 +456,14 @@ print("DEBUG: Messages BEFORE display loop:", st.session_state.messages) # 添�
 for i, message in enumerate(st.session_state.messages):
     with st.chat_message(message["role"]):
         message_placeholder = st.empty() # 创建一个占位符
-        message_placeholder.write(message["content"], key=f"message_{i}") # 使用占位符显示消息内容
+
+        # ADDED DEBUG PRINT INSIDE LOOP:
+        print(f"DEBUG: Display loop - index: {i}, message keys: {message.keys()}") # Print keys of message
+        if "content" not in message: # Check if 'content' key exists (for extra safety)
+            print(f"DEBUG: ERROR - Message at index {i} MISSING 'content' key! Message: {message}") # Print full message if missing 'content'
+            continue # Skip to next message if 'content' is missing
+
+        message_placeholder.write(message["content"], key=f"message_{i}") # LINE 459 (Potentially problematic line)
         st.session_state.messages[i]["placeholder_widget"] = message_placeholder # 保存占位符到消息对象中
 
     if st.session_state.get("editing"):
