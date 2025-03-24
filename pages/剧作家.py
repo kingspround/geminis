@@ -120,7 +120,7 @@ file = os.path.abspath(__file__)
 filename = os.path.splitext(os.path.basename(file))[0] + ".pkl"
 log_file = os.path.join(os.path.dirname(file), filename)
 
-# 检查文件是否存在，如果不存在就创建空文件
+# --- 检查文件是否存在，如果不存在就创建空文件
 if not os.path.exists(log_file):
     with open(log_file, "wb") as f:
         pass  # 创建空文件
@@ -557,9 +557,9 @@ if prompt := st.chat_input("输入你的消息:"):
                     agent_full_response = ""
                     try:
                         agent_model = create_model(system_instruction=agent_system_message) # 为 agent 创建模型
-                        agent_messages = [{"role": "system", "parts": [{"text": agent_system_message}]},
-                                         {"role": "user", "parts": [{"text": agent_system_prompt}]},
-                                         {"role": "user", "parts": [{"text": prompt}]}] # 将用户prompt也传递给agent
+                        agent_messages = [ # Simplified agent_messages - NO system role message
+                                         {"role": "user", "parts": [{"text": agent_system_prompt}]}, # System prompt as user message
+                                         {"role": "user", "parts": [{"text": prompt}]}] # User prompt as user message
                         agent_response_stream = agent_model.generate_content(contents=agent_messages, stream=True)
                         with st.chat_message("assistant"): #  [-- ADDED st.chat_message HERE, inside try block --]
                             for chunk in agent_response_stream:
@@ -570,7 +570,7 @@ if prompt := st.chat_input("输入你的消息:"):
                         st.session_state.messages.append({"role": "assistant", "content": agent_response_content}) # 添加角色AI的完整回复，包含角色名
                         print("DEBUG: Assistant message appended (agent mode - role response - {called_role_name}):", st.session_state.messages[-1]) # 添加这行 - DEBUG PRINT
                     except Exception as e:
-                        st.error(f"调用 AI 角色 {called_role_name} 时发生错误：{type(e).__name__} - {e}。 请检查你的 AI 角色定义。")
+                        st.error(f"调用 AI 角色 {called_role_name} 时发生错误：{type(e).__name__} - {e}。 错误信息: {e}") # Include error message in st.error
 
 
         else: # 正常对话模式
