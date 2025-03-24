@@ -553,7 +553,7 @@ if prompt := st.chat_input("输入你的消息:"):
                     #  为每个角色AI创建一个新的消息容器
                     # with st.chat_message("assistant"): #  [-- REMOVE this nested st.chat_message --]
 
-                    agent_message_placeholder = st.empty() #  在 the playwright's message container
+                    agent_message_placeholder = message_placeholder #  !!! 使用 playwright 的 message_placeholder !!!
                     agent_full_response = ""
                     try:
                         agent_model = create_model(system_instruction=agent_system_message) # 为 agent 创建模型
@@ -565,8 +565,9 @@ if prompt := st.chat_input("输入你的消息:"):
 
                         for chunk in agent_response_stream:
                             agent_full_response += chunk.text
-                            message_placeholder.markdown(f"**【{called_role_name}】:** {agent_full_response}▌") # Role name prefix in markdown
-                        message_placeholder.markdown(f"**【{called_role_name}】:** {agent_full_response}") # Final display
+                            message_placeholder.markdown(f"{playwright_full_response}\n\n**【{called_role_name}】:** {agent_full_response}▌") # Role name prefix in markdown, appending to playwright's message
+                        message_placeholder.markdown(f"{playwright_full_response}\n\n**【{called_role_name}】:** {agent_full_response}") # Final display, appending to playwright's message
+
                         agent_response_content = f"**【{called_role_name}】:** {agent_full_response}" # Save with role name prefix
                         st.session_state.messages.append({"role": "assistant", "content": agent_response_content}) # Add role AI response
                         print("DEBUG: Assistant message appended (agent mode - role response - {called_role_name}):", st.session_state.messages[-1]) # Debug print
