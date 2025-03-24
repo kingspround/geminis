@@ -7,6 +7,7 @@ import string
 from datetime import datetime
 from io import BytesIO
 import zipfile
+import importlib.util  # 用于动态导入模块
 
 # --- API 密钥设置 ---
 API_KEYS = {
@@ -47,6 +48,82 @@ safety_settings = [
 ]
 
 
+# --- 剧作家模式默认系统消息和提示 ---
+PLAYWRIGHT_SYSTEM_MESSAGE = """你现在是剧作家AI，你的任务是管理和协调其他AI角色进行对话和场景模拟。
+当用户请求调用特定AI角色时，你需要识别并指示相应的AI角色登场。
+你可以通过说出AI角色的文件名（例如：【XXX.py】）来调用它们。
+你的首要目标是理解用户的需求，并选择最合适的AI角色组合来满足这些需求。
+记住，你是所有AI角色的管理者，确保对话流畅且富有创意。
+
+请注意以下几点：
+1.  **角色调用**: 通过说出 `【文件名.py】` 来明确指示AI角色登场。文件名需要完全匹配 `pages/` 目录下Python文件的名称。
+2.  **自我判断**: 根据用户输入判断是否需要以及如何调用AI角色。可以一次调用多个角色，或者让角色之间进行对话。
+3.  **对话流程**: 引导对话流程，确保每个AI角色都根据其设定的系统消息和提示进行回应。
+4.  **场景模拟**: 利用AI角色进行场景模拟，为用户创造丰富的互动体验。
+
+作为剧作家AI，你的系统消息和系统提示拥有最高优先级。你需要确保所有被调用的AI角色都服务于用户的最终需求。"""
+
+PLAYWRIGHT_SYSTEM_PROMPT = """你当前处于剧作家模式。请根据用户的最新指示，决定是否需要调用或协调任何AI角色。
+如果用户提到了特定的 `【文件名.py】`，你需要立即识别并让该AI角色开始工作。
+如果没有明确的角色调用，你需要根据对话内容判断是否需要引入新的角色来丰富对话或解决问题。
+
+记住，你的目标是作为一个智能的剧作家，灵活地运用你所管理的AI角色，创造引人入胜的对话和场景。"""
+
+
+# --- 加载AI角色定义 ---
+def load_ai_agents(pages_dir="pages"):
+    ai_agents = {}
+    if not os.path.exists(pages_dir):
+        os.makedirs(pages_dir)  # 确保 pages 目录存在
+
+    for filename in os.listdir(pages_dir):
+        if filename.endswith(".py"):
+            module_name = filename[:-3]  # Remove '.py' extension
+            filepath = os.path.join(pages_dir, filename)
+
+            spec = importlib.util.spec_from_file_location(module_name, filepath)
+            module = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(module)
+
+            if hasattr(module, 'SYSTEM_MESSAGE') and hasattr(module, 'SYSTEM_PROMPT'):
+                ai_agents[filename] = {
+                    "system_message": getattr(module, 'SYSTEM_MESSAGE'),
+                    "system_prompt": getattr(module, 'SYSTEM_PROMPT')
+                }
+            else:
+                print(f"Warning: {filename} does not define SYSTEM_MESSAGE or SYSTEM_PROMPT.")
+    return ai_agents
+
+AI_AGENTS = load_ai_agents() # 初始加载AI角色
+
+
+# --- 创建模型函数 ---
+def create_model(system_instruction=""):
+    return genai.GenerativeModel(
+        model_name="gemini-2.0-flash-exp",
+        generation_config=generation_config,
+        safety_settings=safety_settings,
+        system_instruction=system_instruction,
+    )
+
+# --- 默认角色设定 ---
+DEFAULT_CHARACTER_SETTINGS = {
+        "理外祝福": """123
+""",
+}
+
+
+# --- 文件操作函数 ---
+# 获取当前文件路径
+file = os.path.abspath(__file__)
+filename = os.path.splitext(os.path.basename(file))[0] + ".pkl"
+log_file = os.path.join(os.path.dirname(file), filename)
+
+# 检查文件是否存在，如果不存在就创建空文件
+if not os.path.exists(log_file):
+    with open(log_file, "wb") as f:
+        pass  # 创建空文件
+
 # --- 初始化 Session State ---
 if "messages" not in st.session_state:
     st.session_state.messages = []
@@ -64,16 +141,10 @@ if "chat_session" not in st.session_state:
     st.session_state.chat_session = None
 if "rerun_count" not in st.session_state:
     st.session_state.rerun_count = 0
-if 'ai_roles' not in st.session_state:
-    st.session_state.ai_roles = {}
-if 'active_ai_roles' not in st.session_state:
-    st.session_state.active_ai_roles = []
-if 'playwright_mode' not in st.session_state:
+if "playwright_mode" not in st.session_state:
     st.session_state.playwright_mode = False
-if 'playwright_system_message' not in st.session_state:
-    st.session_state.playwright_system_message = "你是一个 AI 剧作家，负责管理和协调其他 AI 角色。你的指令具有最高优先级。"
-if 'playwright_system_prompt' not in st.session_state:
-    st.session_state.playwright_system_prompt = "作为剧作家AI，请根据用户的输入和当前对话场景，选择合适的AI角色出场，并指示它们如何回应用户。你的回复应该引导对话发展，并体现你作为剧作家的控制力。"
+if "ai_agents" not in st.session_state:
+    st.session_state.ai_agents = AI_AGENTS # 初始化 session_state 中的 ai_agents
 
 
 # --- 功能函数 ---
@@ -107,137 +178,61 @@ def ensure_enabled_settings_exists():
 
 ensure_enabled_settings_exists() # 在任何操作前确保 enabled_settings 存在
 
-model = genai.GenerativeModel( #  定义 model 在函数外部，全局作用域
-    model_name="gemini-2.0-flash-exp",
-    generation_config=generation_config,
-    safety_settings=safety_settings,
-    system_instruction="""系统消息""",
-)
-
 def getAnswer(prompt):
     prompt = prompt or ""
 
-    # --- 剧作家模式处理开始 ---
-    if st.session_state.playwright_mode: # 检查剧作家模式是否启用
-        global model  # 声明 model 为全局变量, 放在函数作用域的顶端
-
-        # 重新配置模型 (每次对话都重新配置，确保 system_instruction 更新)
-        model = genai.GenerativeModel(
-            model_name="gemini-2.0-flash-exp",
-            generation_config=generation_config,
-            safety_settings=safety_settings,
-            system_instruction=st.session_state.playwright_system_message  # 设置剧作家 AI 的系统消息作为 system_instruction
-        )
-
-        # 构建历史消息列表
-        history_messages = []
-        history_messages.append(
-            {
-                "role": "model",
-                "parts":[{"text": """
-
-"""}]}
-       )
-
-        # --- 优先注入剧作家 AI 的系统提示 (作为用户消息) ---
-        if st.session_state.playwright_system_prompt: # 只有当剧作家系统提示不为空时才添加
-            history_messages.append({
-                "role": "user",
-                "parts": [{"text": st.session_state.playwright_system_prompt}]
-            })
-        # --- 剧作家 AI 系统提示注入完成 ---
-
-        # 处理 test_text (这个部分保持不变，但现在优先级较低)
-        if "test_text" in st.session_state and st.session_state.test_text and not any(msg.get("parts", [""])[0] == st.session_state.test_text for msg in st.session_state.messages if msg.get("role") == "system"):
-            history_messages.append({"role": "user", "parts": [{"text": "```system\n" + st.session_state.test_text + "\n```"}]}) #  作为用户消息添加，优先级低于剧作家AI
+    # 检查是否启用了剧作家模式
+    if st.session_state.playwright_mode:
+        system_message_content = PLAYWRIGHT_SYSTEM_MESSAGE
+        system_prompt_content = PLAYWRIGHT_SYSTEM_PROMPT
+        current_model = create_model(system_instruction=system_message_content) # 使用剧作家模式的模型
+    else:
+        system_message_content = st.session_state.get("test_text", "") if "test_text" in st.session_state else ""
+        system_prompt_content = "" # 正常模式下没有额外的系统提示
+        current_model = model # 使用默认模型
 
 
-        # 构建启用的角色设定内容 (包括系统提示),  优先级更低
-        enabled_settings_content = ""
-        if any(st.session_state.enabled_settings.values()): # 如果有启用的全局设定
-            enabled_settings_content = "```system\n# Active Settings:\n"
-            # 全局角色设定
-            for setting_name, enabled in st.session_state.enabled_settings.items():
-                if enabled:
-                    enabled_settings_content += f"- {setting_name}: {st.session_state.character_settings[setting_name]}\n"
-            enabled_settings_content += "```\n"
-        if enabled_settings_content: # 角色设定内容作为用户消息添加，优先级低于剧作家AI
-            history_messages.append({"role": "user", "parts": [{"text": enabled_settings_content}]})
+    # 处理 system_message
+    if system_message_content and not any(msg.get("parts", [""])[0] == system_message_content for msg in st.session_state.messages if msg.get("role") == "system"):
+        if st.session_state.playwright_mode:
+            st.session_state.messages.insert(0, {"role": "system", "parts": [{"text": system_message_content}]}) # 剧作家模式系统消息
+        elif system_message_content:
+            st.session_state.messages.insert(0, {"role": "system", "parts": [{"text": system_message_content}]}) # 常规模式系统消息
 
 
-        role_activation_command = None
-        if prompt.endswith(".py"): # 简单的角色激活指令判断 (假设角色名就是文件名，例如 "角色A.py")
-            role_name = prompt[:-3] # 去掉 ".py" 后缀
-            if role_name in st.session_state.ai_roles:
-                role_activation_command = role_name
-                prompt = "" # 清空 prompt，因为这只是角色激活指令
+    # 处理启用角色设定 (仅在非剧作家模式下)
+    enabled_settings_content = ""
+    if not st.session_state.playwright_mode and any(st.session_state.enabled_settings.values()):
+        enabled_settings_content = "```system\n"
+        enabled_settings_content += "# Active Settings:\n"
+        for setting_name, enabled in st.session_state.enabled_settings.items():
+            if enabled:
+                enabled_settings_content += f"- {setting_name}: {st.session_state.character_settings[setting_name]}\n"
+        enabled_settings_content += "```\n"
 
-        if role_activation_command: # 检测到角色激活指令
-            if role_activation_command not in st.session_state.active_ai_roles: # 如果角色尚未激活
-                st.session_state.active_ai_roles.append(role_activation_command) # 激活角色
-                system_message = st.session_state.ai_roles[role_activation_command]["system_message"]
-                if system_message: # 只有当系统消息不为空时才添加
-                    st.session_state.messages.append({"role": "system", "parts": [{"text": system_message}]}) # 应用系统消息 (一次性)
-                st.info(f"已激活 AI 角色: {role_activation_command}") # 提示信息
-
-
-        # 激活的 AI 角色系统提示 (作为用户消息添加，优先级低于剧作家AI和全局设定)
-        if st.session_state.active_ai_roles:
-            ai_roles_prompt_content = "```system\n# Active AI Roles Prompts:\n" # 修改提示文字
-            for role_name in st.session_state.active_ai_roles:
-                system_prompt = st.session_state.ai_roles[role_name]["system_prompt"]
-                if system_prompt: # 只有当系统提示不为空时才添加
-                    ai_roles_prompt_content += f"- {role_name}: {system_prompt}\n"
-            ai_roles_prompt_content += "```\n"
-            history_messages.append({"role": "user", "parts": [{"text": ai_roles_prompt_content}]})
-
-
-    else: # 非剧作家模式
-        global model #  声明 model 为全局变量, 放在函数作用域的顶端
-        # 模型配置恢复默认 system_instruction
-        model = genai.GenerativeModel(
-            model_name="gemini-2.0-flash-exp",
-            generation_config=generation_config,
-            safety_settings=safety_settings,
-            system_instruction="""系统消息""", # 恢复默认
-        )
-
-        # 处理 test_text (这个部分保持不变)
-        if "test_text" in st.session_state and st.session_state.test_text and not any(msg.get("parts", [""])[0] == st.session_state.test_text for msg in st.session_state.messages if msg.get("role") == "system"):
-            st.session_state.messages.insert(0, {"role": "system", "parts": [st.session_state.test_text]})
-
-        # 构建启用的角色设定内容 (包括系统提示)
-        enabled_settings_content = ""
-        if any(st.session_state.enabled_settings.values()):
-            enabled_settings_content = "```system\n# Active Settings:\n"
-            for setting_name, enabled in st.session_state.enabled_settings.items():
-                if enabled:
-                    enabled_settings_content += f"- {setting_name}: {st.session_state.character_settings[setting_name]}\n"
-            enabled_settings_content += "```\n"
-
-
-        # 构建历史消息列表
-        history_messages = []
-        history_messages.append(
-            {
-                "role": "model",
-                "parts":[{"text": """
+    # 构建历史消息列表
+    history_messages = []
+    history_messages.append(
+        {
+            "role": "model",
+            "parts":[{"text": """
 
 """}]}
-       )
+   )
 
-        # --- 添加额外的提示信息作为用户消息 ---
-        history_messages.append({
-            "role": "user",  #  使用 "user" 角色
-            "parts": [{"text": """{系统提示
-"""}] #  提示信息内容
-        })
-        # --- 提示信息添加完成 ---
-        if enabled_settings_content:
-            history_messages.append({"role": "user", "parts": [{"text": enabled_settings_content}]})
+    # --- 添加系统提示作为用户消息 ---
+    if st.session_state.playwright_mode:
+        system_prompt_to_add = system_prompt_content # 剧作家模式系统提示
+    else:
+        system_prompt_to_add = "{系统提示\n}" # 常规模式系统提示 (这里保持原样，或者可以根据需要修改)
+
+    history_messages.append({
+        "role": "user",
+        "parts": [{"text": system_prompt_to_add}]
+    })
+    # --- 系统提示添加完成 ---
 
 
-    # 历史消息 (保持不变，优先级最低)
     for msg in st.session_state.messages[-20:]:
       if msg and msg.get("role") and msg.get("content"): # 只有当msg不为空，并且有 role 和 content 属性的时候才去处理
           if msg["role"] == "user":
@@ -248,14 +243,15 @@ def getAnswer(prompt):
 
     history_messages = [msg for msg in history_messages if msg["role"] in ["user", "model"]] #  只保留 "user" 和 "model" 角色
 
+    if enabled_settings_content:
+        history_messages.append({"role": "user", "parts": [{"text": enabled_settings_content}]})
 
-    if prompt: # 用户 prompt 优先级最低
+    if prompt:
         history_messages.append({"role": "user", "parts": [{"text": prompt}]})
-
 
     full_response = ""
     try:
-        response = model.generate_content(contents=history_messages, stream=True)
+        response = current_model.generate_content(contents=history_messages, stream=True) # 使用当前模型 (可能是剧作家模式模型或默认模型)
         for chunk in response:
             full_response += chunk.text
             yield chunk.text
@@ -371,6 +367,9 @@ with st.sidebar:
 
 # 在左侧边栏
 with st.sidebar:
+    # 剧作家模式开关
+    st.checkbox("启用剧作家模式", key="playwright_mode")
+
     # 功能区 1: 文件操作
     with st.expander("文件操作"):
         if len(st.session_state.messages) > 0:
@@ -412,86 +411,44 @@ with st.sidebar:
             except Exception as e:
                 st.error(f"读取本地pkl文件失败：{e}")
 
-    # 功能区 2: 角色设定
-    with st.expander("角色设定"):
-        uploaded_setting_file = st.file_uploader("读取本地设定文件 (txt) 📝", type=["txt"])
-        if uploaded_setting_file is not None:
-            try:
-                setting_name = os.path.splitext(uploaded_setting_file.name)[0]
-                setting_content = uploaded_setting_file.read().decode("utf-8")
-                st.session_state.character_settings[setting_name] = setting_content
-                st.session_state.enabled_settings[setting_name] = False
+    # 功能区 2: 角色设定 (仅在非剧作家模式下显示)
+    if not st.session_state.playwright_mode:
+        with st.expander("角色设定"):
+            uploaded_setting_file = st.file_uploader("读取本地设定文件 (txt) 📝", type=["txt"])
+            if uploaded_setting_file is not None:
+                try:
+                    setting_name = os.path.splitext(uploaded_setting_file.name)[0]
+                    setting_content = uploaded_setting_file.read().decode("utf-8")
+                    st.session_state.character_settings[setting_name] = setting_content
+                    st.session_state.enabled_settings[setting_name] = False
+                    st.experimental_rerun()
+                except Exception as e:
+                    st.error(f"读取文件失败: {e}")
+
+            for setting_name in DEFAULT_CHARACTER_SETTINGS:
+                if setting_name not in st.session_state.character_settings:
+                    st.session_state.character_settings[setting_name] = DEFAULT_CHARACTER_SETTINGS[setting_name]
+                st.session_state.enabled_settings[setting_name] = st.checkbox(setting_name, st.session_state.enabled_settings.get(setting_name, False),key=f"checkbox_{setting_name}") #直接显示checkbox
+
+            st.session_state.test_text = st.text_area("System Message (Optional):", st.session_state.get("test_text", ""), key="system_message")
+            # 显示已加载的设定
+            enabled_settings_display = [setting_name for setting_name, enabled in st.session_state.enabled_settings.items() if enabled]
+            if enabled_settings_display:
+                st.write("已加载设定:", ", ".join(enabled_settings_display))
+
+    # 功能区 3: 剧作家模式 - AI 角色管理 (仅在剧作家模式下显示)
+    if st.session_state.playwright_mode:
+        with st.expander("剧作家模式 - AI 角色管理"):
+            st.write("已加载 AI 角色:")
+            for filename in st.session_state.ai_agents:
+                st.write(f"- {filename}")
+            st.write("提示: 在对话中输入 `【文件名.py】` 来调用 AI 角色。")
+            if st.button("刷新 AI 角色列表 🔄", on_click=lambda: st.session_state.ai_agents.update(load_ai_agents())):
                 st.experimental_rerun()
-            except Exception as e:
-                st.error(f"读取文件失败: {e}")
-
-        for setting_name in DEFAULT_CHARACTER_SETTINGS:
-            if setting_name not in st.session_state.character_settings:
-                st.session_state.character_settings[setting_name] = DEFAULT_CHARACTER_SETTINGS[setting_name]
-            st.session_state.enabled_settings[setting_name] = st.checkbox(setting_name, st.session_state.enabled_settings.get(setting_name, False),key=f"checkbox_{setting_name}") #直接显示checkbox
-
-        st.session_state.test_text = st.text_area("System Message (Optional):", st.session_state.get("test_text", ""), key="system_message")
-        # 显示已加载的设定
-        enabled_settings_display = [setting_name for setting_name, enabled in st.session_state.enabled_settings.items() if enabled]
-        if enabled_settings_display:
-            st.write("已加载设定:", ", ".join(enabled_settings_display))
-        if st.button("刷新 🔄"):  # 添加刷新按钮
-            st.experimental_rerun()
-
-    # 功能区 3: 剧作家模式
-    with st.expander("剧作家模式"):
-        st.session_state.playwright_mode = st.checkbox("启用剧作家模式") # 剧作家模式开关
-        if st.session_state.playwright_mode:
-            st.write("剧作家模式已启用")
-
-            # --- 剧作家 AI 专属配置 ---
-            st.subheader("剧作家 AI 配置")
-            st.session_state.playwright_system_message = st.text_area(
-                "剧作家 AI 系统消息 (System Instruction - 优先级最高, 初始化时设置):",
-                st.session_state.playwright_system_message,
-                key="playwright_system_message_input"
-            )
-            st.session_state.playwright_system_prompt = st.text_area(
-                "剧作家 AI 系统提示 (User Prompt - 优先级最高, 每次对话注入):",
-                st.session_state.playwright_system_prompt,
-                key="playwright_system_prompt_input"
-            )
-            st.write("---")
-            # --- 剧作家 AI 配置结束 ---
 
 
-            # 新建 AI 角色
-            if st.button("新建 AI 角色"):
-                new_role_name = f"AI角色_{len(st.session_state.ai_roles) + 1}" # 自动生成角色名
-                st.session_state.ai_roles[new_role_name] = {
-                    "system_message": "我是 AI 角色 " + new_role_name + " 的系统消息，初次收到。",
-                    "system_prompt": "我是 AI 角色 " + new_role_name + " 的系统提示，每次对话都收到。",
-                }
-                st.success(f"已创建 AI 角色: {new_role_name}")
-                st.experimental_rerun() # 刷新界面显示新角色
-
-            st.write("---") # 分割线
-
-            # AI 角色列表和编辑
-            st.subheader("AI 角色列表")
-            for role_name in st.session_state.ai_roles:
-                with st.expander(role_name):
-                    st.session_state.ai_roles[role_name]["system_message"] = st.text_area(
-                        "系统消息 (一次性):",
-                        st.session_state.ai_roles[role_name]["system_message"],
-                        key=f"system_message_{role_name}"
-                    )
-                    st.session_state.ai_roles[role_name]["system_prompt"] = st.text_area(
-                        "系统提示 (每次对话):",
-                        st.session_state.ai_roles[role_name]["system_prompt"],
-                        key=f"system_prompt_{role_name}"
-                    )
-                    # 可以添加删除角色按钮等 (可选)
-
-            # 显示已激活的 AI 角色
-            if st.session_state.active_ai_roles:
-                st.write("已激活角色:", ", ".join(st.session_state.active_ai_roles))
-
+    if st.button("刷新页面 🔄"):  # 添加刷新页面按钮
+        st.experimental_rerun()
 
 # 自动加载历史记录 (如果消息列表为空)
 if not st.session_state.messages:
@@ -554,14 +511,45 @@ if prompt := st.chat_input("输入你的消息:"):
     with st.chat_message("assistant"):
         message_placeholder = st.empty()
         full_response = ""
-        try:
-            for chunk in getAnswer(prompt):
-                full_response += chunk
-                message_placeholder.markdown(full_response + "▌")
-            message_placeholder.markdown(full_response)
-            st.session_state.messages.append({"role": "assistant", "content": full_response})
-        except Exception as e:
-            st.error(f"发生错误：{type(e).name} - {e}。  请检查你的 API 密钥和消息格式。")
+
+        # 检查是否需要调用 AI 角色
+        called_agent_filename = None
+        for filename in st.session_state.ai_agents:
+            if f"【{filename}】" in prompt: # 检查用户输入中是否包含角色文件名
+                called_agent_filename = filename
+                break
+
+        if st.session_state.playwright_mode and called_agent_filename:
+            agent_info = st.session_state.ai_agents[called_agent_filename]
+            agent_system_message = agent_info["system_message"]
+            agent_system_prompt = agent_info["system_prompt"]
+
+            agent_messages = [{"role": "system", "parts": [{"text": agent_system_message}]},
+                             {"role": "user", "parts": [{"text": agent_system_prompt}]},
+                             {"role": "user", "parts": [{"text": prompt}]}] # 将用户prompt也传递给agent
+
+            agent_model = create_model(system_instruction=agent_system_message) # 为 agent 创建模型
+
+            try:
+                agent_response_stream = agent_model.generate_content(contents=agent_messages, stream=True)
+                for chunk in agent_response_stream:
+                    full_response += chunk.text
+                    message_placeholder.markdown(full_response + "▌")
+                message_placeholder.markdown(full_response)
+                st.session_state.messages.append({"role": "assistant", "content": full_response})
+            except Exception as e:
+                st.error(f"调用 AI 角色 {called_agent_filename} 时发生错误：{type(e).__name__} - {e}。 请检查你的 AI 角色文件配置。")
+
+        else: # 正常对话模式
+            try:
+                for chunk in getAnswer(prompt):
+                    full_response += chunk
+                    message_placeholder.markdown(full_response + "▌")
+                message_placeholder.markdown(full_response)
+                st.session_state.messages.append({"role": "assistant", "content": full_response})
+            except Exception as e:
+                st.error(f"发生错误：{type(e).__name__} - {e}。  请检查你的 API 密钥和消息格式。")
+
     with open(log_file, "wb") as f:
         messages_to_pickle = []
         for msg in st.session_state.messages:
@@ -576,12 +564,3 @@ if prompt := st.chat_input("输入你的消息:"):
     with col2:
         if st.button("🔄", key="refresh_button"):
             st.experimental_rerun()
-
-
-# 首次运行加载模型 (放在 getAnswer 函数外部)
-model = genai.GenerativeModel(
-    model_name="gemini-2.0-flash-exp",
-    generation_config=generation_config,
-    safety_settings=safety_settings,
-    system_instruction="""系统消息""",
-)
