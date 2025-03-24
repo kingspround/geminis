@@ -52,7 +52,7 @@ safety_settings = [
 PLAYWRIGHT_SYSTEM_MESSAGE = """你现在是剧作家AI，你的任务是管理和协调其他AI角色进行对话和场景模拟。
 当用户请求调用特定AI角色时，你需要识别并指示相应的AI角色登场。
 你可以通过说出AI角色的文件名（例如：【XXX.py】）来调用它们。
-你的首要目标是理解用户的需求，并选择最合适的AI角色组合来满足这些需求。
+你的首要目标是理解用户的需求，并选择最合适的AI角色组合来满足这些角色。
 记住，你是所有AI角色的管理者，确保对话流畅且富有创意。
 
 请注意以下几点：
@@ -83,7 +83,11 @@ def load_ai_agents(pages_dir="pages"):
 
             spec = importlib.util.spec_from_file_location(module_name, filepath)
             module = importlib.util.module_from_spec(spec)
-            spec.loader.exec_module(module)
+            try: # 使用 try-except 块来捕获模块执行时的错误
+                spec.loader.exec_module(module)
+            except Exception as e:
+                print(f"Warning: Error executing module {filename}: {e}. This file will be skipped.") # 打印加载模块时的错误，并告知文件将被跳过
+                continue # 跳过当前文件，继续处理下一个文件
 
             if hasattr(module, 'SYSTEM_MESSAGE') and hasattr(module, 'SYSTEM_PROMPT'):
                 ai_agents[filename] = {
@@ -91,7 +95,7 @@ def load_ai_agents(pages_dir="pages"):
                     "system_prompt": getattr(module, 'SYSTEM_PROMPT')
                 }
             else:
-                print(f"Warning: {filename} does not define SYSTEM_MESSAGE or SYSTEM_PROMPT.")
+                print(f"Warning: {filename} does not define SYSTEM_MESSAGE or SYSTEM_PROMPT. This file will be skipped.") # 提示缺少必要变量，并跳过
     return ai_agents
 
 AI_AGENTS = load_ai_agents() # 初始加载AI角色
@@ -371,7 +375,7 @@ with st.sidebar:
     st.checkbox("启用剧作家模式", key="playwright_mode")
 
     # 功能区 1: 文件操作
-    with st.expander("文件操作"):
+    with st.expander("文件操作", expanded=False): # 设置默认不展开
         if len(st.session_state.messages) > 0:
             st.button("重置上一个输出 ⏪",
                       on_click=lambda: st.session_state.messages.pop(-1) if len(st.session_state.messages) > 1 and not st.session_state.reset_history else None,
@@ -379,7 +383,7 @@ with st.sidebar:
         # 移除首次加载判断，总是显示 "读取历史记录" 按钮
         st.button("读取历史记录 📖", key="load_history_button", on_click=lambda: load_history(log_file))
 
-        if st.button("清除历史记录 🗑️"):
+        if st.button("清除历史记录 🗑️", key="clear_history_button"): # 添加 key
             st.session_state.clear_confirmation = True
 
         if "clear_confirmation" in st.session_state and st.session_state.clear_confirmation:
@@ -399,9 +403,10 @@ with st.sidebar:
             data=download_data,
             file_name=os.path.basename(log_file),
             mime="application/octet-stream",
+            key="download_log_button" # 添加 key
         )
 
-        uploaded_file = st.file_uploader("读取本地pkl文件 📁", type=["pkl"])
+        uploaded_file = st.file_uploader("读取本地pkl文件 📁", type=["pkl"], key="file_uploader_pkl") # 添加 key
         if uploaded_file is not None:
             try:
                 loaded_messages = pickle.load(uploaded_file)
@@ -413,8 +418,8 @@ with st.sidebar:
 
     # 功能区 2: 角色设定 (仅在非剧作家模式下显示)
     if not st.session_state.playwright_mode:
-        with st.expander("角色设定"):
-            uploaded_setting_file = st.file_uploader("读取本地设定文件 (txt) 📝", type=["txt"])
+        with st.expander("角色设定", expanded=False): # 设置默认不展开
+            uploaded_setting_file = st.file_uploader("读取本地设定文件 (txt) 📝", type=["txt"], key="file_uploader_txt") # 添加 key
             if uploaded_setting_file is not None:
                 try:
                     setting_name = os.path.splitext(uploaded_setting_file.name)[0]
@@ -438,16 +443,16 @@ with st.sidebar:
 
     # 功能区 3: 剧作家模式 - AI 角色管理 (仅在剧作家模式下显示)
     if st.session_state.playwright_mode:
-        with st.expander("剧作家模式 - AI 角色管理"):
+        with st.expander("剧作家模式 - AI 角色管理", expanded=True): # 设置默认展开
             st.write("已加载 AI 角色:")
             for filename in st.session_state.ai_agents:
                 st.write(f"- {filename}")
             st.write("提示: 在对话中输入 `【文件名.py】` 来调用 AI 角色。")
-            if st.button("刷新 AI 角色列表 🔄", on_click=lambda: st.session_state.ai_agents.update(load_ai_agents())):
+            if st.button("刷新 AI 角色列表 🔄", key="refresh_ai_agents_button", on_click=lambda: st.session_state.ai_agents.update(load_ai_agents())): # 添加 key
                 st.experimental_rerun()
 
 
-    if st.button("刷新页面 🔄"):  # 添加刷新页面按钮
+    if st.button("刷新页面 🔄", key="refresh_page_button"): # 添加 key
         st.experimental_rerun()
 
 # 自动加载历史记录 (如果消息列表为空)
