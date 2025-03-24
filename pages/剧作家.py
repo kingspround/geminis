@@ -408,7 +408,7 @@ with st.sidebar:
         uploaded_file = st.file_uploader("读取本地pkl文件 📁", type=["pkl"], key="file_uploader_pkl") # 添加 key
         if uploaded_file is not None:
             try:
-                loaded_messages = pickle.load(uploaded_file)
+                loaded_messages = pickle.load(uploaded_messages)
                 st.session_state.messages = loaded_messages  # 使用 = 替换现有消息
                 st.success("成功读取本地pkl文件！")
                 st.experimental_rerun()
@@ -520,7 +520,7 @@ if prompt := st.chat_input("输入你的消息:"):
     print("DEBUG: User message appended:", st.session_state.messages[-1]) # 添加这行 - DEBUG PRINT
     with st.chat_message("user"):
         st.markdown(prompt)
-    with st.chat_message("assistant"):
+    with st.chat_message("assistant"): #  剧作家 AI 的消息容器
         message_placeholder = st.empty()
         playwright_full_response = "" # 用于存储剧作家AI的完整回复
 
@@ -551,20 +551,26 @@ if prompt := st.chat_input("输入你的消息:"):
                     agent_system_prompt = agent_info["system_prompt"]
 
                     #  为每个角色AI创建一个新的消息容器
-                    with st.chat_message("assistant"): #  使用 assistant 角色显示 角色AI 的消息
-                        agent_message_placeholder = st.empty() #  在新的消息容器中创建占位符
-                        agent_full_response = ""
-                        try:
-                            agent_response_stream = agent_model.generate_content(contents=agent_messages, stream=True)
+                    # with st.chat_message("assistant"): #  [-- REMOVED this line from here --]
+
+                    agent_message_placeholder = st.empty() #  在新的消息容器中创建占位符
+                    agent_full_response = ""
+                    try:
+                        agent_model = create_model(system_instruction=agent_system_message) # 为 agent 创建模型
+                        agent_messages = [{"role": "system", "parts": [{"text": agent_system_message}]},
+                                         {"role": "user", "parts": [{"text": agent_system_prompt}]},
+                                         {"role": "user", "parts": [{"text": prompt}]}] # 将用户prompt也传递给agent
+                        agent_response_stream = agent_model.generate_content(contents=agent_messages, stream=True)
+                        with st.chat_message("assistant"): #  [-- ADDED st.chat_message HERE, inside try block --]
                             for chunk in agent_response_stream:
                                 agent_full_response += chunk.text
                                 agent_message_placeholder.markdown(f"**【{called_role_name}】:** {agent_full_response}▌") # 角色名作为前缀
                             agent_message_placeholder.markdown(f"**【{called_role_name}】:** {agent_full_response}") # 完成显示
-                            agent_response_content = f"**【{called_role_name}】:** {agent_full_response}" # 保存时包含角色名前缀
-                            st.session_state.messages.append({"role": "assistant", "content": agent_response_content}) # 添加角色AI的完整回复，包含角色名
-                            print("DEBUG: Assistant message appended (agent mode - role response - {called_role_name}):", st.session_state.messages[-1]) # 添加这行 - DEBUG PRINT
-                        except Exception as e:
-                            st.error(f"调用 AI 角色 {called_role_name} 时发生错误：{type(e).__name__} - {e}。 请检查你的 AI 角色定义。")
+                        agent_response_content = f"**【{called_role_name}】:** {agent_full_response}" # 保存时包含角色名前缀
+                        st.session_state.messages.append({"role": "assistant", "content": agent_response_content}) # 添加角色AI的完整回复，包含角色名
+                        print("DEBUG: Assistant message appended (agent mode - role response - {called_role_name}):", st.session_state.messages[-1]) # 添加这行 - DEBUG PRINT
+                    except Exception as e:
+                        st.error(f"调用 AI 角色 {called_role_name} 时发生错误：{type(e).__name__} - {e}。 请检查你的 AI 角色定义。")
 
 
         else: # 正常对话模式
