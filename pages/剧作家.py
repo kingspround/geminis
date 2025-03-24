@@ -107,13 +107,21 @@ def ensure_enabled_settings_exists():
 
 ensure_enabled_settings_exists() # 在任何操作前确保 enabled_settings 存在
 
+model = genai.GenerativeModel( #  定义 model 在函数外部，全局作用域
+    model_name="gemini-2.0-flash-exp",
+    generation_config=generation_config,
+    safety_settings=safety_settings,
+    system_instruction="""系统消息""",
+)
+
 def getAnswer(prompt):
     prompt = prompt or ""
 
     # --- 剧作家模式处理开始 ---
     if st.session_state.playwright_mode: # 检查剧作家模式是否启用
+        global model  # 声明 model 为全局变量, 放在函数作用域的顶端
+
         # 重新配置模型 (每次对话都重新配置，确保 system_instruction 更新)
-        global model  # 声明 model 为全局变量
         model = genai.GenerativeModel(
             model_name="gemini-2.0-flash-exp",
             generation_config=generation_config,
@@ -185,8 +193,8 @@ def getAnswer(prompt):
 
 
     else: # 非剧作家模式
+        global model #  声明 model 为全局变量, 放在函数作用域的顶端
         # 模型配置恢复默认 system_instruction
-        global model
         model = genai.GenerativeModel(
             model_name="gemini-2.0-flash-exp",
             generation_config=generation_config,
@@ -568,3 +576,12 @@ if prompt := st.chat_input("输入你的消息:"):
     with col2:
         if st.button("🔄", key="refresh_button"):
             st.experimental_rerun()
+
+
+# 首次运行加载模型 (放在 getAnswer 函数外部)
+model = genai.GenerativeModel(
+    model_name="gemini-2.0-flash-exp",
+    generation_config=generation_config,
+    safety_settings=safety_settings,
+    system_instruction="""系统消息""",
+)
