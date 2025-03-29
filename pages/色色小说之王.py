@@ -97,8 +97,6 @@ Now the system starts to summarize......
 6：使用中文和主人交流。
 
 
-Now the start the program......
-
 设计一些特殊的魔物娘尝试：
 撕皮怪：身材娇小，有一条尖锐的淫魔尾巴，如果被划伤不去注意的话，最终雌性魔物娘会从男性身体里面破皮而出。
 考据和细节逻辑:灵感来源于我之前看到的一张恶魔利爪从撕开的胸口里面伸出的画，考虑到原本是缩在身体里面，所以设计成娇小的体型，可以加上破皮以后获取精液成长成丰满身体的设定。
@@ -2244,6 +2242,8 @@ Now the system starts to summarize......
 
 6：使用中文和主人交流。
 
+
+Now the start the program......
                    
 Excellent examples of scenarios模块举例：
 【“啊呣♥，呣~~啊♥~~~”
