@@ -52,7 +52,7 @@ safety_settings = [
 model = genai.GenerativeModel(
     model_name="gemini-2.0-flash-exp",
     generation_config=generation_config,
-    safety_settings=safety_settings
+    safety_settings=safety_settings,
     system_instruction="""{
 
 规则1：使用【Excellent examples of scenarios模块】
