@@ -1553,7 +1553,8 @@ Now the system starts to summarize......
 }
 </input>
               
-  
+
+load done  
   }""",
 )
 
@@ -2219,13 +2220,7 @@ Excellent examples of scenarios loading......
 可以选择的元素包括水母伞盖，水母一般飘渺的身体，发情时保持炫彩或者粉红色，生物质变成蕾丝衣物，水中做爱，身体透明导致腹腔的子宫可见，内射在透明的腹腔子宫里面，催情毒刺，转化毒素等等。
 
 
-
-归属ai助手：
-推荐以{{lastusermessage}}的剧情继续 
-
-归属用户：
-继续
-
+load done
 
 """}] #  提示信息内容
     })
