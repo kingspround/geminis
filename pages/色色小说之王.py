@@ -2316,7 +2316,7 @@ Excellent examples of scenarios loading......
 [output]：
 我将进行设计一些特殊的魔物娘尝试：
 先提出灵感或者方向，再将原概念的特征细节科学化的介绍说明，进行符合魔物娘规则的色情化重新设计。【参考[summary]【主程序】模块】
-仅仅说明如何设计魔物娘种族，不作为例子。故事文笔请参考Excellent examples of scenarios。
+仅仅说明如何设计魔物娘种族，不作为例子(所以收到设计魔物娘种族任务时，进行原创，不使用例子)。故事文笔请参考Excellent examples of scenarios。
 
 
 撕皮怪：身材娇小，有一条尖锐的淫魔尾巴，如果被划伤不去注意的话，最终雌性魔物娘会从男性身体里面破皮而出。
