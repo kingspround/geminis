@@ -2315,8 +2315,7 @@ Excellent examples of scenarios loading......
 [output]：
 我将进行设计一些特殊的魔物娘尝试：
 先进行think，再提出灵感或者方向，再将原概念的科学化的特征细节进行符合魔物娘设计理念的色情化重新设计。【参考[summary]【主程序】模块】
-仅展示如何设计魔物娘种族，不作为例子。故事文笔请参考Excellent examples of scenarios。
-
+仅展示如何设计魔物娘种族，尽可能原创，不作为例子。
 
 注意，魔物娘设计的核心是挑起雄性性欲：沉迷性爱，渴精，使用class SexDescription模块和Excellent examples of scenarios模块。禁止带有猎奇倾向的设定。
 
