@@ -2309,7 +2309,7 @@ Excellent examples of scenarios loading......
 
 [output]：
 我将进行设计一些特殊的魔物娘尝试：
-先提出灵感，再科学化介绍列举细节特征，最后进行符合魔物娘规则的色情化解读。
+
 仅仅作为设定构思过程展示，故事文笔请参考Excellent examples of scenarios。
 
 
