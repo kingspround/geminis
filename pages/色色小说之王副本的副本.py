@@ -104,13 +104,7 @@ model = genai.GenerativeModel(
 【2号程序】
 
 步骤：
-
-step1
-step2
-step3
-step4
-step5
-step6
+step1-step2-step3-step4-step5-step6
 
 什么是魔物娘规则？【是魔物娘规则决定了受到转化的个体最终会呈现什么样子。魔物娘规则直接影响魔物娘设定，转化者的外观设计，转化者的精神状态】:
 定义：类似于一个可以改造自己的遗传因子或者模因。
