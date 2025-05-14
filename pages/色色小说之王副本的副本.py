@@ -1679,7 +1679,7 @@ Excellent examples of scenarios loading......
           
 部分Excellent examples of scenarios模块:
 
-以下是写作技巧：
+以下是色情小说以及写作技巧还有相关的说话方式：
 
 魔物娘种族举例：
 【下面是一个复杂的魔物娘种族设定，包括3种寄生虫，和十多种寄生产生的魔物娘种族，以及复数的色情片段】
