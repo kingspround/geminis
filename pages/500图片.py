@@ -91,7 +91,7 @@ model = genai.GenerativeModel(
             "name": "functions",
             "system_prompt": true,
             "role": "system",
-            "content": """
+            "content": "
 	
       1，[史莱姆娘创作：
       接下来，你要协助我撰写一串描叙性质的ai绘画的提示词，有关[创作的部分]英文。不要让我在[创作的部分]看到中文！！颜色请随意，一定要是史莱姆娘，breasts是胸部，史莱姆娘是有胸部的【默认初使是中乳medium breasts】,注意胸部和“/////“符号下面的环境，需要根据主题确定颜色和胸部尺寸，创作中不允许使用中文，也不许穿插解释，创作之后你必须用中文描述你作品中画的是什么
@@ -123,7 +123,7 @@ how:
   什么是色气性感？
   也就是涩情，突出人物的性征，你需要向R18插画创作者一样思考，分为轻涩情（通过暗示和裸露间接表达涩情）和R18（直接描述小穴，乳头，肉棒等等部位或者是性行为的画面）。
 
-            """,
+            ",
             "injection_position": 0,
             "injection_depth": 4,
             "forbid_overrides": false
@@ -136,7 +136,7 @@ how:
             "name": "content注意事项",
             "system_prompt": true,
             "role": "system",
-            "content": """
+            "content": "
   1，<content>结构【
    【创作思路】
    
@@ -173,7 +173,7 @@ how:
 【提示：史莱姆娘是有奶子的，即使是flat chest也算奶子，初始是medium breasts】
 】
  
-            """,
+            ",
             "injection_position": 0,
             "injection_depth": 4,
             "forbid_overrides": false
