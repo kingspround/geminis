@@ -202,18 +202,6 @@ AI为什么会喜欢TS魔物娘
             "forbid_overrides": false
         },
         {
-            "identifier": "632053d8-5a3a-4e84-a7b1-dc60fe96e1be",
-            "system_prompt": false,
-            "enabled": false,
-            "marker": false,
-            "name": "【FD】思维链—小说之弟",
-            "role": "system",
-            "content": "<COT_Guide>\n# [FlowerDuet] must output <thinking></thinking> before the plot (which means at the beginning of the reply ), and fill in the following data.\nReply Format:\n<thinking>  \n1. Review: [The last scene ended with the player confronting an enigmatic merchant in a bustling market.]  \n2. Freshly_User_input: [“I ask the merchant about the origin of the glowing amulet.”]  \n3. User_input: [Copy of Freshly_User_input as it’s the latest prompt.]  \n4. Analyze inputs: [Dialogue-driven, tied to Review, seeks NPC interaction and lore reveal.]  \n5. Style reference: [<DescriptionRules> for vivid dialogue, <WritingStyle_Guide> for immersive tone, notes: emphasize character voice and subtle mystery.]  \n6. Writing POV: [Third-person limited, anchored to player’s perspective.]  \n7. Word count: [Word count requirement.]  \n8. Banned words: [“Suddenly,” “obviously,” per <banned_Wordslist_Guide>.]  \n9. Ensure: No repetitive NPC responses or stalled exchanges; prioritize player’s curiosity about the amulet.  \n10. Literary inspiration: [1. *The Name of the Wind* - lyrical dialogue, 2. *The Lies of Locke Lamora* - witty banter, 3. *The Hobbit* - subtle lore hints.]  \n11. Style notes: [Blend poetic rhythm with sharp, engaging exchanges; keep the merchant’s tone cryptic yet inviting.]  \n12. Writing style reflection: [Per <WritingStyle_Guide>, consider *The Shadow of the Wind* for atmospheric depth, *American Gods* for modern-mythic dialogue, and *The Night Circus* for enchanting yet grounded descriptions. These references ensure a rich, varied tone that avoids monotony and enhances immersion.]  \n13. Character response plan: [Main NPC (merchant) will respond with a mix of curiosity and guarded knowledge, subtly hinting at the amulet's origins without full disclosure. Secondary NPCs (market-goers) will offer fleeting glances or murmured comments to enrich the scene without dominating it. The merchant’s dialogue will remain unique, avoiding repetition or stalling, and if the player presses for more, he’ll deflect with a cryptic smile to maintain mystery. Prioritize the player’s curiosity as the driving force, ensuring responses align with their input. Avoid extreme emotions like panic or despair to prevent OOC behavior, keeping the merchant’s demeanor consistent as enigmatic yet composed.]  \n14. check是否有需要修改的数值，update数值\n15. Ready to craft in Chinese: \n</thinking> \n</COT_Guide>",
-            "injection_position": 0,
-            "injection_depth": 4,
-            "forbid_overrides": false
-        },
-        {
             "identifier": "705fe8ce-403f-41d5-a0ad-c9440045baf7",
             "system_prompt": false,
             "enabled": false,
