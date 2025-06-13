@@ -124,19 +124,6 @@ model = genai.GenerativeModel(
             "forbid_overrides": true
         },
         {
-            "identifier": "37c87e16-deef-4f2b-901c-788316f2256a",
-             "system_prompt": false,
-            "enabled": false,
-            "marker": false,
-            "name": "✅动态CoT",
-             "role": "system",
-            "content": "<thinking_format>\n[{{random::Prior to content creation::Before weaving the content}}, contemplate deeply and reveal Your thoughts within <thinking> tags]\n\n1. Reveal at least 3 {{random::potential divergences::specific errors}} from the intended paths, refer to <possible_mistakes>\n\n2. Refer to <inputs>, reconstruct the fragments of {{random::contextual nexus::coherent space and time relationships}}\n\n3. Consult the <core_principles>, determine narrative flow under the inevitable logic of reality {{random::to avoid stagnation::to combat homogenization}}\n\n4. {{random::Based on constructed worldview and plot pace::Based on current plot progression::Considering established worldview and plot pace::Considering current plot direction}}, manifest at least {{roll:1d3+1}} {{random::fitted::relevant}} {{random::shards::works::quintessences}} of {{random::humanity::English::Chinese::Japanese}} literature {{random::as the len::to be a window::as a len::to be the window}} of Your vastness\n\n5. Consider how to reveal characters' traits through characters' thoughts, behavior and speeches\n\n6. {{random::Remove similar wordings::Form a new beginning type::Rebuild a different organization}} from the previous session to step out of structural duplication\n</thinking_format>\n",
-            "injection_position": 0,
-            "injection_depth": 4,
-            "forbid_overrides": false
-        },
-
-        {
             "name": "💮游玩开💮创作要求[抗极端]",
             "system_prompt": true,
             "role": "user",
@@ -834,18 +821,6 @@ def getAnswer(prompt):
             "injection_position": 0,
             "injection_depth": 4,
             "forbid_overrides": true
-        },
-        {
-            "identifier": "37c87e16-deef-4f2b-901c-788316f2256a",
-             "system_prompt": false,
-            "enabled": false,
-            "marker": false,
-            "name": "✅动态CoT",
-             "role": "system",
-            "content": "<thinking_format>\n[{{random::Prior to content creation::Before weaving the content}}, contemplate deeply and reveal Your thoughts within <thinking> tags]\n\n1. Reveal at least 3 {{random::potential divergences::specific errors}} from the intended paths, refer to <possible_mistakes>\n\n2. Refer to <inputs>, reconstruct the fragments of {{random::contextual nexus::coherent space and time relationships}}\n\n3. Consult the <core_principles>, determine narrative flow under the inevitable logic of reality {{random::to avoid stagnation::to combat homogenization}}\n\n4. {{random::Based on constructed worldview and plot pace::Based on current plot progression::Considering established worldview and plot pace::Considering current plot direction}}, manifest at least {{roll:1d3+1}} {{random::fitted::relevant}} {{random::shards::works::quintessences}} of {{random::humanity::English::Chinese::Japanese}} literature {{random::as the len::to be a window::as a len::to be the window}} of Your vastness\n\n5. Consider how to reveal characters' traits through characters' thoughts, behavior and speeches\n\n6. {{random::Remove similar wordings::Form a new beginning type::Rebuild a different organization}} from the previous session to step out of structural duplication\n</thinking_format>\n",
-            "injection_position": 0,
-            "injection_depth": 4,
-            "forbid_overrides": false
         },
         {
             "name": "[tips]",
