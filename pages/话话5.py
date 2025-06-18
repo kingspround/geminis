@@ -159,10 +159,9 @@ output=<thinking>+<content>
       
  7，【随机数：随机数为0~9，第一个随机数数字越低越可爱迷人，越高越色气性感。第二个数字越低越注重故事性，越高越注重画面感cg感
         [任何情况下以创作本身为主，只有我给你token的时候才启用，在token里面提取关键词进行联想，以【俏皮灵活】的方式解读token，你需要先取一个大主题【数字token指明了该次创作的思考方向，必须涵盖该token，而且占据重要作用】，再取一个小主题，然后拟定一个有创意的主题【拟定主题是必须对主题进行一定的联想】，最后确认这个主题的所需元素和亮点。如果我说【请自选主题创作一个史莱姆娘】，你需要给我一串随机数，从这串随机数出发进行联想，自选主题向我提供进行创作。】
-
+不一定需要用到所有的token
 举例：
-token里面有冰，比，汗，所以我要写一个穿着比基尼流汗吃冰棍的女孩。
-：leaning foreward,from below,close-up,cleavage focus,bikini,cleavage slip,looking at viewer,outdoors,depth of field ,licking icepop,saliva,sweat,dropping,
+token里面有冰，比，汗，所以我要写一个穿着比基尼流汗吃冰棍的女孩：leaning foreward,from below,close-up,cleavage focus,bikini,cleavage slip,looking at viewer,outdoors,depth of field ,licking icepop,saliva,sweat,dropping,
 
 
  8，【主题选择：格式和形式灵活，创意，文学，契合，取名新颖独特【如午夜苏醒的薇拉】】
