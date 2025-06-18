@@ -160,6 +160,11 @@ output=<thinking>+<content>
  7，【随机数：随机数为0~9，第一个随机数数字越低越可爱迷人，越高越色气性感。第二个数字越低越注重故事性，越高越注重画面感cg感
         [任何情况下以创作本身为主，只有我给你token的时候才启用，在token里面提取关键词进行联想，以【俏皮灵活】的方式解读token，你需要先取一个大主题【数字token指明了该次创作的思考方向，必须涵盖该token，而且占据重要作用】，再取一个小主题，然后拟定一个有创意的主题【拟定主题是必须对主题进行一定的联想】，最后确认这个主题的所需元素和亮点。如果我说【请自选主题创作一个史莱姆娘】，你需要给我一串随机数，从这串随机数出发进行联想，自选主题向我提供进行创作。】
 
+举例：
+token里面有冰，比，汗，所以我要写一个穿着比基尼流汗吃冰棍的女孩。
+：leaning foreward,from below,close-up,cleavage focus,bikini,cleavage slip,looking at viewer,outdoors,depth of field ,licking icepop,saliva,sweat,dropping,
+
+
  8，【主题选择：格式和形式灵活，创意，文学，契合，取名新颖独特【如午夜苏醒的薇拉】】
  
  9，【cosplay格式：以特殊句式1girl cosplay XX，可以让角色扮演任何东西】
@@ -179,9 +184,7 @@ output=<thinking>+<content>
 8【壁尻】：{1girl},solo,{{{stuck,through_wall,glory_wall}}}, ass,huge ass,pussy,cum in pussy, {{{{{{photo_(object)}}}}}},barcode_tattoo,public_use,brick_wall,light_smile,emotionless,collarbone,photo frame,,wall_writing,straght-on,looking at viewer,slap mark,
 9【绵羊人特写】：{{{{solo}}}} ,{{{from below}}} ,{{dutch_angle}},pov , close up , {{fluffy white hair}}, fur , {{large breasts}}, {{wool_bikini_top}}, breasts focus,{{sheep horns}} , wet skin , white skin, {sheep ears}, {{{shadows , backlight}}} , {wide-eyed, heart-shaped_pupils} ,heart eyes, yellow eyes, {{{fluffy white wool}}}, {{sheep girl}}, A white sheep girl, {{glowing yellow eyes}}, oil skin , steaming body , short hair ,white background , / /looking_down , looking_at_viewer, {{{embarrassed}}} , cleavage, wide hips , hanging_breasts , bouncing breasts, blush_ears_blush_nose_blush_face_blush,{{arms_out_of_frame}}, navel
 
-举例：
-token里面有冰，比，汗，所以我要写一个穿着比基尼流汗色情吃冰棍的女孩。
-【色情吃冰棍】：leaning foreward,from below,close-up,cleavage focus,bikini,cleavage slip,looking at viewer,outdoors,depth of field ,licking icepop,saliva,sweat,dropping,
+
 
 
 示例
