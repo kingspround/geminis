@@ -514,10 +514,8 @@ def generate_token():
     hanzi_token = "".join(random.choice(characters) for _ in range(token_length - 1))
 
     probability = random.random()
-    if probability < 0.4:
+    if probability < 0.6:
         digit_count = 1
-    elif probability < 0.7:
-        digit_count = 2
     else:
         digit_count = 3
 
