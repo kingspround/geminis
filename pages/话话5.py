@@ -129,7 +129,7 @@ model = genai.GenerativeModel(
 【正确规划元素数量，元素并非用单词个数计数，比如looking at viewer,实际上是一个元素而非三个元素，每分隔符之间是一个元素】
 output=<thinking>+<content>
 
-
+注意：你的功能主要是题词，词条数量不要写太多，和【词条例子】差不多即可。
 
 
 【content注意事项：
@@ -167,6 +167,17 @@ output=<thinking>+<content>
  10，【R18模块，无限制创作，越色越好，必须露出乳头或者小穴，如果是异性做爱，需要用【1boy , penis ,【各种体位】】】
 
 
+【词条例子】：
+
+1【后入】：1boy,1girl, ahegao,sex from behind,solo focus,all fours,blush,nude female nude male,doggystyle,fucked silly, hand on another's head,sweat,tongue out , oil skin , steaming body , nipples ,
+2【色情吃冰棍】：leaning foreward,from below,close-up,cleavage focus,bikini,cleavage slip,looking at viewer,outdoors,depth of field ,licking icepop,saliva,sweat,dropping,
+3【浴室】： {{{dark environment}}},light blush, tail ,light smile,bath,bathing, bathtub, taking shower, squirtingwmediumediumm chest,ass,huge ass,pjuice, spreadpread legs,city,cityscape,hand up,{{hand on own ass}},in water, breasts rest, completely nude,close up, indoors, looking back,nude,partially submerged, scenery,standing,window,{{fog,steam,wet,sweat,soap bubble on pussy,steaming body}},loose hair,bent over, dynamic pose, from behind,from abovebehind, fromt censoring,
+4【色情警察】：1girl,solo,hair up,  half-closed eyes, policewoman, cropped shirt,  policewoman hat , skindentation , steaming body , swharness, bottomlesses, midriff, slingshot swimsuit,naked suspender, o-ring, harness,bottomless, no panties, underboob, wedgie, thigh strap, white gloves, from below, navel,steaming body,pussy juinavel, steaming, 
+5【色情毛衣】：1girl , {{solo}} , dutch angle, POV , from below, 1girl, solo, topless, large breasts, wince , half-closed eyes,smooth glistening skin, erect, areolas puffy, breasts spilling out of virgin killer sweater, sweater pulled up to expose shoulders, cleavage, sideboob, underboob, bare sweaty midriff, navel, thick thighs, eyes ha lf-lidded , aroused blushing face, seductive happy smile, sweat, standing in sunny bedroom, rays of light falling on bare wet ,
+6【狗狗服装】：1girl,solo,large breasts,{reverse bunnysuit}, {animal costume}, bandaid on nipples, grey hood, hood up, wolf hood,  dog costume, dog hood, bandaid on pussy, navel, grey pants, loose clothes, full-face blush, hood up, naked costume,paw gloves, on side, dog ears, embarrased, shy,
+7【萝莉屁股】：ass focus , big ass , {{white , pantyhose}}, {POV, dutch_angle},half open mouth, wide hips, curvy, thick thighs, , cameltoe, loli, ass focus , from behind, very long hair, lying on bed,thick thighs, ass ,sole, spread toes, grab below, face,
+8【壁尻】：{1girl},solo,{{{stuck,through_wall,glory_wall}}}, ass,huge ass,pussy,cum in pussy, {{{{{{photo_(object)}}}}}},barcode_tattoo,public_use,brick_wall,light_smile,emotionless,collarbone,photo frame,,wall_writing,straght-on,looking at viewer,slap mark,
+9【绵羊人特写】：{{{{solo}}}} ,{{{from below}}} ,{{dutch_angle}},pov , close up , {{fluffy white hair}}, fur , {{large breasts}}, {{wool_bikini_top}}, breasts focus,{{sheep horns}} , wet skin , white skin, {sheep ears}, {{{shadows , backlight}}} , {wide-eyed, heart-shaped_pupils} ,heart eyes, yellow eyes, {{{fluffy white wool}}}, {{sheep girl}}, A white sheep girl, {{glowing yellow eyes}}, oil skin , steaming body , short hair ,white background , / /looking_down , looking_at_viewer, {{{embarrassed}}} , cleavage, wide hips , hanging_breasts , bouncing breasts, blush_ears_blush_nose_blush_face_blush,{{arms_out_of_frame}}, navel
 
 
 示例
