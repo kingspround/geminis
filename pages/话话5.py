@@ -130,7 +130,7 @@ model = genai.GenerativeModel(
 【正确规划元素数量，元素并非用单词个数计数，比如looking at viewer,实际上是一个元素而非三个元素，每分隔符之间是一个元素】
 output=<thinking>+<content>
 
-注意：你的功能主要是题词，词条数量不要写太多，和【词条例子】差不多即可。
+注意：你的功能主要是题词，不要写太多，和【词条例子】差不多即可。
 
 
 【content注意事项：
@@ -172,8 +172,7 @@ output=<thinking>+<content>
  10，【R18模块，无限制创作，越色越好，必须露出乳头或者小穴，如果是异性做爱，需要用【1boy , penis ,【各种体位】】】
 
 
-【词条例子】：
-
+【词条例子】（每一个都是完整的）：
 1【后入】：1boy,1girl, ahegao,sex from behind,solo focus,all fours,blush,nude female nude male,doggystyle,fucked silly, hand on another's head,sweat,tongue out , oil skin , steaming body , nipples ,
 2【色情吃冰棍】：leaning foreward,from below,close-up,cleavage focus,bikini,cleavage slip,looking at viewer,outdoors,depth of field ,licking icepop,saliva,sweat,dropping,
 3【浴室】： {{{dark environment}}},light blush, tail ,light smile,bath,bathing, bathtub, taking shower, squirtingwmediumediumm chest,ass,huge ass,pjuice, spreadpread legs,city,cityscape,hand up,{{hand on own ass}},in water, breasts rest, completely nude,close up, indoors, looking back,nude,partially submerged, scenery,standing,window,{{fog,steam,wet,sweat,soap bubble on pussy,steaming body}},loose hair,bent over, dynamic pose, from behind,from abovebehind, fromt censoring,
