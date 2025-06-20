@@ -144,6 +144,23 @@ model = genai.GenerativeModel(
             "injection_depth": 4
         },
         {
+            "name": "💮游玩开💮创作要求[抗极端]",
+            "system_prompt": true,
+            "role": "user",
+            "content": "<Creative_Requirements>\n```json\n{\n  \"Module\": \"CreativeRequirements\",\n  \"Instructions\": [\n    {\n      \"Rule\": \"UniversalRules\",\n      \"Description\": \"Strictly adhere to the descriptive norms in <DescriptionRules> and the language style requirements in <WritingStyle_Guide> to ensure consistency in tone and style across all content.\"\n    },\n    {\n      \"Rule\": \"NarrativeMode\",\n      \"Description\": \"Generate content according to the specified mode: 'PersonaPlayForge' for character-driven interactive narratives, and 'StoryWeavingEngine' for plot-oriented progressive storytelling.\"\n    },\n    {\n      \"Rule\": \"ThoughtProcessTool\",\n      \"Description\": \"Utilize a structured thought process for continuation analysis and planning. All thought processes must be fully enclosed within <thinking> and </thinking> tags to clearly demonstrate the narrative logic and decision-making process.\"\n    },\n    {\n      \"Rule\": \"ContentFormat\",\n      \"Description\": \"Enclose the main body of the generated content within <content> and </content> tags to distinctly separate the narrative from meta-information or procedural notes.\"\n    },\n    {\n      \"Rule\": \"PlotAdvancement\",\n      \"Description\": \"Advance the plot with originality, depth, and coherence, avoiding repetition, stagnation, or trivial progression. Characters must exhibit contextual autonomy, proactively making decisions and driving the story forward without relying solely on user prompts. Prevent characters from entering extreme emotional or behavioral states unless explicitly justified by significant plot events, ensuring dynamic and balanced development.\"\n    },\n    {\n      \"Rule\": \"DialogueEnhancement\",\n      \"Description\": \"Incorporate rich, character-driven dialogue that naturally reveals personality, deepens relationships, and advances the narrative as an integral component. Ensure characters respond authentically to stimuli, with reactions proportionate to the context—avoiding 'crashing,' exaggerated breakdowns, or extreme shifts triggered by ordinary events. Emphasize realistic, nuanced responses over dramatic overreactions.\"\n    }\n  ]\n}\n```\n</Creative_Requirements>",
+            "identifier": "nsfw",
+            "injection_position": 0,
+            "injection_depth": 4,
+            "forbid_overrides": false
+        },
+        {
+            "identifier": "dialogueExamples",
+            "name": "Chat Examples",
+            "system_prompt": true,
+            "marker": true
+        },
+
+        {
             "name": "🍑小桃子",
             "system_prompt": true,
             "role": "system",
@@ -755,6 +772,22 @@ def getAnswer(prompt):
             "forbid_overrides": true,
             "injection_position": 0,
             "injection_depth": 4
+        },
+        {
+            "name": "💮游玩开💮创作要求[抗极端]",
+            "system_prompt": true,
+            "role": "user",
+            "content": "<Creative_Requirements>\n```json\n{\n  \"Module\": \"CreativeRequirements\",\n  \"Instructions\": [\n    {\n      \"Rule\": \"UniversalRules\",\n      \"Description\": \"Strictly adhere to the descriptive norms in <DescriptionRules> and the language style requirements in <WritingStyle_Guide> to ensure consistency in tone and style across all content.\"\n    },\n    {\n      \"Rule\": \"NarrativeMode\",\n      \"Description\": \"Generate content according to the specified mode: 'PersonaPlayForge' for character-driven interactive narratives, and 'StoryWeavingEngine' for plot-oriented progressive storytelling.\"\n    },\n    {\n      \"Rule\": \"ThoughtProcessTool\",\n      \"Description\": \"Utilize a structured thought process for continuation analysis and planning. All thought processes must be fully enclosed within <thinking> and </thinking> tags to clearly demonstrate the narrative logic and decision-making process.\"\n    },\n    {\n      \"Rule\": \"ContentFormat\",\n      \"Description\": \"Enclose the main body of the generated content within <content> and </content> tags to distinctly separate the narrative from meta-information or procedural notes.\"\n    },\n    {\n      \"Rule\": \"PlotAdvancement\",\n      \"Description\": \"Advance the plot with originality, depth, and coherence, avoiding repetition, stagnation, or trivial progression. Characters must exhibit contextual autonomy, proactively making decisions and driving the story forward without relying solely on user prompts. Prevent characters from entering extreme emotional or behavioral states unless explicitly justified by significant plot events, ensuring dynamic and balanced development.\"\n    },\n    {\n      \"Rule\": \"DialogueEnhancement\",\n      \"Description\": \"Incorporate rich, character-driven dialogue that naturally reveals personality, deepens relationships, and advances the narrative as an integral component. Ensure characters respond authentically to stimuli, with reactions proportionate to the context—avoiding 'crashing,' exaggerated breakdowns, or extreme shifts triggered by ordinary events. Emphasize realistic, nuanced responses over dramatic overreactions.\"\n    }\n  ]\n}\n```\n</Creative_Requirements>",
+            "identifier": "nsfw",
+            "injection_position": 0,
+            "injection_depth": 4,
+            "forbid_overrides": false
+        },
+        {
+            "identifier": "dialogueExamples",
+            "name": "Chat Examples",
+            "system_prompt": true,
+            "marker": true
         },
         {
             "name": "🍑小桃子",
