@@ -871,35 +871,6 @@ def getAnswer(prompt, update_message, continue_mode=False):
         update_message(full_response)  # 在 getAnswer 函数内部调用 update_message 函数
     return full_response
 
-    for msg in st.session_state.messages[-20:]:
-      if msg and msg.get("role") and msg.get("content"): # 只有当msg不为空，并且有 role 和 content 属性的时候才去处理
-          if msg["role"] == "user":
-            history_messages.append({"role": "user", "parts": [{"text": msg["content"]}]})
-          elif msg["role"] == "assistant" and msg["content"] is not None:  # 使用 elif 确保只添加 role 为 assistant 的消息
-            history_messages.append({"role": "model", "parts": [{"text": msg["content"]}]})
-
-
-    history_messages = [msg for msg in history_messages if msg["role"] in ["user", "model"]] #  只保留 "user" 和 "model" 角色
-
-    if enabled_settings_content:
-        history_messages.append({"role": "user", "parts": [{"text": enabled_settings_content}]})
-
-    if prompt:
-        history_messages.append({"role": "user", "parts": [{"text": prompt}]})
-
-    full_response = ""
-    try:
-        response = model.generate_content(contents=history_messages, stream=True)
-        for chunk in response:
-            full_response += chunk.text
-            yield chunk.text
-        return full_response
-    except Exception as e:
-      if full_response:
-          st.session_state.messages.append({"role": "assistant", "content": full_response}) # 保存不完整输出
-      st.error(f"发生错误: {type(e).__name__} - {e}。 Prompt: {prompt}。 请检查你的API密钥、模型配置和消息格式。")
-      return ""
-
 def download_all_logs():
     # 下载所有日志函数
     zip_buffer = BytesIO()
