@@ -8,10 +8,16 @@ from datetime import datetime
 from io import BytesIO
 import zipfile
 
+# --- Streamlit Page Configuration (这个必须是你的 Streamlit 脚本中的第一行 Streamlit 代码！) ---
+st.set_page_config(
+    page_title="Gemini Chatbot",
+    layout="wide"
+)
+
 # --- API 密钥设置 ---
 API_KEYS = {
-    "主密钥": "AIzaSyCBjZbA78bPusYmUNvfsmHpt6rPx6Ur0QE",  # 替换成你的主 API 密钥
-    "备用1号": "AIzaSyAWfFf6zqy1DizINOwPfxPD8EF2ACdwCaQ",  # 替换成你的备用 API 密钥
+    "主密钥": "AIzaSyCBjZbA78bPusYmUNvfsmHpt6rPx6Ur0QE",
+    "备用1号": "AIzaSyAWfFf6zqy1DizINOwPfxPD8EF2ACdwCaQ",
     "备用2号":"AIzaSyD4UdMp5wndOAKxtO1CWpzuZEGEf78YKUQ",
     "备用3号":"AIzaSyBVbA7tEyyy_ASp7l9P60qSh1xOM2CSMNw",
     "备用4号":"AIzaSyDezEpxvtY1AKN6JACMU9XHte5sxATNcUs",
@@ -24,13 +30,37 @@ API_KEYS = {
     # 可以继续添加更多 API key
 }
 
+# --- 初始化 Session State (现在可以安全访问了，因为它在 st.set_page_config() 之后) ---
+# 确保 'selected_api_key' 在被 genai.configure 使用之前初始化
+if "selected_api_key" not in st.session_state:
+    st.session_state.selected_api_key = list(API_KEYS.keys())[0]  # 默认使用第一个 key
+
+if "messages" not in st.session_state:
+    st.session_state.messages = []
+if 'character_settings' not in st.session_state:
+    st.session_state.character_settings = {}
+if 'enabled_settings' not in st.session_state:
+    st.session_state.enabled_settings = {}
+if 'regenerate_index' not in st.session_state:
+    st.session_state.regenerate_index = None
+if 'continue_index' not in st.session_state:
+    st.session_state.continue_index = None
+if "reset_history" not in st.session_state:
+    st.session_state.reset_history = False
+if "chat_session" not in st.session_state:
+    st.session_state.chat_session = None
+if "rerun_count" not in st.session_state:
+    st.session_state.rerun_count = 0
+if "use_token" not in st.session_state:
+    st.session_state.use_token = True
+
 
 # --- 配置 API 密钥 ---
 if "selected_api_key" not in st.session_state:
     st.session_state.selected_api_key = list(API_KEYS.keys())[0]  # Default to the first key
 genai.configure(api_key=API_KEYS[st.session_state.selected_api_key])
 
-# --- 模型设置 ---
+# --- 模型设置 (保持不变) ---
 generation_config = {
   "temperature": 1.6,
   "top_p": 0.95,
@@ -45,8 +75,6 @@ safety_settings = [
     {"category": "HARM_CATEGORY_SEXUALLY_EXPLICIT", "threshold": "BLOCK_NONE"},
     {"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_NONE"},
 ]
-
-
 
 model = genai.GenerativeModel(
   model_name="gemini-2.5-flash-preview-05-20",
@@ -779,25 +807,7 @@ if not os.path.exists(log_file):
     with open(log_file, "wb") as f:
         pass  # 创建空文件
 
-# --- 初始化 Session State ---
-if "messages" not in st.session_state:
-    st.session_state.messages = []
-if 'character_settings' not in st.session_state:
-    st.session_state.character_settings = {}
-if 'enabled_settings' not in st.session_state:
-    st.session_state.enabled_settings = {}
-if 'regenerate_index' not in st.session_state:
-    st.session_state.regenerate_index = None
-if 'continue_index' not in st.session_state:
-    st.session_state.continue_index = None
-if "reset_history" not in st.session_state:
-    st.session_state.reset_history = False
-if "chat_session" not in st.session_state:
-    st.session_state.chat_session = None
-if "rerun_count" not in st.session_state:
-    st.session_state.rerun_count = 0
-if "use_token" not in st.session_state:
-    st.session_state.use_token = True
+
 
 # --- 功能函数 ---
 def generate_token():
@@ -1006,11 +1016,7 @@ def continue_message(index):
     else:
         st.error("无效的消息索引")
 
-# --- Streamlit 布局 ---
-st.set_page_config(
-    page_title="Gemini Chatbot",
-    layout="wide"
-)
+
 
 # 添加 API key 选择器
 with st.sidebar:
