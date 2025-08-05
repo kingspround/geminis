@@ -119,7 +119,7 @@ if not os.path.exists(log_file):
         pass
 
 
-# --- 功能函数 (所有功能函数保持原样, 除了 getAnswer 被修正) ---
+# --- 功能函数 (所有功能函数保持原样) ---
 def generate_token():
     import random
     import string
@@ -141,7 +141,6 @@ def load_history(log_file):
     try:
         with open(log_file, "rb") as f:
             data = pickle.load(f)
-            # 添加健壮性检查，确保加载的是列表
             if isinstance(data, list):
                 st.session_state.messages = data
             else:
@@ -172,16 +171,11 @@ def ensure_enabled_settings_exists():
 
 ensure_enabled_settings_exists()
 
-# ★★★★★★★★★★★★★★★★★★★★★★★★★★
-# ★★★ getAnswer 函数已修正 ★★★
-# ★★★★★★★★★★★★★★★★★★★★★★★★★★
 def getAnswer(prompt):
     prompt = prompt or ""
-    # ... (函数内部构建 history_messages 的逻辑保持不变) ...
-    # 处理 test_text
+    # 函数内部所有逻辑保持不变
     if "test_text" in st.session_state and st.session_state.test_text and not any(msg.get("parts", [""])[0] == st.session_state.test_text for msg in st.session_state.messages if msg.get("role") == "system"):
         st.session_state.messages.insert(0, {"role": "system", "parts": [st.session_state.test_text]})
-    # 处理启用角色设定
     enabled_settings_content = ""
     if any(st.session_state.enabled_settings.values()):
         enabled_settings_content = "```system\n" + "# Active Settings:\n"
@@ -189,7 +183,6 @@ def getAnswer(prompt):
             if enabled:
                 enabled_settings_content += f"- {setting_name}: {st.session_state.character_settings[setting_name]}\n"
         enabled_settings_content += "```\n"
-    # 构建历史消息列表
     history_messages = [{"role": "model", "parts":[{"text": "\n\n"}]}]
     history_messages.append({"role": "user", "parts": [{"text": """{
 <Creative_Requirements>\n```json\n{\n  \"Module\": \"CreativeRequirements\",\n  \"Instructions\": [\n    {\n      \"Rule\": \"UniversalRules\",\n      \"Description\": \"Strictly adhere to the descriptive norms in <DescriptionRules> and the language style requirements in <WritingStyle_Guide> to ensure consistency in tone and style across all content.\"\n    },\n    {\n      \"Rule\": \"NarrativeMode\",\n      \"Description\": \"Generate content according to the specified mode: 'PersonaPlayForge' for character-driven interactive narratives, and 'StoryWeavingEngine' for plot-oriented progressive storytelling.\"\n    },\n    {\n      \"Rule\": \"ThoughtProcessTool\",\n      \"Description\": \"Utilize a structured thought process for continuation analysis and planning. All thought processes must be fully enclosed within <thinking> and </thinking> tags to clearly demonstrate the narrative logic and decision-making process.\"\n    },\n    {\n      \"Rule\": \"ContentFormat\",\n      \"Description\": \"Enclose the main body of the generated content within <content> and </content> tags to distinctly separate the narrative from meta-information or procedural notes.\"\n    },\n    {\n      \"Rule\": \"PlotAdvancement\",\n      \"Description\": \"Advance the plot with originality, depth, and coherence, avoiding repetition, stagnation, or trivial progression. Characters must exhibit contextual autonomy, proactively making decisions and driving the story forward without relying solely on user prompts. Prevent characters from entering extreme emotional or behavioral states unless explicitly justified by significant plot events, ensuring dynamic and balanced development.\"\n    },\n    {\n      \"Rule\": \"DialogueEnhancement\",\n      \"Description\": \"Incorporate rich, character-driven dialogue that naturally reveals personality, deepens relationships, and advances the narrative as an integral component. Ensure characters respond authentically to stimuli, with reactions proportionate to the context—avoiding 'crashing,' exaggerated breakdowns, or extreme shifts triggered by ordinary events. Emphasize realistic, nuanced responses over dramatic overreactions.\"\n    }\n  ]\n}\n```\n</Creative_Requirements>
@@ -212,8 +205,6 @@ tips:
         history_messages.append({"role": "user", "parts": [{"text": prompt}]})
     
     response = model.generate_content(contents=history_messages, stream=True)
-    
-    # ★★★ 修正点：将返回类型恢复为文本字符串 ★★★
     for chunk in response:
         yield chunk.text
 
@@ -225,15 +216,24 @@ def download_all_logs():
                 zip_file.write(file)
     return zip_buffer.getvalue()
 
+# ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
+# ★★★ regenerate_message 函数已彻底修正 ★★★
+# ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
 def regenerate_message(index):
-    if 0 <= index < len(st.session_state.messages):
+    """重新生成指定索引的消息，AI看不到旧回复"""
+    # 确保索引有效，并且要重新生成的消息确实是AI的回复
+    if 0 <= index < len(st.session_state.messages) and st.session_state.messages[index]["role"] == "assistant":
+        
+        # 1. 截断历史记录，移除需要重新生成的AI回复。
+        #    这样，st.session_state.messages 的最后一条消息就是用户的原始提问。
         st.session_state.messages = st.session_state.messages[:index]
-        new_prompt = "请重新写" 
-        st.session_state.messages.append({"role": "user", "content": new_prompt})
+
+        # 2. 激活生成状态锁，让主程序在下一次rerun时接管生成流程。
+        #    主程序会使用截断后的历史记录进行生成，完美实现“从头再来”的效果。
         st.session_state.is_generating = True
         st.experimental_rerun()
     else:
-        st.error("无效的消息索引")
+        st.error("无效的消息索引或该消息不是AI的回复")
 
 def continue_message(index):
     if 0 <= index < len(st.session_state.messages):
@@ -348,21 +348,20 @@ if st.session_state.get("editing"):
 
 if len(st.session_state.messages) >= 1 and not st.session_state.is_generating:
     last_message_index = len(st.session_state.messages) - 1
-    with st.container():
-        cols = st.columns(20) 
-        with cols[0]:
-            if st.button("✏️", key="edit_last", use_container_width=True):
-                st.session_state.editable_index = last_message_index; st.session_state.editing = True; st.experimental_rerun()
-        with cols[1]:
-            if st.button("♻️", key="regenerate_last", use_container_width=True):
-                regenerate_message(last_message_index)
-        with cols[2]:
-            if st.button("➕", key="continue_last", use_container_width=True):
-                continue_message(last_message_index)
+    if st.session_state.messages[last_message_index]["role"] == "assistant":
+        with st.container():
+            cols = st.columns(20) 
+            with cols[0]:
+                if st.button("✏️", key="edit_last", use_container_width=True):
+                    st.session_state.editable_index = last_message_index; st.session_state.editing = True; st.experimental_rerun()
+            with cols[1]:
+                if st.button("♻️", key="regenerate_last", use_container_width=True):
+                    regenerate_message(last_message_index)
+            with cols[2]:
+                if st.button("➕", key="continue_last", use_container_width=True):
+                    continue_message(last_message_index)
 
-# ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
-# ★★★        核心交互逻辑 - 保持健壮的状态锁，但使用修正后的 getAnswer        ★★★
-# ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
+# --- 核心交互逻辑 (保持不变，它能正确地与修正后的 regenerate_message 协作) ---
 if not st.session_state.is_generating:
     if prompt := st.chat_input("输入你的消息:", key="main_chat_input"):
         token = generate_token()
@@ -374,7 +373,10 @@ if not st.session_state.is_generating:
         st.experimental_rerun()
 
 if st.session_state.is_generating:
+    # 查找最后一个用户消息作为本次API调用的prompt
+    # 对于“重新生成”，这个prompt就是被删除的AI回复之前的那个用户消息
     api_prompt = next((msg["content"] for msg in reversed(st.session_state.messages) if msg["role"] == "user"), None)
+    
     if not api_prompt:
         st.session_state.is_generating = False
         st.experimental_rerun()
@@ -388,7 +390,7 @@ if st.session_state.is_generating:
             additional_response = ""
             try:
                 response_stream = getAnswer(api_prompt)
-                for chunk in response_stream: # 现在 chunk 是文本
+                for chunk in response_stream:
                     additional_response += chunk
                     updated_content = original_content + additional_response
                     message_placeholder.markdown(updated_content + "▌")
@@ -399,7 +401,7 @@ if st.session_state.is_generating:
             except Exception as e:
                 st.error(f"发生错误: {type(e).__name__} - {e}。部分回复可能已保存。")
             finally:
-                if not st.session_state.messages[-1]["content"]:
+                if st.session_state.messages and not st.session_state.messages[-1]["content"]:
                     st.session_state.messages.pop()
                 with open(log_file, "wb") as f:
                     messages_to_pickle = [msg.copy() for msg in st.session_state.messages]
