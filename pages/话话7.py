@@ -4,12 +4,6 @@ import streamlit as st
 import pickle
 import random
 import string
-from datetime import datetimeimport os
-import google.generativeai as genai
-import streamlit as st
-import pickle
-import random
-import string
 from datetime import datetime
 from io import BytesIO
 import zipfile
