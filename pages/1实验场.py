@@ -185,28 +185,6 @@ def regenerate_message(index):
         st.session_state.is_generating = True
         st.experimental_rerun()
 
-# ★★★★★ 修正后的图片发送回调函数 ★★★★★
-def send_images_to_chat():
-    """处理侧边栏图片上传并发送到聊天记录的回调函数。"""
-    uploaded_files = st.session_state.get("sidebar_image_uploader", [])
-    if not uploaded_files:
-        st.toast("⚠️ 请先上传图片再发送。")
-        return
-
-    image_parts = []
-    for uploaded_file in uploaded_files:
-        try:
-            image = Image.open(uploaded_file)
-            image_parts.append(image)
-        except Exception as e:
-            st.error(f"处理图片 {uploaded_file.name} 失败: {e}")
-
-    if image_parts:
-        st.session_state.messages.append({"role": "user", "content": image_parts})
-        st.toast(f"✅ 已将 {len(image_parts)} 张图片添加到对话中！")
-        # 关键修复：在回调函数内部清空文件上传器的状态
-        st.session_state.sidebar_image_uploader = []
-
 # --- UI 侧边栏 ---
 with st.sidebar:
     st.session_state.selected_api_key = st.selectbox("选择 API Key:", options=list(API_KEYS.keys()), index=list(API_KEYS.keys()).index(st.session_state.selected_api_key), key="api_selector")
@@ -226,12 +204,39 @@ with st.sidebar:
                 st.success("成功读取pkl文件！"); st.experimental_rerun()
             except Exception as e: st.error(f"读取pkl文件失败：{e}")
 
-        # --- 图片发送功能 ---
+        # ★★★★★ 最终修复方案 ★★★★★
         st.markdown("---")
         st.markdown("**发送图片到对话**")
-        st.file_uploader("上传图片", type=["png", "jpg", "jpeg", "webp"], accept_multiple_files=True, key="sidebar_image_uploader", label_visibility="collapsed")
-        # 将回调函数绑定到按钮的 on_click 事件
-        st.button("发送图片到对话 ↗️", use_container_width=True, on_click=send_images_to_chat)
+        # 使用一个独立的key，与主聊天输入区分
+        sidebar_uploader_key = "sidebar_image_uploader"
+        uploaded_files = st.file_uploader(
+            "上传图片",
+            type=["png", "jpg", "jpeg", "webp"],
+            accept_multiple_files=True,
+            key=sidebar_uploader_key,
+            label_visibility="collapsed"
+        )
+        
+        # 使用简单的 if st.button 结构
+        if st.button("发送图片到对话 ↗️", use_container_width=True):
+            if uploaded_files:
+                image_parts = []
+                for uploaded_file in uploaded_files:
+                    try:
+                        image = Image.open(uploaded_file)
+                        image_parts.append(image)
+                    except Exception as e:
+                        st.error(f"处理图片 {uploaded_file.name} 失败: {e}")
+                
+                if image_parts:
+                    st.session_state.messages.append({"role": "user", "content": image_parts})
+                    st.toast(f"✅ 已将 {len(image_parts)} 张图片添加到对话中！")
+                    
+                    # 关键修复：执行完逻辑后，立即强制刷新页面
+                    # 这将导致文件上传器自然重置，从而避免API异常
+                    st.experimental_rerun()
+            else:
+                st.toast("⚠️ 请先上传图片再发送。")
 
     # --- 已恢复的角色设定模块 ---
     with st.expander("角色设定"):
@@ -279,7 +284,7 @@ if not st.session_state.is_generating:
 if st.session_state.is_generating:
     with st.chat_message("assistant"):
         placeholder = st.empty()
-        if st.session_state.messages[-1]["role"] != "assistant":
+        if not st.session_state.messages or st.session_state.messages[-1]["role"] != "assistant":
             st.session_state.messages.append({"role": "assistant", "content": [""]})
         full_response = ""
         try:
