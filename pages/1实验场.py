@@ -39,6 +39,8 @@ if 'character_settings' not in st.session_state:
     st.session_state.character_settings = {}
 if 'enabled_settings' not in st.session_state:
     st.session_state.enabled_settings = {}
+if 'test_text' not in st.session_state:
+    st.session_state.test_text = ""
 if "is_generating" not in st.session_state:
     st.session_state.is_generating = False
 if 'regenerate_index' not in st.session_state:
@@ -53,7 +55,6 @@ if "rerun_count" not in st.session_state:
     st.session_state.rerun_count = 0
 if "use_token" not in st.session_state:
     st.session_state.use_token = True
-
 
 # --- API配置和模型定义 (保持不变) ---
 genai.configure(api_key=API_KEYS[st.session_state.selected_api_key])
@@ -84,7 +85,7 @@ model = genai.GenerativeModel(
 """,
 )
 
-# --- 默认角色设定 (保持不变) ---
+# --- 默认角色设定 ---
 DEFAULT_CHARACTER_SETTINGS = { "理外祝福": """【理外祝福】的核心概念：\n\n""" }
 
 # --- 文件操作与功能函数 (全部保持不变) ---
@@ -135,7 +136,6 @@ def _reconstitute_messages_after_load(messages):
         reconstituted_messages.append(new_msg)
     return reconstituted_messages
 def generate_token():
-    #... (函数保持不变)
     import random
     import string
     random.seed()
@@ -168,10 +168,8 @@ def ensure_enabled_settings_exists():
             st.session_state.enabled_settings[setting_name] = False
 ensure_enabled_settings_exists()
 def getAnswer():
-    #... (函数保持不变)
     history_messages = []
-    # (省略了固定的system instruction和prompt以节省空间，实际代码中它们是存在的)
-    if "test_text" in st.session_state and st.session_state.test_text:
+    if st.session_state.test_text:
         history_messages.append({"role": "user", "parts": [st.session_state.test_text]})
     enabled_settings_content = ""
     if any(st.session_state.enabled_settings.values()):
@@ -179,24 +177,25 @@ def getAnswer():
         for name, enabled in st.session_state.enabled_settings.items():
             if enabled: enabled_settings_content += f"- {name}: {st.session_state.character_settings[name]}\n"
         enabled_settings_content += "```\n"
+
     for msg in st.session_state.messages[-20:]:
-      if msg and msg.get("role") and msg.get("content"):
-          api_role = "model" if msg["role"] == "assistant" else "user"
-          history_messages.append({"role": api_role, "parts": msg["content"]})
+        if msg and msg.get("role") and msg.get("content"):
+            api_role = "model" if msg["role"] == "assistant" else "user"
+            history_messages.append({"role": api_role, "parts": msg["content"]})
+
     if enabled_settings_content:
         history_messages.append({"role": "user", "parts": [enabled_settings_content]})
+
     final_contents = [msg for msg in history_messages if msg.get("parts")]
     response = model.generate_content(contents=final_contents, stream=True)
     for chunk in response: yield chunk.text
 def regenerate_message(index):
-    #... (函数保持不变)
     if 0 <= index < len(st.session_state.messages) and st.session_state.messages[index]["role"] == "assistant":
         st.session_state.messages = st.session_state.messages[:index]
         st.session_state.is_generating = True
         st.experimental_rerun()
     else: st.error("无效的消息索引或该消息不是AI的回复")
 def continue_message(index):
-    #... (函数保持不变)
     if 0 <= index < len(st.session_state.messages):
         message_to_continue = st.session_state.messages[index]
         original_message_content = message_to_continue["content"][0] if message_to_continue["content"] else ""
@@ -213,7 +212,7 @@ def continue_message(index):
         except Exception as e: st.error(f"发生错误: {type(e).__name__} - {e}。 续写消息失败。")
     else: st.error("无效的消息索引")
 
-# --- UI 侧边栏 (重点修改区域) ---
+# --- UI 侧边栏 ---
 with st.sidebar:
     st.session_state.selected_api_key = st.selectbox("选择 API Key:", options=list(API_KEYS.keys()), index=list(API_KEYS.keys()).index(st.session_state.selected_api_key), label_visibility="visible", key="api_selector")
     genai.configure(api_key=API_KEYS[st.session_state.selected_api_key])
@@ -239,50 +238,34 @@ with st.sidebar:
                 st.experimental_rerun()
             except Exception as e: st.error(f"读取本地pkl文件失败：{e}")
 
-        # ★★★★★★★★★★★★★★★★★★★★
-        # ★★★  错误修复：使用st.form  ★★★
-        # ★★★★★★★★★★★★★★★★★★★★
         st.markdown("---")
         with st.form("image_text_form", clear_on_submit=True):
             st.markdown("**发送图片及文字**")
             uploaded_files = st.file_uploader(
-                "上传图片",
-                type=["png", "jpg", "jpeg", "webp"],
-                accept_multiple_files=True,
-                key="sidebar_uploader"
-            )
-            caption = st.text_input("添加说明文字 (可选)", key="sidebar_caption")
-            
-            # 表单的提交按钮
+                "上传图片", type=["png", "jpg", "jpeg", "webp"], accept_multiple_files=True, label_visibility="collapsed")
+            caption_text = st.text_input("添加说明文字 (可选)")
             submitted = st.form_submit_button("发送到对话 ↗️", use_container_width=True)
 
-            if submitted and (uploaded_files or caption):
+            if submitted and (uploaded_files or caption_text):
                 content_parts = []
-                # 1. 处理上传的图片
                 if uploaded_files:
                     for uploaded_file in uploaded_files:
                         try:
                             image = Image.open(uploaded_file)
                             content_parts.append(image)
-                        except Exception as e:
-                            st.error(f"处理图片 {uploaded_file.name} 失败: {e}")
-                
-                # 2. 处理文字说明
-                if caption:
-                    content_parts.append(caption)
-
-                # 3. 如果有内容，则添加到消息历史
+                        except Exception as e: st.error(f"处理图片 {uploaded_file.name} 失败: {e}")
+                if caption_text:
+                    content_parts.append(caption_text)
                 if content_parts:
                     st.session_state.messages.append({"role": "user", "content": content_parts})
                     st.success(f"消息已发送！")
-                    # 不需要手动清空，form会自动处理，只需rerun
                     st.experimental_rerun()
 
     # ★★★★★★★★★★★★★★★★★★★★★★★★
     # ★★★  功能恢复：角色设定区域  ★★★
     # ★★★★★★★★★★★★★★★★★★★★★★★★
     with st.expander("角色设定"):
-        uploaded_setting_file = st.file_uploader("读取本地设定文件 (txt) 📝", type=["txt"])
+        uploaded_setting_file = st.file_uploader("读取本地设定文件 (txt) 📝", type=["txt"], key="setting_uploader")
         if uploaded_setting_file is not None:
             try:
                 setting_name = os.path.splitext(uploaded_setting_file.name)[0]
@@ -295,13 +278,18 @@ with st.sidebar:
         for setting_name in DEFAULT_CHARACTER_SETTINGS:
             if setting_name not in st.session_state.character_settings:
                 st.session_state.character_settings[setting_name] = DEFAULT_CHARACTER_SETTINGS[setting_name]
-            st.session_state.enabled_settings[setting_name] = st.checkbox(setting_name, st.session_state.enabled_settings.get(setting_name, False),key=f"checkbox_{setting_name}")
-        st.session_state.test_text = st.text_area("System Message (Optional):", st.session_state.get("test_text", ""), key="system_message")
+            st.session_state.enabled_settings[setting_name] = st.checkbox(
+                setting_name, st.session_state.enabled_settings.get(setting_name, False), key=f"checkbox_{setting_name}"
+            )
+        st.session_state.test_text = st.text_area(
+            "System Message (Optional):", value=st.session_state.test_text, key="system_message_input"
+        )
         enabled_settings_display = [name for name, enabled in st.session_state.enabled_settings.items() if enabled]
         if enabled_settings_display:
             st.write("已加载设定:", ", ".join(enabled_settings_display))
         if st.button("刷新 🔄", key="sidebar_refresh"):
             st.experimental_rerun()
+
 
 # --- 聊天记录显示、编辑、续写等逻辑 (全部保持不变) ---
 if not st.session_state.messages and not st.session_state.is_generating:
