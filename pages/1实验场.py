@@ -42,18 +42,14 @@ if 'enabled_settings' not in st.session_state:
     st.session_state.enabled_settings = {}
 if "is_generating" not in st.session_state:
     st.session_state.is_generating = False
-if 'regenerate_index' not in st.session_state:
-    st.session_state.regenerate_index = None
-if 'continue_index' not in st.session_state:
-    st.session_state.continue_index = None
-if "reset_history" not in st.session_state:
-    st.session_state.reset_history = False
-if "chat_session" not in st.session_state:
-    st.session_state.chat_session = None
-if "rerun_count" not in st.session_state:
-    st.session_state.rerun_count = 0
-if "use_token" not in st.session_state:
-    st.session_state.use_token = True
+# (其他 session state 初始化保持不变)
+if 'regenerate_index' not in st.session_state: st.session_state.regenerate_index = None
+if 'continue_index' not in st.session_state: st.session_state.continue_index = None
+if "reset_history" not in st.session_state: st.session_state.reset_history = False
+if "chat_session" not in st.session_state: st.session_state.chat_session = None
+if "rerun_count" not in st.session_state: st.session_state.rerun_count = 0
+if "use_token" not in st.session_state: st.session_state.use_token = True
+
 
 # --- API配置和模型定义 ---
 genai.configure(api_key=API_KEYS[st.session_state.selected_api_key])
@@ -77,6 +73,7 @@ file = os.path.abspath(__file__); filename = os.path.splitext(os.path.basename(f
 if not os.path.exists(log_file):
     with open(log_file, "wb") as f: pass
 
+# ... (所有辅助函数 _prepare_messages_for_save, _reconstitute_messages_after_load, 等都保持不变)
 def _prepare_messages_for_save(messages):
     picklable_messages = []
     for msg in messages:
@@ -189,12 +186,12 @@ def continue_message(index):
     else: st.error("无效的消息索引")
 
 
-# --- UI 侧边栏 ---
+# --- UI 侧边栏 (已添加所有keys) ---
 with st.sidebar:
-    st.selectbox("选择 API Key:", options=list(API_KEYS.keys()), index=list(API_KEYS.keys()).index(st.session_state.selected_api_key), key="api_selector") # <--- 已有 key
+    st.selectbox("选择 API Key:", options=list(API_KEYS.keys()), index=list(API_KEYS.keys()).index(st.session_state.selected_api_key), key="api_selector")
     genai.configure(api_key=API_KEYS[st.session_state.selected_api_key])
     with st.expander("文件操作"):
-        if st.button("清除历史记录 🗑️", key="clear_history_button"): # <--- 已添加 key
+        if st.button("清除历史记录 🗑️", key="clear_history_button"):
             st.session_state.clear_confirmation = True
         if "clear_confirmation" in st.session_state and st.session_state.clear_confirmation:
             c1, c2 = st.columns(2)
@@ -202,13 +199,13 @@ with st.sidebar:
                 clear_history(log_file); st.session_state.clear_confirmation = False; st.experimental_rerun()
             if c2.button("取消", key="clear_cancel"): 
                 st.session_state.clear_confirmation = False
-        st.download_button("下载当前聊天记录 ⬇️", data=pickle.dumps(_prepare_messages_for_save(st.session_state.messages)), file_name=os.path.basename(log_file), mime="application/octet-stream", key="download_button") # <--- 已添加 key
-        uploaded_pkl = st.file_uploader("读取本地pkl文件 📁", type=["pkl"], key="pkl_uploader") # <--- 已添加 key
+        st.download_button("下载当前聊天记录 ⬇️", data=pickle.dumps(_prepare_messages_for_save(st.session_state.messages)), file_name=os.path.basename(log_file), mime="application/octet-stream", key="download_button")
+        uploaded_pkl = st.file_uploader("读取本地pkl文件 📁", type=["pkl"], key="pkl_uploader")
         if uploaded_pkl:
             try: st.session_state.messages = _reconstitute_messages_after_load(pickle.load(uploaded_pkl)); st.success("成功读取本地pkl文件！"); st.experimental_rerun()
             except Exception as e: st.error(f"读取失败：{e}")
     with st.expander("角色设定"):
-        uploaded_setting_file = st.file_uploader("读取本地设定文件 (txt) 📝", type=["txt"], key="txt_uploader") # <--- 已添加 key
+        uploaded_setting_file = st.file_uploader("读取本地设定文件 (txt) 📝", type=["txt"], key="txt_uploader")
         if uploaded_setting_file is not None:
             try:
                 setting_name = os.path.splitext(uploaded_setting_file.name)[0]; setting_content = uploaded_setting_file.read().decode("utf-8")
@@ -216,13 +213,12 @@ with st.sidebar:
             except Exception as e: st.error(f"读取文件失败: {e}")
         for setting_name in DEFAULT_CHARACTER_SETTINGS:
             if setting_name not in st.session_state.character_settings: st.session_state.character_settings[setting_name] = DEFAULT_CHARACTER_SETTINGS[setting_name]
-            st.checkbox(setting_name, value=st.session_state.enabled_settings.get(setting_name, False), key=f"checkbox_{setting_name}") # <--- 已有 f-string key
-        st.text_area("System Message (Optional):", st.session_state.get("test_text", ""), key="system_message") # <--- 已有 key
+            st.checkbox(setting_name, value=st.session_state.enabled_settings.get(setting_name, False), key=f"checkbox_{setting_name}")
+        st.text_area("System Message (Optional):", value=st.session_state.get("test_text", ""), key="system_message")
         enabled_settings_display = [name for name, enabled in st.session_state.enabled_settings.items() if enabled]
         if enabled_settings_display: st.write("已加载设定:", ", ".join(enabled_settings_display))
-        if st.button("刷新 🔄", key="sidebar_refresh_button"): # <--- 已添加 key
+        if st.button("刷新 🔄", key="sidebar_refresh_button"):
             st.experimental_rerun()
-
 
 # --- 主聊天界面 ---
 if not st.session_state.messages and not st.session_state.is_generating:
@@ -248,16 +244,30 @@ if len(st.session_state.messages) > 0 and not st.session_state.is_generating:
                 if st.button("➕", key=f"cont_{last_msg_idx}", help="继续", use_container_width=True):
                     continue_message(last_msg_idx)
 
+# ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
+# ★★★ 全新优化的消息输入区：使用 on_change 回调，确保状态稳定 ★★★
+# ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
+def on_file_upload():
+    """当文件上传器内容改变时触发的回调函数。"""
+    if not st.session_state.main_file_uploader:
+        return
+    
+    current_pending_ids = {f.file_id for f in st.session_state.pending_files}
+    for file in st.session_state.main_file_uploader:
+        if file.file_id not in current_pending_ids:
+            st.session_state.pending_files.append(file)
 
-# --- 消息输入区 ---
 if not st.session_state.is_generating:
     with st.container():
-        uploaded_files = st.file_uploader( "拖拽图片到这里，或点击上传", type=["png", "jpg", "jpeg", "webp"], accept_multiple_files=True, key="main_file_uploader", label_visibility="collapsed")
+        st.file_uploader(
+            "拖拽图片到这里，或点击上传",
+            type=["png", "jpg", "jpeg", "webp"],
+            accept_multiple_files=True,
+            key="main_file_uploader", # 这个key连接到回调函数
+            on_change=on_file_upload, # ★★★ 关键：使用回调函数 ★★★
+            label_visibility="collapsed"
+        )
         
-        if uploaded_files:
-            st.session_state.pending_files.extend(uploaded_files)
-            st.experimental_rerun()
-
         if st.session_state.pending_files:
             st.markdown("---")
             st.write("**:blue[待发送的图片：]**")
@@ -265,8 +275,9 @@ if not st.session_state.is_generating:
             files_to_remove = []
             for i, file in enumerate(st.session_state.pending_files):
                 with cols[i % 5]:
-                    st.image(file, width=100)
-                    if st.button("❌", key=f"remove_pending_{i}_{file.file_id}", help="移除这张图片"):
+                    st.image(file, width=100, caption=f"")
+                    # 使用 file.id 作为 key 的一部分，确保唯一性
+                    if st.button("❌", key=f"remove_pending_{file.file_id}", help="移除这张图片"):
                         files_to_remove.append(i)
             
             if files_to_remove:
@@ -311,7 +322,8 @@ if st.session_state.is_generating:
         except Exception as e:
             error_message = f"\n\n**发生错误**: {type(e).__name__} - {e}"
             st.error(error_message.strip())
-            st.session_state.messages[-1]["content"][0] += error_message
+            if st.session_state.messages and st.session_state.messages[-1]["role"] == "assistant":
+                st.session_state.messages[-1]["content"][0] += error_message
         finally:
             if st.session_state.messages and (not st.session_state.messages[-1]["content"] or not st.session_state.messages[-1]["content"][0].strip()):
                 st.session_state.messages.pop()
@@ -325,8 +337,8 @@ if st.session_state.is_generating:
 # --- 底部控件 ---
 col1, col2 = st.columns(2)
 with col1:
-    st.checkbox("使用 Token", value=st.session_state.use_token, key="use_token_checkbox") # <--- 已添加 key
+    st.checkbox("使用 Token", value=st.session_state.use_token, key="use_token_checkbox")
     st.session_state.use_token = st.session_state.use_token_checkbox
 with col2:
-    if st.button("🔄", help="刷新页面", key="main_refresh_button"): # <--- 已添加 key
+    if st.button("🔄", help="刷新页面", key="main_refresh_button"):
         st.experimental_rerun()
