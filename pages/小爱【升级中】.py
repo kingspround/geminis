@@ -1231,27 +1231,39 @@ if not st.session_state.is_generating:
         st.session_state.is_generating = True
         st.experimental_rerun()
 
-# --- 核心生成逻辑 (保持不变) ---
+# --- 核心生成逻辑 ---
 if st.session_state.is_generating:
     with st.chat_message("assistant"):
         placeholder = st.empty()
+        # 确保我们有一个 assistant 消息可以写入
         if not st.session_state.messages or st.session_state.messages[-1]["role"] != "assistant":
             st.session_state.messages.append({"role": "assistant", "content": [""]})
+
         full_response = ""
         try:
+            # 流式获取并显示回答
             for chunk in getAnswer():
                 full_response += chunk
                 st.session_state.messages[-1]["content"][0] = full_response
                 placeholder.markdown(full_response + "▌")
+            # 显示最终完整回答
             placeholder.markdown(full_response)
         except Exception as e:
-            err_msg = f"\n\n**发生错误**: {type(e).__name__} - {e}"
-            st.error(err_msg.strip())
-            if st.session_state.messages and st.session_state.messages[-1]["role"] == "assistant":
-                 st.session_state.messages[-1]["content"][0] += err_msg
+            # ★★★ 修复点 ★★★
+            # 构造错误信息
+            err_msg = f"**回答生成中断**: {type(e).__name__}。您现在可以尝试【继续】或【重新生成】。"
+            # 仅在界面上显示错误提示，不修改 session_state.messages
+            st.error(err_msg)
+            # 保持已生成的部分在聊天框中，所以 placeholder 也要更新一下
+            placeholder.markdown(full_response)
         finally:
-            if st.session_state.messages and st.session_state.messages[-1]['content'] and not st.session_state.messages[-1]["content"][0].strip(): st.session_state.messages.pop()
-            with open(log_file, "wb") as f: pickle.dump(_prepare_messages_for_save(st.session_state.messages), f)
+            # 确保空消息不被保存
+            if st.session_state.messages and st.session_state.messages[-1]['content'] and not st.session_state.messages[-1]["content"][0].strip():
+                st.session_state.messages.pop()
+            # 无论成功还是失败，都保存当前聊天记录
+            with open(log_file, "wb") as f:
+                pickle.dump(_prepare_messages_for_save(st.session_state.messages), f)
+            # 结束生成状态并刷新
             st.session_state.is_generating = False
             st.experimental_rerun()
 
