@@ -1271,8 +1271,11 @@ if st.session_state.is_generating:
                 st.session_state.is_generating = False
                 st.experimental_rerun()
 
-
-# --- 底部控件 ---
-c1, c2 = st.columns(2)
-st.session_state.use_token = c1.checkbox("使用 Token", value=st.session_state.get("use_token", True))
-if c2.button("🔄", key="page_refresh", help="刷新页面"): st.experimental_rerun()
+# --- 底部控件 (保持原样) ---
+col1, col2 = st.columns(2)
+with col1:
+    st.checkbox("使用 Token", value=st.session_state.use_token, key="token_checkbox_controller")
+    st.session_state.use_token = st.session_state.token_checkbox_controller
+with col2:
+    if st.button("🔄", key="refresh_button"):
+        st.experimental_rerun()
