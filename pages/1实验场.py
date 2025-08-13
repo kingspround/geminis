@@ -284,76 +284,51 @@ if not st.session_state.is_generating:
         st.session_state.is_generating = True
         st.experimental_rerun()
 
-# ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
-# ★★★ 核心生成逻辑 (已采用“追加式”更新，彻底修复中断问题) ★★★
-# ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
+# --- 核心生成逻辑 (已彻底修复部分生成问题) ---
 if st.session_state.is_generating:
-    
-    # 检查是否为“继续”指令
-    is_continue = st.session_state.messages[-1].get("content") == ["[continue]"]
-    if is_continue:
-        # 移除内部指令
-        st.session_state.messages.pop()
-        # 找到需要继续的消息（现在是最后一条）
-        message_to_continue = st.session_state.messages[-1]
-        # 添加一个特殊的续写提示
-        last_chars = message_to_continue["content"][0][-50:]
-        continue_prompt = f"请务必从 '{last_chars}...' 无缝衔接自然地继续写，不要重复，不要输出任何思考过程或元标记。"
-        st.session_state.messages.append({"role": "user", "content": [continue_prompt]})
-
     with st.chat_message("assistant"):
         placeholder = st.empty()
-        
-        # 确保我们有一个 assistant 消息可以写入，但如果是继续，则直接用上一条
+
+        # 1. 确保我们有一个 assistant 消息可以写入
         if not st.session_state.messages or st.session_state.messages[-1]["role"] != "assistant":
-             st.session_state.messages.append({"role": "assistant", "content": [""]})
+            # 我们只添加一个空的占位符，内容将在下面填充
+            st.session_state.messages.append({"role": "assistant", "content": [""]})
 
-        # 1. 获取已存在的内容
-        # 我们总是在最后一条AI消息上工作
-        assistant_message_index = -1
-        if is_continue:
-            assistant_message_index = -2 # 如果是继续，AI消息在倒数第二个位置
-        
-        # 兼容多部分内容（图片+文字），我们只追加到第一个文本部分
-        if not st.session_state.messages[assistant_message_index]["content"]:
-            st.session_state.messages[assistant_message_index]["content"].append("")
-        
-        existing_text = st.session_state.messages[assistant_message_index]["content"][0]
-
-        # 2. 初始化本次流式接收的新内容
-        streamed_text_part = ""
+        # 2. 从 session_state 中获取当前正在构建的消息
+        # 这是关键：我们直接操作永久状态，而不是临时变量
+        message_index_to_update = len(st.session_state.messages) - 1
         
         try:
-            # 3. 流式获取并追加
-            for chunk in getAnswer():
-                streamed_text_part += chunk
-                full_response = existing_text + streamed_text_part
+            # 3. 流式获取并“即收即存”
+            response_stream = getAnswer()
+            for chunk in response_stream:
+                # ★★★ 核心修复点 ★★★
+                # 直接将新块附加到 session_state 中的消息内容上
+                st.session_state.messages[message_index_to_update]["content"][0] += chunk
                 
-                # 4. 实时更新session_state和UI
-                st.session_state.messages[assistant_message_index]["content"][0] = full_response
-                placeholder.markdown(full_response + "▌")
+                # 更新UI显示
+                current_content = st.session_state.messages[message_index_to_update]["content"][0]
+                placeholder.markdown(current_content + "▌")
             
-            # 显示最终完整回答
-            placeholder.markdown(st.session_state.messages[assistant_message_index]["content"][0])
+            # 成功完成后，移除光标
+            final_content = st.session_state.messages[message_index_to_update]["content"][0]
+            placeholder.markdown(final_content)
 
         except Exception as e:
-            # 5. 优雅处理中断
-            err_msg = f"**回答生成中断**: {type(e).__name__}。部分内容已保存。您可以尝试【继续】或【重新生成】。"
-            st.error(err_msg)
-            # 即使出错，UI也显示已接收到的部分
-            placeholder.markdown(st.session_state.messages[assistant_message_index]["content"][0])
-            
+            # 4. 如果发生错误
+            # UI上显示错误信息
+            st.error(f"回答生成中断: {type(e).__name__}。已保存部分内容，可尝试【继续】或【重新生成】。")
+            # 确保UI上显示的是最后保存的内容（无光标）
+            final_partial_content = st.session_state.messages[message_index_to_update]["content"][0]
+            placeholder.markdown(final_partial_content)
+
         finally:
-            # 如果是“继续”模式，事后清理我们添加的临时续写prompt
-            if is_continue and st.session_state.messages[-1]['role'] == 'user':
-                 st.session_state.messages.pop()
-
-            # 确保不保存完全空的消息
-            last_msg_content = st.session_state.messages[-1]["content"]
-            if last_msg_content and not last_msg_content[0].strip():
+            # 5. 无论成功与否，都执行收尾工作
+            # 确保空消息不被保存
+            if st.session_state.messages and not st.session_state.messages[-1]["content"][0].strip():
                 st.session_state.messages.pop()
-
-            # 保存最终状态
+            
+            # 将最终状态（无论是完整的还是部分的）保存到文件
             with open(log_file, "wb") as f:
                 pickle.dump(_prepare_messages_for_save(st.session_state.messages), f)
             
