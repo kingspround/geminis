@@ -249,36 +249,49 @@ def generate_images_callback():
     st.session_state.is_generating_image = True
 
 
-# ★★★ 核心修改：使用 REST API 进行图片生成，完全绕开 genai.Client() ★★★
+# ★★★ 使用 REST API 进行图片生成 ★★★
 def perform_image_generation_rest():
     """使用 requests 库直接调用 Google Imagen REST API"""
     api_key = API_KEYS[st.session_state.selected_api_key]
     model_name = st.session_state.imagen_model
     
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateImages?key={api_key}"
-    
-    payload = {
-        "prompt": st.session_state.imagen_prompt,
-        "number": st.session_state.imagen_num_images, # REST API 使用 'number'
-        "aspect_ratio": st.session_state.imagen_aspect_ratio,
-        "person_generation": st.session_state.imagen_person_gen,
-    }
-    
+    # 根据模型版本选择正确的API端点
+    if model_name.startswith('imagen-4.0'):
+        url = f"https://generativelanguage.googleapis.com/v1/models/{model_name}:generateImages?key={api_key}"
+        payload = {
+            "prompt": st.session_state.imagen_prompt,
+            "number_of_images": st.session_state.imagen_num_images,
+            "aspect_ratio": st.session_state.imagen_aspect_ratio,
+            "person_generation": st.session_state.imagen_person_gen,
+        }
+        b64_key = 'b64_image'
+        images_key = 'generatedImages'
+    else: # 假设是 Imagen 3 或其他使用 v1beta 的模型
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateImages?key={api_key}"
+        payload = {
+            "prompt": st.session_state.imagen_prompt,
+            "number": st.session_state.imagen_num_images,
+            "aspect_ratio": st.session_state.imagen_aspect_ratio,
+            "person_generation": st.session_state.imagen_person_gen,
+        }
+        b64_key = 'b64Json'
+        images_key = 'images'
+        
     headers = {'Content-Type': 'application/json'}
 
     with st.spinner(f"正在通过 REST API 调用 {model_name} 生成图片中..."):
         try:
-            response = requests.post(url, headers=headers, data=json.dumps(payload))
+            response = requests.post(url, headers=headers, data=json.dumps(payload), timeout=120)
             response.raise_for_status() 
             
             data = response.json()
-            if 'images' not in data:
-                 raise ValueError(f"API响应中未找到'images'键。响应内容: {data}")
+            if images_key not in data:
+                 raise ValueError(f"API响应中未找到'{images_key}'键。响应内容: {data}")
 
-            image_content = [f"遵命，主人！这是为您生成的 {len(data['images'])} 张图片："]
+            image_content = [f"遵命，主人！这是为您生成的 {len(data[images_key])} 张图片："]
             
-            for gen_img in data['images']:
-                b64_data = gen_img['b64Json'] # REST API 使用 'b64Json'
+            for gen_img in data[images_key]:
+                b64_data = gen_img[b64_key]
                 image_bytes = base64.b64decode(b64_data)
                 image = Image.open(BytesIO(image_bytes))
                 image_content.append(image)
@@ -402,7 +415,8 @@ for i, message in enumerate(st.session_state.messages):
 # --- 核心生成逻辑区 ---
 if st.session_state.is_generating_image:
     perform_image_generation_rest()
-    st.experimental_rerun()
+    # ★★★ 删除下面这行有问题的 rerun ★★★
+    # st.experimental_rerun() 
 
 if st.session_state.get("editing"):
     i = st.session_state.editable_index
