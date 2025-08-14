@@ -1,5 +1,6 @@
 import os
 import google.generativeai as genai
+import google.generativeai.types as types  # <-- 新增导入
 import streamlit as st
 import pickle
 import random
@@ -8,8 +9,6 @@ from datetime import datetime
 from io import BytesIO
 import zipfile
 from PIL import Image
-# 新增的导入，用于 Imagen
-from google.genai import types
 
 # --- Streamlit Page Configuration ---
 st.set_page_config(
@@ -33,7 +32,7 @@ API_KEYS = {
 }
 
 # --- 初始化 Session State ---
-# (所有旧的 session state 初始化保持不变)
+# (所有 session state 初始化保持不变)
 if "selected_api_key" not in st.session_state:
     st.session_state.selected_api_key = list(API_KEYS.keys())[0]
 if "messages" not in st.session_state:
@@ -63,21 +62,7 @@ if "rerun_count" not in st.session_state:
 if "use_token" not in st.session_state:
     st.session_state.use_token = True
 
-# --- 新增: Imagen 相关 Session State 初始化 ---
-if "active_model" not in st.session_state:
-    st.session_state.active_model = "💬 聊天 (Gemini)"
-if 'imagen_model' not in st.session_state:
-    st.session_state.imagen_model = 'imagen-4.0-generate-preview-06-06'
-if 'imagen_num_images' not in st.session_state:
-    st.session_state.imagen_num_images = 1
-if 'imagen_aspect_ratio' not in st.session_state:
-    st.session_state.imagen_aspect_ratio = "1:1"
-if 'imagen_person_gen' not in st.session_state:
-    st.session_state.imagen_person_gen = "allow_adult"
-
-
-# --- API配置和模型定义 (保持不变) ---
-# Gemini Chat 模型配置
+# --- API配置和模型定义 ---
 genai.configure(api_key=API_KEYS[st.session_state.selected_api_key])
 generation_config = {
   "temperature": 1.0, "top_p": 0.95, "top_k": 40, "max_output_tokens": 8192, "response_mime_type": "text/plain",
@@ -88,8 +73,9 @@ safety_settings = [
     {"category": "HARM_CATEGORY_SEXUALLY_EXPLICIT", "threshold": "BLOCK_NONE"},
     {"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_NONE"},
 ]
+# 这是聊天模型
 chat_model = genai.GenerativeModel(
-  model_name="gemini-1.5-flash-latest", # 使用您指定的模型，这里我用了最新的flash，您可改回 gemini-2.5-flash-preview-05-20
+  model_name="gemini-2.5-flash-preview-05-20", # 您的聊天模型
   generation_config=generation_config,
   safety_settings=safety_settings,
   system_instruction="""
@@ -235,12 +221,79 @@ def send_from_sidebar_callback():
         st.session_state.sidebar_caption = ""
         st.session_state.is_generating = True
 
+# --- ★★★ 新增：Imagen 图片生成回调函数 ★★★ ---
+def generate_images_callback():
+    prompt = st.session_state.get("imagen_prompt", "").strip()
+    if not prompt:
+        st.toast("请输入图片生成提示！(仅支持英文)", icon="⚠️")
+        return
+
+    # 先将用户的生成请求加入消息列表，方便追溯
+    user_request_message = f"""**🎨 图片生成任务**
+- **模型:** `{st.session_state.imagen_model}`
+- **提示:** `{prompt}`
+- **数量:** `{st.session_state.imagen_num_images}`
+- **宽高比:** `{st.session_state.imagen_aspect_ratio}`
+    """
+    st.session_state.messages.append({"role": "user", "content": [user_request_message]})
+
+    with st.spinner(f"正在调用 {st.session_state.imagen_model} 生成图片中，请稍候..."):
+        try:
+            # Client 会自动使用 genai.configure 设置的 API Key
+            client = genai.Client()
+            
+            config = types.GenerateImagesConfig(
+                number_of_images=st.session_state.imagen_num_images,
+                aspect_ratio=st.session_state.imagen_aspect_ratio,
+                person_generation=st.session_state.imagen_person_gen,
+            )
+
+            # 调用 Imagen API
+            response = client.models.generate_images(
+                model=st.session_state.imagen_model,
+                prompt=prompt,
+                config=config
+            )
+
+            # 准备包含生成图片的助手消息
+            image_content = [f"遵命，主人！这是为您生成的 {len(response.generated_images)} 张图片："]
+            for gen_img in response.generated_images:
+                # gen_img.image 本身就是 PIL.Image 对象
+                image_content.append(gen_img.image)
+
+            st.session_state.messages.append({"role": "assistant", "content": image_content})
+            st.toast("图片生成成功！", icon="✅")
+
+        except Exception as e:
+            # 严格按照要求，显示详细的错误信息
+            error_message = f"""😥 **抱歉主人，图片生成失败了**
+
+**可能原因:**
+- API Key 失效或额度用尽。
+- 提示语可能触发了安全策略。
+- 网络连接问题。
+- 模型服务暂时不可用。
+
+**详细错误信息:**
+```
+{type(e).__name__}: {e}
+```
+"""
+            st.session_state.messages.append({"role": "assistant", "content": [error_message]})
+            st.error(f"图片生成失败，详情请看聊天窗口。")
+    
+    # 保存历史记录并刷新界面显示结果
+    with open(log_file, "wb") as f:
+        pickle.dump(_prepare_messages_for_save(st.session_state.messages), f)
+    st.experimental_rerun()
+
+
 # --- UI 侧边栏 ---
 with st.sidebar:
     st.session_state.selected_api_key = st.selectbox("选择 API Key:", options=list(API_KEYS.keys()), index=list(API_KEYS.keys()).index(st.session_state.selected_api_key), key="api_selector")
     genai.configure(api_key=API_KEYS[st.session_state.selected_api_key])
-
-    with st.expander("文件操作", expanded=False):
+    
+    with st.expander("文件操作"):
         if len(st.session_state.messages) > 0: st.button("重置上一个输出 ⏪", on_click=lambda: st.session_state.messages.pop(-1))
         st.button("读取历史记录 📖", on_click=lambda: load_history(log_file))
         if st.button("清除历史记录 🗑️"): st.session_state.clear_confirmation = True
@@ -249,6 +302,7 @@ with st.sidebar:
             if c1.button("确认清除", key="clear_confirm"): clear_history(log_file); st.session_state.clear_confirmation = False; st.experimental_rerun()
             if c2.button("取消", key="clear_cancel"): st.session_state.clear_confirmation = False
         st.download_button("下载当前聊天记录 ⬇️", data=pickle.dumps(_prepare_messages_for_save(st.session_state.messages)), file_name=os.path.basename(log_file), mime="application/octet-stream")
+        
         uploaded_pkl = st.file_uploader("读取本地pkl文件 📁", type=["pkl"], key="pkl_uploader")
         if uploaded_pkl is not None:
             try:
@@ -256,12 +310,62 @@ with st.sidebar:
                 st.success("成功读取本地pkl文件！"); st.experimental_rerun()
             except Exception as e: st.error(f"读取本地pkl文件失败：{e}")
 
-    with st.expander("发送图片与文字 (用于聊天)", expanded=False):
+    with st.expander("发送图片与文字"):
         st.file_uploader("上传图片", type=["png", "jpg", "jpeg", "webp"], accept_multiple_files=True, key="sidebar_uploader", label_visibility="collapsed")
         st.text_area("输入文字 (可选)", key="sidebar_caption", height=100)
         st.button("发送到对话 ↗️", on_click=send_from_sidebar_callback, use_container_width=True)
 
-    with st.expander("角色设定 (用于聊天)", expanded=False):
+    # --- ★★★ 新增：Imagen 图片生成UI ★★★ ---
+    with st.expander("🎨 Imagen 图片生成"):
+        st.selectbox(
+            "选择 Imagen 模型:",
+            options=[
+                'imagen-4.0-generate-preview-06-06',
+                'imagen-4.0-ultra-generate-preview-06-06',
+                'imagen-3.0-generate-002'
+            ],
+            key='imagen_model',
+            help="根据文档，Imagen 4 Ultra 一次仅能生成一张图。"
+        )
+        st.text_area(
+            "图片生成提示 (仅英文):",
+            key="imagen_prompt",
+            height=120,
+            placeholder="A photorealistic image of a cat wearing a tiny wizard hat."
+        )
+        
+        # 动态调整图片数量上限
+        max_images = 1 if 'ultra' in st.session_state.get('imagen_model', '') else 4
+        
+        cols = st.columns(2)
+        with cols[0]:
+            st.slider(
+                "生成数量:",
+                min_value=1,
+                max_value=max_images,
+                value=1,
+                step=1,
+                key='imagen_num_images'
+            )
+            st.selectbox(
+                "宽高比 (Aspect Ratio):",
+                options=["1:1", "3:4", "4:3", "9:16", "16:9"],
+                key='imagen_aspect_ratio'
+            )
+        with cols[1]:
+            st.selectbox(
+                "人物生成 (Person Gen):",
+                options=["allow_adult", "dont_allow", "allow_all"],
+                index=0, # 默认为 allow_adult
+                key='imagen_person_gen',
+                help="allow_all 在部分地区不可用"
+            )
+
+        if st.button("生成图片 🚀", on_click=generate_images_callback, use_container_width=True, type="primary"):
+            pass
+
+
+    with st.expander("角色设定"):
         uploaded_setting_file = st.file_uploader("读取本地设定文件 (txt) 📝", type=["txt"], key="setting_uploader")
         if uploaded_setting_file is not None:
             try:
@@ -277,53 +381,7 @@ with st.sidebar:
         st.session_state.test_text = st.text_area("System Message (Optional):", st.session_state.get("test_text", ""), key="system_msg")
         enabled_list = [name for name, enabled in st.session_state.enabled_settings.items() if enabled]
         if enabled_list: st.write("已加载设定:", ", ".join(enabled_list))
-
-    # --- 新增: Imagen 设置 UI ---
-    with st.expander("🎨 Imagen 图片生成设置", expanded=True):
-        st.session_state.imagen_model = st.selectbox(
-            "选择 Imagen 模型:",
-            ('imagen-4.0-generate-preview-06-06', 'imagen-4.0-ultra-generate-preview-06-06', 'imagen-3.0-generate-002'),
-            key="imagen_model_selector",
-            help="根据文档，Ultra模型一次只能生成一张图。"
-        )
-
-        # 根据模型动态调整图片数量上限
-        max_images = 1 if 'ultra' in st.session_state.imagen_model else 4
-        current_val = st.session_state.imagen_num_images
-        if current_val > max_images:
-            current_val = max_images # 如果切换到 ultra，自动将数量降为1
-        st.session_state.imagen_num_images = st.slider(
-            "生成图片数量:", 1, max_images, value=current_val, key="imagen_num_slider"
-        )
-
-        st.session_state.imagen_aspect_ratio = st.selectbox(
-            "宽高比:",
-            ("1:1", "3:4", "4:3", "9:16", "16:9"),
-            key="imagen_aspect_ratio_selector"
-        )
-
-        st.session_state.imagen_person_gen = st.selectbox(
-            "人物生成:",
-            ("allow_adult", "dont_allow", "allow_all"),
-            key="imagen_person_gen_selector",
-            help="allow_adult: 允许生成成人，不允许儿童 (默认)。dont_allow: 禁止。allow_all: 允许所有 (部分地区不可用)。"
-        )
-    
-    if st.button("刷新页面 🔄", key="sidebar_refresh", use_container_width=True): st.experimental_rerun()
-
-
-# --- 主界面 ---
-
-# --- 新增: 模式选择器 ---
-st.session_state.active_model = st.radio(
-    "选择功能模式:",
-    ["💬 聊天 (Gemini)", "🖼️ 生成图片 (Imagen)"],
-    horizontal=True,
-    key="mode_selector",
-    index=0 if st.session_state.active_model == "💬 聊天 (Gemini)" else 1
-)
-st.markdown("---")
-
+        if st.button("刷新 🔄", key="sidebar_refresh"): st.experimental_rerun()
 
 # --- 加载和显示聊天记录 (保持不变) ---
 if not st.session_state.messages and not st.session_state.is_generating: load_history(log_file)
@@ -331,15 +389,24 @@ for i, message in enumerate(st.session_state.messages):
     if message.get("temp"):
         continue
     with st.chat_message(message["role"]):
-        # content 可以是列表，包含文本和图片
-        for part in message.get("content", []):
-            if isinstance(part, str):
+        # 特别处理包含多张图片的消息
+        if message["role"] == "assistant" and any(isinstance(p, Image.Image) for p in message.get("content", [])):
+            text_parts = [p for p in message["content"] if isinstance(p, str)]
+            image_parts = [p for p in message["content"] if isinstance(p, Image.Image)]
+            
+            for part in text_parts:
                 st.markdown(part, unsafe_allow_html=True)
-            elif isinstance(part, Image.Image):
-                st.image(part, width=400) # 显示 PIL 图片对象
-            # 处理多张图片的情况
-            elif isinstance(part, list) and all(isinstance(p, Image.Image) for p in part):
-                 st.image(part, width=250) # Streamlit 可以自动并排显示图片列表
+
+            # 将图片显示在网格中，每行最多4张
+            cols = st.columns(4)
+            for idx, img in enumerate(image_parts):
+                with cols[idx % 4]:
+                    st.image(img, use_column_width=True)
+        else: # 原有逻辑
+            for part in message.get("content", []):
+                if isinstance(part, str): st.markdown(part, unsafe_allow_html=True)
+                elif isinstance(part, Image.Image): st.image(part, width=400)
+
 
 # --- 编辑界面显示逻辑 (保持不变) ---
 if st.session_state.get("editing"):
@@ -366,78 +433,28 @@ if len(st.session_state.messages) >= 1 and not st.session_state.is_generating an
             break
     if last_real_msg_idx != -1:
         last_msg = st.session_state.messages[last_real_msg_idx]
-        is_text_only_assistant = (last_msg["role"] == "assistant" and len(last_msg.get("content", [])) > 0 and isinstance(last_msg["content"][0], str))
+        is_text_only_assistant = (last_msg["role"] == "assistant" and all(isinstance(p, str) for p in last_msg.get("content", [])))
+        
         if is_text_only_assistant:
             with st.container():
-                cols = st.columns([1,1,1,17])
+                cols = st.columns(20)
                 if cols[0].button("✏️", key="edit", help="编辑"): st.session_state.editable_index = last_real_msg_idx; st.session_state.editing = True; st.experimental_rerun()
                 if cols[1].button("♻️", key="regen", help="重新生成"): regenerate_message(last_real_msg_idx)
                 if cols[2].button("➕", key="cont", help="继续"): continue_message(last_real_msg_idx)
+        elif last_msg["role"] == "assistant":
+             if st.columns(20)[0].button("♻️", key="regen_vision", help="重新生成"): regenerate_message(last_real_msg_idx)
 
-# --- 核心交互逻辑 (主输入框) ---
-input_label = "输入图片描述 (Prompt)..." if st.session_state.active_model == "🖼️ 生成图片 (Imagen)" else "输入你的消息..."
+# --- 核心交互逻辑 (主输入框, 保持不变) ---
 if not st.session_state.is_generating:
-    if prompt := st.chat_input(input_label, key="main_chat_input", disabled=st.session_state.editing):
-        
-        # --- 分支逻辑: 根据模式执行不同操作 ---
+    if prompt := st.chat_input("输入你的聊天消息...", key="main_chat_input", disabled=st.session_state.editing):
+        token = generate_token()
+        full_prompt = f"{prompt} (token: {token})" if st.session_state.use_token else prompt
+        st.session_state.messages.append({"role": "user", "content": [full_prompt]})
+        st.session_state.is_generating = True
+        st.experimental_rerun()
 
-        # 模式一: 聊天
-        if st.session_state.active_model == "💬 聊天 (Gemini)":
-            token = generate_token()
-            full_prompt = f"{prompt} (token: {token})" if st.session_state.use_token else prompt
-            st.session_state.messages.append({"role": "user", "content": [full_prompt]})
-            st.session_state.is_generating = True # 触发 Gemini 的流式生成
-            st.experimental_rerun()
-
-        # 模式二: 图片生成
-        elif st.session_state.active_model == "🖼️ 生成图片 (Imagen)":
-            st.session_state.messages.append({"role": "user", "content": [f"🎨 图片生成提示: {prompt}"]})
-            # 立即在界面上显示用户消息
-            st.experimental_rerun()
-            
-            with st.chat_message("assistant"):
-                with st.spinner("正在请求 Imagen 生成图片中，请稍候..."):
-                    try:
-                        # 重新配置以确保使用的是最新密钥
-                        genai.configure(api_key=API_KEYS[st.session_state.selected_api_key])
-                        
-                        # 根据文档，使用 genai.Client()
-                        client = genai.Client()
-
-                        # 准备生成配置
-                        config = types.GenerateImagesConfig(
-                            number_of_images=st.session_state.imagen_num_images,
-                            aspect_ratio=st.session_state.imagen_aspect_ratio,
-                            person_generation=st.session_state.imagen_person_gen,
-                        )
-
-                        # 调用 Imagen API
-                        response = client.models.generate_images(
-                            model=st.session_state.imagen_model,
-                            prompt=prompt,
-                            config=config
-                        )
-
-                        # 处理返回的图片
-                        generated_images = [img.image for img in response.generated_images]
-                        
-                        # 将图片列表作为一个整体存入消息内容
-                        st.session_state.messages.append({"role": "assistant", "content": [generated_images]})
-                    
-                    except Exception as e:
-                        # ★★★ 关键: 详细的错误处理 ★★★
-                        st.error(f"图片生成失败！\n\n**错误类型:** `{type(e).__name__}`\n\n**详细信息:**\n```\n{e}\n```")
-                        error_message = f"很抱歉，图片生成失败了。错误详情：\n\n`{e}`"
-                        st.session_state.messages.append({"role": "assistant", "content": [error_message]})
-            
-            # 保存历史并刷新界面
-            with open(log_file, "wb") as f:
-                pickle.dump(_prepare_messages_for_save(st.session_state.messages), f)
-            st.experimental_rerun()
-
-
-# --- Gemini 聊天核心生成逻辑 (保持不变，仅在 is_generating 为 True 且为聊天模式时触发) ---
-if st.session_state.is_generating and st.session_state.active_model == "💬 聊天 (Gemini)":
+# --- 核心聊天生成逻辑 (保持不变) ---
+if st.session_state.is_generating:
     is_continuation_task = st.session_state.messages and st.session_state.messages[-1].get("is_continue_prompt")
     with st.chat_message("assistant"):
         placeholder = st.empty()
@@ -483,5 +500,8 @@ if st.session_state.is_generating and st.session_state.active_model == "💬 聊
                     pickle.dump(_prepare_messages_for_save(st.session_state.messages), f)
                 st.experimental_rerun()
 
-# --- 底部控件 ---
-st.session_state.use_token = st.checkbox("在聊天时使用 Token", value=st.session_state.get("use_token", True))
+
+# --- 底部控件 (保持不变) ---
+c1, c2 = st.columns(2)
+st.session_state.use_token = c1.checkbox("使用 Token", value=st.session_state.get("use_token", True))
+if c2.button("🔄", key="page_refresh", help="刷新页面"): st.experimental_rerun()
