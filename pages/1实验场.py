@@ -63,7 +63,7 @@ if "rerun_count" not in st.session_state:
 if "use_token" not in st.session_state:
     st.session_state.use_token = True
 
-# --- 新增：影片生成相关的 Session State 初始化 ---
+# --- 影片生成相关的 Session State 初始化 ---
 if "is_generating_video" not in st.session_state:
     st.session_state.is_generating_video = False
 if "video_operation_name" not in st.session_state:
@@ -97,7 +97,7 @@ model = genai.GenerativeModel(
 }
 """,
 )
-# 新增：影片生成模型列表
+# 影片生成模型列表
 VIDEO_MODELS = [
     "veo-3.0-generate-preview",
     "veo-3.0-fast-generate-preview",
@@ -266,7 +266,7 @@ with st.sidebar:
         st.text_area("输入文字 (可选)", key="sidebar_caption", height=100)
         st.button("发送到对话 ↗️", on_click=send_from_sidebar_callback, use_container_width=True)
 
-    # --- 新增：影片生成 UI ---
+    # --- 影片生成 UI ---
     with st.expander("影片生成 (Veo)", expanded=True):
         st.selectbox("选择影片模型:", VIDEO_MODELS, key="veo_model")
         st.text_area("影片提示词:", key="veo_prompt", height=150, placeholder="A cinematic shot of a majestic lion in the savannah.")
@@ -301,13 +301,12 @@ with st.sidebar:
         if enabled_list: st.write("已加载设定:", ", ".join(enabled_list))
         if st.button("刷新 🔄", key="sidebar_refresh"): st.experimental_rerun()
 
-# --- 新增：影片生成核心逻辑 (异步轮询) ---
-# 此逻辑块负责处理从发起请求到获取结果的全过程
+# --- 影片生成核心逻辑 (异步轮询) - 已修复兼容性问题 ---
 if st.session_state.is_generating_video:
     # 仅在首次触发时发起生成请求
     if st.session_state.video_operation_name is None:
         try:
-            with st.status("🚀 正在发起影片生成请求...", expanded=True) as status:
+            with st.spinner(f"🚀 正在向 {st.session_state.veo_model} 发起影片生成请求..."):
                 client = genai.Client()
                 model_name = st.session_state.veo_model
                 prompt = st.session_state.veo_prompt
@@ -320,13 +319,13 @@ if st.session_state.is_generating_video:
                     gen_video_kwargs["config"] = types.GenerateVideosConfig(negative_prompt=negative_prompt)
                 if uploaded_image:
                     gen_video_kwargs["image"] = Image.open(uploaded_image)
-
-                status.update(label=f"正在向 {model_name} 发送请求...")
+                
                 operation = client.models.generate_videos(**gen_video_kwargs)
                 
                 # 保存操作名称，这是跨页面刷新的关键
                 st.session_state.video_operation_name = operation.name
-                status.update(label="✅ 请求已发送！正在等待服务器处理...", state="running")
+            
+            st.info("✅ 请求已发送！服务器正在处理中，请在下方查看进度...")
             # 立即重新运行以进入轮询状态
             st.experimental_rerun()
 
@@ -339,39 +338,36 @@ if st.session_state.is_generating_video:
     # 如果已有操作名称，则进入轮询状态
     else:
         try:
-            with st.status(f"⏳ 正在生成影片，请勿关闭页面... (每10秒查询一次状态)", expanded=True) as status:
-                client = genai.Client()
-                operation_name = st.session_state.video_operation_name
-                
-                # 从名称获取操作对象
-                operation = client.operations.get(name=operation_name)
-                
-                # 检查操作是否完成
-                if operation.done:
-                    status.update(label="🎉 影片生成完成!", state="complete")
-                    
+            client = genai.Client()
+            operation_name = st.session_state.video_operation_name
+            
+            # 从名称获取操作对象
+            operation = client.operations.get(name=operation_name)
+            
+            # 检查操作是否完成
+            if operation.done:
+                with st.spinner("🎉 影片生成完成! 正在处理和下载影片..."):
                     # 检查是否有错误
                     if operation.error:
                         st.session_state.video_generation_error = f"生成失败: {operation.error.message}"
                     else:
                         generated_video = operation.response.generated_videos[0]
-                        status.write("正在下载影片数据...")
                         client.files.download(file=generated_video.video)
                         st.session_state.generated_video_data = generated_video.video.data
-                        status.write("下载完成！")
+                        st.success("影片处理完成！")
 
                     # 清理状态并刷新页面
                     st.session_state.is_generating_video = False
                     st.session_state.video_operation_name = None
                     time.sleep(2) # 留出时间给用户看消息
                     st.experimental_rerun()
-                
-                # 如果未完成，则等待并安排下一次刷新
-                else:
-                    metadata = types.GenerateVideosOperation.metadata_type.from_dict(operation.metadata)
-                    status.update(label=f"⏳ 正在生成影片... 状态: {metadata.state.name}", state="running")
-                    time.sleep(10)
-                    st.experimental_rerun()
+            
+            # 如果未完成，则等待并安排下一次刷新
+            else:
+                metadata = types.GenerateVideosOperation.metadata_type.from_dict(operation.metadata)
+                st.info(f"⏳ 正在生成影片... 当前状态: {metadata.state.name} (页面每10秒自动刷新)")
+                time.sleep(10)
+                st.experimental_rerun()
 
         except Exception as e:
             st.session_state.video_generation_error = f"轮询状态失败: {type(e).__name__} - {e}"
@@ -379,11 +375,10 @@ if st.session_state.is_generating_video:
             st.session_state.video_operation_name = None
             st.experimental_rerun()
 
-# --- 新增：显示影片生成结果或错误信息 ---
+# --- 显示影片生成结果或错误信息 ---
 if st.session_state.generated_video_data:
     st.subheader("🎬 生成的影片")
     st.video(st.session_state.generated_video_data)
-    # 提供下载按钮
     st.download_button(
         label="下载影片",
         data=st.session_state.generated_video_data,
@@ -442,7 +437,9 @@ if len(st.session_state.messages) >= 1 and not st.session_state.is_generating an
 
 # --- 聊天核心交互逻辑 (主输入框, 保持不变) ---
 if not st.session_state.is_generating:
-    if prompt := st.chat_input("输入你的消息...", key="main_chat_input", disabled=st.session_state.editing or st.session_state.is_generating_video):
+    # 增加影片生成时禁用输入框的判断
+    chat_disabled = st.session_state.editing or st.session_state.is_generating_video
+    if prompt := st.chat_input("输入你的消息...", key="main_chat_input", disabled=chat_disabled):
         token = generate_token()
         full_prompt = f"{prompt} (token: {token})" if st.session_state.use_token else prompt
         st.session_state.messages.append({"role": "user", "content": [full_prompt]})
