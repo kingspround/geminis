@@ -9,15 +9,12 @@ from datetime import datetime
 from io import BytesIO
 import zipfile
 from PIL import Image
-import importlib.metadata  # ★★★ 新增：用于诊断的库 ★★★
+import importlib.metadata
 
 # --- Streamlit Page Configuration ---
-st.set_page_config(
-    page_title="Gemini Chatbot with Vision & Imagen",
-    layout="wide"
-)
+st.set_page_config(page_title="Gemini Chatbot - Final Diagnosis", layout="wide")
 
-# ... (API_KEYS 和 session_state 初始化等其余代码完全不变)
+# --- (所有API密钥、session_state初始化、函数定义等代码保持不变，为简洁省略) ---
 # --- API 密钥设置 ---
 API_KEYS = {
     "主密钥": "AIzaSyCBjZbA78bPusYmUNvfsmHpt6rPx6Ur0QE",
@@ -64,6 +61,10 @@ if "rerun_count" not in st.session_state:
     st.session_state.rerun_count = 0
 if "use_token" not in st.session_state:
     st.session_state.use_token = True
+
+# --- API配置和模型定义 ---
+genai.configure(api_key=API_KEYS[st.session_state.selected_api_key])
+
 
 # --- API配置和模型定义 ---
 # 现在可以安全地使用 st.session_state.selected_api_key
@@ -258,7 +259,7 @@ def generate_images_callback():
             )
             response = client.models.generate_images(
                 model=st.session_state.imagen_model,
-                prompt=prompt,
+                prompt=st.session_state.imagen_prompt,
                 config=config
             )
             image_content = [f"遵命，主人！这是为您生成的 {len(response.generated_images)} 张图片："]
@@ -282,6 +283,9 @@ def generate_images_callback():
 """
             st.session_state.messages.append({"role": "assistant", "content": [error_message]})
             st.error(f"图片生成失败，详情请看聊天窗口。")
+        finally:
+            st.session_state.is_generating_image = False
+
     
     with open(log_file, "wb") as f:
         pickle.dump(_prepare_messages_for_save(st.session_state.messages), f)
@@ -289,14 +293,29 @@ def generate_images_callback():
 
 # --- UI 侧边栏 ---
 with st.sidebar:
-    # ★★★ 新增：在这里显示诊断信息 ★★★
+    st.header("🔬 终极诊断信息")
     try:
+        # 1. 检查版本
         version = importlib.metadata.version('google-generativeai')
-        st.info(f"✅ `google-generativeai` 版本: {version}")
-        if not version.startswith("0.5"):
-             st.error("版本过旧！需要 >= 0.5.0")
-    except importlib.metadata.PackageNotFoundError:
-        st.error("❌ 未找到 `google-generativeai` 库！")
+        st.info(f"版本号 (Version): {version}")
+
+        # 2. 检查导入文件的路径
+        st.info("导入模块的文件路径 (Path):")
+        st.code(genai.__file__, language='text')
+        
+        # 3. 检查模块的所有属性
+        attributes = dir(genai)
+        if 'Client' in attributes:
+            st.success("✅ 'Client' 属性在模块中已找到！")
+        else:
+            st.error("❌ 致命错误：'Client' 属性未找到！")
+            with st.expander("点击查看模块所有属性"):
+                st.json(attributes)
+
+    except Exception as e:
+        st.error(f"诊断代码执行失败: {e}")
+
+    st.divider()
 
 
     st.session_state.selected_api_key = st.selectbox("选择 API Key:", options=list(API_KEYS.keys()), index=list(API_KEYS.keys()).index(st.session_state.selected_api_key), key="api_selector")
