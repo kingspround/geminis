@@ -468,67 +468,71 @@ if st.session_state.is_generating:
             st.experimental_rerun()
 
 
-# --- 新增：核心影片生成逻辑 ---
+# --- 新增：核心影片生成逻辑 (兼容旧版 Streamlit) ---
 if st.session_state.is_generating_video:
-    # 使用 st.status 提供清晰的进度反馈
-    with st.status("正在处理影片生成请求...", expanded=True) as status:
-        try:
+    # 创建一个占位符，用于显示状态信息
+    status_placeholder = st.empty()
+
+    try:
+        # 使用 st.spinner 来显示持续的加载动画
+        with st.spinner("影片生成中... 此过程可能需要数分钟，请勿关闭页面。"):
             client = genai.Client()
 
             # 步骤 1: 如果操作尚未开始，则启动它
             if not st.session_state.video_operation_name:
-                status.update(label="向 API 发送请求中...")
-                
+                status_placeholder.info("向 API 发送请求中...")
+
                 input_image = None
                 if st.session_state.video_image_input:
                     input_image = Image.open(st.session_state.video_image_input)
 
                 video_config = types.GenerateVideosConfig(
-                    negative_prompt=st.session_state.video_negative_prompt or None
+                    negative_prompt=st.session_state.video_negative_prompt_input or None
                 )
 
                 operation = client.models.generate_videos(
                     model=st.session_state.video_model,
-                    prompt=st.session_state.video_prompt,
+                    prompt=st.session_state.video_prompt_input,
                     image=input_image,
                     config=video_config
                 )
                 st.session_state.video_operation_name = operation.name
-                status.update(label=f"✅ 请求已发送，操作名称: `{operation.name}`。开始轮询状态...")
-                time.sleep(10) # 首次轮询前等待10秒
+                status_placeholder.info(f"✅ 请求已发送，操作名称: `{operation.name}`。开始轮询状态...")
+                time.sleep(10) # 首次轮询前等待
                 st.experimental_rerun()
 
             # 步骤 2: 如果操作已在运行，则轮询其状态
             else:
-                status.update(label=f"正在轮询操作 `{st.session_state.video_operation_name}` 的状态...")
+                status_placeholder.info(f"正在轮询操作 `{st.session_state.video_operation_name}` 的状态...")
                 operation = client.operations.get(name=st.session_state.video_operation_name)
 
                 if not operation.done:
-                    status.update(label="影片生成中... (API 正在处理，此过程可能需要数分钟，请勿关闭页面)")
-                    time.sleep(15) # 每15秒检查一次状态，避免过于频繁的请求
+                    # 状态仍在进行中，继续显示加载动画并安排下一次检查
+                    time.sleep(15) # 每15秒检查一次状态
                     st.experimental_rerun()
                 else:
                     # 步骤 3: 操作完成，处理结果
-                    status.update(label="✅ 生成完成！正在下载和处理影片...", state="complete")
-                    
+                    # 首先清空占位符，然后显示最终结果
+                    status_placeholder.empty()
+
                     if hasattr(operation, 'response') and operation.response:
+                        st.info("✅ 生成完成！正在下载和处理影片...")
                         generated_video = operation.response.generated_videos[0]
-                        
-                        st.write("正在下载影片数据...")
+
                         client.files.download(file=generated_video.video)
                         video_bytes = generated_video.video.data
-                        
+
                         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S_%f")
                         temp_vid_path = os.path.join(VIDEO_CACHE_DIR, f"vid_{timestamp}.mp4")
                         with open(temp_vid_path, "wb") as f: f.write(video_bytes)
-                        
+
                         video_message = {
                             "role": "assistant",
                             "content": [{
                                 "type": "video",
                                 "data": video_bytes,
                                 "path": temp_vid_path,
-                                "prompt": st.session_state.video_prompt,
+                                "prompt": st.session_state.video_prompt_input,
                                 "model": st.session_state.video_model
                             }],
                             "is_video": True
@@ -536,29 +540,27 @@ if st.session_state.is_generating_video:
                         st.session_state.messages.append(video_message)
 
                         st.success("影片已成功生成并添加到对话中！")
-                        
                         # 清理并重置状态
                         st.session_state.is_generating_video = False
                         st.session_state.video_operation_name = None
-                        
+
                         with open(log_file, "wb") as f:
                             pickle.dump(_prepare_messages_for_save(st.session_state.messages), f)
                         st.experimental_rerun()
                     else:
                         error_details = f"操作完成，但 API 未返回有效的影片数据。元数据: {operation.metadata}"
                         st.error(error_details)
-                        status.update(label=f"❌ 生成失败: {error_details}", state="error")
                         st.session_state.is_generating_video = False
                         st.session_state.video_operation_name = None
 
-        except Exception as e:
-            error_msg = f"影片生成过程中发生严重错误：\n\n**{type(e).__name__}:**\n\n{e}"
-            st.error(error_msg)
-            status.update(label="❌ 发生错误", state="error", expanded=True)
-            # 发生错误时重置状态
-            st.session_state.is_generating_video = False
-            st.session_state.video_operation_name = None
-
+    except Exception as e:
+        # 发生错误时，清空占位符并显示详细错误信息
+        status_placeholder.empty()
+        error_msg = f"影片生成过程中发生严重错误：\n\n**{type(e).__name__}:**\n\n{e}"
+        st.error(error_msg)
+        # 重置状态
+        st.session_state.is_generating_video = False
+        st.session_state.video_operation_name = None
 
 # --- 底部控件 (保持不变) ---
 c1, c2 = st.columns(2)
