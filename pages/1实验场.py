@@ -68,7 +68,6 @@ if "rerun_count" not in st.session_state:
     st.session_state.rerun_count = 0
 if "use_token" not in st.session_state:
     st.session_state.use_token = True
-# --- 新增: 为模型选择和Imagen参数初始化session_state ---
 if "generation_mode" not in st.session_state:
     st.session_state.generation_mode = list(GENERATION_MODES.keys())[0]
 if "imagen_num_images" not in st.session_state:
@@ -80,7 +79,6 @@ if "imagen_aspect_ratio" not in st.session_state:
 # --- API配置和模型定义 ---
 genai.configure(api_key=API_KEYS[st.session_state.selected_api_key])
 
-# 聊天模型的配置
 chat_model_generation_config = {
   "temperature": 1.0, "top_p": 0.95, "top_k": 40, "max_output_tokens": 8192, "response_mime_type": "text/plain",
 }
@@ -206,7 +204,7 @@ tips:
     for chunk in response:
         yield chunk.text
 
-# --- 新增: 图像生成处理函数 ---
+# --- 图像生成处理函数 ---
 def handle_image_generation():
     """处理所有图像生成请求，包括Gemini和Imagen。"""
     last_user_message = next((msg for msg in reversed(st.session_state.messages) if msg["role"] == "user"), None)
@@ -215,7 +213,6 @@ def handle_image_generation():
         st.session_state.is_generating = False
         return
 
-    # 从用户消息中提取文本和图片
     prompt_text = ""
     input_images = []
     for part in last_user_message['content']:
@@ -238,9 +235,7 @@ def handle_image_generation():
                 client = genai.Client()
                 output_content = []
 
-                # --- Gemini Image Generation Logic ---
                 if "Gemini Image" in mode_key:
-                    # Gemini支持多模态输入（文本+图片）
                     contents = [prompt_text] + input_images 
                     config = types.GenerateContentConfig(response_modalities=['TEXT', 'IMAGE'])
                     
@@ -257,7 +252,6 @@ def handle_image_generation():
                             img = Image.open(BytesIO(part.inline_data.data))
                             output_content.append(img)
 
-                # --- Imagen 4.0 Generation Logic ---
                 elif "Imagen 4.0" in mode_key:
                     if input_images:
                         st.warning("Imagen 4.0 当前不支持图片输入，已忽略上传的图片。")
@@ -273,7 +267,6 @@ def handle_image_generation():
                         config=config
                     )
                     
-                    # Imagen 可能也会返回一些解释性文字，可以放在前面
                     output_content.append(f"为您生成了 {len(response.generated_images)} 张图片：")
                     for generated_image in response.generated_images:
                         output_content.append(generated_image.image)
@@ -284,12 +277,9 @@ def handle_image_generation():
                     st.warning("模型没有返回任何内容。")
 
             except Exception as e:
-                # 详细的错误处理
                 error_message = f"""
                 **图片生成失败！**
-
                 **错误类型:** `{type(e).__name__}`
-                
                 **详细信息:** 
                 ```
                 {e}
@@ -299,11 +289,11 @@ def handle_image_generation():
                 st.session_state.messages.append({"role": "assistant", "content": [error_message]})
             
             finally:
-                # 无论成功失败，都结束生成状态并刷新
                 st.session_state.is_generating = False
                 with open(log_file, "wb") as f:
                     pickle.dump(_prepare_messages_for_save(st.session_state.messages), f)
-                st.experimental_rerun()
+                # ★★★ FIX: REMOVED st.experimental_rerun() TO PREVENT INFINITE LOOP ★★★
+                # st.experimental_rerun()
 
 
 # --- 其他功能函数 (保持不变) ---
@@ -347,6 +337,7 @@ def send_from_sidebar_callback():
         st.session_state.messages.append({"role": "user", "content": content_parts})
         st.session_state.sidebar_caption = ""
         st.session_state.is_generating = True
+        st.experimental_rerun() # This rerun is okay because it's in a callback
 
 
 # --- UI 侧边栏 (保持不变) ---
@@ -445,7 +436,6 @@ st.selectbox(
     key="generation_mode"
 )
 
-# --- 新增: Imagen参数配置UI ---
 if "Imagen" in st.session_state.generation_mode:
     with st.expander("Imagen 4.0 参数配置"):
         cols = st.columns(2)
@@ -474,7 +464,6 @@ if not st.session_state.is_generating:
     
     if prompt := st.chat_input(prompt_placeholder, key="main_chat_input", disabled=st.session_state.editing):
         full_prompt = prompt
-        # 只在聊天模式下添加 token
         if "聊天" in st.session_state.generation_mode and st.session_state.use_token:
             token = generate_token()
             full_prompt = f"{prompt} (token: {token})"
@@ -488,7 +477,6 @@ if not st.session_state.is_generating:
 # ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
 if st.session_state.is_generating:
 
-    # --- 分支1: 文本聊天模式 (流式) ---
     if "聊天" in st.session_state.generation_mode:
         is_continuation_task = st.session_state.messages and st.session_state.messages[-1].get("is_continue_prompt")
         
@@ -538,9 +526,9 @@ if st.session_state.is_generating:
                         st.session_state.messages.pop()
                     with open(log_file, "wb") as f:
                         pickle.dump(_prepare_messages_for_save(st.session_state.messages), f)
-                    st.experimental_rerun()
+                    # ★★★ FIX: REMOVED st.experimental_rerun() TO PREVENT INFINITE LOOP ★★★
+                    # st.experimental_rerun()
     
-    # --- 分支2: 图像生成模式 (非流式) ---
     else:
         handle_image_generation()
 
