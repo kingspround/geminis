@@ -215,13 +215,9 @@ def generate_image_and_text():
     根据最新的用户消息（可能包含文本和图像）调用图像生成模型。
     严格遵循文档，返回一个包含文本和Pillow图像对象的列表。
     """
-    # 1. 实例化一个专门用于本次调用的模型客户端
-    #    模型名称从 session_state 中获取
     image_gen_model = genai.GenerativeModel(model_name=st.session_state.selected_model)
 
-    # 2. 准备API的输入内容 (contents)
     last_user_message = None
-    # 从后往前找最后一个 'user' 消息
     for msg in reversed(st.session_state.messages):
         if msg.get("role") == "user":
             last_user_message = msg
@@ -230,35 +226,29 @@ def generate_image_and_text():
     if not last_user_message or not last_user_message.get("content"):
         raise ValueError("无法找到有效的用户输入来进行图像生成。")
 
-    # API的 contents 就是用户消息的内容列表
     api_contents = last_user_message["content"]
-
-    # 3. 构造请求配置，这是关键
-    #    根据文档，必须指定 response_modalities
     generation_config = types.GenerationConfig(
         response_modalities=['TEXT', 'IMAGE']
     )
-
-    # 4. 调用API (这不是一个流式调用)
     response = image_gen_model.generate_content(
         contents=api_contents,
         generation_config=generation_config,
-        safety_settings=safety_settings # 复用安全设置
+        safety_settings=safety_settings
     )
 
-    # 5. 解析响应
     output_parts = []
     if response.candidates and response.candidates[0].content and response.candidates[0].content.parts:
         for part in response.candidates[0].content.parts:
             if part.text:
                 output_parts.append(part.text)
             elif part.inline_data and part.inline_data.data:
-                # 将返回的二进制数据转换为Pillow Image对象
                 image = Image.open(BytesIO(part.inline_data.data))
                 output_parts.append(image)
     
     if not output_parts:
-        # 如果模型因为某些原因（如安全策略）没有返回任何内容
+        # 检查是否有prompt_feedback，这通常表示因为安全设置而被阻止
+        if response.prompt_feedback and response.prompt_feedback.block_reason:
+             return [f"图像生成被阻止。原因: {response.prompt_feedback.block_reason.name}. 请尝试更换提示词。"]
         return ["模型没有返回有效的图像或文本。请尝试更换提示词。"]
 
     return output_parts
@@ -269,7 +259,6 @@ def regenerate_message(index):
         st.session_state.is_generating = True
         st.experimental_rerun()
 def continue_message(index):
-    # 续写功能主要针对文本模型，图像模型不支持流式续写
     if st.session_state.selected_model != TEXT_ONLY_MODEL_NAME:
         st.warning("续写功能仅支持文本对话模型。")
         return
@@ -285,11 +274,8 @@ def continue_message(index):
         last_chars = (original_content[-50:] + "...") if len(original_content) > 50 else original_content
         new_prompt = f"请严格地从以下文本的结尾处，无缝、自然地继续写下去。不要重复任何内容，不要添加任何前言或解释，直接输出续写的内容即可。文本片段：\n\"...{last_chars}\""
         
-        temp_history = [{"role": ("model" if m["role"] == "assistant" else "user"), "parts": m["content"]} for m in st.session_state.messages[:index+1]]
-        temp_history.append({"role": "user", "parts": [new_prompt]})
-        
-        st.session_state.is_generating = True
         st.session_state.messages.append({"role": "user", "content": [new_prompt], "temp": True})
+        st.session_state.is_generating = True
         st.experimental_rerun()
 
 def send_from_sidebar_callback():
@@ -306,7 +292,6 @@ def send_from_sidebar_callback():
     if content_parts:
         st.session_state.messages.append({"role": "user", "content": content_parts})
         st.session_state.sidebar_caption = ""
-        # 如果是图像模型，直接触发生成
         if st.session_state.selected_model != TEXT_ONLY_MODEL_NAME:
              st.session_state.is_generating = True
         st.experimental_rerun()
@@ -321,7 +306,6 @@ with st.sidebar:
     )
     genai.configure(api_key=API_KEYS[st.session_state.selected_api_key])
     
-    # 新增：模型选择器
     st.session_state.selected_model_key = st.selectbox(
         "选择模型:",
         options=list(AVAILABLE_MODELS.keys()),
@@ -329,9 +313,7 @@ with st.sidebar:
         key="model_selector_ui",
         help="选择'文字对话'进行聊天，选择'图像生成'来创建或编辑图片。"
     )
-    # 更新 session_state 中的模型名称
     st.session_state.selected_model = AVAILABLE_MODELS[st.session_state.selected_model_key]
-
 
     with st.expander("文件操作"):
         if len(st.session_state.messages) > 0: st.button("重置上一个输出 ⏪", on_click=lambda: st.session_state.messages.pop(-1))
@@ -388,16 +370,20 @@ if st.session_state.get("editing"):
     i = st.session_state.editable_index
     message = st.session_state.messages[i]
     with st.chat_message(message["role"]):
-        current_text = message["content"][0] if message["content"] and isinstance(message["content"][0], str) else ""
+        current_text = ""
+        if message["content"] and isinstance(message["content"][0], str):
+             current_text = message["content"][0]
         new_text = st.text_area(f"编辑 {message['role']} 的消息:", current_text, key=f"edit_area_{i}")
         c1, c2 = st.columns(2)
         if c1.button("保存 ✅", key=f"save_{i}"):
-            st.session_state.messages[i]["content"][0] = new_text
+            if message["content"] and isinstance(message["content"][0], str):
+                 st.session_state.messages[i]["content"][0] = new_text
+            else: # 如果原来是纯图片，现在编辑会变成图文
+                 st.session_state.messages[i]["content"].insert(0, new_text)
             with open(log_file, "wb") as f: pickle.dump(_prepare_messages_for_save(st.session_state.messages), f)
             st.session_state.editing = False; st.experimental_rerun()
         if c2.button("取消 ❌", key=f"cancel_{i}"):
             st.session_state.editing = False; st.experimental_rerun()
-
 
 # --- 续写/编辑/重生成按钮逻辑 ---
 if len(st.session_state.messages) >= 1 and not st.session_state.is_generating and not st.session_state.editing:
@@ -414,23 +400,20 @@ if len(st.session_state.messages) >= 1 and not st.session_state.is_generating an
         if is_assistant:
              with st.container():
                 cols = st.columns(20)
-                # 编辑按钮仅对纯文本消息有效
-                is_text_only = len(last_msg.get("content", [])) == 1 and isinstance(last_msg["content"][0], str)
-                if is_text_only:
-                     if cols[0].button("✏️", key="edit", help="编辑"): st.session_state.editable_index = last_real_msg_idx; st.session_state.editing = True; st.experimental_rerun()
+                # 编辑按钮总是显示，但只对文本部分有效
+                if cols[0].button("✏️", key="edit", help="编辑"): st.session_state.editable_index = last_real_msg_idx; st.session_state.editing = True; st.experimental_rerun()
                 # 重生成按钮对所有助手消息有效
                 if cols[1].button("♻️", key="regen", help="重新生成"): regenerate_message(last_real_msg_idx)
-                # 继续按钮仅对文本模型生成的文本消息有效
+                # 继续按钮仅对文本模型生成的纯文本消息有效
+                is_text_only = len(last_msg.get("content", [])) > 0 and isinstance(last_msg["content"][0], str) and all(isinstance(p, str) for p in last_msg['content'])
                 if is_text_only and st.session_state.selected_model == TEXT_ONLY_MODEL_NAME:
                      if cols[2].button("➕", key="cont", help="继续"): continue_message(last_real_msg_idx)
 
 # --- 核心交互逻辑 (主输入框) ---
 if not st.session_state.is_generating:
-    # 根据所选模型更改输入提示
     input_placeholder = "输入文字生成图片或编辑图片..." if st.session_state.selected_model != TEXT_ONLY_MODEL_NAME else "输入你的消息..."
     
     if prompt := st.chat_input(input_placeholder, key="main_chat_input", disabled=st.session_state.editing):
-        # 根据模型决定是否添加token
         if st.session_state.selected_model == TEXT_ONLY_MODEL_NAME and st.session_state.use_token:
             token = generate_token()
             full_prompt = f"{prompt} (token: {token})"
@@ -441,99 +424,109 @@ if not st.session_state.is_generating:
         st.session_state.is_generating = True
         st.experimental_rerun()
 
-# --- 核心生成逻辑 (已分流处理文本和图像) ---
+# ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
+# ★★★ 核心生成逻辑 (已重构，修复了状态管理错误) ★★★
+# ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
 if st.session_state.is_generating:
-    # ==========================================================
-    # 分支1: 如果选择的是图像生成模型
-    # ==========================================================
+    # --- 分支1: 图像生成模型 ---
     if st.session_state.selected_model != TEXT_ONLY_MODEL_NAME:
         with st.chat_message("assistant"):
             try:
-                # 使用 spinner 提示用户正在生成
                 with st.spinner("正在调用模型生成图片... 请稍候..."):
-                    # 调用新的图像生成函数
                     generated_parts = generate_image_and_text()
                 
-                # 在聊天界面显示结果
                 st.session_state.messages.append({"role": "assistant", "content": generated_parts})
+                # 成功后，结束生成状态
+                st.session_state.is_generating = False
 
             except Exception as e:
-                # 强大的错误处理
+                # 详细的错误处理
                 st.error(f"图片生成失败，请检查网络或提示词。详细错误: {e}")
-                # 如果生成失败，移除可能已添加的空的用户消息
-                if st.session_state.messages and st.session_state.messages[-1]["role"] == "user":
-                    # 也可以选择不移除，让用户可以编辑重发
-                    pass
-
-            finally:
-                # 无论成功失败，都结束生成状态并刷新
+                # 失败后，也结束生成状态
                 st.session_state.is_generating = False
-                with open(log_file, "wb") as f:
-                    pickle.dump(_prepare_messages_for_save(st.session_state.messages), f)
-                st.experimental_rerun()
+        
+        # 无论成功或失败，都保存记录并刷新UI
+        with open(log_file, "wb") as f:
+            pickle.dump(_prepare_messages_for_save(st.session_state.messages), f)
+        st.experimental_rerun()
 
-    # ==========================================================
-    # 分支2: 如果选择的是文本对话模型 (沿用旧的流式逻辑)
-    # ==========================================================
+    # --- 分支2: 文本对话模型 ---
     else:
         is_continuation_task = st.session_state.messages and st.session_state.messages[-1].get("temp")
         with st.chat_message("assistant"):
             placeholder = st.empty()
             
             if is_continuation_task:
-                # 续写任务：目标是修改上一条助手消息
                 target_message_index = -2 
             else:
-                # 新生成任务：在末尾追加新的助手消息
                 st.session_state.messages.append({"role": "assistant", "content": [""]})
                 target_message_index = -1
             
-            streamed_part = ""
             try:
                 original_content = ""
                 if is_continuation_task:
-                    # 获取被续写消息的原始内容
                     content_list = st.session_state.messages[target_message_index]["content"]
                     if content_list and isinstance(content_list[0], str):
                         original_content = content_list[0]
                 
+                streamed_part = ""
                 for chunk in getAnswer():
                     streamed_part += chunk
                     updated_full_content = original_content + streamed_part
                     st.session_state.messages[target_message_index]["content"][0] = updated_full_content
                     placeholder.markdown(updated_full_content + "▌")
                 
-                placeholder.markdown(st.session_state.messages[target_message_index]["content"][0])
+                # 成功完成流式输出
+                final_content = st.session_state.messages[target_message_index]["content"][0]
+                placeholder.markdown(final_content)
                 st.session_state.is_generating = False 
-
-            except Exception as e:
-                st.toast("回答中断，正在尝试自动续写…")
-                partial_content = st.session_state.messages[target_message_index]["content"][0]
-
-                if partial_content.strip():
-                    last_chars = (partial_content[-50:] + "...") if len(partial_content) > 50 else partial_content
-                    continue_prompt = f"请严格地从以下文本的结尾处，无缝、自然地继续写下去。不要重复任何内容，不要添加任何前言或解释，直接输出续写的内容即可。文本片段：\n\"...{last_chars}\""
-                    
-                    if is_continuation_task: st.session_state.messages.pop() # 移除旧的续写指令
-                    st.session_state.messages.append({"role": "user", "content": [continue_prompt], "temp": True})
-                else:
-                    st.error(f"回答生成失败 ({type(e).__name__})，请重试。")
-                    st.session_state.is_generating = False
-            finally:
-                if not st.session_state.is_generating and is_continuation_task:
-                    st.session_state.messages.pop() # 清理续写指令
-
-                if not st.session_state.is_generating and st.session_state.messages and st.session_state.messages[-1]['role'] == 'assistant' and not st.session_state.messages[-1]["content"][0].strip():
-                    st.session_state.messages.pop()
                 
+                # 清理临时续写指令
+                if is_continuation_task:
+                    st.session_state.messages.pop() 
+                
+                # 保存并刷新
                 with open(log_file, "wb") as f:
                     pickle.dump(_prepare_messages_for_save(st.session_state.messages), f)
                 st.experimental_rerun()
 
+            except Exception as e:
+                # 发生中断，尝试自动续写
+                st.toast("回答中断，正在尝试自动续写…")
+                partial_content = ""
+                if -len(st.session_state.messages) <= target_message_index < len(st.session_state.messages):
+                    content_list = st.session_state.messages[target_message_index]["content"]
+                    if content_list and isinstance(content_list[0], str):
+                         partial_content = content_list[0]
+
+                # 只有当确实已经生成了部分内容时，才进行自动续写
+                if partial_content.strip():
+                    last_chars = (partial_content[-50:] + "...") if len(partial_content) > 50 else partial_content
+                    continue_prompt = f"请严格地从以下文本的结尾处，无缝、自然地继续写下去。不要重复任何内容，不要添加任何前言或解释，直接输出续写的内容即可。文本片段：\n\"...{last_chars}\""
+                    
+                    if not is_continuation_task: # 如果是新消息中断
+                        # 把之前空的消息占位符填上中断的内容
+                        st.session_state.messages[target_message_index]["content"][0] = partial_content
+                        # 再加上续写指令
+                        st.session_state.messages.append({"role": "user", "content": [continue_prompt], "temp": True})
+                    else: # 如果是续写任务中断
+                         st.session_state.messages[-1]["content"][0] = continue_prompt # 直接更新续写指令
+
+                    # is_generating 保持 True
+                else:
+                    # 如果中断时没有任何内容，则停止并报错
+                    st.error(f"回答生成失败 ({type(e).__name__}: {e})，请重试。")
+                    if st.session_state.messages and st.session_state.messages[-1]['role'] == 'assistant' and not st.session_state.messages[-1]["content"][0].strip():
+                         st.session_state.messages.pop() # 移除空的助手消息
+                    st.session_state.is_generating = False
+                
+                # 保存并刷新以触发续写或显示错误
+                with open(log_file, "wb") as f:
+                    pickle.dump(_prepare_messages_for_save(st.session_state.messages), f)
+                st.experimental_rerun()
 
 # --- 底部控件 ---
 c1, c2 = st.columns(2)
-# Token 复选框仅在选择文本模型时显示和生效
 if st.session_state.selected_model == TEXT_ONLY_MODEL_NAME:
     st.session_state.use_token = c1.checkbox("使用 Token", value=st.session_state.get("use_token", True))
 if c2.button("🔄", key="page_refresh", help="刷新页面"): st.experimental_rerun()
