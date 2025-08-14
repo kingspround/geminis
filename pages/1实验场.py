@@ -292,8 +292,6 @@ def handle_image_generation():
                 st.session_state.is_generating = False
                 with open(log_file, "wb") as f:
                     pickle.dump(_prepare_messages_for_save(st.session_state.messages), f)
-                # ★★★ FIX: REMOVED st.experimental_rerun() TO PREVENT INFINITE LOOP ★★★
-                # st.experimental_rerun()
 
 
 # --- 其他功能函数 (保持不变) ---
@@ -315,9 +313,6 @@ def continue_message(index):
         last_chars = (original_content[-50:] + "...") if len(original_content) > 50 else original_content
         new_prompt = f"请严格地从以下文本的结尾处，无缝、自然地继续写下去。不要重复任何内容，不要添加任何前言或解释，直接输出续写的内容即可。文本片段：\n\"...{last_chars}\""
         
-        temp_history = [{"role": ("model" if m["role"] == "assistant" else "user"), "parts": m["content"]} for m in st.session_state.messages[:index+1]]
-        temp_history.append({"role": "user", "parts": [new_prompt]})
-        
         st.session_state.is_generating = True
         st.session_state.messages.append({"role": "user", "content": [new_prompt], "temp": True})
         st.experimental_rerun()
@@ -337,7 +332,7 @@ def send_from_sidebar_callback():
         st.session_state.messages.append({"role": "user", "content": content_parts})
         st.session_state.sidebar_caption = ""
         st.session_state.is_generating = True
-        st.experimental_rerun() # This rerun is okay because it's in a callback
+        st.experimental_rerun()
 
 
 # --- UI 侧边栏 (保持不变) ---
@@ -470,7 +465,10 @@ if not st.session_state.is_generating:
             
         st.session_state.messages.append({"role": "user", "content": [full_prompt]})
         st.session_state.is_generating = True
-        st.experimental_rerun()
+        # ★★★ FIX: REMOVED st.experimental_rerun() HERE ★★★
+        # This was the cause of the infinite loop. st.chat_input triggers an
+        # automatic rerun, so calling it again manually creates a conflict.
+        # st.experimental_rerun() 
 
 # ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
 # ★★★ 核心生成逻辑 (已重构以支持不同模式) ★★★
@@ -526,8 +524,6 @@ if st.session_state.is_generating:
                         st.session_state.messages.pop()
                     with open(log_file, "wb") as f:
                         pickle.dump(_prepare_messages_for_save(st.session_state.messages), f)
-                    # ★★★ FIX: REMOVED st.experimental_rerun() TO PREVENT INFINITE LOOP ★★★
-                    # st.experimental_rerun()
     
     else:
         handle_image_generation()
