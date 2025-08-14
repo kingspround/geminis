@@ -1,15 +1,4 @@
-Of course! I will integrate the image generation functionality using Imagen into your existing Streamlit application.
 
-The core changes will be:
-1.  Adding an **"Image Generation (Imagen)"** section to the sidebar to control generation settings like aspect ratio and the number of images.
-2.  Implementing a new command, `/imagine [your prompt]`, in the main chat input to trigger image generation.
-3.  Calling the Imagen API when this command is used and displaying the resulting images directly in the chat.
-
-All of your existing features—text chat with your custom persona, history management, message editing, regeneration, and continuation—will remain fully intact and unchanged.
-
-Here is the complete, updated code:
-
-```python
 import os
 import google.generativeai as genai
 import google.generativeai.types as genai_types
@@ -475,4 +464,4 @@ if st.session_state.is_generating:
 c1, c2 = st.columns(2)
 st.session_state.use_token = c1.checkbox("使用 Token", value=st.session_state.get("use_token", True))
 if c2.button("🔄", key="page_refresh", help="刷新页面"): st.experimental_rerun()
-```
+
