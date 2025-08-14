@@ -34,8 +34,8 @@ API_KEYS = {
 # --- 定义模型选项 ---
 GENERATION_MODES = {
     "聊天 (Gemini 2.5 Flash)": "gemini-2.5-flash-preview-05-20",
-    "文生图 (Gemini Image)": "gemini-2.0-flash-preview-image-generation",
-    "文生图 (Imagen 4.0)": "imagen-4.0-generate-preview-06-06"
+    "文生图 (Imagen 4.0)": "imagen-4.0-generate-preview-06-06",
+    "文图编辑 (Gemini Image)": "gemini-2.0-flash-preview-image-generation",
 }
 
 
@@ -206,7 +206,7 @@ tips:
 
 # --- 图像生成处理函数 (已修正) ---
 def handle_image_generation():
-    """处理所有图像生成请求，包括Gemini和Imagen。"""
+    """处理所有图像生成请求，为不同模型使用正确的API方法。"""
     last_user_message = next((msg for msg in reversed(st.session_state.messages) if msg["role"] == "user"), None)
     if not last_user_message:
         st.error("无法找到用户输入。")
@@ -222,7 +222,7 @@ def handle_image_generation():
             input_images.append(part)
 
     if not prompt_text:
-        st.error("请输入文本提示词以生成图片。")
+        st.error("请输入文本提示词。")
         st.session_state.is_generating = False
         return
 
@@ -230,43 +230,38 @@ def handle_image_generation():
     model_name = GENERATION_MODES[mode_key]
 
     with st.chat_message("assistant"):
-        with st.spinner(f"正在使用 {mode_key} 生成图片..."):
+        with st.spinner(f"正在使用 {mode_key} 生成..."):
             try:
-                # ★★★ FIX: Removed genai.Client() and using genai.GenerativeModel() directly ★★★
-                image_model = genai.GenerativeModel(model_name=model_name)
                 output_content = []
-                response = None
-
-                # --- Gemini Image and Imagen Logic (Unified) ---
-                if "Gemini Image" in mode_key:
-                    # Gemini支持多模态输入（文本+图片）
+                
+                # ★★★ FIX: Separated logic for Imagen vs. Gemini models ★★★
+                if "Imagen" in mode_key:
+                    # Imagen uses the dedicated `generate_images` function
+                    if input_images:
+                        st.warning("Imagen 模型当前不支持图片输入，已忽略上传的图片。")
+                    
+                    response = genai.generate_images(
+                        model=model_name,
+                        prompt=prompt_text,
+                        number_of_images=st.session_state.imagen_num_images,
+                        aspect_ratio=st.session_state.imagen_aspect_ratio,
+                    )
+                    
+                    output_content.append(f"为您生成了 {len(response.images)} 张图片：")
+                    for img in response.images:
+                         output_content.append(img)
+                
+                elif "Gemini" in mode_key:
+                    # Gemini models (including image editing) use `generate_content`
+                    image_model = genai.GenerativeModel(model_name=model_name)
                     contents = [prompt_text] + input_images
-                    # Gemini Image requires a specific modality config
                     generation_config = types.GenerateContentConfig(response_modalities=['TEXT', 'IMAGE'])
+                    
                     response = image_model.generate_content(
                         contents=contents,
                         generation_config=generation_config
                     )
 
-                elif "Imagen 4.0" in mode_key:
-                    if input_images:
-                        st.warning("Imagen 4.0 当前不支持图片输入，已忽略上传的图片。")
-                    
-                    # Imagen uses generation_config for its parameters
-                    generation_config = types.GenerationConfig(
-                        # The API expects number_of_images inside a candidate_count field
-                        candidate_count=st.session_state.imagen_num_images 
-                    )
-                    # Imagen expects a simple text prompt
-                    response = image_model.generate_content(
-                        contents=prompt_text,
-                        generation_config=generation_config
-                    )
-                    # For Imagen, we can add a descriptive text header
-                    output_content.append(f"为您生成了 {st.session_state.imagen_num_images} 张图片：")
-
-                # --- Unified Response Parsing ---
-                if response:
                     for part in response.candidates[0].content.parts:
                         if part.text:
                             output_content.append(part.text)
@@ -281,7 +276,7 @@ def handle_image_generation():
 
             except Exception as e:
                 error_message = f"""
-                **图片生成失败！**
+                **生成失败！**
                 **错误类型:** `{type(e).__name__}`
                 **详细信息:** 
                 ```
@@ -430,12 +425,16 @@ if len(st.session_state.messages) >= 1 and not st.session_state.is_generating an
 # --- 核心交互逻辑 (主输入框) ---
 st.selectbox(
     "选择模式:",
-    options=GENERATION_MODES.keys(),
+    options=list(GENERATION_MODES.keys()),
     key="generation_mode"
 )
 
-if "Imagen" in st.session_state.generation_mode:
-    with st.expander("Imagen 4.0 参数配置"):
+# --- 修正: 根据模式显示不同UI ---
+is_imagen_mode = "Imagen" in st.session_state.generation_mode
+is_chat_mode = "聊天" in st.session_state.generation_mode
+
+if is_imagen_mode:
+    with st.expander("Imagen 4.0 参数配置", expanded=True):
         cols = st.columns(2)
         with cols[0]:
             st.slider(
@@ -445,25 +444,24 @@ if "Imagen" in st.session_state.generation_mode:
                 key="imagen_num_images",
                 help="要生成的图片数量，范围为 1 到 4。"
             )
-        # 宽高比参数目前在 .generate_content 中不易直接设置，暂时注释
-        # with cols[1]:
-        #     st.selectbox(
-        #         "图片宽高比",
-        #         options=["1:1", "3:4", "4:3", "9:16", "16:9"],
-        #         key="imagen_aspect_ratio",
-        #         help="更改生成图像的显示比例。"
-        #     )
+        with cols[1]:
+            st.selectbox(
+                "图片宽高比",
+                options=["1:1", "3:4", "4:3", "9:16", "16:9"],
+                key="imagen_aspect_ratio",
+                help="更改生成图像的显示比例。"
+            )
 
 if not st.session_state.is_generating:
     prompt_placeholder = "输入你的消息..."
-    if "Imagen" in st.session_state.generation_mode:
-        prompt_placeholder = "输入英文提示词生成图片..."
-    elif "Gemini Image" in st.session_state.generation_mode:
-        prompt_placeholder = "输入提示词，或通过侧边栏上传图片进行编辑..."
+    if is_imagen_mode:
+        prompt_placeholder = "输入英文提示词生成图片 (Imagen)..."
+    elif not is_chat_mode:
+        prompt_placeholder = "输入提示词，或通过侧边栏上传图片进行编辑 (Gemini)..."
     
     if prompt := st.chat_input(prompt_placeholder, key="main_chat_input", disabled=st.session_state.editing):
         full_prompt = prompt
-        if "聊天" in st.session_state.generation_mode and st.session_state.use_token:
+        if is_chat_mode and st.session_state.use_token:
             token = generate_token()
             full_prompt = f"{prompt} (token: {token})"
             
@@ -475,8 +473,8 @@ if not st.session_state.is_generating:
 # ★★★ 核心生成逻辑 (已重构以支持不同模式) ★★★
 # ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
 if st.session_state.is_generating:
-
-    if "聊天" in st.session_state.generation_mode:
+    
+    if is_chat_mode:
         # (聊天逻辑保持不变)
         is_continuation_task = st.session_state.messages and st.session_state.messages[-1].get("is_continue_prompt")
         
@@ -527,7 +525,7 @@ if st.session_state.is_generating:
                     with open(log_file, "wb") as f:
                         pickle.dump(_prepare_messages_for_save(st.session_state.messages), f)
     
-    else:
+    else: # This covers both Imagen and Gemini Image modes
         handle_image_generation()
 
 # --- 底部控件 (保持不变) ---
