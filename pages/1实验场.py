@@ -204,7 +204,7 @@ tips:
     for chunk in response:
         yield chunk.text
 
-# --- 图像生成处理函数 ---
+# --- 图像生成处理函数 (已修正) ---
 def handle_image_generation():
     """处理所有图像生成请求，包括Gemini和Imagen。"""
     last_user_message = next((msg for msg in reversed(st.session_state.messages) if msg["role"] == "user"), None)
@@ -232,44 +232,47 @@ def handle_image_generation():
     with st.chat_message("assistant"):
         with st.spinner(f"正在使用 {mode_key} 生成图片..."):
             try:
-                client = genai.Client()
+                # ★★★ FIX: Removed genai.Client() and using genai.GenerativeModel() directly ★★★
+                image_model = genai.GenerativeModel(model_name=model_name)
                 output_content = []
+                response = None
 
+                # --- Gemini Image and Imagen Logic (Unified) ---
                 if "Gemini Image" in mode_key:
-                    contents = [prompt_text] + input_images 
-                    config = types.GenerateContentConfig(response_modalities=['TEXT', 'IMAGE'])
-                    
-                    response = client.models.generate_content(
-                        model=model_name,
+                    # Gemini支持多模态输入（文本+图片）
+                    contents = [prompt_text] + input_images
+                    # Gemini Image requires a specific modality config
+                    generation_config = types.GenerateContentConfig(response_modalities=['TEXT', 'IMAGE'])
+                    response = image_model.generate_content(
                         contents=contents,
-                        config=config
+                        generation_config=generation_config
                     )
+
+                elif "Imagen 4.0" in mode_key:
+                    if input_images:
+                        st.warning("Imagen 4.0 当前不支持图片输入，已忽略上传的图片。")
                     
+                    # Imagen uses generation_config for its parameters
+                    generation_config = types.GenerationConfig(
+                        # The API expects number_of_images inside a candidate_count field
+                        candidate_count=st.session_state.imagen_num_images 
+                    )
+                    # Imagen expects a simple text prompt
+                    response = image_model.generate_content(
+                        contents=prompt_text,
+                        generation_config=generation_config
+                    )
+                    # For Imagen, we can add a descriptive text header
+                    output_content.append(f"为您生成了 {st.session_state.imagen_num_images} 张图片：")
+
+                # --- Unified Response Parsing ---
+                if response:
                     for part in response.candidates[0].content.parts:
                         if part.text:
                             output_content.append(part.text)
                         elif part.inline_data:
                             img = Image.open(BytesIO(part.inline_data.data))
                             output_content.append(img)
-
-                elif "Imagen 4.0" in mode_key:
-                    if input_images:
-                        st.warning("Imagen 4.0 当前不支持图片输入，已忽略上传的图片。")
-                        
-                    config = types.GenerateImagesConfig(
-                        number_of_images=st.session_state.imagen_num_images,
-                        aspect_ratio=st.session_state.imagen_aspect_ratio,
-                    )
-                    
-                    response = client.models.generate_images(
-                        model=model_name,
-                        prompt=prompt_text,
-                        config=config
-                    )
-                    
-                    output_content.append(f"为您生成了 {len(response.generated_images)} 张图片：")
-                    for generated_image in response.generated_images:
-                        output_content.append(generated_image.image)
                 
                 if output_content:
                     st.session_state.messages.append({"role": "assistant", "content": output_content})
@@ -442,13 +445,14 @@ if "Imagen" in st.session_state.generation_mode:
                 key="imagen_num_images",
                 help="要生成的图片数量，范围为 1 到 4。"
             )
-        with cols[1]:
-            st.selectbox(
-                "图片宽高比",
-                options=["1:1", "3:4", "4:3", "9:16", "16:9"],
-                key="imagen_aspect_ratio",
-                help="更改生成图像的显示比例。"
-            )
+        # 宽高比参数目前在 .generate_content 中不易直接设置，暂时注释
+        # with cols[1]:
+        #     st.selectbox(
+        #         "图片宽高比",
+        #         options=["1:1", "3:4", "4:3", "9:16", "16:9"],
+        #         key="imagen_aspect_ratio",
+        #         help="更改生成图像的显示比例。"
+        #     )
 
 if not st.session_state.is_generating:
     prompt_placeholder = "输入你的消息..."
@@ -465,10 +469,7 @@ if not st.session_state.is_generating:
             
         st.session_state.messages.append({"role": "user", "content": [full_prompt]})
         st.session_state.is_generating = True
-        # ★★★ FIX: REMOVED st.experimental_rerun() HERE ★★★
-        # This was the cause of the infinite loop. st.chat_input triggers an
-        # automatic rerun, so calling it again manually creates a conflict.
-        # st.experimental_rerun() 
+
 
 # ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
 # ★★★ 核心生成逻辑 (已重构以支持不同模式) ★★★
@@ -476,6 +477,7 @@ if not st.session_state.is_generating:
 if st.session_state.is_generating:
 
     if "聊天" in st.session_state.generation_mode:
+        # (聊天逻辑保持不变)
         is_continuation_task = st.session_state.messages and st.session_state.messages[-1].get("is_continue_prompt")
         
         with st.chat_message("assistant"):
