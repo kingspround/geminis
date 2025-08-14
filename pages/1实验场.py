@@ -1,6 +1,7 @@
 import os
 import google.generativeai as genai
-import google.generativeai.types as types  # <-- 新增导入
+# --- ★★★ 这里是修正后的关键行 ★★★ ---
+import google.generativeai.types as types
 import streamlit as st
 import pickle
 import random
