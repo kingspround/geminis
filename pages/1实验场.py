@@ -1,4 +1,3 @@
-
 import os
 import google.generativeai as genai
 import streamlit as st
@@ -6,12 +5,12 @@ import pickle
 import random
 import string
 import time
+import requests # 新增导入
 from datetime import datetime
 from io import BytesIO
 import zipfile
 from PIL import Image
-# 新增的导入
-from google.generativeai import types
+# from google.generativeai import types # 不再需要这个
 
 # --- Streamlit Page Configuration ---
 st.set_page_config(
@@ -23,13 +22,10 @@ st.set_page_config(
 file = os.path.abspath(__file__)
 filename = os.path.splitext(os.path.basename(file))[0] + ".pkl"
 log_file = os.path.join(os.path.dirname(file), filename)
-
-# 为缓存的视频文件创建目录
 VIDEO_CACHE_DIR = "video_cache"
 os.makedirs(VIDEO_CACHE_DIR, exist_ok=True)
 
-
-# --- API 密钥设置 (保持不变) ---
+# --- API 密钥设置 ---
 API_KEYS = {
     "主密钥": "AIzaSyCBjZbA78bPusYmUNvfsmHpt6rPx6Ur0QE",
     "备用1号": "AIzaSyAWfFf6zqy1DizINOwPfxPD8EF2ACdwCaQ",
@@ -74,15 +70,13 @@ if "rerun_count" not in st.session_state:
     st.session_state.rerun_count = 0
 if "use_token" not in st.session_state:
     st.session_state.use_token = True
-
-# --- 新增影片生成相关的 Session State ---
 if "is_generating_video" not in st.session_state:
     st.session_state.is_generating_video = False
 if "video_operation_name" not in st.session_state:
     st.session_state.video_operation_name = None
 
-
-# --- API配置和模型定义 (保持不变) ---
+# --- API配置和模型定义 ---
+# 仅为文本聊天配置
 try:
     genai.configure(api_key=API_KEYS[st.session_state.selected_api_key])
 except Exception as e:
@@ -98,7 +92,7 @@ safety_settings = [
     {"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_NONE"},
 ]
 model = genai.GenerativeModel(
-  model_name="gemini-1.5-flash-latest", # 原有模型保持不变
+  model_name="gemini-1.5-flash-latest",
   generation_config=generation_config,
   safety_settings=safety_settings,
   system_instruction="""
@@ -109,30 +103,22 @@ model = genai.GenerativeModel(
 """,
 )
 
-# --- 默认角色设定 (保持不变) ---
+# --- 默认角色设定 ---
 DEFAULT_CHARACTER_SETTINGS = { "理外祝福": """【理外祝福】的核心概念：\n\n""" }
 
-# --- 文件操作与功能函数 (已更新以支持影片) ---
-
+# --- 文件操作与功能函数 (保持不变) ---
 def _prepare_messages_for_save(messages):
-    """准备消息列表用于 pickle 保存，处理图片和影片数据。"""
     picklable_messages = []
     for msg in messages:
         new_msg = msg.copy()
-
-        # 处理影片消息
         if new_msg.get("is_video"):
-            # 深拷贝内容列表以安全地修改
             new_content_list = [c.copy() for c in new_msg.get("content", [])]
             if new_content_list and new_content_list[0].get("type") == "video":
-                # 保存时移除临时的本地文件路径
                 new_content_list[0].pop("path", None)
             new_msg["content"] = new_content_list
             new_msg.pop("placeholder_widget", None)
             picklable_messages.append(new_msg)
             continue
-
-        # 处理常规图文消息
         new_content_list = []
         if isinstance(new_msg.get("content"), list):
             for part in new_msg["content"]:
@@ -143,31 +129,23 @@ def _prepare_messages_for_save(messages):
                 else:
                     new_content_list.append(part)
             new_msg["content"] = new_content_list
-
         new_msg.pop("placeholder_widget", None)
         picklable_messages.append(new_msg)
     return picklable_messages
 
 def _reconstitute_messages_after_load(messages):
-    """从 pickle 加载后重建消息列表，处理图片和影片。"""
     reconstituted_messages = []
     for msg in messages:
         new_msg = msg.copy()
-
-        # 处理影片消息
         if new_msg.get("is_video"):
             video_content = new_msg["content"][0]
             if video_content.get("type") == "video" and "data" in video_content:
                 try:
                     video_bytes = video_content["data"]
-                    # 创建唯一文件名以避免缓存冲突
                     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S_%f")
                     temp_vid_path = os.path.join(VIDEO_CACHE_DIR, f"vid_{timestamp}.mp4")
-                    with open(temp_vid_path, "wb") as f:
-                        f.write(video_bytes)
-                    # 存储文件路径用于 st.video 显示
+                    with open(temp_vid_path, "wb") as f: f.write(video_bytes)
                     video_content["path"] = temp_vid_path
-                    # 从内存中移除大的字节对象
                     video_content.pop("data")
                     reconstituted_messages.append(new_msg)
                 except Exception as e:
@@ -175,8 +153,6 @@ def _reconstitute_messages_after_load(messages):
                     new_msg["is_video"] = False
                     reconstituted_messages.append(new_msg)
             continue
-
-        # 处理常规图文消息
         content = new_msg.get("content")
         new_content = []
         if isinstance(content, str):
@@ -186,12 +162,9 @@ def _reconstitute_messages_after_load(messages):
         if isinstance(content, list):
             for part in content:
                 if isinstance(part, dict) and part.get("type") == "image":
-                    try:
-                        new_content.append(Image.open(BytesIO(part["data"])))
-                    except Exception as e:
-                        new_content.append(f"[图片加载失败: {e}]")
-                else:
-                    new_content.append(part)
+                    try: new_content.append(Image.open(BytesIO(part["data"])))
+                    except Exception as e: new_content.append(f"[图片加载失败: {e}]")
+                else: new_content.append(part)
             new_msg["content"] = new_content
         reconstituted_messages.append(new_msg)
     return reconstituted_messages
@@ -218,7 +191,6 @@ def load_history(log_file):
 def clear_history(log_file):
     st.session_state.messages.clear(); st.session_state.chat_session = None
     if os.path.exists(log_file): os.remove(log_file)
-    # 同时清理视频缓存
     for f in os.listdir(VIDEO_CACHE_DIR):
         os.remove(os.path.join(VIDEO_CACHE_DIR, f))
     st.success("历史记录和视频缓存已清除！")
@@ -250,7 +222,7 @@ tips:
     if st.session_state.get("test_text", "").strip():
         history_messages.append({"role": "user", "parts": [st.session_state.test_text]})
     for msg in st.session_state.messages[-20:]:
-      if msg and msg.get("role") and msg.get("content") and not msg.get("is_video"): # 忽略视频消息
+      if msg and msg.get("role") and msg.get("content") and not msg.get("is_video"):
           api_role = "model" if msg["role"] == "assistant" else "user"
           history_messages.append({"role": api_role, "parts": msg["content"]})
     final_contents = [msg for msg in history_messages if msg.get("parts")]
@@ -292,35 +264,42 @@ def send_from_sidebar_callback():
         st.session_state.messages.append({"role": "user", "content": content_parts})
         st.session_state.sidebar_caption = ""
         st.session_state.is_generating = True
-
+        st.experimental_rerun() # 添加 reran 保证即时响应
 
 # --- UI 侧边栏 ---
 with st.sidebar:
-    st.session_state.selected_api_key = st.selectbox("选择 API Key:", options=list(API_KEYS.keys()), index=list(API_KEYS.keys()).index(st.session_state.selected_api_key), key="api_selector")
+    selected_key_name = st.selectbox(
+        "选择 API Key:",
+        options=list(API_KEYS.keys()),
+        index=list(API_KEYS.keys()).index(st.session_state.selected_api_key),
+        key="api_selector"
+    )
+    st.session_state.selected_api_key = selected_key_name
+    # 仅为文本聊天配置
     genai.configure(api_key=API_KEYS[st.session_state.selected_api_key])
 
-    # --- 新增：影片生成面板 ---
-    with st.expander("影片生成 (Veo)"):
+    with st.expander("影片生成 (Veo - 手动模式)"):
         video_model_select = st.selectbox(
             "选择影片模型",
             options=["veo-3.0-generate-preview", "veo-3.0-fast-generate-preview", "veo-2.0-generate-001"],
             key="video_model",
-            help="Veo 3 和 Veo 3 Fast 支持原生音频，Veo 2 为静音影片。"
+            help="使用 REST API 手动调用"
         )
         video_prompt_input = st.text_area("影片提示词", key="video_prompt_input", height=120)
         video_negative_prompt_input = st.text_input("负面提示词 (可选)", key="video_negative_prompt_input")
-        video_image_input = st.file_uploader("上传初始图片 (可选)", type=["png", "jpg", "jpeg", "webp"], key="video_image_uploader")
+        # 图片转视频暂时不支持手动模式，因涉及复杂的文件上传流程
+        # video_image_input = st.file_uploader("上传初始图片 (可选)", type=["png", "jpg", "jpeg", "webp"], key="video_image_uploader")
 
         if st.button("生成影片 🚀", key="generate_video_button", use_container_width=True, disabled=st.session_state.is_generating_video or st.session_state.is_generating):
             if not video_prompt_input:
                 st.warning("请输入影片提示词！")
             else:
                 st.session_state.is_generating_video = True
-                st.session_state.video_operation_name = None # 重置操作
+                st.session_state.video_operation_name = None
                 st.experimental_rerun()
-
+    
+    # ... (其他侧边栏 Expander 保持不变) ...
     with st.expander("文件操作"):
-        # ... (原有文件操作UI保持不变)
         if len(st.session_state.messages) > 0: st.button("重置上一个输出 ⏪", on_click=lambda: st.session_state.messages.pop(-1))
         st.button("读取历史记录 📖", on_click=lambda: load_history(log_file))
         if st.button("清除历史记录 🗑️"): st.session_state.clear_confirmation = True
@@ -337,13 +316,11 @@ with st.sidebar:
             except Exception as e: st.error(f"读取本地pkl文件失败：{e}")
 
     with st.expander("发送图片与文字"):
-        # ... (原有发送图片UI保持不变)
         st.file_uploader("上传图片", type=["png", "jpg", "jpeg", "webp"], accept_multiple_files=True, key="sidebar_uploader", label_visibility="collapsed")
         st.text_area("输入文字 (可选)", key="sidebar_caption", height=100)
         st.button("发送到对话 ↗️", on_click=send_from_sidebar_callback, use_container_width=True)
 
     with st.expander("角色设定"):
-        # ... (原有角色设定UI保持不变)
         uploaded_setting_file = st.file_uploader("读取本地设定文件 (txt) 📝", type=["txt"], key="setting_uploader")
         if uploaded_setting_file is not None:
             try:
@@ -361,16 +338,14 @@ with st.sidebar:
         if enabled_list: st.write("已加载设定:", ", ".join(enabled_list))
         if st.button("刷新 🔄", key="sidebar_refresh"): st.experimental_rerun()
 
-
-# --- 加载和显示聊天记录 (已更新以支持影片) ---
-if not st.session_state.messages and not st.session_state.is_generating:
+# --- 加载和显示聊天记录 (保持不变) ---
+if not st.session_state.messages and not st.session_state.is_generating and not st.session_state.is_generating_video:
     load_history(log_file)
 
 for i, message in enumerate(st.session_state.messages):
     if message.get("temp"):
         continue
     with st.chat_message(message["role"]):
-        # 处理影片消息
         if message.get("is_video"):
             video_content = message["content"][0]
             if video_content.get("type") == "video" and "path" in video_content:
@@ -379,7 +354,6 @@ for i, message in enumerate(st.session_state.messages):
                 st.video(video_content["path"])
             else:
                 st.error("影片内容无效或加载失败。")
-        # 处理常规图文消息
         else:
             for part in message.get("content", []):
                 if isinstance(part, str):
@@ -430,8 +404,7 @@ if not st.session_state.is_generating and not st.session_state.is_generating_vid
         st.session_state.is_generating = True
         st.experimental_rerun()
 
-
-# --- 核心文本生成逻辑 (已修复自动续写) ---
+# --- 核心文本生成逻辑 (保持不变) ---
 if st.session_state.is_generating:
     is_continuation_task = st.session_state.messages and st.session_state.messages[-1].get("temp")
     with st.chat_message("assistant"):
@@ -459,73 +432,79 @@ if st.session_state.is_generating:
                 st.error(f"回答生成失败 ({type(e).__name__})，请重试。")
                 st.session_state.is_generating = False
         finally:
-            if not st.session_state.is_generating and is_continuation_task:
-                st.session_state.messages.pop()
-            if not st.session_state.is_generating and st.session_state.messages and st.session_state.messages[-1]['role'] == 'assistant' and not st.session_state.messages[-1]["content"][0].strip():
-                st.session_state.messages.pop()
-            with open(log_file, "wb") as f:
-                pickle.dump(_prepare_messages_for_save(st.session_state.messages), f)
-            st.experimental_rerun()
+            if not st.session_state.is_generating:
+                if is_continuation_task: st.session_state.messages.pop()
+                if st.session_state.messages and st.session_state.messages[-1]['role'] == 'assistant' and not st.session_state.messages[-1]["content"][0].strip():
+                    st.session_state.messages.pop()
+                with open(log_file, "wb") as f:
+                    pickle.dump(_prepare_messages_for_save(st.session_state.messages), f)
+                st.experimental_rerun()
 
-
-# --- 新增：核心影片生成逻辑 (兼容旧版 Streamlit) ---
+# --- 新增：核心影片生成逻辑 (使用 requests 手动调用) ---
 if st.session_state.is_generating_video:
-    # 创建一个占位符，用于显示状态信息
     status_placeholder = st.empty()
 
     try:
-        # 使用 st.spinner 来显示持续的加载动画
         with st.spinner("影片生成中... 此过程可能需要数分钟，请勿关闭页面。"):
-            client = genai.Client()
-
+            API_KEY = API_KEYS[st.session_state.selected_api_key]
+            headers = {"Content-Type": "application/json"}
+            
             # 步骤 1: 如果操作尚未开始，则启动它
             if not st.session_state.video_operation_name:
-                status_placeholder.info("向 API 发送请求中...")
+                status_placeholder.info("通过 REST API 发送请求中...")
 
-                input_image = None
-                if st.session_state.video_image_input:
-                    input_image = Image.open(st.session_state.video_image_input)
+                API_URL = f"https://generativelanguage.googleapis.com/v1beta/models/{st.session_state.video_model}:generateVideos?key={API_KEY}"
 
-                video_config = types.GenerateVideosConfig(
-                    negative_prompt=st.session_state.video_negative_prompt_input or None
-                )
+                payload = {
+                    "prompt": st.session_state.video_prompt_input
+                }
+                if st.session_state.video_negative_prompt_input:
+                    payload["config"] = {"negativePrompt": st.session_state.video_negative_prompt_input}
 
-                operation = client.models.generate_videos(
-                    model=st.session_state.video_model,
-                    prompt=st.session_state.video_prompt_input,
-                    image=input_image,
-                    config=video_config
-                )
-                st.session_state.video_operation_name = operation.name
-                status_placeholder.info(f"✅ 请求已发送，操作名称: `{operation.name}`。开始轮询状态...")
-                time.sleep(10) # 首次轮询前等待
+                response = requests.post(API_URL, headers=headers, json=payload)
+                response.raise_for_status()  # 如果请求失败（如4xx或5xx），则抛出异常
+                
+                operation_data = response.json()
+                operation_name = operation_data.get("name")
+                if not operation_name:
+                    raise ValueError(f"API未返回有效的操作名称。响应: {operation_data}")
+
+                st.session_state.video_operation_name = operation_name
+                status_placeholder.info(f"✅ 请求已发送，操作名称: `{operation_name}`。开始轮询状态...")
+                time.sleep(10)
                 st.experimental_rerun()
 
             # 步骤 2: 如果操作已在运行，则轮询其状态
             else:
-                status_placeholder.info(f"正在轮询操作 `{st.session_state.video_operation_name}` 的状态...")
-                operation = client.operations.get(name=st.session_state.video_operation_name)
+                operation_name = st.session_state.video_operation_name
+                POLL_URL = f"https://generativelanguage.googleapis.com/v1beta/{operation_name}?key={API_KEY}"
+                status_placeholder.info(f"正在轮询操作 `{operation_name}` 的状态...")
 
-                if not operation.done:
-                    # 状态仍在进行中，继续显示加载动画并安排下一次检查
-                    time.sleep(15) # 每15秒检查一次状态
+                response = requests.get(POLL_URL, headers=headers)
+                response.raise_for_status()
+                operation_data = response.json()
+
+                if not operation_data.get("done", False):
+                    time.sleep(15)
                     st.experimental_rerun()
                 else:
                     # 步骤 3: 操作完成，处理结果
-                    # 首先清空占位符，然后显示最终结果
                     status_placeholder.empty()
-
-                    if hasattr(operation, 'response') and operation.response:
+                    
+                    if "response" in operation_data and "generatedVideos" in operation_data["response"]:
                         st.info("✅ 生成完成！正在下载和处理影片...")
-                        generated_video = operation.response.generated_videos[0]
-
-                        client.files.download(file=generated_video.video)
-                        video_bytes = generated_video.video.data
-
+                        video_info = operation_data["response"]["generatedVideos"][0]
+                        video_uri = video_info["video"]["uri"] # 获取下载链接
+                        
+                        # 下载影片
+                        download_response = requests.get(video_uri)
+                        download_response.raise_for_status()
+                        video_bytes = download_response.content
+                        
                         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S_%f")
                         temp_vid_path = os.path.join(VIDEO_CACHE_DIR, f"vid_{timestamp}.mp4")
                         with open(temp_vid_path, "wb") as f: f.write(video_bytes)
-
+                        
                         video_message = {
                             "role": "assistant",
                             "content": [{
@@ -538,33 +517,34 @@ if st.session_state.is_generating_video:
                             "is_video": True
                         }
                         st.session_state.messages.append(video_message)
-
                         st.success("影片已成功生成并添加到对话中！")
-                        # 清理并重置状态
+                        
                         st.session_state.is_generating_video = False
                         st.session_state.video_operation_name = None
-
                         with open(log_file, "wb") as f:
                             pickle.dump(_prepare_messages_for_save(st.session_state.messages), f)
                         st.experimental_rerun()
                     else:
-                        error_details = f"操作完成，但 API 未返回有效的影片数据。元数据: {operation.metadata}"
+                        error_details = f"操作完成，但API未返回有效的影片数据。响应: {operation_data}"
                         st.error(error_details)
                         st.session_state.is_generating_video = False
                         st.session_state.video_operation_name = None
 
+    except requests.exceptions.HTTPError as http_err:
+        status_placeholder.empty()
+        error_msg = f"影片生成过程中发生HTTP错误：\n\n**状态码: {http_err.response.status_code}**\n\n**响应内容:**\n```\n{http_err.response.text}\n```"
+        st.error(error_msg)
+        st.session_state.is_generating_video = False
+        st.session_state.video_operation_name = None
     except Exception as e:
-        # 发生错误时，清空占位符并显示详细错误信息
         status_placeholder.empty()
         error_msg = f"影片生成过程中发生严重错误：\n\n**{type(e).__name__}:**\n\n{e}"
         st.error(error_msg)
-        # 重置状态
         st.session_state.is_generating_video = False
         st.session_state.video_operation_name = None
 
-# --- 底部控件 (保持不变) ---
+# --- 底部控件 ---
 c1, c2 = st.columns(2)
 st.session_state.use_token = c1.checkbox("使用 Token", value=st.session_state.get("use_token", True))
 if c2.button("🔄", key="page_refresh", help="刷新页面"):
     st.experimental_rerun()
-
