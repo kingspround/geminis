@@ -283,7 +283,6 @@ def generate_images_callback():
     
     with open(log_file, "wb") as f:
         pickle.dump(_prepare_messages_for_save(st.session_state.messages), f)
-    st.experimental_rerun()
 
 
 # --- UI 侧边栏 ---
