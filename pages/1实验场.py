@@ -9,12 +9,17 @@ from datetime import datetime
 from io import BytesIO
 import zipfile
 from PIL import Image
-import importlib.metadata
+# 新增的库，用于直接调用REST API
+import requests
+import base64
+import json
 
 # --- Streamlit Page Configuration ---
-st.set_page_config(page_title="Gemini Chatbot - Final Diagnosis", layout="wide")
+st.set_page_config(
+    page_title="Gemini Chatbot with Vision & Imagen",
+    layout="wide"
+)
 
-# --- (所有API密钥、session_state初始化、函数定义等代码保持不变，为简洁省略) ---
 # --- API 密钥设置 ---
 API_KEYS = {
     "主密钥": "AIzaSyCBjZbA78bPusYmUNvfsmHpt6rPx6Ur0QE",
@@ -63,11 +68,6 @@ if "use_token" not in st.session_state:
     st.session_state.use_token = True
 
 # --- API配置和模型定义 ---
-genai.configure(api_key=API_KEYS[st.session_state.selected_api_key])
-
-
-# --- API配置和模型定义 ---
-# 现在可以安全地使用 st.session_state.selected_api_key
 genai.configure(api_key=API_KEYS[st.session_state.selected_api_key])
 generation_config = {
   "temperature": 1.0, "top_p": 0.95, "top_k": 40, "max_output_tokens": 8192, "response_mime_type": "text/plain",
@@ -213,10 +213,8 @@ def continue_message(index):
                 break
         last_chars = (original_content[-50:] + "...") if len(original_content) > 50 else original_content
         new_prompt = f"请严格地从以下文本的结尾处，无缝、自然地继续写下去。不要重复任何内容，不要添加任何前言或解释，直接输出续写的内容即可。文本片段：\n\"...{last_chars}\""
-        temp_history = [{"role": ("model" if m["role"] == "assistant" else "user"), "parts": m["content"]} for m in st.session_state.messages[:index+1]]
-        temp_history.append({"role": "user", "parts": [new_prompt]})
-        st.session_state.is_generating = True
         st.session_state.messages.append({"role": "user", "content": [new_prompt], "temp": True})
+        st.session_state.is_generating = True
         st.experimental_rerun()
 
 def send_from_sidebar_callback():
@@ -234,13 +232,13 @@ def send_from_sidebar_callback():
         st.session_state.messages.append({"role": "user", "content": content_parts})
         st.session_state.sidebar_caption = ""
         st.session_state.is_generating = True
+        st.experimental_rerun()
 
 def generate_images_callback():
     prompt = st.session_state.get("imagen_prompt", "").strip()
     if not prompt:
         st.toast("请输入图片生成提示！(仅支持英文)", icon="⚠️")
         return
-
     user_request_message = f"""**🎨 图片生成任务**
 - **模型:** `{st.session_state.imagen_model}`
 - **提示:** `{prompt}`
@@ -248,33 +246,60 @@ def generate_images_callback():
 - **宽高比:** `{st.session_state.imagen_aspect_ratio}`
     """
     st.session_state.messages.append({"role": "user", "content": [user_request_message]})
+    st.session_state.is_generating_image = True
 
-    with st.spinner(f"正在调用 {st.session_state.imagen_model} 生成图片中，请稍候..."):
+
+# ★★★ 核心修改：使用 REST API 进行图片生成，完全绕开 genai.Client() ★★★
+def perform_image_generation_rest():
+    """使用 requests 库直接调用 Google Imagen REST API"""
+    api_key = API_KEYS[st.session_state.selected_api_key]
+    model_name = st.session_state.imagen_model
+    
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateImages?key={api_key}"
+    
+    payload = {
+        "prompt": st.session_state.imagen_prompt,
+        "number": st.session_state.imagen_num_images, # REST API 使用 'number'
+        "aspect_ratio": st.session_state.imagen_aspect_ratio,
+        "person_generation": st.session_state.imagen_person_gen,
+    }
+    
+    headers = {'Content-Type': 'application/json'}
+
+    with st.spinner(f"正在通过 REST API 调用 {model_name} 生成图片中..."):
         try:
-            client = genai.Client()
-            config = types.GenerateImagesConfig(
-                number_of_images=st.session_state.imagen_num_images,
-                aspect_ratio=st.session_state.imagen_aspect_ratio,
-                person_generation=st.session_state.imagen_person_gen,
-            )
-            response = client.models.generate_images(
-                model=st.session_state.imagen_model,
-                prompt=st.session_state.imagen_prompt,
-                config=config
-            )
-            image_content = [f"遵命，主人！这是为您生成的 {len(response.generated_images)} 张图片："]
-            for gen_img in response.generated_images:
-                image_content.append(gen_img.image)
+            response = requests.post(url, headers=headers, data=json.dumps(payload))
+            response.raise_for_status() 
+            
+            data = response.json()
+            if 'images' not in data:
+                 raise ValueError(f"API响应中未找到'images'键。响应内容: {data}")
+
+            image_content = [f"遵命，主人！这是为您生成的 {len(data['images'])} 张图片："]
+            
+            for gen_img in data['images']:
+                b64_data = gen_img['b64Json'] # REST API 使用 'b64Json'
+                image_bytes = base64.b64decode(b64_data)
+                image = Image.open(BytesIO(image_bytes))
+                image_content.append(image)
+                
             st.session_state.messages.append({"role": "assistant", "content": image_content})
             st.toast("图片生成成功！", icon="✅")
+
+        except requests.exceptions.HTTPError as http_err:
+            error_details = http_err.response.text
+            error_message = f"""😥 **抱歉主人，图片生成失败了 (HTTP Error)**
+
+**详细错误信息:**
+```
+{error_details}
+```
+"""
+            st.session_state.messages.append({"role": "assistant", "content": [error_message]})
+            st.error(f"图片生成失败，详情请看聊天窗口。")
+            
         except Exception as e:
             error_message = f"""😥 **抱歉主人，图片生成失败了**
-
-**可能原因:**
-- API Key 失效或额度用尽。
-- 提示语可能触发了安全策略。
-- 网络连接问题。
-- 模型服务暂时不可用。
 
 **详细错误信息:**
 ```
@@ -283,41 +308,15 @@ def generate_images_callback():
 """
             st.session_state.messages.append({"role": "assistant", "content": [error_message]})
             st.error(f"图片生成失败，详情请看聊天窗口。")
+            
         finally:
             st.session_state.is_generating_image = False
-
-    
-    with open(log_file, "wb") as f:
-        pickle.dump(_prepare_messages_for_save(st.session_state.messages), f)
+            with open(log_file, "wb") as f:
+                pickle.dump(_prepare_messages_for_save(st.session_state.messages), f)
 
 
 # --- UI 侧边栏 ---
 with st.sidebar:
-    st.header("🔬 终极诊断信息")
-    try:
-        # 1. 检查版本
-        version = importlib.metadata.version('google-generativeai')
-        st.info(f"版本号 (Version): {version}")
-
-        # 2. 检查导入文件的路径
-        st.info("导入模块的文件路径 (Path):")
-        st.code(genai.__file__, language='text')
-        
-        # 3. 检查模块的所有属性
-        attributes = dir(genai)
-        if 'Client' in attributes:
-            st.success("✅ 'Client' 属性在模块中已找到！")
-        else:
-            st.error("❌ 致命错误：'Client' 属性未找到！")
-            with st.expander("点击查看模块所有属性"):
-                st.json(attributes)
-
-    except Exception as e:
-        st.error(f"诊断代码执行失败: {e}")
-
-    st.divider()
-
-
     st.session_state.selected_api_key = st.selectbox("选择 API Key:", options=list(API_KEYS.keys()), index=list(API_KEYS.keys()).index(st.session_state.selected_api_key), key="api_selector")
     genai.configure(api_key=API_KEYS[st.session_state.selected_api_key])
     
@@ -330,7 +329,6 @@ with st.sidebar:
             if c1.button("确认清除", key="clear_confirm"): clear_history(log_file); st.session_state.clear_confirmation = False; st.experimental_rerun()
             if c2.button("取消", key="clear_cancel"): st.session_state.clear_confirmation = False
         st.download_button("下载当前聊天记录 ⬇️", data=pickle.dumps(_prepare_messages_for_save(st.session_state.messages)), file_name=os.path.basename(log_file), mime="application/octet-stream")
-        
         uploaded_pkl = st.file_uploader("读取本地pkl文件 📁", type=["pkl"], key="pkl_uploader")
         if uploaded_pkl is not None:
             try:
@@ -346,49 +344,23 @@ with st.sidebar:
     with st.expander("🎨 Imagen 图片生成"):
         st.selectbox(
             "选择 Imagen 模型:",
-            options=[
-                'imagen-4.0-generate-preview-06-06',
-                'imagen-4.0-ultra-generate-preview-06-06',
-                'imagen-3.0-generate-002'
-            ],
+            options=['imagen-4.0-generate-preview-06-06', 'imagen-4.0-ultra-generate-preview-06-06', 'imagen-3.0-generate-002'],
             key='imagen_model',
             help="根据文档，Imagen 4 Ultra 一次仅能生成一张图。"
         )
         st.text_area(
-            "图片生成提示 (仅英文):",
-            key="imagen_prompt",
-            height=120,
+            "图片生成提示 (仅英文):", key="imagen_prompt", height=120,
             placeholder="A photorealistic image of a cat wearing a tiny wizard hat."
         )
-        
         max_images = 1 if 'ultra' in st.session_state.get('imagen_model', '') else 4
-        
         cols = st.columns(2)
         with cols[0]:
-            st.slider(
-                "生成数量:",
-                min_value=1,
-                max_value=max_images,
-                value=1,
-                step=1,
-                key='imagen_num_images'
-            )
-            st.selectbox(
-                "宽高比 (Aspect Ratio):",
-                options=["1:1", "3:4", "4:3", "9:16", "16:9"],
-                key='imagen_aspect_ratio'
-            )
+            st.slider("生成数量:", min_value=1, max_value=max_images, value=1, step=1, key='imagen_num_images')
+            st.selectbox("宽高比 (Aspect Ratio):", options=["1:1", "3:4", "4:3", "9:16", "16:9"], key='imagen_aspect_ratio')
         with cols[1]:
-            st.selectbox(
-                "人物生成 (Person Gen):",
-                options=["allow_adult", "dont_allow", "allow_all"],
-                index=0, 
-                key='imagen_person_gen',
-                help="allow_all 在部分地区不可用"
-            )
-
-        if st.button("生成图片 🚀", on_click=generate_images_callback, use_container_width=True, type="primary"):
-            pass
+            st.selectbox("人物生成 (Person Gen):", options=["allow_adult", "dont_allow", "allow_all"], index=0, key='imagen_person_gen', help="allow_all 在部分地区不可用")
+        
+        st.button("生成图片 🚀", on_click=generate_images_callback, use_container_width=True, type="primary")
 
 
     with st.expander("角色设定"):
@@ -410,28 +382,28 @@ with st.sidebar:
         if st.button("刷新 🔄", key="sidebar_refresh"): st.experimental_rerun()
 
 # --- 加载和显示聊天记录 ---
-if not st.session_state.messages and not st.session_state.is_generating: load_history(log_file)
+if not st.session_state.is_generating and not st.session_state.is_generating_image:
+    load_history(log_file)
 for i, message in enumerate(st.session_state.messages):
-    if message.get("temp"):
-        continue
+    if message.get("temp"): continue
     with st.chat_message(message["role"]):
         if message["role"] == "assistant" and any(isinstance(p, Image.Image) for p in message.get("content", [])):
             text_parts = [p for p in message["content"] if isinstance(p, str)]
             image_parts = [p for p in message["content"] if isinstance(p, Image.Image)]
-            
-            for part in text_parts:
-                st.markdown(part, unsafe_allow_html=True)
-
-            cols = st.columns(4)
+            for part in text_parts: st.markdown(part, unsafe_allow_html=True)
+            cols = st.columns(min(4, len(image_parts) if len(image_parts) > 0 else 1))
             for idx, img in enumerate(image_parts):
-                with cols[idx % 4]:
-                    st.image(img, use_column_width=True)
+                with cols[idx % len(cols)]: st.image(img, use_column_width=True)
         else: 
             for part in message.get("content", []):
                 if isinstance(part, str): st.markdown(part, unsafe_allow_html=True)
                 elif isinstance(part, Image.Image): st.image(part, width=400)
 
-# --- 编辑界面显示逻辑 ---
+# --- 核心生成逻辑区 ---
+if st.session_state.is_generating_image:
+    perform_image_generation_rest()
+    st.experimental_rerun()
+
 if st.session_state.get("editing"):
     i = st.session_state.editable_index
     message = st.session_state.messages[i]
@@ -446,17 +418,13 @@ if st.session_state.get("editing"):
         if c2.button("取消 ❌", key=f"cancel_{i}"):
             st.session_state.editing = False; st.experimental_rerun()
 
-# --- 续写/编辑/重生成按钮逻辑 ---
-if len(st.session_state.messages) >= 1 and not st.session_state.is_generating and not st.session_state.editing:
+if len(st.session_state.messages) >= 1 and not st.session_state.is_generating and not st.session_state.editing and not st.session_state.is_generating_image:
     last_real_msg_idx = -1
     for i in range(len(st.session_state.messages) - 1, -1, -1):
-        if not st.session_state.messages[i].get("temp"):
-            last_real_msg_idx = i
-            break
+        if not st.session_state.messages[i].get("temp"): last_real_msg_idx = i; break
     if last_real_msg_idx != -1:
         last_msg = st.session_state.messages[last_real_msg_idx]
         is_text_only_assistant = (last_msg["role"] == "assistant" and all(isinstance(p, str) for p in last_msg.get("content", [])))
-        
         if is_text_only_assistant:
             with st.container():
                 cols = st.columns(20)
@@ -466,8 +434,7 @@ if len(st.session_state.messages) >= 1 and not st.session_state.is_generating an
         elif last_msg["role"] == "assistant":
              if st.columns(20)[0].button("♻️", key="regen_vision", help="重新生成"): regenerate_message(last_real_msg_idx)
 
-# --- 核心交互逻辑 (主输入框) ---
-if not st.session_state.is_generating:
+if not st.session_state.is_generating and not st.session_state.is_generating_image:
     if prompt := st.chat_input("输入你的聊天消息...", key="main_chat_input", disabled=st.session_state.editing):
         token = generate_token()
         full_prompt = f"{prompt} (token: {token})" if st.session_state.use_token else prompt
@@ -475,14 +442,12 @@ if not st.session_state.is_generating:
         st.session_state.is_generating = True
         st.experimental_rerun()
 
-# --- 核心聊天生成逻辑 ---
 if st.session_state.is_generating:
     is_continuation_task = st.session_state.messages and st.session_state.messages[-1].get("is_continue_prompt")
     with st.chat_message("assistant"):
         placeholder = st.empty()
         target_message_index = -1
-        if is_continuation_task:
-            target_message_index = st.session_state.messages[-1].get("target_index", -1)
+        if is_continuation_task: target_message_index = st.session_state.messages[-1].get("target_index", -1)
         elif not st.session_state.messages or st.session_state.messages[-1]["role"] != "assistant":
             st.session_state.messages.append({"role": "assistant", "content": [""]})
         if not (-len(st.session_state.messages) <= target_message_index < len(st.session_state.messages)):
@@ -491,10 +456,8 @@ if st.session_state.is_generating:
         else:
             streamed_part = ""
             try:
-                original_content = ""
-                content_list = st.session_state.messages[target_message_index]["content"]
-                if content_list and isinstance(content_list[0], str):
-                    original_content = content_list[0]
+                original_content = ""; content_list = st.session_state.messages[target_message_index]["content"]
+                if content_list and isinstance(content_list[0], str): original_content = content_list[0]
                 for chunk in getAnswer():
                     streamed_part += chunk
                     updated_full_content = original_content + streamed_part
@@ -514,14 +477,11 @@ if st.session_state.is_generating:
                     st.error(f"回答生成失败 ({type(e).__name__})，请重试。")
                     st.session_state.is_generating = False
             finally:
-                if not st.session_state.is_generating and is_continuation_task:
-                    st.session_state.messages.pop()
+                if not st.session_state.is_generating and is_continuation_task: st.session_state.messages.pop()
                 if not st.session_state.is_generating and st.session_state.messages and st.session_state.messages[-1]['role'] == 'assistant' and not st.session_state.messages[-1]["content"][0].strip():
                     st.session_state.messages.pop()
-                with open(log_file, "wb") as f:
-                    pickle.dump(_prepare_messages_for_save(st.session_state.messages), f)
+                with open(log_file, "wb") as f: pickle.dump(_prepare_messages_for_save(st.session_state.messages), f)
                 st.experimental_rerun()
-
 
 # --- 底部控件 ---
 c1, c2 = st.columns(2)
