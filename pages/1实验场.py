@@ -1,6 +1,5 @@
 import os
 import google.generativeai as genai
-# 修正了拼写错误
 import google.generativeai.types as types
 import streamlit as st
 import pickle
@@ -10,6 +9,7 @@ from datetime import datetime
 from io import BytesIO
 import zipfile
 from PIL import Image
+import importlib.metadata  # ★★★ 新增：用于诊断的库 ★★★
 
 # --- Streamlit Page Configuration ---
 st.set_page_config(
@@ -17,6 +17,7 @@ st.set_page_config(
     layout="wide"
 )
 
+# ... (API_KEYS 和 session_state 初始化等其余代码完全不变)
 # --- API 密钥设置 ---
 API_KEYS = {
     "主密钥": "AIzaSyCBjZbA78bPusYmUNvfsmHpt6rPx6Ur0QE",
@@ -32,8 +33,7 @@ API_KEYS = {
     "备用10号":"AIzaSyDOI2e-I1RdXBnk99jY2H00A3aymXREETA"
 }
 
-# --- ★★★ 关键：完整的 Session State 初始化 ★★★ ---
-# 必须在使用任何 st.session_state 变量之前进行初始化
+# --- 完整的 Session State 初始化 ---
 if "selected_api_key" not in st.session_state:
     st.session_state.selected_api_key = list(API_KEYS.keys())[0]
 if "messages" not in st.session_state:
@@ -48,6 +48,8 @@ if 'editable_index' not in st.session_state:
     st.session_state.editable_index = -1
 if "is_generating" not in st.session_state:
     st.session_state.is_generating = False
+if "is_generating_image" not in st.session_state:
+    st.session_state.is_generating_image = False
 if "sidebar_caption" not in st.session_state:
     st.session_state.sidebar_caption = ""
 if 'regenerate_index' not in st.session_state:
@@ -287,6 +289,16 @@ def generate_images_callback():
 
 # --- UI 侧边栏 ---
 with st.sidebar:
+    # ★★★ 新增：在这里显示诊断信息 ★★★
+    try:
+        version = importlib.metadata.version('google-generativeai')
+        st.info(f"✅ `google-generativeai` 版本: {version}")
+        if not version.startswith("0.5"):
+             st.error("版本过旧！需要 >= 0.5.0")
+    except importlib.metadata.PackageNotFoundError:
+        st.error("❌ 未找到 `google-generativeai` 库！")
+
+
     st.session_state.selected_api_key = st.selectbox("选择 API Key:", options=list(API_KEYS.keys()), index=list(API_KEYS.keys()).index(st.session_state.selected_api_key), key="api_selector")
     genai.configure(api_key=API_KEYS[st.session_state.selected_api_key])
     
