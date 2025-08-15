@@ -1,6 +1,7 @@
 openai
 anthropic
 langchain
+google-generativeai
 gradio
 requests
 aiohttp
@@ -8,8 +9,3 @@ promise
 asyncio
 python-dotenv
 streamlit
-google-generativeai
-pillow
-
-
-
