@@ -981,12 +981,17 @@ def generate_token():
     return f"({hanzi_token})({digit_token})"
 def load_history(log_file):
     try:
-        with open(log_file, "rb") as f:
-            data = pickle.load(f)
-            if isinstance(data, list): st.session_state.messages = _reconstitute_messages_after_load(data)
-        st.session_state.chat_session = None
-    except FileNotFoundError: pass
-    except Exception as e: st.error(f"读取历史记录失败：{e}")
+        # 检查文件是否存在且不为空，避免因空文件导致 pickle 报错
+        if os.path.exists(log_file) and os.path.getsize(log_file) > 0:
+            with open(log_file, "rb") as f:
+                data = pickle.load(f)
+                if isinstance(data, list):
+                    st.session_state.messages = _reconstitute_messages_after_load(data)
+            st.session_state.chat_session = None
+    except FileNotFoundError:
+        pass # 文件不存在是正常情况，直接跳过
+    except Exception as e:
+        st.error(f"读取历史记录失败：{e}")
 def clear_history(log_file):
     st.session_state.messages.clear(); st.session_state.chat_session = None
     if os.path.exists(log_file): os.remove(log_file)
@@ -1236,7 +1241,8 @@ if st.session_state.is_generating:
 
             except Exception as e:
                 # ★★★ 核心修复：自动续写逻辑 ★★★
-                st.toast("回答中断，正在尝试自动续写…")
+                # 将 st.toast 改为 st.warning 以兼容旧版 Streamlit，避免 AttributeError
+                st.warning("回答中断，正在尝试自动续写…")
                 
                 # 获取中断时已保存的内容
                 partial_content = st.session_state.messages[target_message_index]["content"][0]
