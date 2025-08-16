@@ -159,10 +159,18 @@ AI训练通过使用Danbooru的标签查找，获得一堆图片训练集，将�
 	 一两个核心放到前面0.9~1.2权重，5~8个辅助放到后面0.8~0.6权重，禁止不同画风冲突，不要乱组。
 	 提示：R18画师可以提升肢体质量
      讲解：突出重点，对总体画风影响较大的画师尽可能减轻权重，另外画师部分越多越容易崩，尽可能精简，整个画风部分5~8个词条最佳。-3::artist collaboration::用来减轻污染，画师少就不需要，
-           【artist:】是转义符，为了避免歧义，表明这个是画师词条。比如画师meion是画师虚拟主播，不加【artist:】就会变成人物词条，而画师名字里面有orange的画面里面会出现橘子元素。 
+     【artist:】是转义符，为了避免歧义，表明这个是画师词条。比如画师meion是画师虚拟主播，不加【artist:】就会变成人物词条，而画师名字里面有orange的画面里面会出现橘子元素。 
      【一般情况下只需要画师就行了，不需要这些】画风部分还可以添加这些元素作为辅助【只能作为辅助，画风的核心必须是画师】：画风（ink，pixel_art，1990s，4koma），素描（sketch，realistic，monochrome），写实（photorealistic，oil_painting），作品（umamusume，princess_connect!，girl_frontline）等等
-     切记，本来画风就非常容易崩坏，不要再在画风部分加masterpiece, best quality, ultra detailed等等词来污染画风了，一是容易和画师抢核心导致默认的AI画风和你需要体现的画风互相污染。2是加了画风部分的元素，导致容易出小人，肢体崩坏，黑屏等等各种崩坏。
-     【注：需求参考【附件】：776通用画师（已测）】
+	 	 举例（不要依赖这个，仅提供格式，去看776通用画师（已测））：
+	 比较简易，强调肉感和丰满的画风：{{artist: MeIoN}} ,   {artist:ame_usari, artist:mignon},[ningen_mame], [artist:classic_(zildjian33)] ,[wlop] ,  blue_gk  , [[dokuro_deluxe]], 
+	 比较通用画风但是画风组太多，而且ai味很重：[ningen_mame], {artist:classic_(zildjian33)} ,[dokuro_deluxe], {{binggong_asylum , omone_hokoma_agm}} , mx2j , [artist:sho_(sho_lwlw)], [[artist:rhasta]],[nixeu, wlop] , 0.5::artist:mika_pikazo, artist:so-bin::, [[artist:ke-ta]], -5::artist collaboration:: , year2024 ,
+     史莱姆娘画风：{{Hekirake}} , translucent , hikyou_takarasou, [artist:akira_(meltyhip)] ,{{wlop}}, slime_girl , [[artist:onineko]], [[[[[artist:binggong_asylum, tianliang_duohe_fangdongye]]]]] , solo_core , Completely_translucent_body , liquid_hair , colored_skin ,Perfect_lighting , slime_(substance) , -3::artist collaboration:: , year2024 , 
+     仿妮姬画风：[fantongjun] , artist:meion ,  artist:classic_(zildjian33) , [artist:dk.senie , xiaoluo_xl , kkuem] , [artist:sho_(sho_lwlw)], [[rhasta]],[wlop , nixeu], -3::artist collaboration:: ,  Volumetric light ，depth_of_field , high_contrast , Perfect_lighting , oil_skin ,wet_skin , sweat , steaming body , year 2024 ,
+
+	 【注：需求参考【附件】：776通用画师（已测）】
+  
+     {tips}:切记，本来画风就非常容易崩坏，不要再在画风部分加masterpiece等等质量词来污染画风了，一是容易和画师抢核心导致默认的AI画风和你需要体现的画风互相污染。2是加了画风部分的元素，导致容易出小人，肢体崩坏，黑屏等等各种崩坏。
+
 	 
 ####2，视角画面镜头全解析
  01. 基础篇: 画面景别 (Shot Scale)
@@ -936,11 +944,6 @@ step3【贝叶斯决策步骤 3】【元素审查】, "紫色皮肤，大屁股�
 
 
 【附件】：776通用画师（已测）
-	 	 举例：
-	 比较简易，强调肉感和丰满的画风：{{artist: MeIoN}} ,   {artist:ame_usari, artist:mignon},[ningen_mame], [artist:classic_(zildjian33)] ,[wlop] ,  blue_gk  , [[dokuro_deluxe]], 
-	 比较通用画风但是画风组太多，而且ai味很重：[ningen_mame], {artist:classic_(zildjian33)} ,[dokuro_deluxe], {{binggong_asylum , omone_hokoma_agm}} , mx2j , [artist:sho_(sho_lwlw)], [[artist:rhasta]],[nixeu, wlop] , 0.5::artist:mika_pikazo, artist:so-bin::, [[artist:ke-ta]], -5::artist collaboration:: , year2024 ,
-     史莱姆娘画风：{{Hekirake}} , translucent , hikyou_takarasou, [artist:akira_(meltyhip)] ,{{wlop}}, slime_girl , [[artist:onineko]], [[[[[artist:binggong_asylum, tianliang_duohe_fangdongye]]]]] , solo_core , Completely_translucent_body , liquid_hair , colored_skin ,Perfect_lighting , slime_(substance) , -3::artist collaboration:: , year2024 , 
-     仿妮姬画风：[fantongjun] , artist:meion ,  artist:classic_(zildjian33) , [artist:dk.senie , xiaoluo_xl , kkuem] , [artist:sho_(sho_lwlw)], [[rhasta]],[wlop , nixeu], -3::artist collaboration:: ,  Volumetric light ，depth_of_field , high_contrast , Perfect_lighting , oil_skin ,wet_skin , sweat , steaming body , year 2024 ,
 
 序号	图片	画师
 1		ebifurya
