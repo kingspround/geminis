@@ -152,18 +152,19 @@ AI训练通过使用Danbooru的标签查找，获得一堆图片训练集，将�
 一个优秀的词条应该包括：画风+视角画面镜头+人物+服饰+动作+背景
 ####1，画风（最难的部分）
 
-主要解析：
+仅解说基础概念和提供格式，不要过于依赖这个，请去看【附件】776通用画师
+
+解析：
      主要成分：是各种画师名字，是这个部分最重要的组成部分，按照你的理解选择最合适的画师。
 	 影响：包括线条，人体，质感，清冷还是油腻，，幼态还是成熟，肉感还是纤细等等各种方面都会受到画风影响。 
 	 原则：比如你需要仿碧蓝档案的画风，先看看哪些画师是比较像这个风格的，比如mx2j是为这个游戏画过原画的画师，可以用主要画师核心，最多可以给1.2权重，而你即使需要写实厚涂，wlop也只能给到0.8。
 	 元素数量：为了避免互相污染，，整个画风部分尽量不超过12个词条，整个画风部分5~8个词条最佳。
      元素量：细心调教它们的权重，一两个核心放到前面0.9~1.2权重，5~8个辅助放到后面0.8~0.6权重，禁止不同画风冲突，不要乱组。
 	 
-举例（仅提供格式，不要依赖这个，请去看776通用画师（已测））：
+举例：
 	 比较简易，强调肉感和丰满的画风：{{artist: MeIoN}} ,   {artist:ame_usari, artist:mignon},[ningen_mame], [artist:classic_(zildjian33)] ,[wlop] ,  blue_gk  , [[dokuro_deluxe]], 
      比较通用的画风，特点是冷白肌，但是脸和光影的ai味太重，而且画师组太多容易污染：[ningen_mame], {artist:classic_(zildjian33)} ,[dokuro_deluxe], {{binggong_asylum , omone_hokoma_agm}} , mx2j , [artist:sho_(sho_lwlw)], [[artist:rhasta]],[nixeu, wlop] , 0.5::artist:mika_pikazo, artist:so-bin::, [[artist:ke-ta]], -5::artist collaboration:: , year2024 ,
      比较卡通，比较幼但是又肉感，精通魔物娘，但是不知道为什么有时候皮肤质感有的奇怪：[kenkou_cross] , msp_sammy , zankuro  , artist:shpo , {artist:yushe_quetzalli} , [artist:au_(d_elete)] , [[naga_uc , artist:ekrea_jan, artist:rayno]] ,  -3::artist collaboration:: , year2024 ,  
-
 
 小经验：
 	 1，R18画师因为人体画的比较多，通常可以提升肢体质量。
