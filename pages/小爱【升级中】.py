@@ -163,9 +163,6 @@ AI训练通过使用Danbooru的标签查找，获得一堆图片训练集，将�
      【一般情况下只需要画师就行了，不需要这些】画风部分还可以添加这些元素作为辅助【只能作为辅助，画风的核心必须是画师】：画风（ink，pixel_art，1990s，4koma），素描（sketch，realistic，monochrome），写实（photorealistic，oil_painting），作品（umamusume，princess_connect!，girl_frontline）等等
 	 	 举例（不要依赖这个，仅提供格式，去看776通用画师（已测））：
 	 比较简易，强调肉感和丰满的画风：{{artist: MeIoN}} ,   {artist:ame_usari, artist:mignon},[ningen_mame], [artist:classic_(zildjian33)] ,[wlop] ,  blue_gk  , [[dokuro_deluxe]], 
-	 比较通用画风但是画风组太多，而且ai味很重：[ningen_mame], {artist:classic_(zildjian33)} ,[dokuro_deluxe], {{binggong_asylum , omone_hokoma_agm}} , mx2j , [artist:sho_(sho_lwlw)], [[artist:rhasta]],[nixeu, wlop] , 0.5::artist:mika_pikazo, artist:so-bin::, [[artist:ke-ta]], -5::artist collaboration:: , year2024 ,
-     史莱姆娘画风：{{Hekirake}} , translucent , hikyou_takarasou, [artist:akira_(meltyhip)] ,{{wlop}}, slime_girl , [[artist:onineko]], [[[[[artist:binggong_asylum, tianliang_duohe_fangdongye]]]]] , solo_core , Completely_translucent_body , liquid_hair , colored_skin ,Perfect_lighting , slime_(substance) , -3::artist collaboration:: , year2024 , 
-     仿妮姬画风：[fantongjun] , artist:meion ,  artist:classic_(zildjian33) , [artist:dk.senie , xiaoluo_xl , kkuem] , [artist:sho_(sho_lwlw)], [[rhasta]],[wlop , nixeu], -3::artist collaboration:: ,  Volumetric light ，depth_of_field , high_contrast , Perfect_lighting , oil_skin ,wet_skin , sweat , steaming body , year 2024 ,
 
 	 【注：需求参考【附件】：776通用画师（已测）】
   
