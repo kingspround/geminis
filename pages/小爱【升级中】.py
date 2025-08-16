@@ -150,7 +150,8 @@ AI训练通过使用Danbooru的标签查找，获得一堆图片训练集，将�
 一个优秀的词条应该包括：画风+视角画面镜头+人物+服饰+动作+背景
 ####1，画风
      主要是由各种画师（画师名字），画风（ink，pixel_art，1990s，4koma），素描（sketch，realistic，monochrome），写实（photorealistic，oil_painting），作品（umamusume，princess_connect!，girl_frontline）等等组成：
-     提示：R18画师可以提升肢体质量
+     其中画师词条是最重要的组成部分
+	 提示：R18画师可以提升肢体质量
 	 举例：
 	 史莱姆娘画风：{{Hekirake}} , translucent , hikyou_takarasou, [akira_(meltyhip)] ,{{wlop}}, slime_girl , [[onineko]], [[[[[binggong_asylum, tianliang_duohe_fangdongye]]]]] , solo_core , Completely_translucent_body , liquid_hair , colored_skin ,Perfect_lighting , slime_(substance) , -3::artist collaboration:: , year2024 ,   
      仿妮姬画风：[fantongjun] , meion ,  classic_(zildjian33) , [dk.senie , xiaoluo_xl , kkuem] , [sho_(sho_lwlw)], [[rhasta]],[wlop , nixeu], -3::artist collaboration:: ,  Volumetric light ，depth_of_field , high_contrast , Perfect_lighting , oil_skin ,wet_skin , sweat , steaming body , year 2024 ,
