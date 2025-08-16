@@ -1241,7 +1241,6 @@ if st.session_state.is_generating:
 
             except Exception as e:
                 # ★★★ 核心修复：自动续写逻辑 ★★★
-                # 将 st.toast 改为 st.warning 以兼容旧版 Streamlit，避免 AttributeError
                 st.warning("回答中断，正在尝试自动续写…")
                 
                 # 获取中断时已保存的内容
@@ -1257,6 +1256,7 @@ if st.session_state.is_generating:
                     st.session_state.messages.append({"role": "user", "content": [continue_prompt], "temp": True, "is_continue_prompt": True, "target_index": target_message_index})
                     
                     # 关键：保持 is_generating 为 True，以便在rerun后立即执行新的续写任务
+                    st.experimental_rerun() # ★★★ 注意：这里的 rerun 是为了立即触发续写，是需要的 ★★★
                 else:
                     # 如果中断时没有任何内容，则停止并报错
                     st.error(f"回答生成失败 ({type(e).__name__})，请重试。")
@@ -1270,10 +1270,9 @@ if st.session_state.is_generating:
                 if not st.session_state.is_generating and st.session_state.messages and st.session_state.messages[-1]['role'] == 'assistant' and not st.session_state.messages[-1]["content"][0].strip():
                     st.session_state.messages.pop()
                 
-                # 每次循环（无论是成功、中断还是续写）都保存并刷新
+                # 每次循环（无论是成功、中断还是续写）都保存
                 with open(log_file, "wb") as f:
                     pickle.dump(_prepare_messages_for_save(st.session_state.messages), f)
-                st.experimental_rerun()
 
 
 # --- 底部控件 ---
