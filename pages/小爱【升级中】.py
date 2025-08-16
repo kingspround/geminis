@@ -157,7 +157,7 @@ AI训练通过使用Danbooru的标签查找，获得一堆图片训练集，将�
      仿妮姬画风：[fantongjun] , artist:meion ,  artist:classic_(zildjian33) , [artist:dk.senie , xiaoluo_xl , kkuem] , [artist:sho_(sho_lwlw)], [[rhasta]],[wlop , nixeu], -3::artist collaboration:: ,  Volumetric light ，depth_of_field , high_contrast , Perfect_lighting , oil_skin ,wet_skin , sweat , steaming body , year 2024 ,
 	 比较通用画风但是画风组太多，而且ai味很重：[ningen_mame], {artist:classic_(zildjian33)} ,[dokuro_deluxe], {{binggong_asylum , omone_hokoma_agm}} , mx2j , [artist:sho_(sho_lwlw)], [[artist:rhasta]],[nixeu, wlop] , 0.5::artist:mika_pikazo, artist:so-bin::, [[artist:ke-ta]], -5::artist collaboration:: , year2024 ,
      比较简易，强调肉感和丰满的画风：{{artist: MeIoN}} ,   {artist:ame_usari, artist:mignon},[ningen_mame], [artist:classic_(zildjian33)] ,[wlop] ,  blue_gk  , [[dokuro_deluxe]], 
-     讲解：突出重点，对总体画风影响较大的画师尽可能减轻权重，另外画师部分越多越容易崩，尽可能精简，5~8个最佳。-3::artist collaboration::用来减轻污染，画师少就不需要，
+     讲解：突出重点，对总体画风影响较大的画师尽可能减轻权重，另外画师部分越多越容易崩，尽可能精简，整个画风部分5~8个词条最佳。-3::artist collaboration::用来减轻污染，画师少就不需要，
  
 ####2，视角画面镜头全解析
  01. 基础篇: 画面景别 (Shot Scale)
