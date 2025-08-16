@@ -167,7 +167,9 @@ AI训练通过使用Danbooru的标签查找，获得一堆图片训练集，将�
 	 
 	 举例（不要依赖这个，仅提供格式，去看776通用画师（已测））：
 	 比较简易，强调肉感和丰满的画风：{{artist: MeIoN}} ,   {artist:ame_usari, artist:mignon},[ningen_mame], [artist:classic_(zildjian33)] ,[wlop] ,  blue_gk  , [[dokuro_deluxe]], 
-
+     比较通用的画风，特点是冷白肌，但是脸和光影的ai味太重，而且画师组太多容易污染：[ningen_mame], {artist:classic_(zildjian33)} ,[dokuro_deluxe], {{binggong_asylum , omone_hokoma_agm}} , mx2j , [artist:sho_(sho_lwlw)], [[artist:rhasta]],[nixeu, wlop] , 0.5::artist:mika_pikazo, artist:so-bin::, [[artist:ke-ta]], -5::artist collaboration:: , year2024 ,
+     比较卡通，比较幼但是又肉感，精通魔物娘，但是不知道为什么有时候皮肤质感有的奇怪：[kenkou_cross] , msp_sammy , zankuro  , artist:shpo , {artist:yushe_quetzalli} , [artist:au_(d_elete)] , [[naga_uc , artist:ekrea_jan, artist:rayno]] ,  -3::artist collaboration:: , year2024 ,  
+	 
      总结：突出重点，对总体画风影响较大的画师尽可能减轻权重，另外画师部分越多越容易崩，尽可能精简，
 
   
