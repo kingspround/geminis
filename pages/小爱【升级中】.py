@@ -1206,59 +1206,50 @@ if st.session_state.is_generating:
         placeholder = st.empty()
         
         target_message_index = -1 # 默认指向最后一条消息（新生成）
-        # 如果是续写任务，目标索引由任务本身提供
         if is_continuation_task:
             target_message_index = st.session_state.messages[-1].get("target_index", -1)
-        # 如果是新生成，确保有助手消息占位符
         elif not st.session_state.messages or st.session_state.messages[-1]["role"] != "assistant":
             st.session_state.messages.append({"role": "assistant", "content": [""]})
         
-        # 安全检查，防止索引越界
         if not (-len(st.session_state.messages) <= target_message_index < len(st.session_state.messages)):
              st.error("续写目标消息索引无效，已停止生成。")
              st.session_state.is_generating = False
         else:
             streamed_part = ""
             try:
-                # 1. 获取已存在的内容，用于拼接
                 original_content = ""
                 content_list = st.session_state.messages[target_message_index]["content"]
                 if content_list and isinstance(content_list[0], str):
                     original_content = content_list[0]
                 
-                # 2. 正常进行流式生成
                 for chunk in getAnswer():
                     streamed_part += chunk
                     updated_full_content = original_content + streamed_part
-                    # 实时将拼接后的完整内容存入session_state
                     st.session_state.messages[target_message_index]["content"][0] = updated_full_content
-                    # 在界面上显示
                     placeholder.markdown(updated_full_content + "▌")
                 
-                # 正常生成结束
                 placeholder.markdown(st.session_state.messages[target_message_index]["content"][0])
-                st.session_state.is_generating = False # 任务完成，关闭生成锁
+                st.session_state.is_generating = False
 
             except Exception as e:
-                # ★★★ 核心修复：自动续写逻辑 ★★★
+                # 当发生中断时
                 st.warning("回答中断，正在尝试自动续写…")
-                
-                # 获取中断时已保存的内容
-                partial_content = st.session_state.messages[target_message_index]["content"][0]
+                partial_content = ""
+                # 安全地获取部分内容，以防 messages 也不存在
+                if 'messages' in st.session_state and st.session_state.messages:
+                    partial_content = st.session_state.messages[target_message_index]["content"][0]
 
-                # 只有当确实已经生成了部分内容时，才进行自动续写
                 if partial_content.strip():
                     last_chars = (partial_content[-50:] + "...") if len(partial_content) > 50 else partial_content
                     continue_prompt = f"请严格地从以下文本的结尾处，无缝、自然地继续写下去。不要重复任何内容，不要添加任何前言或解释，直接输出续写的内容即可。文本片段：\n\"...{last_chars}\""
                     
-                    # 清理可能存在的旧临时指令，添加新的自动续写指令
                     if is_continuation_task: st.session_state.messages.pop()
                     st.session_state.messages.append({"role": "user", "content": [continue_prompt], "temp": True, "is_continue_prompt": True, "target_index": target_message_index})
                     
-                    # 关键：保持 is_generating 为 True，以便在rerun后立即执行新的续写任务
-                    st.experimental_rerun() # ★★★ 注意：这里的 rerun 是为了立即触发续写，是需要的 ★★★
+                    # ★★★ 核心改动：删除这里的 rerun ★★★
+                    # 脚本会自然结束并自动刷新，无需手动强制刷新，从而避免 DuplicateWidgetID 错误。
+                    # st.experimental_rerun() # <--- 删除或注释掉这一行
                 else:
-                    # 如果中断时没有任何内容，则停止并报错
                     st.error(f"回答生成失败 ({type(e).__name__})，请重试。")
                     st.session_state.is_generating = False
             finally:
@@ -1270,9 +1261,14 @@ if st.session_state.is_generating:
                 if not st.session_state.is_generating and st.session_state.messages and st.session_state.messages[-1]['role'] == 'assistant' and not st.session_state.messages[-1]["content"][0].strip():
                     st.session_state.messages.pop()
                 
-                # 每次循环（无论是成功、中断还是续写）都保存
-                with open(log_file, "wb") as f:
-                    pickle.dump(_prepare_messages_for_save(st.session_state.messages), f)
+                # 只有在 session_state 正常时才保存
+                if 'messages' in st.session_state:
+                    with open(log_file, "wb") as f:
+                        pickle.dump(_prepare_messages_for_save(st.session_state.messages), f)
+                
+                # 如果生成没有被中断并转入续写，则需要刷新一次以移除 "▌" 光标
+                if not st.session_state.is_generating:
+                    st.experimental_rerun()
 
 
 # --- 底部控件 ---
