@@ -1189,68 +1189,139 @@ if len(st.session_state.messages) >= 1 and not st.session_state.is_generating an
              if st.columns(20)[0].button("♻️", key="regen_vision", help="重新生成"): regenerate_message(last_real_msg_idx)
 
 # --- 核心交互逻辑 (主输入框) ---
-if prompt := st.chat_input("输入你的消息...", key="main_chat_input", disabled=st.session_state.get('editing', False) or st.session_state.get('is_generating', False)):
-    token = generate_token()
-    full_prompt = f"{prompt} (token: {token})" if st.session_state.use_token else prompt
-    st.session_state.messages.append({"role": "user", "content": [full_prompt]})
+
+def handle_user_input(prompt: str):
+    """处理用户输入，准备并触发AI生成。"""
+    # 1. (可选) 根据设置决定是否添加Token
+    if st.session_state.get("use_token", True):
+        token = generate_token()
+        prompt = f"{prompt} (token: {token})"
+    
+    # 2. 将用户消息添加到聊天记录中
+    st.session_state.messages.append({"role": "user", "content": [prompt]})
+    
+    # 3. 设置生成状态标志，streamlit会自动重跑并进入下面的“核心生成逻辑”
     st.session_state.is_generating = True
 
-# ★★★ 核心生成逻辑 ★★★
-if st.session_state.get("is_generating", False):
-    is_continuation_task = st.session_state.messages and st.session_state.messages[-1].get("is_continue_prompt")
+# 获取用户输入，并禁用输入框直到生成完成
+prompt = st.chat_input(
+    "输入你的消息...", 
+    key="main_chat_input", 
+    disabled=st.session_state.get('editing', False) or st.session_state.get('is_generating', False)
+)
+if prompt:
+    handle_user_input(prompt)
+
+# --- 核心生成逻辑 ---
+
+def generate_response():
+    """调用API生成回复，并以流式方式更新UI。"""
+    # 1. 为即将生成的AI回复准备一个位置
+    st.session_state.messages.append({"role": "assistant", "content": [""]})
+
+    try:
+        # 2. 在UI上创建聊天气泡和用于流式输出的占位符
+        with st.chat_message("assistant"):
+            placeholder = st.empty()
+            
+            # 3. 调用API并流式接收数据
+            full_response = ""
+            for chunk in getAnswer():
+                full_response += chunk
+                # 实时更新UI占位符（带光标效果）
+                placeholder.markdown(full_response + "▌")
+            
+            # 4. 流式结束后，用完整内容更新UI和session_state
+            placeholder.markdown(full_response)
+            st.session_state.messages[-1]["content"][0] = full_response
+
+    except Exception as e:
+        # 5. 如果发生错误，显示错误信息并移除之前准备的空AI消息位置
+        st.error(f"生成回复时出错: {e}")
+        st.session_state.messages.pop()
     
-    with st.chat_message("assistant"):
-        placeholder = st.empty()
+    finally:
+        # 6. 无论成功与否，都要重置生成状态并保存聊天记录
+        st.session_state.is_generating = False
+        with open(log_file, "wb") as f:
+            pickle.dump(_prepare_messages_for_save(st.session_state.messages), f)
         
-        target_message_index = -1
-        if is_continuation_task:
-            target_message_index = st.session_state.messages[-1].get("target_index", -1)
-        elif not st.session_state.messages or st.session_state.messages[-1]["role"] != "assistant":
-            st.session_state.messages.append({"role": "assistant", "content": [""]})
-        
-        if not (-len(st.session_state.messages) <= target_message_index < len(st.session_state.messages)):
-             st.error("续写目标消息索引无效，已停止生成。")
-             st.session_state.is_generating = False
-             st.experimental_rerun()
-        else:
-            streamed_part = ""
-            try:
-                original_content = ""
-                content_list = st.session_state.messages[target_message_index]["content"]
-                if content_list and isinstance(content_list[0], str):
-                    original_content = content_list[0]
-                
-                for chunk in getAnswer():
-                    streamed_part += chunk
-                    updated_full_content = original_content + streamed_part
-                    st.session_state.messages[target_message_index]["content"][0] = updated_full_content
-                    placeholder.markdown(updated_full_content + "▌")
-                
-                placeholder.markdown(st.session_state.messages[target_message_index]["content"][0])
-                st.session_state.is_generating = False
+        # 7. 手动触发一次重跑，以确保UI状态（如输入框的禁用状态）正确更新
+        st.experimental_rerun()
 
-            except Exception as e:
-                st.warning(f"回答中断 ({type(e).__name__})，正在尝试自动续写…")
-                partial_content = st.session_state.messages[target_message_index]["content"][0]
+# 当 st.session_state.is_generating 为 True 时，执行生成逻辑
+if st.session_state.get("is_generating", False):
+    generate_response()
+```
 
-                if partial_content.strip():
-                    last_chars = (partial_content[-50:] + "...") if len(partial_content) > 50 else partial_content
-                    continue_prompt = f"请严格地从以下文本的结尾处，无缝、自然地继续写下去。不要重复任何内容，不要添加任何前言或解释，直接输出续写的内容即可。文本片段：\n\"...{last_chars}\""
-                    if is_continuation_task: st.session_state.messages.pop()
-                    st.session_state.messages.append({"role": "user", "content": [continue_prompt], "temp": True, "is_continue_prompt": True, "target_index": target_message_index})
-                else:
-                    st.error(f"回答生成失败 ({type(e).__name__})，请重试。")
-                    st.session_state.is_generating = False
-            finally:
-                if not st.session_state.is_generating and is_continuation_task:
-                    st.session_state.messages.pop()
+### 完整整合代码
 
-                if not st.session_state.is_generating and st.session_state.messages and st.session_state.messages[-1]['role'] == 'assistant' and not st.session_state.messages[-1]["content"][0].strip():
-                    st.session_state.messages.pop()
+您可以直接用下面的代码块替换掉您原来代码中对应的两个部分。
 
-                with open(log_file, "wb") as f:
-                    pickle.dump(_prepare_messages_for_save(st.session_state.messages), f)
+```python
+# ... (您的代码上半部分，直到 "核心交互逻辑" 之前) ...
 
+# --- 核心交互逻辑 (主输入框) ---
+
+def handle_user_input(prompt: str):
+    """处理用户输入，准备并触发AI生成。"""
+    if st.session_state.get("use_token", True):
+        token = generate_token()
+        prompt = f"{prompt} (token: {token})"
+    st.session_state.messages.append({"role": "user", "content": [prompt]})
+    st.session_state.is_generating = True
+
+prompt = st.chat_input(
+    "输入你的消息...", 
+    key="main_chat_input", 
+    disabled=st.session_state.get('editing', False) or st.session_state.get('is_generating', False)
+)
+if prompt:
+    handle_user_input(prompt)
+
+
+# --- 核心生成逻辑 ---
+
+def generate_response():
+    """调用API生成回复，并以流式方式更新UI。"""
+    # 为AI回复创建一个新的消息条目
+    st.session_state.messages.append({"role": "assistant", "content": [""]})
+
+    try:
+        with st.chat_message("assistant"):
+            placeholder = st.empty()
+            
+            full_response = ""
+            # 从 getAnswer() 流式获取响应
+            for chunk in getAnswer():
+                full_response += chunk
+                placeholder.markdown(full_response + "▌")
+            
+            # 更新最终的UI和会话状态
+            placeholder.markdown(full_response)
+            st.session_state.messages[-1]["content"][0] = full_response
+            
+            # 如果AI返回了空内容，则移除该消息
+            if not full_response.strip():
+                st.session_state.messages.pop()
+
+    except Exception as e:
+        st.error(f"生成回复时出错: {e}")
+        # 移除因出错而产生的空AI消息
+        if st.session_state.messages and st.session_state.messages[-1]["role"] == "assistant":
+            st.session_state.messages.pop()
+    
+    finally:
+        # 重置状态并保存记录
+        st.session_state.is_generating = False
+        with open(log_file, "wb") as f:
+            pickle.dump(_prepare_messages_for_save(st.session_state.messages), f)
+        # 强制重跑以更新UI
+        st.experimental_rerun()
+
+# 检查是否需要生成回复
+if st.session_state.get("is_generating", False):
+    generate_response()
 
 # --- 底部控件 ---
 c1, c2 = st.columns(2)
