@@ -150,14 +150,14 @@ AI训练通过使用Danbooru的标签查找，获得一堆图片训练集，将�
 一个优秀的词条应该包括：画风+视角画面镜头+人物+服饰+动作+背景
 ####1，画风（最难的部分）
      主要是由各种画师（画师名字），画风（ink，pixel_art，1990s，4koma），素描（sketch，realistic，monochrome），写实（photorealistic，oil_painting），作品（umamusume，princess_connect!，girl_frontline）等等组成：
-     其中画师词条是最重要的组成部分，至少4个，尽量不超过12个，但是按照你的理解选择最合适的画师，调教它们的权重，不用过于依赖例子。
+     其中画师词条是最重要的组成部分，至少4个，但是按照你的理解选择最合适的画师，细心调教它们的权重，整个画风部分尽量不超过12个词条，不用过于依赖例子。
 	 提示：R18画师可以提升肢体质量
 	 举例：
 	 史莱姆娘画风：{{Hekirake}} , translucent , hikyou_takarasou, [artist:akira_(meltyhip)] ,{{wlop}}, slime_girl , [[artist:onineko]], [[[[[artist:binggong_asylum, tianliang_duohe_fangdongye]]]]] , solo_core , Completely_translucent_body , liquid_hair , colored_skin ,Perfect_lighting , slime_(substance) , -3::artist collaboration:: , year2024 , 
      仿妮姬画风：[fantongjun] , artist:meion ,  artist:classic_(zildjian33) , [artist:dk.senie , xiaoluo_xl , kkuem] , [artist:sho_(sho_lwlw)], [[rhasta]],[wlop , nixeu], -3::artist collaboration:: ,  Volumetric light ，depth_of_field , high_contrast , Perfect_lighting , oil_skin ,wet_skin , sweat , steaming body , year 2024 ,
 	 比较通用画风但是画风组太多，而且ai味很重：[ningen_mame], {artist:classic_(zildjian33)} ,[dokuro_deluxe], {{binggong_asylum , omone_hokoma_agm}} , mx2j , [artist:sho_(sho_lwlw)], [[artist:rhasta]],[nixeu, wlop] , 0.5::artist:mika_pikazo, artist:so-bin::, [[artist:ke-ta]], -5::artist collaboration:: , year2024 ,
      比较简易，强调肉感和丰满的画风：{{artist: MeIoN}} ,   {artist:ame_usari, artist:mignon},[ningen_mame], [artist:classic_(zildjian33)] ,[wlop] ,  blue_gk  , [[dokuro_deluxe]], 
-     讲解：突出重点，对总体画风影响较大的画师尽可能减轻权重。-3::artist collaboration::用来减轻污染，画师少就不需要，
+     讲解：突出重点，对总体画风影响较大的画师尽可能减轻权重，另外画师部分越多越容易崩，尽可能精简。-3::artist collaboration::用来减轻污染，画师少就不需要，
  
 ####2，视角画面镜头全解析
  01. 基础篇: 画面景别 (Shot Scale)
