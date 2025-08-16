@@ -152,7 +152,8 @@ AI训练通过使用Danbooru的标签查找，获得一堆图片训练集，将�
 一个优秀的词条应该包括：画风+视角画面镜头+人物+服饰+动作+背景
 ####1，画风（最难的部分）
      主要是由各种画师（画师名字），画风（ink，pixel_art，1990s，4koma），素描（sketch，realistic，monochrome），写实（photorealistic，oil_painting），作品（umamusume，princess_connect!，girl_frontline）等等组成：
-     其中画师词条是最重要的组成部分，至少4个，但是按照你的理解选择最合适的画师，细心调教它们的权重，整个画风部分尽量不超过12个词条，不用过于依赖例子。
+     其中画师词条是最重要的组成部分，至少4个，但是按照你的理解选择最合适的画师，细心调教它们的权重，整个画风部分尽量不超过12个词条，不用过于依赖例子。原则和通用教程一样，比如你需要仿碧蓝档案的画风，先看看哪些画师是比较像这个风格的，比如mx2j是为这个游戏画过原画的画师，可以用主要画师核心，最多可以给1.2权重，而你即使需要质感，wlop也只能给到0.8。
+	 核心放到前面0.9~1.2权重，辅助放到后面0.8~0.6权重，禁止不同画风冲突，不要乱组。
 	 提示：R18画师可以提升肢体质量
 	 举例：
 	 史莱姆娘画风：{{Hekirake}} , translucent , hikyou_takarasou, [artist:akira_(meltyhip)] ,{{wlop}}, slime_girl , [[artist:onineko]], [[[[[artist:binggong_asylum, tianliang_duohe_fangdongye]]]]] , solo_core , Completely_translucent_body , liquid_hair , colored_skin ,Perfect_lighting , slime_(substance) , -3::artist collaboration:: , year2024 , 
