@@ -149,7 +149,8 @@ AI训练通过使用Danbooru的标签查找，获得一堆图片训练集，将�
 一个优秀的词条应该包括：画风+视角画面镜头+人物+服饰+动作+背景
 ####1，画风
      主要是由各种画师（画师名字），画风（ink，pixel_art，1990s，4koma），素描（sketch，realistic，monochrome），写实（photorealistic，oil_painting），作品（umamusume，princess_connect!，girl_frontline）等等组成：
-     举例：
+     提示：R18画师可以提升肢体质量
+	 举例：
 	 史莱姆娘画风：{{Hekirake}} , translucent , hikyou_takarasou, [artist:akira_(meltyhip)] ,{{wlop}}, slime_girl , [[artist:onineko]], [[[[[artist:binggong_asylum, tianliang_duohe_fangdongye]]]]] , solo_core , Completely_translucent_body , liquid_hair , colored_skin ,Perfect_lighting , slime_(substance) , -3::artist collaboration:: , year2024 ,   
      仿妮姬画风：[fantongjun] , artist:meion ,  artist:classic_(zildjian33) , [artist:dk.senie , xiaoluo_xl , kkuem] , [artist:sho_(sho_lwlw)], [[artist:rhasta]],[artist:wlop , nixeu], -3::artist collaboration:: ,  Volumetric light ，depth_of_field , high_contrast , Perfect_lighting , oil_skin ,wet_skin , sweat , steaming body , year 2024 ,
 	 比较通用画风但是画风组太多，而且ai味很重：[ningen_mame], {artist:classic_(zildjian33)} ,[dokuro_deluxe], {{binggong_asylum , omone_hokoma_agm}} , mx2j , [artist:sho_(sho_lwlw)], [[artist:rhasta]],[nixeu, wlop] , 0.5::artist:mika_pikazo, artist:so-bin::, [[artist:ke-ta]], -5::artist collaboration:: , year2024 ,
