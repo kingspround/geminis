@@ -1997,15 +1997,122 @@ if len(st.session_state.messages) >= 1 and not st.session_state.is_generating an
         elif last_msg["role"] == "assistant":
              if st.columns(20)[0].button("♻️", key="regen_vision", help="重新生成"): regenerate_message(last_real_msg_idx)
 
-# --- 核心交互逻辑 (主输入框, 保持不变) ---
-if not st.session_state.is_generating:
-    if prompt := st.chat_input("输入你的消息...", key="main_chat_input", disabled=st.session_state.editing):
-        token = generate_token()
-        full_prompt = f"{prompt} (token: {token})" if st.session_state.use_token else prompt
-        st.session_state.messages.append({"role": "user", "content": [full_prompt]})
-        st.session_state.is_generating = True
-        st.experimental_rerun()
+# --- 核心交互逻辑 (主输入框) ---
 
+# 1. 获取用户输入
+if prompt := st.chat_input("你好，我是小爱，有什么可以帮助主人的吗？", disabled=st.session_state.is_generating):
+    # 如果勾选了“使用 Token”，则在提问前添加
+    if st.session_state.use_token:
+        token = generate_token()
+        full_prompt = f"{token} {prompt}"
+    else:
+        full_prompt = prompt
+        
+    # 2. 将用户的完整提问添加到消息历史中
+    st.session_state.messages.append({"role": "user", "content": [full_prompt]})
+    
+    # 3. 设置生成状态为True，并立即重新运行脚本以显示用户消息
+    st.session_state.is_generating = True
+    st.experimental_rerun()
+
+# 4. 如果处于“正在生成”状态，则执行核心生成逻辑
+if st.session_state.is_generating:
+    # 确保最后一条消息是用户的，我们才需要生成回应
+    if st.session_state.messages and st.session_state.messages[-1]["role"] == "user":
+        
+        # 为AI的回答创建一个聊天消息容器和占位符
+        with st.chat_message("assistant"):
+            placeholder = st.empty()
+            full_response = ""
+            finish_reason = None
+            
+            # --- 第一次生成尝试 ---
+            try:
+                # 调用 getAnswer() 获取流式响应生成器
+                # 注意：getAnswer() 内部会读取 st.session_state.messages 来构建上下文
+                response_generator = getAnswer()
+                
+                # 逐块读取并显示响应
+                for chunk in response_generator:
+                    full_response += chunk
+                    placeholder.markdown(full_response + "▌")
+                
+                # 流结束后，response_generator 对象上没有 finish_reason。
+                # 我们需要重新调用一次非流式API来获取它，或者简化逻辑。
+                # 为了性能和简化，我们假设任何非正常结束（如异常）都需要续写。
+                # 更好的方法是直接调用 model.generate_content 并捕获完整的 response 对象
+                
+                # 我们采用直接调用的方式来获取 finish_reason
+                # 构造历史记录
+                history_for_api = []
+                # (此处省略getAnswer中复杂的历史构建逻辑，直接使用简化的st.session_state.messages)
+                for msg in st.session_state.messages:
+                    api_role = "model" if msg["role"] == "assistant" else "user"
+                    history_for_api.append({"role": api_role, "parts": msg["content"]})
+                
+                # 重新执行生成以获取完整的响应对象
+                response = model.generate_content(contents=history_for_api, stream=True)
+                
+                # 重置并重新流式传输（这次是为了获取完成原因）
+                full_response = "" 
+                for chunk in response:
+                    if chunk.text:
+                        full_response += chunk.text
+                        placeholder.markdown(full_response + "▌")
+                
+                finish_reason = response.candidates[0].finish_reason if response.candidates else "UNKNOWN"
+
+            except Exception as e:
+                st.error(f"生成时发生错误: {e}")
+                full_response += f"\n\n[生成中断，错误: {e}]"
+                finish_reason = "ERROR" # 自定义一个错误原因
+
+            # --- 自动续写逻辑 ---
+            # 如果完成原因不是正常的 'STOP'，则执行一次续写
+            if finish_reason != "STOP":
+                placeholder.markdown(full_response + "\n\n🔄 正在尝试继续生成...")
+                
+                # 1. 将已生成的部分作为AI的回复，添加到历史记录中，为续写提供上下文
+                st.session_state.messages.append({"role": "assistant", "content": [full_response]})
+                
+                # 2. 再次调用API进行续写
+                try:
+                    # 构造新的历史记录
+                    history_for_continue = []
+                    for msg in st.session_state.messages:
+                         api_role = "model" if msg["role"] == "assistant" else "user"
+                         history_for_continue.append({"role": api_role, "parts": msg["content"]})
+
+                    continue_response = model.generate_content(contents=history_for_continue, stream=True)
+                    
+                    # 拼接续写的内容
+                    for chunk in continue_response:
+                        if chunk.text:
+                            full_response += chunk.text
+                            placeholder.markdown(full_response + "▌")
+                            
+                except Exception as e:
+                    st.error(f"继续生成时发生错误: {e}")
+                    full_response += f"\n\n[继续生成中断，错误: {e}]"
+                
+                # 3. 移除我们为续写而临时添加的部分回复，以便下一步添加完整回复
+                if st.session_state.messages[-1]["role"] == "assistant":
+                    st.session_state.messages.pop()
+
+            # --- 完成与收尾 ---
+            # 在占位符中显示最终的完整回复
+            placeholder.markdown(full_response)
+            
+            # 将最终的、完整的AI回复添加到消息历史中
+            st.session_state.messages.append({"role": "assistant", "content": [full_response]})
+            
+            # 将更新后的历史记录保存到文件中
+            with open(log_file, "wb") as f:
+                pickle.dump(_prepare_messages_for_save(st.session_state.messages), f)
+                
+            # 重置生成状态，并重新运行脚本以更新UI（例如显示编辑/重生成按钮）
+            st.session_state.is_generating = False
+            st.experimental_rerun()
 
 
 
