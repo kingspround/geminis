@@ -2050,7 +2050,6 @@ if st.session_state.is_generating:
                     original_content = content_list[0]
             
             # 3. 调用API进行流式生成
-            # 如果是“继续”任务，api_history 不为 None
             for chunk in getAnswer(custom_history=api_history):
                 streamed_part += chunk
                 updated_full_content = original_content + streamed_part
@@ -2079,10 +2078,9 @@ if st.session_state.is_generating:
             if not st.session_state.is_generating and st.session_state.messages and st.session_state.messages[-1]['role'] == 'assistant' and not st.session_state.messages[-1]["content"][0].strip():
                 st.session_state.messages.pop()
             
-            # 保存并刷新
+            # 保存记录
             with open(log_file, "wb") as f:
                 pickle.dump(_prepare_messages_for_save(st.session_state.messages), f)
-            st.rerun()
 
 
 # --- 底部控件 (保持不变) ---
