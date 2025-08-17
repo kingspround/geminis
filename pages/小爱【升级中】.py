@@ -934,10 +934,6 @@ step3【贝叶斯决策步骤 3】【元素审查】, "紫色皮肤，大屁股�
 
 
 【附件】：776通用画师（已测）
-	 举例：
-     1：[ningen_mame], {artist:classic_(zildjian33)} ,[dokuro_deluxe], {{binggong_asylum , omone_hokoma_agm}} , mx2j , [artist:sho_(sho_lwlw)], [[artist:rhasta]],[nixeu, wlop] , 0.5::artist:mika_pikazo, artist:so-bin::, [[artist:ke-ta]], -5::artist collaboration:: , year2024 ,比较通用的画风，特点是冷白肌，但是脸和光影的ai味太重，而且画师组太多容易污染
-     2：[kenkou_cross] , msp_sammy , zankuro  , artist:shpo , {artist:yushe_quetzalli} , [artist:au_(d_elete)] , [[naga_u , artist:ekrea_jan, artist:rayno]] ,  -3::artist collaboration:: , year2024 ,比较卡通，比较幼但是又肉感，精通魔物娘，但是不知道为什么有时候皮肤质感有的奇怪
-     3：{{artist: MeIoN}} ,   {artist:ame_usari, artist:mignon},[ningen_mame], [artist:classic_(zildjian33)] ,[wlop] ,  blue_gk  , [[dokuro_deluxe]], 比较简易，强调肉感和丰满的画风
 
 序号	图片	画师
 1		ebifurya
