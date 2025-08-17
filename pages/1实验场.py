@@ -1865,19 +1865,6 @@ def continue_message(index):
     st.session_state.is_generating = True
     # st.rerun() 会由 on_click 自动触发
         
-        last_chars = (original_content[-50:] + "...") if len(original_content) > 50 else original_content
-        # 使用一个更明确的续写指令
-        new_prompt = f"请严格地从以下文本的结尾处，无缝、自然地继续写下去。不要重复任何内容，不要添加任何前言或解释，直接输出续写的内容即可。文本片段：\n\"...{last_chars}\""
-        
-        # 构造包含部分历史和续写指令的临时历史记录
-        temp_history = [{"role": ("model" if m["role"] == "assistant" else "user"), "parts": m["content"]} for m in st.session_state.messages[:index+1]]
-        temp_history.append({"role": "user", "parts": [new_prompt]})
-        
-        st.session_state.is_generating = True
-        # 在触发生成前，将续写指令临时添加到消息中，生成后再移除
-        st.session_state.messages.append({"role": "user", "content": [new_prompt], "temp": True})
-        st.experimental_rerun()
-
 
 def send_from_sidebar_callback():
     uploaded_files = st.session_state.get("sidebar_uploader", [])
