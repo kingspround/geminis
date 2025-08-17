@@ -1886,15 +1886,20 @@ def continue_message(index):
         st.experimental_rerun()
 
 def send_from_main_input_callback():
-    """处理主输入框提交的回调函数"""
-    prompt = st.session_state.get("main_chat_input", "").strip()
+    """处理主输入框提交的回调函数 (已修复)"""
+    # 1. 直接从 session_state 获取原始输入，不立即 .strip()
+    prompt = st.session_state.get("main_chat_input", "")
+
+    # 2. 检查 prompt 是否存在。一个或多个空格的字符串不为空，会通过此检查。
+    #    这样就解决了“只输入空格无法触发”的问题。
     if prompt:
+        # 在构建最终要发送的消息时，再使用 .strip() 来清理，确保我们不发送纯空格给模型
+        clean_prompt = prompt.strip()
+        
         token = generate_token()
-        full_prompt = f"{prompt} (token: {token})" if st.session_state.use_token else prompt
+        full_prompt = f"{clean_prompt} (token: {token})" if st.session_state.use_token else clean_prompt
         st.session_state.messages.append({"role": "user", "content": [full_prompt]})
         st.session_state.is_generating = True
-        # 清空输入框内容
-        st.session_state.main_chat_input = ""
 		
 def send_from_sidebar_callback():
     uploaded_files = st.session_state.get("sidebar_uploader", [])
