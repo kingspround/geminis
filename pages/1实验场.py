@@ -1886,6 +1886,22 @@ def continue_message(index):
         st.session_state.messages.append({"role": "user", "content": [new_prompt], "temp": True})
         st.experimental_rerun()
 
+def send_from_sidebar_callback():
+    uploaded_files = st.session_state.get("sidebar_uploader", [])
+    caption = st.session_state.get("sidebar_caption", "").strip()
+    if not uploaded_files and not caption:
+        st.toast("请输入文字或上传图片！", icon="⚠️"); return
+    content_parts = []
+    if uploaded_files:
+        for uploaded_file in uploaded_files:
+            try: content_parts.append(Image.open(uploaded_file))
+            except Exception as e: st.error(f"处理图片 {uploaded_file.name} 失败: {e}")
+    if caption: content_parts.append(caption)
+    if content_parts:
+        st.session_state.messages.append({"role": "user", "content": content_parts})
+        st.session_state.sidebar_caption = ""
+        st.session_state.is_generating = True
+
 def send_from_main_input_callback():
     """处理主输入框提交的回调函数"""
     raw_prompt = st.session_state.get("main_chat_input", "")
