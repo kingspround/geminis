@@ -2021,7 +2021,12 @@ if st.session_state.is_generating:
     is_continuation_task = False
 
     # 1. 根据任务类型准备API请求和目标索引
-    if task and task.get("type") == "continue":
+    # 安全检查：如果is_generating为True但没有任务，则将其重置
+    if not task:
+        st.session_state.is_generating = False
+        st.rerun()
+
+    if task.get("type") == "continue":
         is_continuation_task = True
         target_message_index = task["target_index"]
         
@@ -2038,14 +2043,14 @@ if st.session_state.is_generating:
         temp_history.append({"role": "user", "parts": [continue_prompt]})
         api_history = temp_history 
 
-    else: # 处理 "new" 和 "regenerate" 任务
+    else: # "new" or "regenerate"
         if not st.session_state.messages or st.session_state.messages[-1]["role"] != "assistant":
             st.session_state.messages.append({"role": "assistant", "content": [""]})
 
     with st.chat_message("assistant"):
         placeholder = st.empty()
         streamed_part = ""
-        rerun_after_error = False
+        rerun_needed = False # --- NEW: 统一的刷新标志 ---
         try:
             # 2. 获取已存在的内容
             original_content = ""
@@ -2062,47 +2067,49 @@ if st.session_state.is_generating:
                 placeholder.markdown(updated_full_content + "▌")
 
             # 4. 生成结束后进行检查
+            final_content = st.session_state.messages[target_message_index]["content"][0]
             if is_continuation_task and not streamed_part.strip():
                 st.error("自动续写失败：可能由于内容审核被阻止。已终止生成。")
                 st.session_state.messages[target_message_index]["content"][0] = original_content
                 placeholder.markdown(original_content)
-                st.session_state.is_generating = False
             else:
-                final_content = st.session_state.messages[target_message_index]["content"][0]
                 placeholder.markdown(final_content)
-                st.session_state.is_generating = False
+            
+            # --- 关键修改: 成功后，设置刷新标志并清除任务 ---
+            st.session_state.is_generating = False
+            st.session_state.generation_task = None
+            rerun_needed = True
 
         except Exception as e:
-            # --- MODIFIED: 全新的、带重试机制的错误处理 ---
+            # --- 关键修改: 全新、更健壮的错误处理 ---
             current_retry_count = task.get("retry_count", 0)
             MAX_RETRIES = 2
 
             if current_retry_count < MAX_RETRIES:
                 st.toast(f"回答中断，正在尝试自动续写... (第 {current_retry_count + 1}/{MAX_RETRIES} 次)")
                 
-                # 无论之前是否有新内容，都准备续写任务
-                task["retry_count"] += 1 
-                st.session_state.generation_task = task # 更新任务状态
-                rerun_after_error = True # 设置标志以触发重跑
+                # --- 核心修复：总是创建一个"continue"任务来保证数据完整性 ---
+                new_task = {
+                    "type": "continue",
+                    "target_index": target_message_index, # 使用当前的目标索引
+                    "retry_count": current_retry_count + 1
+                }
+                st.session_state.generation_task = new_task
+                rerun_needed = True
             else:
-                # 重试次数耗尽，显示最终错误
                 st.error(f"自动续写失败已达上限。API错误: {type(e).__name__}")
-                st.warning("提示：如果错误为 ValueError，可能由内容策略(RECITATION)触发，请尝试修改您的提示或问题。")
+                st.warning("提示：如果错误为 ValueError，可能由内容策略(RECITATION)触发，请尝试修改您的提示。")
                 st.session_state.is_generating = False
+                st.session_state.generation_task = None
+                rerun_needed = True # 即使最终失败，也刷新一次以清理界面
         
         finally:
-            # 5. 清理和收尾
-            if not rerun_after_error: 
-                 st.session_state.generation_task = None 
-            
-            if not st.session_state.is_generating:
-                if st.session_state.messages and st.session_state.messages[-1]['role'] == 'assistant' and not st.session_state.messages[-1]["content"][0].strip():
-                    st.session_state.messages.pop()
-            
+            # --- 关键修改: 统一在最后处理刷新 ---
+            # 总是保存最新状态
             with open(log_file, "wb") as f:
                 pickle.dump(_prepare_messages_for_save(st.session_state.messages), f)
             
-            if rerun_after_error:
+            if rerun_needed:
                 st.rerun()
 
 
