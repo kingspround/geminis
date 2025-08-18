@@ -1946,7 +1946,8 @@ continue_target_index = -1
 if st.session_state.is_generating and st.session_state.generation_task and st.session_state.generation_task.get("type") == "continue":
     continue_target_index = st.session_state.generation_task.get("target_index")
 
-for i, message in enumerate st.session_state.messages:
+# --- 语法修正：在 enumerate 和 st.session_state.messages 之间添加了 "in" ---
+for i, message in enumerate(st.session_state.messages):
     # 如果当前消息是“继续”任务的目标，就跳过渲染，因为它将在下面的生成逻辑中被重新渲染
     if i == continue_target_index:
         continue
