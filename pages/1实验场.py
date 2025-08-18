@@ -1852,19 +1852,14 @@ tips:
 		
 def regenerate_message(index):
     """准备重新生成任务"""
-    # 截断历史记录，回到触发重新生成的用户消息那里
     st.session_state.messages = st.session_state.messages[:index]
-    st.session_state.generation_task = {"type": "regenerate"}
+    st.session_state.generation_task = {"type": "regenerate", "retry_count": 0} # 初始化重试
     st.session_state.is_generating = True
-    # st.rerun() 会由 on_click 自动触发
 
 def continue_message(index):
     """准备继续生成任务"""
-    # 只设置任务和目标索引，不修改任何消息
-    st.session_state.generation_task = {"type": "continue", "target_index": index}
+    st.session_state.generation_task = {"type": "continue", "target_index": index, "retry_count": 0} # 初始化重试
     st.session_state.is_generating = True
-    # st.rerun() 会由 on_click 自动触发
-        
 
 def send_from_sidebar_callback():
     uploaded_files = st.session_state.get("sidebar_uploader", [])
@@ -1879,12 +1874,12 @@ def send_from_sidebar_callback():
     if caption: content_parts.append(caption)
     if content_parts:
         st.session_state.messages.append({"role": "user", "content": content_parts})
-        st.session_state.generation_task = {"type": "new"} # 标记为新任务
+        st.session_state.generation_task = {"type": "new", "retry_count": 0} # 初始化重试
         st.session_state.is_generating = True
         st.session_state.sidebar_caption = ""
 
 def send_from_main_input_callback():
-    """处理主输入框提交的回调函数 (已修复)"""
+    """处理主输入框提交的回调函数"""
     raw_prompt = st.session_state.get("main_chat_input", "")
     if not raw_prompt:
         return
@@ -1892,7 +1887,7 @@ def send_from_main_input_callback():
     token = generate_token()
     full_prompt = f"{prompt} (token: {token})" if st.session_state.use_token else prompt
     st.session_state.messages.append({"role": "user", "content": [full_prompt]})
-    st.session_state.generation_task = {"type": "new"} # 标记为新任务
+    st.session_state.generation_task = {"type": "new", "retry_count": 0} # 初始化重试
     st.session_state.is_generating = True
 
 
@@ -1951,7 +1946,7 @@ continue_target_index = -1
 if st.session_state.is_generating and st.session_state.generation_task and st.session_state.generation_task.get("type") == "continue":
     continue_target_index = st.session_state.generation_task.get("target_index")
 
-for i, message in enumerate(st.session_state.messages):
+for i, message in enumerate st.session_state.messages:
     # 如果当前消息是“继续”任务的目标，就跳过渲染，因为它将在下面的生成逻辑中被重新渲染
     if i == continue_target_index:
         continue
@@ -2029,10 +2024,8 @@ if st.session_state.is_generating:
         is_continuation_task = True
         target_message_index = task["target_index"]
         
-        # 为“继续”任务构建一个特殊的、截至到目标消息的历史记录
         temp_history = [{"role": ("model" if m["role"] == "assistant" else "user"), "parts": m["content"]} for m in st.session_state.messages[:target_message_index+1]]
         
-        # 添加续写指令
         message_to_continue = st.session_state.messages[target_message_index]
         original_content = ""
         for part in message_to_continue.get("content", []):
@@ -2051,7 +2044,7 @@ if st.session_state.is_generating:
     with st.chat_message("assistant"):
         placeholder = st.empty()
         streamed_part = ""
-        rerun_after_error = False # --- NEW: 初始化错误后重跑标志 ---
+        rerun_after_error = False
         try:
             # 2. 获取已存在的内容
             original_content = ""
@@ -2079,24 +2072,26 @@ if st.session_state.is_generating:
                 st.session_state.is_generating = False
 
         except Exception as e:
-            # --- MODIFIED: 增强了自动续写逻辑 ---
-            st.toast(f"回答中断 ({type(e).__name__})，正在尝试自动续写…")
-            partial_content = st.session_state.messages[target_message_index]["content"][0]
+            # --- MODIFIED: 全新的、带重试机制的错误处理 ---
+            current_retry_count = task.get("retry_count", 0)
+            MAX_RETRIES = 2
 
-            if partial_content.strip() and len(partial_content) > len(original_content):
-                last_chars = (partial_content[-50:] + "...") if len(partial_content) > 50 else partial_content
-                continue_prompt = f"请严格地从以下文本的结尾处，无缝、自然地继续写下去。不要重复任何内容，不要添加任何前言或解释，直接输出续写的内容即可。文本片段：\n\"...{last_chars}\""
+            if current_retry_count < MAX_RETRIES:
+                st.toast(f"回答中断，正在尝试自动续写... (第 {current_retry_count + 1}/{MAX_RETRIES} 次)")
                 
-                # 为自动续写设置一个新的“继续”任务
-                st.session_state.generation_task = {"type": "continue", "target_index": target_message_index}
-                rerun_after_error = True # 设置标志，以便在 finally 中重跑
+                # 无论之前是否有新内容，都准备续写任务
+                task["retry_count"] += 1 
+                st.session_state.generation_task = task # 更新任务状态
+                rerun_after_error = True # 设置标志以触发重跑
             else:
-                st.error(f"回答生成失败 ({type(e).__name__})，且无内容可续写，请重试。")
+                # 重试次数耗尽，显示最终错误
+                st.error(f"自动续写失败已达上限。API错误: {type(e).__name__}")
+                st.warning("提示：如果错误为 ValueError，可能由内容策略(RECITATION)触发，请尝试修改您的提示或问题。")
                 st.session_state.is_generating = False
         
         finally:
             # 5. 清理和收尾
-            if not rerun_after_error: # 只有在非错误续写的情况下才清除任务
+            if not rerun_after_error: 
                  st.session_state.generation_task = None 
             
             if not st.session_state.is_generating:
@@ -2106,7 +2101,6 @@ if st.session_state.is_generating:
             with open(log_file, "wb") as f:
                 pickle.dump(_prepare_messages_for_save(st.session_state.messages), f)
             
-            # --- MODIFIED: 仅在需要时才刷新 ---
             if rerun_after_error:
                 st.rerun()
 
