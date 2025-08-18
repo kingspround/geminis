@@ -1841,34 +1841,59 @@ tips:
         yield chunk.text
 
 def regenerate_message(index):
-    #... 此函数完全不变
+    """
+    重新生成指定索引处的助手消息。
+    此函数会移除目标消息以及之后的所有对话，然后重新触发生成。
+    """
     if 0 <= index < len(st.session_state.messages) and st.session_state.messages[index]["role"] == "assistant":
+        # 截断历史记录，保留到要重新生成的消息之前
         st.session_state.messages = st.session_state.messages[:index]
+        
+        # 清除可能存在的续写任务状态
+        st.session_state.continue_task = None 
+        
+        # 启动生成状态
         st.session_state.is_generating = True
         st.experimental_rerun()
+
 def continue_message(index):
+    """
+    在指定索引的消息上继续生成内容。
+    此函数会利用主生成循环中的“自动续写”逻辑。
+    """
     if 0 <= index < len(st.session_state.messages):
         message_to_continue = st.session_state.messages[index]
         original_content = ""
-        # 找到消息内容中的文本部分进行续写
+        # 找到消息内容中的文本部分
         for part in message_to_continue.get("content", []):
             if isinstance(part, str):
                 original_content = part
                 break
         
-        last_chars = (original_content[-50:] + "...") if len(original_content) > 50 else original_content
-        # 使用一个更明确的续写指令
-        new_prompt = f"请严格地从以下文本的结尾处，无缝、自然地继续写下去。不要重复任何内容，不要添加任何前言或解释，直接输出续写的内容即可。文本片段：\n\"...{last_chars}\""
-        
-        # 构造包含部分历史和续写指令的临时历史记录
-        temp_history = [{"role": ("model" if m["role"] == "assistant" else "user"), "parts": m["content"]} for m in st.session_state.messages[:index+1]]
-        temp_history.append({"role": "user", "parts": [new_prompt]})
-        
-        st.session_state.is_generating = True
-        # 在触发生成前，将续写指令临时添加到消息中，生成后再移除
-        st.session_state.messages.append({"role": "user", "content": [new_prompt], "temp": True})
-        st.experimental_rerun()
+        # 如果没有文本内容，则无法续写
+        if not original_content.strip():
+            st.toast("无法在空消息或纯图片消息上继续。", icon="⚠️")
+            return
 
+        last_chars = (original_content[-100:] + "...") if len(original_content) > 100 else original_content
+        # 创建一个明确的、用于续写的指令
+        continue_prompt = f"请严格地从以下文本的结尾处，无缝、自然地继续写下去。不要重复任何内容，不要添加任何前言或解释，直接输出续写的内容即可。文本片段：\n\"...{last_chars}\""
+        
+        # ★ 核心改动 ★
+        # 添加一个带有特殊标记的临时用户消息。
+        # 主生成循环会识别这些标记，并在 `target_index` 指定的消息上进行续写，而不是创建新消息。
+        st.session_state.messages.append({
+            "role": "user", 
+            "content": [continue_prompt], 
+            "temp": True,  # 标记为临时消息，不在UI上显示
+            "is_continue_prompt": True, # 告诉主循环这是一个续写任务
+            "target_index": index # 告诉主循环要续写的消息索引
+        })
+        
+        # 启动生成状态
+        st.session_state.is_generating = True
+        st.experimental_rerun()
+		
 def send_from_sidebar_callback():
     uploaded_files = st.session_state.get("sidebar_uploader", [])
     caption = st.session_state.get("sidebar_caption", "").strip()
