@@ -1941,17 +1941,28 @@ with st.sidebar:
         if enabled_list: st.write("已加载设定:", ", ".join(enabled_list))
         if st.button("刷新 🔄", key="sidebar_refresh"): st.experimental_rerun()
 
-# --- 加载和显示聊天记录 (保持不变) ---
+# --- 加载和显示聊天记录 ---
 if not st.session_state.messages and not st.session_state.is_generating: load_history(log_file)
+
+### --- MODIFIED ---
+### 增加了逻辑，在“继续”任务期间，跳过渲染原始消息，以防止重复显示
+continue_target_index = -1
+# 检查当前是否是“继续”任务，并获取目标消息的索引
+if st.session_state.is_generating and st.session_state.generation_task and st.session_state.generation_task.get("type") == "continue":
+    continue_target_index = st.session_state.generation_task.get("target_index")
+
 for i, message in enumerate(st.session_state.messages):
-    # 不显示临时的续写指令
+    # 如果当前消息是“继续”任务的目标，就跳过渲染，因为它将在下面的生成逻辑中被重新渲染
+    if i == continue_target_index:
+        continue
+    
     if message.get("temp"):
         continue
     with st.chat_message(message["role"]):
         for part in message.get("content", []):
             if isinstance(part, str): st.markdown(part, unsafe_allow_html=True)
             elif isinstance(part, Image.Image): st.image(part, width=400)
-
+				
 # --- 编辑界面显示逻辑 (保持不变) ---
 if st.session_state.get("editing"):
     i = st.session_state.editable_index
@@ -2031,18 +2042,18 @@ if st.session_state.is_generating:
         last_chars = (original_content[-50:] + "...") if len(original_content) > 50 else original_content
         continue_prompt = f"请严格地从以下文本的结尾处，无缝、自然地继续写下去。不要重复任何内容，不要添加任何前言或解释，直接输出续写的内容即可。文本片段：\n\"...{last_chars}\""
         temp_history.append({"role": "user", "parts": [continue_prompt]})
-        api_history = temp_history # 使用这个特殊历史
+        api_history = temp_history 
 
     else: # 处理 "new" 和 "regenerate" 任务
-        # 确保有助手消息占位符
         if not st.session_state.messages or st.session_state.messages[-1]["role"] != "assistant":
             st.session_state.messages.append({"role": "assistant", "content": [""]})
 
     with st.chat_message("assistant"):
         placeholder = st.empty()
         streamed_part = ""
+        rerun_after_error = False # --- NEW: 初始化错误后重跑标志 ---
         try:
-            # 2. 获取已存在的内容（对于“继续”任务很重要）
+            # 2. 获取已存在的内容
             original_content = ""
             if is_continuation_task:
                 content_list = st.session_state.messages[target_message_index]["content"]
@@ -2068,19 +2079,36 @@ if st.session_state.is_generating:
                 st.session_state.is_generating = False
 
         except Exception as e:
-            st.error(f"回答生成时发生错误: {type(e).__name__} - {e}")
-            st.session_state.is_generating = False
+            # --- MODIFIED: 增强了自动续写逻辑 ---
+            st.toast(f"回答中断 ({type(e).__name__})，正在尝试自动续写…")
+            partial_content = st.session_state.messages[target_message_index]["content"][0]
+
+            if partial_content.strip() and len(partial_content) > len(original_content):
+                last_chars = (partial_content[-50:] + "...") if len(partial_content) > 50 else partial_content
+                continue_prompt = f"请严格地从以下文本的结尾处，无缝、自然地继续写下去。不要重复任何内容，不要添加任何前言或解释，直接输出续写的内容即可。文本片段：\n\"...{last_chars}\""
+                
+                # 为自动续写设置一个新的“继续”任务
+                st.session_state.generation_task = {"type": "continue", "target_index": target_message_index}
+                rerun_after_error = True # 设置标志，以便在 finally 中重跑
+            else:
+                st.error(f"回答生成失败 ({type(e).__name__})，且无内容可续写，请重试。")
+                st.session_state.is_generating = False
         
         finally:
             # 5. 清理和收尾
-            st.session_state.generation_task = None # 清除任务
-            # 清理空的助手消息
-            if not st.session_state.is_generating and st.session_state.messages and st.session_state.messages[-1]['role'] == 'assistant' and not st.session_state.messages[-1]["content"][0].strip():
-                st.session_state.messages.pop()
+            if not rerun_after_error: # 只有在非错误续写的情况下才清除任务
+                 st.session_state.generation_task = None 
             
-            # 保存记录
+            if not st.session_state.is_generating:
+                if st.session_state.messages and st.session_state.messages[-1]['role'] == 'assistant' and not st.session_state.messages[-1]["content"][0].strip():
+                    st.session_state.messages.pop()
+            
             with open(log_file, "wb") as f:
                 pickle.dump(_prepare_messages_for_save(st.session_state.messages), f)
+            
+            # --- MODIFIED: 仅在需要时才刷新 ---
+            if rerun_after_error:
+                st.rerun()
 
 
 # --- 底部控件 (保持不变) ---
