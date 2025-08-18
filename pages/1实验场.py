@@ -2051,6 +2051,8 @@ if st.session_state.is_generating:
         finally:
             # 6. 统一收尾和刷新
             with open(log_file, "wb") as f:
+                pickle.dump(_prepare_messages_for_save(st.session_state.messages), f)
+            st.rerun() # 无论是成功还是失败后触发续写，都立即刷新
 
 # --- 底部控件 (保持不变) ---
 c1, c2 = st.columns(2)
