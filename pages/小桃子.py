@@ -2188,3 +2188,4 @@ if st.session_state.is_generating:
 c1, c2 = st.columns(2)
 st.session_state.use_token = c1.checkbox("使用 Token", value=st.session_state.get("use_token", True))
 if c2.button("🔄", key="page_refresh", help="刷新页面"): st.experimental_rerun()
+	
