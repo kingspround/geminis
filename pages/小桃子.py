@@ -1508,8 +1508,6 @@ Excellent examples of scenarios loading......
 """,
 )
 
-# --- 默认角色设定 ---
-DEFAULT_CHARACTER_SETTINGS = { "理外祝福": """【理外祝福】的核心概念：\n\n""" }
 
 # --- 默认角色设定 ---
 DEFAULT_CHARACTER_SETTINGS = {
@@ -1851,7 +1849,7 @@ DEFAULT_CHARACTER_SETTINGS = {
 **特别说明:**
 
 由于奇美拉病毒的变异性极强，每次转化后的奇美拉都是独一无二的，无法进行统一命名和分类。病毒本身也在不断进化，可能会出现新的感染途径和转化形态。
-""",
+"""},
 
 
 
