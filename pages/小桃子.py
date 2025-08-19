@@ -1505,12 +1505,6 @@ Excellent examples of scenarios loading......
 
 
 
-
-"""}] #  提示信息内容
-    })
-    # --- 提示信息添加完成 ---
-
-
 """,
 )
 
