@@ -8,6 +8,8 @@ from datetime import datetime
 from io import BytesIO
 import zipfile
 from PIL import Image
+from io import BytesIO
+from google.generativeai import types # 需要导入 types 来配置语音生成
 
 # --- Streamlit Page Configuration ---
 st.set_page_config(
@@ -58,7 +60,13 @@ if "rerun_count" not in st.session_state:
     st.session_state.rerun_count = 0
 if "use_token" not in st.session_state:
     st.session_state.use_token = True
-
+if "tts_voice" not in st.session_state:
+    st.session_state.tts_voice = "Puck - Upbeat" # 默认语音
+if "audio_to_play" not in st.session_state:
+    st.session_state.audio_to_play = None # 用于存储待播放的音频数据
+if "audio_index" not in st.session_state:
+    st.session_state.audio_index = -1 # 用于标记哪条消息的音频正在播放
+	
 
 # --- API配置和模型定义 (保持不变) ---
 genai.configure(api_key=API_KEYS[st.session_state.selected_api_key])
@@ -1840,6 +1848,74 @@ tips:
     for chunk in response:
         yield chunk.text
 
+
+# --- 语音选项常量 ---
+VOICE_OPTIONS = [
+    "Zephyr - Bright", "Puck - Upbeat", "Charon - Practical", "Kore - Solid",
+    "Fenrir - Excited", "Leda - Young", "Orus - Firm", "Aoede - Breezy",
+    "Callirrhoe - Easy-going", "Autonoe - Bright", "Enceladus - Breathy",
+    "Iapetus - Clear", "Umbriel - Easy-going", "Algieba - Smooth",
+    "Despina - Smooth", "Erinome - Clear", "Algenib - Gravelly",
+    "Rasalgethi - Practical", "Laomedeia - Upbeat", "Achernar - Soft",
+    "Alnilam - Firm", "Schedar - Even", "Gacrux - Mature",
+    "Pulcherrima - Forward", "Achird - Friendly", "Zubenelgenubi - Casual",
+    "Vindemiatrix - Gentle", "Sadachbia - Lively", "Sadaltager - Knowledgeable",
+    "Sulafat - Warm"
+]
+
+# --- 文本转语音 (TTS) 模型实例 ---
+# 我们为TTS使用一个单独的模型实例
+tts_model = genai.GenerativeModel('gemini-2.5-flash-preview-tts')
+
+def generate_audio(text_to_speak, voice_name):
+    """调用 Gemini TTS API 生成音频数据"""
+    try:
+        # API 需要的是纯粹的语音名称，例如 "Puck"，而不是 "Puck - Upbeat"
+        api_voice_name = voice_name.split(' - ')[0]
+
+        # 根据文档构建请求
+        response = tts_model.generate_content(
+           contents=f"Say this naturally: {text_to_speak}", # 添加一点引导，让语音更自然
+           generation_config=types.GenerateContentConfig(
+              response_modalities=["AUDIO"],
+              speech_config=types.SpeechConfig(
+                 voice_config=types.VoiceConfig(
+                    prebuilt_voice_config=types.PrebuiltVoiceConfig(
+                       voice_name=api_voice_name,
+                    )
+                 )
+              ),
+           )
+        )
+        # 提取音频数据
+        return response.candidates[0].content.parts[0].inline_data.data
+    except Exception as e:
+        st.error(f"语音生成失败: {e}")
+        return None
+
+def play_audio_callback(index):
+    """当用户点击播放按钮时触发的回调函数"""
+    message = st.session_state.messages[index]
+    text_content = ""
+    # 提取消息中的文本部分
+    for part in message.get("content", []):
+        if isinstance(part, str):
+            text_content = part
+            break
+    
+    if text_content:
+        with st.spinner("正在生成语音..."):
+            audio_data = generate_audio(text_content, st.session_state.tts_voice)
+            if audio_data:
+                st.session_state.audio_to_play = audio_data
+                st.session_state.audio_index = index # 记录当前播放的是哪条消息
+            else:
+                st.session_state.audio_to_play = None
+                st.session_state.audio_index = -1
+    else:
+        st.toast("此消息没有可播放的文本内容。", icon="⚠️")
+
+
 def regenerate_message(index):
     """
     重新生成指定索引处的助手消息。
@@ -1972,16 +2048,28 @@ with st.sidebar:
 if not st.session_state.messages and not st.session_state.is_generating: load_history(log_file)
 
 for i, message in enumerate(st.session_state.messages):
-    # 如果当前消息是正在续写的任务目标，就跳过渲染，因为它将在下面的生成逻辑中被重新渲染
     if st.session_state.is_generating and i == st.session_state.continue_task:
         continue
     
     if message.get("temp"):
         continue
+        
     with st.chat_message(message["role"]):
+        # 显示消息内容（文本和图片）
         for part in message.get("content", []):
             if isinstance(part, str): st.markdown(part, unsafe_allow_html=True)
             elif isinstance(part, Image.Image): st.image(part, width=400)
+        
+        # --- 新增的语音播放逻辑 ---
+        # 1. 只为助手的、包含文本的消息显示播放按钮
+        is_assistant_with_text = message["role"] == "assistant" and any(isinstance(p, str) for p in message.get("content", []))
+        if is_assistant_with_text:
+            st.button("🔊", key=f"play_{i}", help="播放语音", on_click=play_audio_callback, args=(i,))
+
+        # 2. 如果当前消息被标记为待播放，则显示音频播放器
+        if st.session_state.audio_index == i and st.session_state.audio_to_play:
+            st.audio(st.session_state.audio_to_play, format="audio/wav")
+			
 				
 # --- 编辑界面显示逻辑 (保持不变) ---
 if st.session_state.get("editing"):
@@ -1998,6 +2086,14 @@ if st.session_state.get("editing"):
         if c2.button("取消 ❌", key=f"cancel_{i}"):
             st.session_state.editing = False; st.experimental_rerun()
 
+# --- (这是一个全新的 expander，可以粘贴在侧边栏代码的任何位置) ---
+    with st.expander("语音设定 🔊"):
+        st.selectbox(
+            "选择语音:",
+            options=VOICE_OPTIONS,
+            key="tts_voice",
+            help="选择朗读助手回答时使用的声音。"
+        )
 
 # --- 续写/编辑/重生成按钮逻辑 (保持不变) ---
 if len(st.session_state.messages) >= 1 and not st.session_state.is_generating and not st.session_state.editing:
