@@ -1876,8 +1876,6 @@ VOICE_OPTIONS = [
 tts_model = genai.GenerativeModel('gemini-2.5-pro-preview-tts')
 
 
-# 1. 首先定义底层的 API 调用函数: generate_audio
-# ------------------------------------------------------------------------------
 def generate_audio(text_to_speak, voice_name):
     """调用 Gemini TTS API 生成音频数据"""
     if not text_to_speak or not text_to_speak.strip():
@@ -1903,6 +1901,8 @@ def generate_audio(text_to_speak, voice_name):
         print(f"Text Snippet: {text_to_speak.strip()[:200]}...")
         print(f"----------------------------------------")
 
+        # ★★★ 关键更改: 直接发送纯文本 ★★★
+        # 移除任何引导语，只发送需要转换的文本内容
         response = tts_model.generate_content(
            contents=text_to_speak.strip(), 
            generation_config=tts_generation_config
@@ -1911,26 +1911,27 @@ def generate_audio(text_to_speak, voice_name):
         return response.candidates[0].content.parts[0].inline_data.data
     except Exception as e:
         st.error(f"语音生成失败: {type(e).__name__} - {e}")
-        st.warning(f"当前模型: `{tts_model.model_name}`。提示：这可能是由于您选择的 API Key 尚未开通此预览功能或已耗尽额度。请尝试更换侧边栏的 API Key 并稍等片刻。")
+        st.warning(f"当前模型: `{tts_model.model_name}`。提示：这可能是由于您选择的 API Key 尚未开通此预览功能。请尝试更换侧边栏的 API Key。")
         return None
 
-
-# 2. 其次定义调用 generate_audio 的回调函数: play_audio_callback
-# ------------------------------------------------------------------------------
 def play_audio_callback(index):
     """当用户点击播放按钮时触发的回调函数 (带缓存和锁)"""
+    # 如果正在生成另一个音频，直接返回，防止重复点击
     if st.session_state.is_generating_audio:
         st.toast("请等待当前语音生成完成。", icon="⏳")
         return
 
+    # 1. 检查缓存
     if index in st.session_state.audio_cache:
         st.session_state.audio_to_play = st.session_state.audio_cache[index]
         st.session_state.audio_index = index
         print(f"--- [TTS Cache Hit] --- Playing audio for message {index} from cache. ---")
-        st.experimental_rerun()
+        st.experimental_rerun() # 刷新界面以显示播放器
         return
 
+    # 如果缓存中没有，则从 API 生成
     try:
+        # ★★★ 上锁 ★★★
         st.session_state.is_generating_audio = True
         
         message = st.session_state.messages[index]
@@ -1942,9 +1943,9 @@ def play_audio_callback(index):
         
         if text_content:
             with st.spinner("正在生成语音 (首次生成可能需要一点时间)..."):
-                # 现在调用 generate_audio 不会报错，因为它已经被定义了
                 audio_data = generate_audio(text_content, st.session_state.tts_voice)
                 if audio_data:
+                    # 成功后，存入缓存
                     st.session_state.audio_cache[index] = audio_data
                     st.session_state.audio_to_play = audio_data
                     st.session_state.audio_index = index
@@ -1955,9 +1956,10 @@ def play_audio_callback(index):
             st.toast("此消息没有可播放的文本内容。", icon="⚠️")
 
     finally:
+        # ★★★ 解锁 ★★★
+        # 无论成功失败，最后都要解锁
         st.session_state.is_generating_audio = False
-        st.experimental_rerun()
-
+        st.experimental_rerun() # 刷新界面
 
 def regenerate_message(index):
     """
