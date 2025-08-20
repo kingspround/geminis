@@ -1869,14 +1869,17 @@ tts_model = genai.GenerativeModel('gemini-2.5-flash-preview-tts')
 
 def generate_audio(text_to_speak, voice_name):
     """调用 Gemini TTS API 生成音频数据"""
+    # ★★★ 优化 1: 增加输入验证 ★★★
+    # 如果文本为空或只包含空格，则直接返回，避免向API发送无效请求
+    if not text_to_speak or not text_to_speak.strip():
+        st.toast("文本内容为空，无法生成语音。", icon="ℹ️")
+        return None
+
     try:
         # API 需要的是纯粹的语音名称，例如 "Puck"，而不是 "Puck - Upbeat"
         api_voice_name = voice_name.split(' - ')[0]
 
-        # ★★★ 核心修复 ★★★
-        # 我们不再使用 types.GenerateContentConfig 等对象。
-        # 而是将所有配置构建成一个标准的 Python 字典，
-        # 并将其传递给 generation_config 参数。
+        # 配置字典保持不变
         tts_generation_config = {
             "response_modalities": ["AUDIO"],
             "speech_config": {
@@ -1887,19 +1890,29 @@ def generate_audio(text_to_speak, voice_name):
                 }
             }
         }
+        
+        # ★★★ 优化 2: 增加调试输出 ★★★
+        # 在调用API前打印信息，方便排查是哪个文本导致了问题
+        print(f"--- [TTS Request] ---")
+        print(f"Voice: {api_voice_name}")
+        # 只打印前200个字符以保持终端清洁
+        print(f"Text Snippet: {text_to_speak.strip()[:200]}...")
+        print(f"-----------------------")
 
-        # 调用 TTS 模型，并传入字典格式的配置
+
+        # 调用 TTS 模型
         response = tts_model.generate_content(
-           contents=f"Say this naturally: {text_to_speak}",
-           generation_config=tts_generation_config # <-- 注意这里使用的是 generation_config
+           contents=text_to_speak.strip(), # 使用 .strip() 移除首尾空格
+           generation_config=tts_generation_config
         )
         
-        # 提取音频数据
         return response.candidates[0].content.parts[0].inline_data.data
     except Exception as e:
-        # 提供了更详细的错误信息
+        # 保持详细的错误输出
         st.error(f"语音生成失败: {type(e).__name__} - {e}")
+        st.warning("提示：这可能是由于您选择的 API Key 尚未开通 TTS 预览功能。请尝试更换侧边栏的 API Key。")
         return None
+
 
 def play_audio_callback(index):
     """当用户点击播放按钮时触发的回调函数"""
