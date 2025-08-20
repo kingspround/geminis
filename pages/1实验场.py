@@ -2100,16 +2100,20 @@ for i, message in enumerate(st.session_state.messages):
             if isinstance(part, str): st.markdown(part, unsafe_allow_html=True)
             elif isinstance(part, Image.Image): st.image(part, width=400)
         
+        # --- 语音播放逻辑 (已包含禁用功能) ---
+        # 1. 只为助手的、包含文本的消息显示播放按钮
+        is_assistant_with_text = message["role"] == "assistant" and any(isinstance(p, str) for p in message.get("content", []))
+        
         if is_assistant_with_text:
-            # ★★★ 修改 ★★★
-            # 添加 disabled 参数，当 is_generating_audio 为 True 时禁用按钮
+            # ★★★ 关键修改在这里 ★★★
+            # 添加了 disabled 参数，当 is_generating_audio 为 True 时禁用按钮
             st.button(
                 "🔊", 
                 key=f"play_{i}", 
                 help="播放语音", 
                 on_click=play_audio_callback, 
                 args=(i,),
-                disabled=st.session_state.is_generating_audio # <-- 关键新增！
+                disabled=st.session_state.is_generating_audio # 当正在生成语音时，禁用此按钮
             )
 
         # 2. 如果当前消息被标记为待播放，则显示音频播放器
