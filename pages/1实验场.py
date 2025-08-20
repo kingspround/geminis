@@ -8,10 +8,14 @@ from datetime import datetime
 from io import BytesIO
 import zipfile
 from PIL import Image
-from io import BytesIO
-from google.generativeai import types # 需要导入 types 来配置语音生成
+from google.generativeai import types as genai_types
+import wave
 
-
+try:
+    tts_model = genai.GenerativeModel(model_name="gemini-2.5-flash-preview-tts")
+except Exception as e:
+    tts_model = None
+    st.warning(f"无法初始化TTS语音模型，语音功能将不可用。错误: {e}")
 
 # --- Streamlit Page Configuration ---
 st.set_page_config(
@@ -62,16 +66,6 @@ if "rerun_count" not in st.session_state:
     st.session_state.rerun_count = 0
 if "use_token" not in st.session_state:
     st.session_state.use_token = True
-if "tts_voice" not in st.session_state:
-    st.session_state.tts_voice = "Puck - Upbeat" # 默认语音
-if "audio_to_play" not in st.session_state:
-    st.session_state.audio_to_play = None # 用于存储待播放的音频数据
-if "audio_index" not in st.session_state:
-    st.session_state.audio_index = -1 # 用于标记哪条消息的音频正在播放
-if "audio_cache" not in st.session_state:
-    st.session_state.audio_cache = {} # ★★★ 新增：用于缓存已生成的音频，key为消息索引，value为音频数据
-if "is_generating_audio" not in st.session_state:
-    st.session_state.is_generating_audio = False # ★★★ 新增：一个锁，防止在生成音频时发起新的请求
 
 
 # --- API配置和模型定义 (保持不变) ---
@@ -1854,113 +1848,6 @@ tips:
     for chunk in response:
         yield chunk.text
 
-
-# --- 语音选项常量 (保持不变) ---
-VOICE_OPTIONS = [
-    "Zephyr - Bright", "Puck - Upbeat", "Charon - Practical", "Kore - Solid",
-    "Fenrir - Excited", "Leda - Young", "Orus - Firm", "Aoede - Breezy",
-    "Callirrhoe - Easy-going", "Autonoe - Bright", "Enceladus - Breathy",
-    "Iapetus - Clear", "Umbriel - Easy-going", "Algieba - Smooth",
-    "Despina - Smooth", "Erinome - Clear", "Algenib - Gravelly",
-    "Rasalgethi - Practical", "Laomedeia - Upbeat", "Achernar - Soft",
-    "Alnilam - Firm", "Schedar - Even", "Gacrux - Mature",
-    "Pulcherrima - Forward", "Achird - Friendly", "Zubenelgenubi - Casual",
-    "Vindemiatrix - Gentle", "Sadachbia - Lively", "Sadaltager - Knowledgeable",
-    "Sulafat - Warm"
-]
-
-# --- 文本转语音 (TTS) 模型实例 ---
-
-# ★★★ 计划 A: 尝试使用文档中提到的 Pro 模型 ★★★
-# 如果这个模型仍然报错，请看下面的 计划 B
-tts_model = genai.GenerativeModel('gemini-2.5-pro-preview-tts')
-
-
-def generate_audio(text_to_speak, voice_name):
-    """调用 Gemini TTS API 生成音频数据"""
-    if not text_to_speak or not text_to_speak.strip():
-        st.toast("文本内容为空，无法生成语音。", icon="ℹ️")
-        return None
-
-    try:
-        api_voice_name = voice_name.split(' - ')[0]
-
-        tts_generation_config = {
-            "response_modalities": ["AUDIO"],
-            "speech_config": {
-                "voice_config": {
-                    "prebuilt_voice_config": {
-                        "voice_name": api_voice_name
-                    }
-                }
-            }
-        }
-        
-        print(f"--- [TTS Request to {tts_model.model_name}] ---")
-        print(f"Voice: {api_voice_name}")
-        print(f"Text Snippet: {text_to_speak.strip()[:200]}...")
-        print(f"----------------------------------------")
-
-        # ★★★ 关键更改: 直接发送纯文本 ★★★
-        # 移除任何引导语，只发送需要转换的文本内容
-        response = tts_model.generate_content(
-           contents=text_to_speak.strip(), 
-           generation_config=tts_generation_config
-        )
-        
-        return response.candidates[0].content.parts[0].inline_data.data
-    except Exception as e:
-        st.error(f"语音生成失败: {type(e).__name__} - {e}")
-        st.warning(f"当前模型: `{tts_model.model_name}`。提示：这可能是由于您选择的 API Key 尚未开通此预览功能。请尝试更换侧边栏的 API Key。")
-        return None
-
-def play_audio_callback(index):
-    """当用户点击播放按钮时触发的回调函数 (带缓存和锁)"""
-    # 如果正在生成另一个音频，直接返回，防止重复点击
-    if st.session_state.is_generating_audio:
-        st.toast("请等待当前语音生成完成。", icon="⏳")
-        return
-
-    # 1. 检查缓存
-    if index in st.session_state.audio_cache:
-        st.session_state.audio_to_play = st.session_state.audio_cache[index]
-        st.session_state.audio_index = index
-        print(f"--- [TTS Cache Hit] --- Playing audio for message {index} from cache. ---")
-        st.experimental_rerun() # 刷新界面以显示播放器
-        return
-
-    # 如果缓存中没有，则从 API 生成
-    try:
-        # ★★★ 上锁 ★★★
-        st.session_state.is_generating_audio = True
-        
-        message = st.session_state.messages[index]
-        text_content = ""
-        for part in message.get("content", []):
-            if isinstance(part, str):
-                text_content = part
-                break
-        
-        if text_content:
-            with st.spinner("正在生成语音 (首次生成可能需要一点时间)..."):
-                audio_data = generate_audio(text_content, st.session_state.tts_voice)
-                if audio_data:
-                    # 成功后，存入缓存
-                    st.session_state.audio_cache[index] = audio_data
-                    st.session_state.audio_to_play = audio_data
-                    st.session_state.audio_index = index
-                else:
-                    st.session_state.audio_to_play = None
-                    st.session_state.audio_index = -1
-        else:
-            st.toast("此消息没有可播放的文本内容。", icon="⚠️")
-
-    finally:
-        # ★★★ 解锁 ★★★
-        # 无论成功失败，最后都要解锁
-        st.session_state.is_generating_audio = False
-        st.experimental_rerun() # 刷新界面
-
 def regenerate_message(index):
     """
     重新生成指定索引处的助手消息。
@@ -1976,6 +1863,65 @@ def regenerate_message(index):
         # 启动生成状态
         st.session_state.is_generating = True
         st.experimental_rerun()
+
+def pcm_to_wav_in_memory(pcm_data, channels=1, sample_width=2, rate=24000):
+    """将原始PCM数据在内存中转换为WAV格式的字节流"""
+    buffer = BytesIO()
+    with wave.open(buffer, 'wb') as wf:
+        wf.setnchannels(channels)
+        wf.setsampwidth(sample_width)
+        wf.setframerate(rate)
+        wf.writeframes(pcm_data)
+    buffer.seek(0)
+    return buffer.getvalue()
+
+def generate_speech(index):
+    """为指定索引的消息生成语音"""
+    if tts_model is None:
+        st.error("TTS语音模型未成功初始化，无法生成语音。")
+        return
+
+    message = st.session_state.messages[index]
+    text_to_speak = ""
+    # 提取消息中所有的文本部分
+    for part in message.get("content", []):
+        if isinstance(part, str):
+            text_to_speak += part + "\n"
+    text_to_speak = text_to_speak.strip()
+
+    if not text_to_speak:
+        st.toast("没有可供朗读的文本。", icon="⚠️")
+        return
+
+    try:
+        with st.spinner("小爱正在为您生成语音..."):
+            # 调用TTS API
+            response = tts_model.generate_content(
+                contents=f"Read the following text in a gentle and friendly female voice: {text_to_speak}",
+                config=genai_types.GenerateContentConfig(
+                    response_modalities=["AUDIO"],
+                    speech_config=genai_types.SpeechConfig(
+                        voice_config=genai_types.VoiceConfig(
+                            prebuilt_voice_config=genai_types.PrebuiltVoiceConfig(
+                                # 'Puck' 是一个听起来比较活泼愉快的女声
+                                voice_name='Puck',
+                            )
+                        )
+                    ),
+                )
+            )
+            # 从响应中获取原始PCM音频数据
+            pcm_data = response.candidates[0].content.parts[0].inline_data.data
+            # 转换为WAV格式
+            wav_data = pcm_to_wav_in_memory(pcm_data)
+            # 将WAV音频数据保存到session_state对应的消息中
+            st.session_state.messages[index]['audio_data'] = wav_data
+            # 刷新页面以显示播放器
+            st.rerun()
+
+    except Exception as e:
+        st.error(f"语音生成失败: {e}")
+
 
 def continue_message(index):
     """
@@ -2089,51 +2035,27 @@ with st.sidebar:
         if enabled_list: st.write("已加载设定:", ", ".join(enabled_list))
         if st.button("刷新 🔄", key="sidebar_refresh"): st.experimental_rerun()
 
-# --- (这是一个全新的 expander，可以粘贴在侧边栏代码的任何位置) ---
-    with st.expander("语音设定 🔊"):
-        st.selectbox(
-            "选择语音:",
-            options=VOICE_OPTIONS,
-            key="tts_voice",
-            help="选择朗读助手回答时使用的声音。"
-        )
-
 # --- 加载和显示聊天记录 ---
 if not st.session_state.messages and not st.session_state.is_generating: load_history(log_file)
 
 for i, message in enumerate(st.session_state.messages):
+    # 如果当前消息是正在续写的任务目标，就跳过渲染，因为它将在下面的生成逻辑中被重新渲染
     if st.session_state.is_generating and i == st.session_state.continue_task:
         continue
     
     if message.get("temp"):
         continue
-        
     with st.chat_message(message["role"]):
-        # 显示消息内容（文本和图片）
         for part in message.get("content", []):
-            if isinstance(part, str): st.markdown(part, unsafe_allow_html=True)
-            elif isinstance(part, Image.Image): st.image(part, width=400)
+            if isinstance(part, str):
+                st.markdown(part, unsafe_allow_html=True)
+            elif isinstance(part, Image.Image):
+                st.image(part, width=400)
         
-        # --- 语音播放逻辑 (已包含禁用功能) ---
-        # 1. 只为助手的、包含文本的消息显示播放按钮
-        is_assistant_with_text = message["role"] == "assistant" and any(isinstance(p, str) for p in message.get("content", []))
-        
-        if is_assistant_with_text:
-            # ★★★ 关键修改在这里 ★★★
-            # 添加了 disabled 参数，当 is_generating_audio 为 True 时禁用按钮
-            st.button(
-                "🔊", 
-                key=f"play_{i}", 
-                help="播放语音", 
-                on_click=play_audio_callback, 
-                args=(i,),
-                disabled=st.session_state.is_generating_audio # 当正在生成语音时，禁用此按钮
-            )
+        # 新增：如果消息有音频数据，则显示播放器
+        if message.get("audio_data"):
+            st.audio(message["audio_data"], format="audio/wav")
 
-        # 2. 如果当前消息被标记为待播放，则显示音频播放器
-        if st.session_state.audio_index == i and st.session_state.audio_to_play:
-            st.audio(st.session_state.audio_to_play, format="audio/wav")
-			
 				
 # --- 编辑界面显示逻辑 (保持不变) ---
 if st.session_state.get("editing"):
@@ -2165,18 +2087,16 @@ if len(st.session_state.messages) >= 1 and not st.session_state.is_generating an
         
         if is_text_only_assistant:
             with st.container():
-                cols = st.columns(20)
-                if cols[0].button("✏️", key=f"edit_{last_real_msg_idx}", help="编辑"): 
-                    st.session_state.editable_index = last_real_msg_idx
-                    st.session_state.editing = True
-                    st.rerun()
-                # 使用 on_click 绑定新函数
-                cols[1].button("♻️", key=f"regen_{last_real_msg_idx}", help="重新生成", on_click=regenerate_message, args=(last_real_msg_idx,))
-                cols[2].button("➕", key=f"cont_{last_real_msg_idx}", help="继续", on_click=continue_message, args=(last_real_msg_idx,))
-        elif last_msg["role"] == "assistant":
-             # 同样使用 on_click
-             st.columns(20)[0].button("♻️", key=f"regen_vision_{last_real_msg_idx}", help="重新生成", on_click=regenerate_message, args=(last_real_msg_idx,))
-
+        cols = st.columns(20)
+        if cols[0].button("✏️", key=f"edit_{last_real_msg_idx}", help="编辑"): 
+            st.session_state.editable_index = last_real_msg_idx
+            st.session_state.editing = True
+            st.rerun()
+        cols[1].button("♻️", key=f"regen_{last_real_msg_idx}", help="重新生成", on_click=regenerate_message, args=(last_real_msg_idx,))
+        cols[2].button("➕", key=f"cont_{last_real_msg_idx}", help="继续", on_click=continue_message, args=(last_real_msg_idx,))
+        
+        # 新增：语音朗读按钮
+        cols[3].button("🔊", key=f"speak_{last_real_msg_idx}", help="朗读这条消息", on_click=generate_speech, args=(last_real_msg_idx,))
 
 # --- 核心交互逻辑 (主输入框) ---
 # 使用回调函数以获得更好的响应体验
