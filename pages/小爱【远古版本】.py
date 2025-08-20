@@ -191,13 +191,7 @@ model = genai.GenerativeModel(
 )
 
 
-# --- 默认角色设定 ---
-DEFAULT_CHARACTER_SETTINGS = {
-        "理外祝福": """【理外祝福】的核心概念：
 
-
-""",
-)
 
 # --- 默认角色设定 (保持不变) ---
 DEFAULT_CHARACTER_SETTINGS = { "理外祝福": """【理外祝福】的核心概念：\n\n""" }
