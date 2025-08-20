@@ -1873,24 +1873,32 @@ def generate_audio(text_to_speak, voice_name):
         # API 需要的是纯粹的语音名称，例如 "Puck"，而不是 "Puck - Upbeat"
         api_voice_name = voice_name.split(' - ')[0]
 
-        # 根据文档构建请求
+        # ★★★ 核心修复 ★★★
+        # 我们不再使用 types.GenerateContentConfig 等对象。
+        # 而是将所有配置构建成一个标准的 Python 字典，
+        # 并将其传递给 generation_config 参数。
+        tts_generation_config = {
+            "response_modalities": ["AUDIO"],
+            "speech_config": {
+                "voice_config": {
+                    "prebuilt_voice_config": {
+                        "voice_name": api_voice_name
+                    }
+                }
+            }
+        }
+
+        # 调用 TTS 模型，并传入字典格式的配置
         response = tts_model.generate_content(
-           contents=f"Say this naturally: {text_to_speak}", # 添加一点引导，让语音更自然
-           generation_config=types.GenerateContentConfig(
-              response_modalities=["AUDIO"],
-              speech_config=types.SpeechConfig(
-                 voice_config=types.VoiceConfig(
-                    prebuilt_voice_config=types.PrebuiltVoiceConfig(
-                       voice_name=api_voice_name,
-                    )
-                 )
-              ),
-           )
+           contents=f"Say this naturally: {text_to_speak}",
+           generation_config=tts_generation_config # <-- 注意这里使用的是 generation_config
         )
+        
         # 提取音频数据
         return response.candidates[0].content.parts[0].inline_data.data
     except Exception as e:
-        st.error(f"语音生成失败: {e}")
+        # 提供了更详细的错误信息
+        st.error(f"语音生成失败: {type(e).__name__} - {e}")
         return None
 
 def play_audio_callback(index):
