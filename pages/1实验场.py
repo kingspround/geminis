@@ -2073,7 +2073,7 @@ if st.session_state.get("editing"):
             st.session_state.editing = False; st.experimental_rerun()
 
 
-# --- 续写/编辑/重生成/朗读 按钮逻辑 ---
+# --- 续写/编辑/重生成按钮逻辑 (保持不变) ---
 if len(st.session_state.messages) >= 1 and not st.session_state.is_generating and not st.session_state.editing:
     last_real_msg_idx = -1
     for i in range(len(st.session_state.messages) - 1, -1, -1):
@@ -2086,23 +2086,20 @@ if len(st.session_state.messages) >= 1 and not st.session_state.is_generating an
         is_text_only_assistant = (last_msg["role"] == "assistant" and len(last_msg.get("content", [])) > 0 and isinstance(last_msg["content"][0], str))
         
         if is_text_only_assistant:
-            # 确保 with 下面的所有内容都向内缩进一级
             with st.container():
-                # 这一行以及下面的所有 button 调用都必须在 with 内部
                 cols = st.columns(20)
                 if cols[0].button("✏️", key=f"edit_{last_real_msg_idx}", help="编辑"): 
                     st.session_state.editable_index = last_real_msg_idx
                     st.session_state.editing = True
                     st.rerun()
-                # 使用 on_click 绑定新函数
                 cols[1].button("♻️", key=f"regen_{last_real_msg_idx}", help="重新生成", on_click=regenerate_message, args=(last_real_msg_idx,))
                 cols[2].button("➕", key=f"cont_{last_real_msg_idx}", help="继续", on_click=continue_message, args=(last_real_msg_idx,))
                 # 新增：语音朗读按钮
                 cols[3].button("🔊", key=f"speak_{last_real_msg_idx}", help="朗读这条消息", on_click=generate_speech, args=(last_real_msg_idx,))
-
         elif last_msg["role"] == "assistant":
              # 同样使用 on_click
              st.columns(20)[0].button("♻️", key=f"regen_vision_{last_real_msg_idx}", help="重新生成", on_click=regenerate_message, args=(last_real_msg_idx,))
+
 
 
 
