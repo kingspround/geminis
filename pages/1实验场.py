@@ -2044,6 +2044,15 @@ with st.sidebar:
         if enabled_list: st.write("已加载设定:", ", ".join(enabled_list))
         if st.button("刷新 🔄", key="sidebar_refresh"): st.experimental_rerun()
 
+# --- (这是一个全新的 expander，可以粘贴在侧边栏代码的任何位置) ---
+    with st.expander("语音设定 🔊"):
+        st.selectbox(
+            "选择语音:",
+            options=VOICE_OPTIONS,
+            key="tts_voice",
+            help="选择朗读助手回答时使用的声音。"
+        )
+
 # --- 加载和显示聊天记录 ---
 if not st.session_state.messages and not st.session_state.is_generating: load_history(log_file)
 
