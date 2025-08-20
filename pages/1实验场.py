@@ -1849,7 +1849,7 @@ tips:
         yield chunk.text
 
 
-# --- 语音选项常量 ---
+# --- 语音选项常量 (保持不变) ---
 VOICE_OPTIONS = [
     "Zephyr - Bright", "Puck - Upbeat", "Charon - Practical", "Kore - Solid",
     "Fenrir - Excited", "Leda - Young", "Orus - Firm", "Aoede - Breezy",
@@ -1864,22 +1864,21 @@ VOICE_OPTIONS = [
 ]
 
 # --- 文本转语音 (TTS) 模型实例 ---
-# 我们为TTS使用一个单独的模型实例
-tts_model = genai.GenerativeModel('gemini-2.5-flash-preview-tts')
+
+# ★★★ 计划 A: 尝试使用文档中提到的 Pro 模型 ★★★
+# 如果这个模型仍然报错，请看下面的 计划 B
+tts_model = genai.GenerativeModel('gemini-2.5-pro-preview-tts')
+
 
 def generate_audio(text_to_speak, voice_name):
     """调用 Gemini TTS API 生成音频数据"""
-    # ★★★ 优化 1: 增加输入验证 ★★★
-    # 如果文本为空或只包含空格，则直接返回，避免向API发送无效请求
     if not text_to_speak or not text_to_speak.strip():
         st.toast("文本内容为空，无法生成语音。", icon="ℹ️")
         return None
 
     try:
-        # API 需要的是纯粹的语音名称，例如 "Puck"，而不是 "Puck - Upbeat"
         api_voice_name = voice_name.split(' - ')[0]
 
-        # 配置字典保持不变
         tts_generation_config = {
             "response_modalities": ["AUDIO"],
             "speech_config": {
@@ -1891,26 +1890,22 @@ def generate_audio(text_to_speak, voice_name):
             }
         }
         
-        # ★★★ 优化 2: 增加调试输出 ★★★
-        # 在调用API前打印信息，方便排查是哪个文本导致了问题
-        print(f"--- [TTS Request] ---")
+        print(f"--- [TTS Request to {tts_model.model_name}] ---")
         print(f"Voice: {api_voice_name}")
-        # 只打印前200个字符以保持终端清洁
         print(f"Text Snippet: {text_to_speak.strip()[:200]}...")
-        print(f"-----------------------")
+        print(f"----------------------------------------")
 
-
-        # 调用 TTS 模型
+        # ★★★ 关键更改: 直接发送纯文本 ★★★
+        # 移除任何引导语，只发送需要转换的文本内容
         response = tts_model.generate_content(
-           contents=text_to_speak.strip(), # 使用 .strip() 移除首尾空格
+           contents=text_to_speak.strip(), 
            generation_config=tts_generation_config
         )
         
         return response.candidates[0].content.parts[0].inline_data.data
     except Exception as e:
-        # 保持详细的错误输出
         st.error(f"语音生成失败: {type(e).__name__} - {e}")
-        st.warning("提示：这可能是由于您选择的 API Key 尚未开通 TTS 预览功能。请尝试更换侧边栏的 API Key。")
+        st.warning(f"当前模型: `{tts_model.model_name}`。提示：这可能是由于您选择的 API Key 尚未开通此预览功能。请尝试更换侧边栏的 API Key。")
         return None
 
 
