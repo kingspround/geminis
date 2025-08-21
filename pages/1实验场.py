@@ -46,7 +46,7 @@ if "selected_model_name" not in st.session_state:
 if "messages" not in st.session_state:
     st.session_state.messages = []
 if "is_generating" not in st.session_state:
-    st.session_state.is_generating = False
+    st.session_state.is_generating = False  # <<< 关键修正：补上这一行
 if "use_token" not in st.session_state:
     st.session_state.use_token = True
 if "auto_continue_enabled" not in st.session_state:
