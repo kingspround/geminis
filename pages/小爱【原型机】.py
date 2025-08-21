@@ -73,7 +73,7 @@ safety_settings = [
     {"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_NONE"},
 ]
 model = genai.GenerativeModel(
-  model_name="gemini-2.5-flash-preview-05-20",
+  model_name="gemini-2.0-flash-exp",
   generation_config=generation_config,
   safety_settings=safety_settings,
   system_instruction="""
