@@ -42,19 +42,17 @@ MODELS = {
 if "selected_api_key" not in st.session_state:
     st.session_state.selected_api_key = list(API_KEYS.keys())[0]
 if "selected_model_name" not in st.session_state:
-    st.session_state.selected_model_name = list(MODELS.keys())[0] # 新增：模型选择
+    st.session_state.selected_model_name = list(MODELS.keys())[0]
 if "messages" not in st.session_state:
     st.session_state.messages = []
 if "is_generating" not in st.session_state:
-    st.session_state.is_generating = False  # <<< 关键修正：补上这一行
+    st.session_state.is_generating = False
 if "use_token" not in st.session_state:
     st.session_state.use_token = True
 if "auto_continue_enabled" not in st.session_state:
-    st.session_state.auto_continue_enabled = True # 新增：自动续写开关
+    st.session_state.auto_continue_enabled = True
 if "continue_count" not in st.session_state:
-    st.session_state.continue_count = 0 # 新增：续写计数器
-
-# --- (其余 session state 初始化保持不变) ---
+    st.session_state.continue_count = 0
 if 'character_settings' not in st.session_state:
     st.session_state.character_settings = {}
 if 'enabled_settings' not in st.session_state:
@@ -69,6 +67,7 @@ if "reset_history" not in st.session_state:
     st.session_state.reset_history = False
 if "chat_session" not in st.session_state:
     st.session_state.chat_session = None
+
 
 # --- API配置和模型获取 ---
 genai.configure(api_key=API_KEYS[st.session_state.selected_api_key])
