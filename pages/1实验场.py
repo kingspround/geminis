@@ -1303,18 +1303,28 @@ if st.session_state.is_generating:
             placeholder.markdown(full_response_text)
 
         except Exception as e:
-            # 4. ★ 核心修改：使用 st.error() 显示独立的错误信息 ★
+            # 4. ★ 核心修改：返回完整的、未经删改的原始报错信息 ★
             
-            # a. 将已生成的部分内容（如果有）最终显示在聊天气泡中
+            # a. 保留已生成的部分内容
             if full_response_text != original_content:
                  placeholder.markdown(full_response_text)
-            else: # 如果完全没有生成任何新内容，就清空占位符
+            else:
                  placeholder.empty()
 
-            # b. 在聊天气泡之外，显示一个独立的、红色的错误提示框
-            st.error(f"**系统提示：生成中断**\n\n**原因：** `{type(e).__name__}`\n\n*这可能是因为模型名称无效、网络问题或内容安全策略。已生成的内容（如有）已保留在上方。*")
+            # b. 使用 st.error() 显示包含原始错误详情的独立提示框
+            st.error(f"""
+            **系统提示：生成时遇到API错误**
+
+            **错误类型：** `{type(e).__name__}`
             
-            # c. 如果没有生成任何新内容，从消息记录中移除空的消息占位符
+            **原始报错信息：**
+            ```
+            {str(e)}
+            ```
+            *已生成的内容（如有）已保留。请根据上述报错信息检查您的API密钥、模型名称或网络连接。*
+            """)
+            
+            # c. 如果没有生成任何新内容，则清理空的消息占位符
             if not (full_response_text.replace(original_content, '', 1)).strip():
                  if not is_continuation_task:
                      st.session_state.messages.pop(target_message_index)
@@ -1324,6 +1334,7 @@ if st.session_state.is_generating:
             st.session_state.is_generating = False
             with open(log_file, "wb") as f:
                 pickle.dump(_prepare_messages_for_save(st.session_state.messages), f)
+            # 移除 rerun，防止崩溃，UI将在下次交互时自动更新解锁
 
 
 # --- 底部控件 (保持不变) ---
