@@ -43,6 +43,9 @@ DEFAULT_MODEL_NAME = "gemini-2.5-flash-preview-05-20 (默认)"
 
 
 # --- 初始化 Session State ---
+# --- NEW: 为模型对象本身添加 session_state ---
+if "model" not in st.session_state:
+    st.session_state.model = None
 if "selected_model_name" not in st.session_state:
     st.session_state.selected_model_name = DEFAULT_MODEL_NAME
 if "continue_task" not in st.session_state:
@@ -186,7 +189,8 @@ tips:
                 history_to_send.append({"role": api_role, "parts": msg["content"]})
     
     final_contents = [msg for msg in history_to_send if msg.get("parts")]
-    response = model.generate_content(contents=final_contents, stream=True)
+    # --- 关键修改：从 session_state 中获取 model 对象 ---
+    response = st.session_state.model.generate_content(contents=final_contents, stream=True)
     for chunk in response:
         yield chunk.text
 
@@ -282,19 +286,17 @@ with st.sidebar:
         key="api_selector"
     )
     
-    # --- 关键修改：添加模型选择器 ---
     st.session_state.selected_model_name = st.selectbox(
         "选择模型:",
         options=list(MODELS.keys()),
         key="model_selector"
     )
 
-    # 配置API Key
     genai.configure(api_key=API_KEYS[st.session_state.selected_api_key])
 
-    # --- 关键修改：根据选择动态创建模型实例 ---
+    # --- 关键修改：将创建好的模型实例存入 session_state ---
     model_api_name = MODELS[st.session_state.selected_model_name]
-    model = genai.GenerativeModel(
+    st.session_state.model = genai.GenerativeModel(
       model_name=model_api_name,
       generation_config=generation_config,
       safety_settings=safety_settings,
