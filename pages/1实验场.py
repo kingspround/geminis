@@ -34,13 +34,13 @@ API_KEYS = {
 # --- 模型配置 ---
 # 在UI上显示用户指定的名称，后台调用稳定运行的API名称
 MODELS = {
-    "gemini-2.5-flash-preview-05-20 (默认)": "gemini-1.5-flash-latest",
-    "gemini-2.5-pro": "gemini-1.5-pro-latest",
-    # 注意: gemini-embedding-001 是嵌入模型，不能用于聊天。
-    # 其他实验性模型(exp)没有稳定的公开API，因此未包含。
+    "gemini-2.5-flash-preview-05-20 (默认)": "gemini-2.5-flash-preview-05-20",
+    "gemini-2.5-pro": "gemini-2.5-pro",
+    "gemini-2.0-flash-exp": "gemini-2.0-flash-exp",
+    "gemini-exp-1206": "gemini-exp-1206",
+    "gemini-embedding-001 (嵌入模型，会报错)": "gemini-embedding-001",
 }
 DEFAULT_MODEL_NAME = "gemini-2.5-flash-preview-05-20 (默认)"
-
 
 # --- 初始化 Session State ---
 # --- NEW: 为模型对象本身添加 session_state ---
