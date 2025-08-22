@@ -1327,9 +1327,7 @@ if st.session_state.is_generating:
             with open(log_file, "wb") as f:
                 pickle.dump(_prepare_messages_for_save(st.session_state.messages), f)
             
-            # 只有在成功完成后才执行刷新
-            if rerun_on_success:
-                st.rerun()
+
 
 # --- 底部控件 (保持不变) ---
 c1, c2 = st.columns(2)
