@@ -30,7 +30,38 @@ API_KEYS = {
     "备用10号":"AIzaSyDOI2e-I1RdXBnk99jY2H00A3aymXREETA"
 }
 
-
+# --- 初始化 Session State ---
+if "selected_api_key" not in st.session_state:
+    st.session_state.selected_api_key = list(API_KEYS.keys())[0]
+if "messages" not in st.session_state:
+    st.session_state.messages = []
+if 'character_settings' not in st.session_state:
+    st.session_state.character_settings = {}
+if 'enabled_settings' not in st.session_state:
+    st.session_state.enabled_settings = {}
+if 'editing' not in st.session_state:
+    st.session_state.editing = False
+if 'editable_index' not in st.session_state:
+    st.session_state.editable_index = -1
+if "is_generating" not in st.session_state:
+    st.session_state.is_generating = False
+if "sidebar_caption" not in st.session_state:
+    st.session_state.sidebar_caption = ""
+if "reset_history" not in st.session_state:
+    st.session_state.reset_history = False
+if "chat_session" not in st.session_state:
+    st.session_state.chat_session = None
+if "rerun_count" not in st.session_state:
+    st.session_state.rerun_count = 0
+if "use_token" not in st.session_state:
+    st.session_state.use_token = True
+# 加上您上次新增的状态
+if "auto_continue" not in st.session_state:
+    st.session_state.auto_continue = True 
+if "continue_count" not in st.session_state:
+    st.session_state.continue_count = 0 
+if "continue_task" not in st.session_state: # 这个也需要在这里初始化
+    st.session_state.continue_task = None 
 
 
 # --- API配置和模型定义 (保持不变) ---
