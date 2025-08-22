@@ -1260,62 +1260,69 @@ st.chat_input(
 # ★★★ 核心生成逻辑 (已移除自动续写功能) ★★★
 # ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
 if st.session_state.is_generating:
+    # 提前处理续写任务的临时消息，避免污染历史记录
     is_continuation_task = st.session_state.messages and st.session_state.messages[-1].get("is_continue_prompt")
-    
+    task_info = None
+    if is_continuation_task:
+        task_info = st.session_state.messages.pop() # 在开始生成前就移除临时指令
+
     with st.chat_message("assistant"):
         placeholder = st.empty()
         
         target_message_index = -1
         original_content = ""
         api_history_override = None
-        full_response_text = "" # 初始化变量以存储部分或全部响应
+        full_response_text = ""
 
         try:
             # 1. 准备工作
-            if is_continuation_task:
-                task_info = st.session_state.messages.pop() # 取出并删除临时指令
+            if is_continuation_task and task_info:
                 target_message_index = task_info.get("target_index", -1)
-                content_list = st.session_state.messages[target_message_index]["content"]
-                if content_list and isinstance(content_list[0], str):
-                    original_content = content_list[0]
-                
-                # 续写任务的历史记录
-                api_history_override = [{"role": ("model" if m["role"] == "assistant" else "user"), "parts": m["content"]} for m in st.session_state.messages[:target_message_index+1]]
-                last_chars = (original_content[-50:] + "...") if len(original_content) > 50 else original_content
-                continue_prompt = f"请严格地从以下文本的结尾处，无缝、自然地继续写下去。不要重复任何内容，不要添加任何前言或解释，直接输出续写的内容即可。文本片段：\n\"...{last_chars}\""
-                api_history_override.append({"role": "user", "parts": [continue_prompt]})
-            else:
-                # 新消息任务
+                # 确保目标索引有效
+                if 0 <= target_message_index < len(st.session_state.messages):
+                    content_list = st.session_state.messages[target_message_index]["content"]
+                    if content_list and isinstance(content_list[0], str):
+                        original_content = content_list[0]
+                else: # 如果目标索引失效，则当作新消息处理
+                    is_continuation_task = False
+
+            if not is_continuation_task:
                 st.session_state.messages.append({"role": "assistant", "content": [""]})
                 target_message_index = len(st.session_state.messages) - 1
-
+            
+            # 为API准备历史记录
+            api_history_override = get_api_history(is_continuation_task, original_content, target_message_index)
             full_response_text = original_content
             
             # 2. 流式生成与实时保存
             for chunk in getAnswer(custom_history=api_history_override):
                 full_response_text += chunk
-                # 实时更新UI和session_state，确保任何时候中断都有内容保留
                 st.session_state.messages[target_message_index]["content"] = [full_response_text]
                 placeholder.markdown(full_response_text + "▌")
             
             # 3. 成功完成
-            placeholder.markdown(full_response_text) # 移除光标
+            placeholder.markdown(full_response_text)
 
         except Exception as e:
-            # 4. ★ 核心修改：错误处理，但保留已生成的内容 ★
-            error_message = f"\n\n--- \n**系统提示：** 生成在此时被中断。\n**原因：** `{type(e).__name__}`"
+            # 4. 健壮的错误处理
+            # 打印详细错误到控制台，方便调试
+            print(f"An error occurred during generation: {e}") 
+            error_message = f"\n\n---\n**系统提示：** 生成中断。\n**原因：** `{type(e).__name__}`\n> *这可能是因为模型名称无效、网络问题或内容安全策略。已生成的内容已保留。*"
             full_response_text += error_message
-            st.session_state.messages[target_message_index]["content"] = [full_response_text]
-            placeholder.markdown(full_response_text) # 显示包含错误信息的最终内容
-            # 不再清空或删除任何消息！
+            
+            # 确保即使在错误情况下，消息也能被正确保存
+            if target_message_index != -1 and 0 <= target_message_index < len(st.session_state.messages):
+                 st.session_state.messages[target_message_index]["content"] = [full_response_text]
+            else: # 如果索引都错了，就追加一条新的错误消息
+                 st.session_state.messages.append({"role": "assistant", "content": [full_response_text]})
+
+            placeholder.markdown(full_response_text)
             
         finally:
             # 5. 统一清理
-            st.session_state.is_generating = False
+            st.session_state.is_generating = False # 必须设置，以在下次交互时解锁UI
             with open(log_file, "wb") as f:
                 pickle.dump(_prepare_messages_for_save(st.session_state.messages), f)
-            # 触发一次刷新来正确显示被禁用的按钮
-            st.rerun()
 
 
 # --- 底部控件 (保持不变) ---
