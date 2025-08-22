@@ -1258,8 +1258,21 @@ st.chat_input(
     disabled=st.session_state.is_generating or st.session_state.editing
 )
 
+# --- 辅助函数：准备API历史记录 (必须存在) ---
+def get_api_history(is_continuation, original_text, target_idx):
+    """根据任务类型准备发送给API的历史记录"""
+    if is_continuation:
+        history = [{"role": ("model" if m["role"] == "assistant" else "user"), "parts": m["content"]} for m in st.session_state.messages[:target_idx+1]]
+        last_chars = (original_text[-100:] + "...") if len(original_text) > 100 else original_text
+        continue_prompt = f"请严格地从以下文本的结尾处，无缝、自然地继续写下去。不要重复任何内容，不要添加任何前言或解释，直接输出续写的内容即可。文本片段：\n\"...{last_chars}\""
+        history.append({"role": "user", "parts": [continue_prompt]})
+        return history
+    else:
+        # 对于新消息，返回None会让getAnswer使用默认的完整历史构建逻辑
+        return None
+
 # ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
-# ★★★ 核心生成逻辑 (已移除自动续写功能) ★★★
+# ★★★ 核心生成逻辑 (最终版：包含辅助函数 & 精确报错) ★★★
 # ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
 if st.session_state.is_generating:
     is_continuation_task = st.session_state.messages and st.session_state.messages[-1].get("is_continue_prompt")
@@ -1290,6 +1303,7 @@ if st.session_state.is_generating:
                 st.session_state.messages.append({"role": "assistant", "content": [""]})
                 target_message_index = len(st.session_state.messages) - 1
             
+            # 调用辅助函数来准备API历史
             api_history_override = get_api_history(is_continuation_task, original_content, target_message_index)
             full_response_text = original_content
             
@@ -1303,8 +1317,7 @@ if st.session_state.is_generating:
             placeholder.markdown(full_response_text)
 
         except Exception as e:
-            # 4. ★ 核心修改：返回完整的、未经删改的原始报错信息 ★
-            
+            # 4. 返回完整的、未经删改的原始报错信息
             # a. 保留已生成的部分内容
             if full_response_text != original_content:
                  placeholder.markdown(full_response_text)
@@ -1334,7 +1347,6 @@ if st.session_state.is_generating:
             st.session_state.is_generating = False
             with open(log_file, "wb") as f:
                 pickle.dump(_prepare_messages_for_save(st.session_state.messages), f)
-            # 移除 rerun，防止崩溃，UI将在下次交互时自动更新解锁
 
 
 # --- 底部控件 (保持不变) ---
