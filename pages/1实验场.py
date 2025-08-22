@@ -15,7 +15,7 @@ st.set_page_config(
     layout="wide"
 )
 
-# --- API 密钥设置 ---
+# --- API 密钥设置 (保持不变) ---
 API_KEYS = {
     "主密钥": "AIzaSyCBjZbA78bPusYmUNvfsmHpt6rPx6Ur0QE",
     "备用1号": "AIzaSyAWfFf6zqy1DizINOwPfxPD8EF2ACdwCaQ",
@@ -30,10 +30,10 @@ API_KEYS = {
     "备用10号":"AIzaSyDOI2e-I1RdXBnk99jY2H00A3aymXREETA"
 }
 
-# ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
-# ★★★ 关键修正：所有 Session State 初始化必须在最前面 ★★★
-# ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
 # --- 初始化 Session State ---
+if "continue_task" not in st.session_state:
+    st.session_state.continue_task = None # None 或 消息索引
+# --- (其余 session state 初始化保持不变) ---
 if "selected_api_key" not in st.session_state:
     st.session_state.selected_api_key = list(API_KEYS.keys())[0]
 if "messages" not in st.session_state:
@@ -48,6 +48,10 @@ if 'editable_index' not in st.session_state:
     st.session_state.editable_index = -1
 if "is_generating" not in st.session_state:
     st.session_state.is_generating = False
+if "is_generating" not in st.session_state:
+    st.session_state.is_generating = False
+if "auto_continue" not in st.session_state:
+    st.session_state.auto_continue = True # 默认为开启
 if "sidebar_caption" not in st.session_state:
     st.session_state.sidebar_caption = ""
 if "reset_history" not in st.session_state:
@@ -58,15 +62,9 @@ if "rerun_count" not in st.session_state:
     st.session_state.rerun_count = 0
 if "use_token" not in st.session_state:
     st.session_state.use_token = True
-if "auto_continue" not in st.session_state:
-    st.session_state.auto_continue = True
-if "continue_count" not in st.session_state:
-    st.session_state.continue_count = 0
-if "continue_task" not in st.session_state:
-    st.session_state.continue_task = None
 
 
-# --- API配置和模型定义 ---
+# --- API配置和模型定义 (保持不变) ---
 genai.configure(api_key=API_KEYS[st.session_state.selected_api_key])
 generation_config = {
   "temperature": 1.0, "top_p": 0.95, "top_k": 40, "max_output_tokens": 8192, "response_mime_type": "text/plain",
@@ -1100,10 +1098,9 @@ def send_from_sidebar_callback():
     if caption: content_parts.append(caption)
     if content_parts:
         st.session_state.messages.append({"role": "user", "content": content_parts})
-        st.session_state.continue_task = None 
+        st.session_state.continue_task = None # 确保是“新”生成
         st.session_state.is_generating = True
         st.session_state.sidebar_caption = ""
-        st.session_state.continue_count = 0 # <--- 新增此行
 
 def send_from_main_input_callback():
     """处理主输入框提交的回调函数"""
@@ -1114,9 +1111,8 @@ def send_from_main_input_callback():
     token = generate_token()
     full_prompt = f"{prompt} (token: {token})" if st.session_state.use_token else prompt
     st.session_state.messages.append({"role": "user", "content": [full_prompt]})
-    st.session_state.continue_task = None 
+    st.session_state.continue_task = None # 确保是“新”生成
     st.session_state.is_generating = True
-    st.session_state.continue_count = 0 # <--- 新增此行
 
 # --- UI 侧边栏 (保持不变) ---
 with st.sidebar:
@@ -1243,79 +1239,129 @@ if not st.session_state.is_generating:
 # ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
 # ★★★ 核心生成逻辑 (已恢复并优化中断后自动续写功能) ★★★
 # ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
-if st.session_state.is_generating:
-    is_continuation_task = st.session_state.messages and st.session_state.messages[-1].get("is_continue_prompt")
-    
-    with st.chat_message("assistant"):
-        placeholder = st.empty()
-        
-        target_message_index = -1
-        if is_continuation_task:
-            target_message_index = st.session_state.messages[-1].get("target_index", -1)
-        elif not st.session_state.messages or st.session_state.messages[-1]["role"] != "assistant":
-            st.session_state.messages.append({"role": "assistant", "content": [""]})
-        
-        if not (-len(st.session_state.messages) <= target_message_index < len(st.session_state.messages)):
-             st.error("续写目标消息索引无效，已停止生成。")
-             st.session_state.is_generating = False
-        else:
-            streamed_part = ""
-            try:
-                original_content = ""
-                content_list = st.session_state.messages[target_message_index]["content"]
-                if content_list and isinstance(content_list[0], str):
-                    original_content = content_list[0]
-                
-                for chunk in getAnswer():
-                    streamed_part += chunk
-                    updated_full_content = original_content + streamed_part
-                    st.session_state.messages[target_message_index]["content"][0] = updated_full_content
-                    placeholder.markdown(updated_full_content + "▌")
-                
-                placeholder.markdown(st.session_state.messages[target_message_index]["content"][0])
-                st.session_state.is_generating = False
-                st.session_state.continue_count = 0 # 成功完成，重置计数器
+# --- 核心交互与生成逻辑 ---
 
-            except Exception as e:
-                # 检查是否启用了自动续写
-                if st.session_state.auto_continue:
-                    st.session_state.continue_count += 1 # 增加续写次数
-                    st.toast(f"回答中断，正在尝试自动续写… (第 {st.session_state.continue_count} 次)")
+# 根据 "自动续写" 复选框的状态，决定使用哪种交互模式
+# 模式一：启用自动续写（基于 is_generating 状态的复杂逻辑）
+if st.session_state.get("auto_continue", True):
+
+    # --- 交互输入 ---
+    if not st.session_state.is_generating:
+        st.chat_input(
+            "输入你的消息...",
+            key="main_chat_input",
+            on_submit=send_from_main_input_callback,
+            disabled=st.session_state.editing
+        )
+
+    # --- 核心生成逻辑 (支持中断后自动续写) ---
+    if st.session_state.is_generating:
+        is_continuation_task = st.session_state.messages and st.session_state.messages[-1].get("is_continue_prompt")
+        
+        with st.chat_message("assistant"):
+            placeholder = st.empty()
+            target_message_index = -1
+            if is_continuation_task:
+                target_message_index = st.session_state.messages[-1].get("target_index", -1)
+            elif not st.session_state.messages or st.session_state.messages[-1]["role"] != "assistant":
+                st.session_state.messages.append({"role": "assistant", "content": [""]})
+            
+            if not (-len(st.session_state.messages) <= target_message_index < len(st.session_state.messages)):
+                 st.error("续写目标消息索引无效，已停止生成。")
+                 st.session_state.is_generating = False
+            else:
+                streamed_part = ""
+                try:
+                    original_content = ""
+                    content_list = st.session_state.messages[target_message_index]["content"]
+                    if content_list and isinstance(content_list[0], str):
+                        original_content = content_list[0]
                     
+                    for chunk in getAnswer():
+                        streamed_part += chunk
+                        updated_full_content = original_content + streamed_part
+                        st.session_state.messages[target_message_index]["content"][0] = updated_full_content
+                        placeholder.markdown(updated_full_content + "▌")
+                    
+                    placeholder.markdown(st.session_state.messages[target_message_index]["content"][0])
+                    st.session_state.is_generating = False
+
+                except Exception as e:
+                    st.toast("回答中断，正在尝试自动续写…")
                     partial_content = st.session_state.messages[target_message_index]["content"][0]
                     if partial_content.strip():
                         last_chars = (partial_content[-50:] + "...") if len(partial_content) > 50 else partial_content
                         continue_prompt = f"请严格地从以下文本的结尾处，无缝、自然地继续写下去。不要重复任何内容，不要添加任何前言或解释，直接输出续写的内容即可。文本片段：\n\"...{last_chars}\""
-                        
                         if is_continuation_task: st.session_state.messages.pop()
                         st.session_state.messages.append({"role": "user", "content": [continue_prompt], "temp": True, "is_continue_prompt": True, "target_index": target_message_index})
                     else:
-                        st.error(f"回答生成失败 ({type(e).__name__})，且无内容可续写，请重试。")
+                        st.error(f"回答生成失败 ({type(e).__name__})，请重试。")
                         st.session_state.is_generating = False
-                else:
-                    # --- ★ 核心改动点 ★ ---
-                    # 如果未启用自动续写，则直接报错并显示详细错误信息
-                    st.error(f"回答生成失败。自动续写已禁用。\n\n**具体错误:** `{type(e).__name__} - {e}`")
-                    st.session_state.is_generating = False
-                    st.session_state.continue_count = 0 # 失败后重置计数器
-            finally:
-                if not st.session_state.is_generating and is_continuation_task:
-                    st.session_state.messages.pop()
+                finally:
+                    if not st.session_state.is_generating and is_continuation_task:
+                        st.session_state.messages.pop()
+                    if not st.session_state.is_generating and st.session_state.messages and st.session_state.messages[-1]['role'] == 'assistant' and not st.session_state.messages[-1]["content"][0].strip():
+                        st.session_state.messages.pop()
+                    with open(log_file, "wb") as f:
+                        pickle.dump(_prepare_messages_for_save(st.session_state.messages), f)
+                    st.experimental_rerun()
 
-                if not st.session_state.is_generating and st.session_state.messages and st.session_state.messages[-1]['role'] == 'assistant' and not st.session_state.messages[-1]["content"][0].strip():
-                    st.session_state.messages.pop()
+
+# 模式二：禁用自动续写（使用您提供的简单单次流式响应逻辑）
+else:
+    prompt = st.chat_input("输入你的消息 (自动续写已关闭)...", disabled=st.session_state.editing)
+    if prompt:
+        # 1. 准备并添加用户消息到 session_state
+        prompt = prompt.strip()
+        token = generate_token()
+        full_prompt = f"{prompt} (token: {token})" if st.session_state.use_token else prompt
+        st.session_state.messages.append({"role": "user", "content": [full_prompt]})
+
+        # 2. 在 UI 上立即显示用户消息
+        with st.chat_message("user"):
+            st.markdown(full_prompt)
+
+        # 3. 生成并流式传输助手响应
+        with st.chat_message("assistant"):
+            message_placeholder = st.empty()
+            full_response = ""
+            try:
+                # getAnswer 会自动从 session_state 读取最新的历史（包括我们刚添加的用户消息）
+                for chunk in getAnswer():
+                    full_response += chunk
+                    message_placeholder.markdown(full_response + "▌")
+                message_placeholder.markdown(full_response)
                 
-                with open(log_file, "wb") as f:
-                    pickle.dump(_prepare_messages_for_save(st.session_state.messages), f)
-                st.experimental_rerun()
+                # 4. 将完整的助手响应添加到 session_state
+                st.session_state.messages.append({"role": "assistant", "content": [full_response]})
 
-# --- 底部控件 (保持不变) ---
-c1, c2, c3 = st.columns([3, 3, 1]) 
-with c1:
-    st.session_state.use_token = st.checkbox("使用 Token", value=st.session_state.get("use_token", True))
-with c2:
-    st.session_state.auto_continue = st.checkbox("启动自动续写", value=st.session_state.get("auto_continue", True))
-with c3:
-    if st.button("🔄", key="page_refresh", help="刷新页面"): 
+            except Exception as e:
+                st.error(f"发生错误：{type(e).__name__} - {e}。请检查 API 密钥或重试。")
+                # 如果生成失败，将刚刚添加的用户消息移除，避免历史记录中出现未被回答的问题
+                st.session_state.messages.pop()
+        
+        # 5. 交互完成后，保存历史记录
+        with open(log_file, "wb") as f:
+            pickle.dump(_prepare_messages_for_save(st.session_state.messages), f)
+
+
+# --- 底部控件 ---
+# 使用列布局来并排放置复选框和按钮
+col1, col2, col3 = st.columns([1.2, 1.2, 7.6]) # 调整比例以获得更好的布局
+
+with col1:
+    st.session_state.use_token = st.checkbox(
+        "使用 Token", 
+        value=st.session_state.get("use_token", True)
+    )
+
+with col2:
+    st.session_state.auto_continue = st.checkbox(
+        "自动续写", 
+        value=st.session_state.get("auto_continue", True), 
+        help="开启后，若生成中断，程序将自动尝试继续。关闭后，将使用更简单的生成模式，但中断后无法恢复。"
+    )
+
+with col3:
+    if st.button("🔄", key="page_refresh", help="刷新页面"):
         st.experimental_rerun()
-		
