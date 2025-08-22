@@ -1260,11 +1260,10 @@ st.chat_input(
 # ★★★ 核心生成逻辑 (已移除自动续写功能) ★★★
 # ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
 if st.session_state.is_generating:
-    # 提前处理续写任务的临时消息，避免污染历史记录
     is_continuation_task = st.session_state.messages and st.session_state.messages[-1].get("is_continue_prompt")
     task_info = None
     if is_continuation_task:
-        task_info = st.session_state.messages.pop() # 在开始生成前就移除临时指令
+        task_info = st.session_state.messages.pop()
 
     with st.chat_message("assistant"):
         placeholder = st.empty()
@@ -1278,19 +1277,17 @@ if st.session_state.is_generating:
             # 1. 准备工作
             if is_continuation_task and task_info:
                 target_message_index = task_info.get("target_index", -1)
-                # 确保目标索引有效
                 if 0 <= target_message_index < len(st.session_state.messages):
                     content_list = st.session_state.messages[target_message_index]["content"]
                     if content_list and isinstance(content_list[0], str):
                         original_content = content_list[0]
-                else: # 如果目标索引失效，则当作新消息处理
+                else:
                     is_continuation_task = False
 
             if not is_continuation_task:
                 st.session_state.messages.append({"role": "assistant", "content": [""]})
                 target_message_index = len(st.session_state.messages) - 1
             
-            # 为API准备历史记录
             api_history_override = get_api_history(is_continuation_task, original_content, target_message_index)
             full_response_text = original_content
             
@@ -1304,23 +1301,25 @@ if st.session_state.is_generating:
             placeholder.markdown(full_response_text)
 
         except Exception as e:
-            # 4. 健壮的错误处理
-            # 打印详细错误到控制台，方便调试
-            print(f"An error occurred during generation: {e}") 
-            error_message = f"\n\n---\n**系统提示：** 生成中断。\n**原因：** `{type(e).__name__}`\n> *这可能是因为模型名称无效、网络问题或内容安全策略。已生成的内容已保留。*"
-            full_response_text += error_message
+            # 4. ★ 核心修改：使用 st.error() 显示独立的错误信息 ★
             
-            # 确保即使在错误情况下，消息也能被正确保存
-            if target_message_index != -1 and 0 <= target_message_index < len(st.session_state.messages):
-                 st.session_state.messages[target_message_index]["content"] = [full_response_text]
-            else: # 如果索引都错了，就追加一条新的错误消息
-                 st.session_state.messages.append({"role": "assistant", "content": [full_response_text]})
+            # a. 将已生成的部分内容（如果有）最终显示在聊天气泡中
+            if full_response_text != original_content:
+                 placeholder.markdown(full_response_text)
+            else: # 如果完全没有生成任何新内容，就清空占位符
+                 placeholder.empty()
 
-            placeholder.markdown(full_response_text)
+            # b. 在聊天气泡之外，显示一个独立的、红色的错误提示框
+            st.error(f"**系统提示：生成中断**\n\n**原因：** `{type(e).__name__}`\n\n*这可能是因为模型名称无效、网络问题或内容安全策略。已生成的内容（如有）已保留在上方。*")
             
+            # c. 如果没有生成任何新内容，从消息记录中移除空的消息占位符
+            if not (full_response_text.replace(original_content, '', 1)).strip():
+                 if not is_continuation_task:
+                     st.session_state.messages.pop(target_message_index)
+
         finally:
             # 5. 统一清理
-            st.session_state.is_generating = False # 必须设置，以在下次交互时解锁UI
+            st.session_state.is_generating = False
             with open(log_file, "wb") as f:
                 pickle.dump(_prepare_messages_for_save(st.session_state.messages), f)
 
