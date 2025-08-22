@@ -1249,7 +1249,7 @@ if st.session_state.get("auto_continue", True):
     if not st.session_state.is_generating:
         st.chat_input(
             "输入你的消息...",
-            key="main_chat_input",
+            key="main_chat_input", # 这个 key 与回调函数绑定
             on_submit=send_from_main_input_callback,
             disabled=st.session_state.editing
         )
@@ -1306,10 +1306,15 @@ if st.session_state.get("auto_continue", True):
                         pickle.dump(_prepare_messages_for_save(st.session_state.messages), f)
                     st.experimental_rerun()
 
-
 # 模式二：禁用自动续写（使用您提供的简单单次流式响应逻辑）
 else:
-    prompt = st.chat_input("输入你的消息 (自动续写已关闭)...", disabled=st.session_state.editing)
+    # ★★★ 关键修复 ★★★
+    # 为这个 chat_input 添加一个唯一的 key，以避免与模式一中的 key 冲突
+    prompt = st.chat_input(
+        "输入你的消息 (自动续写已关闭)...", 
+        key="main_chat_input_simple_mode", # 添加了唯一的 key
+        disabled=st.session_state.editing
+    )
     if prompt:
         # 1. 准备并添加用户消息到 session_state
         prompt = prompt.strip()
@@ -1338,11 +1343,13 @@ else:
             except Exception as e:
                 st.error(f"发生错误：{type(e).__name__} - {e}。请检查 API 密钥或重试。")
                 # 如果生成失败，将刚刚添加的用户消息移除，避免历史记录中出现未被回答的问题
-                st.session_state.messages.pop()
+                if st.session_state.messages and st.session_state.messages[-1]["role"] == "user":
+                    st.session_state.messages.pop()
         
-        # 5. 交互完成后，保存历史记录
+        # 5. 交互完成后，保存历史记录并刷新界面以保持一致性
         with open(log_file, "wb") as f:
             pickle.dump(_prepare_messages_for_save(st.session_state.messages), f)
+        st.experimental_rerun()
 
 
 # --- 底部控件 ---
