@@ -1219,8 +1219,9 @@ if st.session_state.get("editing"):
             st.session_state.editing = False; st.experimental_rerun()
 
 
-# --- 续写/编辑/重生成按钮逻辑 (保持不变) ---
-if len(st.session_state.messages) >= 1 and not st.session_state.is_generating and not st.session_state.editing:
+# --- 续写/编辑/重生成按钮逻辑 ---
+# 移除了 'if not is_generating' 条件，改为使用 'disabled' 参数
+if len(st.session_state.messages) >= 1 and not st.session_state.editing:
     last_real_msg_idx = -1
     for i in range(len(st.session_state.messages) - 1, -1, -1):
         if not st.session_state.messages[i].get("temp"):
@@ -1231,39 +1232,29 @@ if len(st.session_state.messages) >= 1 and not st.session_state.is_generating an
         last_msg = st.session_state.messages[last_real_msg_idx]
         is_text_only_assistant = (last_msg["role"] == "assistant" and len(last_msg.get("content", [])) > 0 and isinstance(last_msg["content"][0], str))
         
+        # 按钮始终显示，但在生成时禁用
+        is_disabled = st.session_state.is_generating
+
         if is_text_only_assistant:
             with st.container():
                 cols = st.columns(20)
-                if cols[0].button("✏️", key=f"edit_{last_real_msg_idx}", help="编辑"): 
+                if cols[0].button("✏️", key=f"edit_{last_real_msg_idx}", help="编辑", disabled=is_disabled): 
                     st.session_state.editable_index = last_real_msg_idx
                     st.session_state.editing = True
                     st.rerun()
-                # 使用 on_click 绑定新函数
-                cols[1].button("♻️", key=f"regen_{last_real_msg_idx}", help="重新生成", on_click=regenerate_message, args=(last_real_msg_idx,))
-                cols[2].button("➕", key=f"cont_{last_real_msg_idx}", help="继续", on_click=continue_message, args=(last_real_msg_idx,))
+                cols[1].button("♻️", key=f"regen_{last_real_msg_idx}", help="重新生成", on_click=regenerate_message, args=(last_real_msg_idx,), disabled=is_disabled)
+                cols[2].button("➕", key=f"cont_{last_real_msg_idx}", help="继续", on_click=continue_message, args=(last_real_msg_idx,), disabled=is_disabled)
         elif last_msg["role"] == "assistant":
-             # 同样使用 on_click
-             st.columns(20)[0].button("♻️", key=f"regen_vision_{last_real_msg_idx}", help="重新生成", on_click=regenerate_message, args=(last_real_msg_idx,))
-
+             st.columns(20)[0].button("♻️", key=f"regen_vision_{last_real_msg_idx}", help="重新生成", on_click=regenerate_message, args=(last_real_msg_idx,), disabled=is_disabled)
+			
 
 # --- 核心交互逻辑 (主输入框) ---
-# 使用回调函数以获得更好的响应体验
-def send_from_main_input_callback():
-    raw_prompt = st.session_state.get("main_chat_input", "")
-    if not raw_prompt: return
-    prompt = raw_prompt.strip()
-    token = generate_token()
-    full_prompt = f"{prompt} (token: {token})" if st.session_state.use_token else prompt
-    st.session_state.messages.append({"role": "user", "content": [full_prompt]})
-    st.session_state.is_generating = True
-
-if not st.session_state.is_generating:
-    st.chat_input(
-        "输入你的消息...",
-        key="main_chat_input",
-        on_submit=send_from_main_input_callback,
-        disabled=st.session_state.editing
-    )
+st.chat_input(
+    "输入你的消息...",
+    key="main_chat_input",
+    on_submit=send_from_main_input_callback,
+    disabled=st.session_state.is_generating or st.session_state.editing
+)
 
 # ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
 # ★★★ 核心生成逻辑 (已移除自动续写功能) ★★★
@@ -1277,56 +1268,54 @@ if st.session_state.is_generating:
         target_message_index = -1
         original_content = ""
         api_history_override = None
-        rerun_on_success = False # --- NEW: 只有成功时才刷新的标志 ---
+        full_response_text = "" # 初始化变量以存储部分或全部响应
 
         try:
             # 1. 准备工作
             if is_continuation_task:
-                task_info = st.session_state.messages[-1]
+                task_info = st.session_state.messages.pop() # 取出并删除临时指令
                 target_message_index = task_info.get("target_index", -1)
                 content_list = st.session_state.messages[target_message_index]["content"]
                 if content_list and isinstance(content_list[0], str):
                     original_content = content_list[0]
                 
-                temp_history = [{"role": ("model" if m["role"] == "assistant" else "user"), "parts": m["content"]} for m in st.session_state.messages[:target_message_index+1]]
+                # 续写任务的历史记录
+                api_history_override = [{"role": ("model" if m["role"] == "assistant" else "user"), "parts": m["content"]} for m in st.session_state.messages[:target_message_index+1]]
                 last_chars = (original_content[-50:] + "...") if len(original_content) > 50 else original_content
                 continue_prompt = f"请严格地从以下文本的结尾处，无缝、自然地继续写下去。不要重复任何内容，不要添加任何前言或解释，直接输出续写的内容即可。文本片段：\n\"...{last_chars}\""
-                temp_history.append({"role": "user", "parts": [continue_prompt]})
-                api_history_override = temp_history
+                api_history_override.append({"role": "user", "parts": [continue_prompt]})
             else:
-                if not st.session_state.messages or st.session_state.messages[-1]["role"] != "assistant":
-                    st.session_state.messages.append({"role": "assistant", "content": [""]})
+                # 新消息任务
+                st.session_state.messages.append({"role": "assistant", "content": [""]})
+                target_message_index = len(st.session_state.messages) - 1
 
-            # 2. 流式生成
-            streamed_part = ""
+            full_response_text = original_content
+            
+            # 2. 流式生成与实时保存
             for chunk in getAnswer(custom_history=api_history_override):
-                streamed_part += chunk
-                updated_full_content = original_content + streamed_part
-                st.session_state.messages[target_message_index]["content"][0] = updated_full_content
-                placeholder.markdown(updated_full_content + "▌")
+                full_response_text += chunk
+                # 实时更新UI和session_state，确保任何时候中断都有内容保留
+                st.session_state.messages[target_message_index]["content"] = [full_response_text]
+                placeholder.markdown(full_response_text + "▌")
             
             # 3. 成功完成
-            st.session_state.is_generating = False
-            placeholder.markdown(st.session_state.messages[target_message_index]["content"][0])
-            rerun_on_success = True # 设置成功刷新标志
+            placeholder.markdown(full_response_text) # 移除光标
 
         except Exception as e:
-            # 4. ★ 错误处理：冷静地停止并显示错误 ★
-            # 在主聊天区域显示持久的错误信息
-            st.error(f"生成时遇到错误，操作已停止：\n\n`{type(e).__name__}: {e}`")
-            # 清理动态更新的占位符
-            placeholder.empty()
-            # 关键：停止生成状态，以便按钮和输入框能够重新显示
-            st.session_state.is_generating = False
+            # 4. ★ 核心修改：错误处理，但保留已生成的内容 ★
+            error_message = f"\n\n--- \n**系统提示：** 生成在此时被中断。\n**原因：** `{type(e).__name__}`"
+            full_response_text += error_message
+            st.session_state.messages[target_message_index]["content"] = [full_response_text]
+            placeholder.markdown(full_response_text) # 显示包含错误信息的最终内容
+            # 不再清空或删除任何消息！
             
         finally:
-            # 5. 统一清理和条件性刷新
-            if st.session_state.messages and st.session_state.messages[-1].get("temp"):
-                st.session_state.messages.pop()
-
+            # 5. 统一清理
+            st.session_state.is_generating = False
             with open(log_file, "wb") as f:
                 pickle.dump(_prepare_messages_for_save(st.session_state.messages), f)
-            
+            # 触发一次刷新来正确显示被禁用的按钮
+            st.rerun()
 
 
 # --- 底部控件 (保持不变) ---
