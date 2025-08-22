@@ -1916,5 +1916,5 @@ if st.session_state.is_generating:
 
 # --- 底部控件 (保持不变) ---
 c1, c2 = st.columns(2)
-st.session_state.use_token = c1.checkbox("使用 Token", value=st.session_state.get("use_token", false))
+st.session_state.use_token = c1.checkbox("使用 Token", value=st.session_state.get("use_token", False))
 if c2.button("🔄", key="page_refresh", help="刷新页面"): st.experimental_rerun()
