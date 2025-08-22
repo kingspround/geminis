@@ -1204,6 +1204,7 @@ if st.session_state.is_generating:
         target_message_index, original_content, api_history_override, full_response_text = -1, "", None, ""
         
         try:
+            # 1. 准备工作
             if is_continuation_task and task_info:
                 target_message_index = task_info.get("target_index", -1)
                 if 0 <= target_message_index < len(st.session_state.messages):
@@ -1216,23 +1217,30 @@ if st.session_state.is_generating:
             api_history_override = get_api_history(is_continuation_task, original_content, target_message_index)
             full_response_text = original_content
             
+            # 2. 流式生成
             for chunk in getAnswer(custom_history=api_history_override):
                 full_response_text += chunk
                 st.session_state.messages[target_message_index]["content"] = [full_response_text]
-                placeholder.markdown(full_response_text + "▌")
+                # ★ 核心修改：使用更安全的渲染方式 ★
+                placeholder.markdown(full_response_text + "▌", unsafe_allow_html=False)
             
-            placeholder.markdown(full_response_text)
+            # ★ 核心修改：最终显示也使用安全方式 ★
+            placeholder.markdown(full_response_text, unsafe_allow_html=False)
 
+            # 成功路径：清理并刷新
             st.session_state.is_generating = False
             with open(log_file, "wb") as f:
                 pickle.dump(_prepare_messages_for_save(st.session_state.messages), f)
             st.experimental_rerun()
 
         except Exception as e:
+            # 失败路径：显示错误，但不刷新
             if full_response_text != original_content:
-                 placeholder.markdown(full_response_text)
+                 # ★ 核心修改：错误时的部分内容也安全显示 ★
+                 placeholder.markdown(full_response_text, unsafe_allow_html=False)
             else:
                  placeholder.empty()
+
             st.error(f"""
             **系统提示：生成时遇到API错误**
             **错误类型：** `{type(e).__name__}`
@@ -1241,9 +1249,11 @@ if st.session_state.is_generating:
             {str(e)}
             ```
             """)
+            
             if not (full_response_text.replace(original_content, '', 1)).strip():
                  if not is_continuation_task:
                      st.session_state.messages.pop(target_message_index)
+            
             st.session_state.is_generating = False
             with open(log_file, "wb") as f:
                 pickle.dump(_prepare_messages_for_save(st.session_state.messages), f)
