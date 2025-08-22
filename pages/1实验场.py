@@ -1277,7 +1277,6 @@ if st.session_state.is_generating:
                 st.session_state.continue_count = 0 # 成功完成，重置计数器
 
             except Exception as e:
-                # --- ★ 核心改动点 ★ ---
                 # 检查是否启用了自动续写
                 if st.session_state.auto_continue:
                     st.session_state.continue_count += 1 # 增加续写次数
@@ -1294,8 +1293,9 @@ if st.session_state.is_generating:
                         st.error(f"回答生成失败 ({type(e).__name__})，且无内容可续写，请重试。")
                         st.session_state.is_generating = False
                 else:
-                    # 如果未启用自动续写，则直接报错并停止
-                    st.error(f"回答生成失败 ({type(e).__name__})。自动续写已禁用，请手动重试。")
+                    # --- ★ 核心改动点 ★ ---
+                    # 如果未启用自动续写，则直接报错并显示详细错误信息
+                    st.error(f"回答生成失败。自动续写已禁用。\n\n**具体错误:** `{type(e).__name__} - {e}`")
                     st.session_state.is_generating = False
                     st.session_state.continue_count = 0 # 失败后重置计数器
             finally:
