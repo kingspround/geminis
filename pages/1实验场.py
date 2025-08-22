@@ -1241,7 +1241,6 @@ if len(st.session_state.messages) >= 1 and not st.session_state.editing:
         last_msg = st.session_state.messages[last_real_msg_idx]
         is_text_only_assistant = (last_msg["role"] == "assistant" and len(last_msg.get("content", [])) > 0 and isinstance(last_msg["content"][0], str))
         
-        # 移除了所有 'disabled' 参数
         if is_text_only_assistant:
             with st.container():
                 cols = st.columns(20)
@@ -1254,17 +1253,26 @@ if len(st.session_state.messages) >= 1 and not st.session_state.editing:
         elif last_msg["role"] == "assistant":
              st.columns(20)[0].button("♻️", key=f"regen_vision_{last_real_msg_idx}", help="重新生成", on_click=regenerate_message, args=(last_real_msg_idx,))
 
-
-
 # --- 核心交互逻辑 (永久可操作版) ---
-# 移除了 '停止生成' 按钮
 st.chat_input(
     "输入你的消息...",
     key="main_chat_input",
     on_submit=send_from_main_input_callback,
-    disabled=st.session_state.editing # 只在编辑时禁用
+    disabled=st.session_state.editing
 )
 
+# ★ 关键修复：在这里定义 get_api_history 辅助函数 ★
+def get_api_history(is_continuation, original_text, target_idx):
+    """根据任务类型准备发送给API的历史记录"""
+    if is_continuation:
+        history = [{"role": ("model" if m["role"] == "assistant" else "user"), "parts": m["content"]} for m in st.session_state.messages[:target_idx+1]]
+        last_chars = (original_text[-100:] + "...") if len(original_text) > 100 else original_text
+        continue_prompt = f"请严格地从以下文本的结尾处，无缝、自然地继续写下去。不要重复任何内容，不要添加任何前言或解释，直接输出续写的内容即可。文本片段：\n\"...{last_chars}\""
+        history.append({"role": "user", "parts": [continue_prompt]})
+        return history
+    else:
+        # 对于新消息，返回None会让getAnswer使用默认的完整历史构建逻辑
+        return None
 
 # ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
 # ★★★ 核心生成逻辑 (最终版：成功则刷新，失败则不刷新) ★★★
@@ -1289,6 +1297,8 @@ if st.session_state.is_generating:
             if not is_continuation_task:
                 st.session_state.messages.append({"role": "assistant", "content": [""]})
                 target_message_index = len(st.session_state.messages) - 1
+            
+            # 调用 get_api_history 函数
             api_history_override = get_api_history(is_continuation_task, original_content, target_message_index)
             full_response_text = original_content
             
@@ -1323,18 +1333,19 @@ if st.session_state.is_generating:
             """)
             
             if not (full_response_text.replace(original_content, '', 1)).strip():
-                 if not is_continuation_task: st.session_state.messages.pop(target_message_index)
+                 if not is_continuation_task:
+                     st.session_state.messages.pop(target_message_index)
             
             # 只更新状态，不刷新页面
             st.session_state.is_generating = False
             with open(log_file, "wb") as f:
                 pickle.dump(_prepare_messages_for_save(st.session_state.messages), f)
 
-
 # --- 底部控件 ---
 c1, c2 = st.columns(2)
 st.session_state.use_token = c1.checkbox("使用 Token", value=st.session_state.get("use_token", True))
 if c2.button("🔄", key="page_refresh", help="刷新页面"): st.experimental_rerun()
+
 	
 
 
