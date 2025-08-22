@@ -1233,74 +1233,67 @@ if not st.session_state.is_generating:
     )
 
 # ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
-# ★★★ 核心生成逻辑 (已恢复并优化中断后自动续写功能) ★★★
-# ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
-# ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
 # ★★★ 核心生成逻辑 (已移除自动续写功能) ★★★
 # ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
 if st.session_state.is_generating:
-    # 检查当前任务是否是“续写”任务 (此逻辑保持不变，用于支持手动点击“继续”按钮)
     is_continuation_task = st.session_state.messages and st.session_state.messages[-1].get("is_continue_prompt")
     
     with st.chat_message("assistant"):
         placeholder = st.empty()
         
-        target_message_index = -1 # 默认指向最后一条消息（新生成）
-        if is_continuation_task:
-            target_message_index = st.session_state.messages[-1].get("target_index", -1)
-        elif not st.session_state.messages or st.session_state.messages[-1]["role"] != "assistant":
-            st.session_state.messages.append({"role": "assistant", "content": [""]})
-        
-        # 安全检查
-        if not (-len(st.session_state.messages) <= target_message_index < len(st.session_state.messages)):
-             st.error("续写目标消息索引无效，已停止生成。")
-             st.session_state.is_generating = False
-        else:
-            streamed_part = ""
-            try:
-                # 1. 获取已存在的内容，用于拼接
-                original_content = ""
+        target_message_index = -1
+        original_content = ""
+        api_history_override = None
+        rerun_on_success = False # --- NEW: 只有成功时才刷新的标志 ---
+
+        try:
+            # 1. 准备工作
+            if is_continuation_task:
+                task_info = st.session_state.messages[-1]
+                target_message_index = task_info.get("target_index", -1)
                 content_list = st.session_state.messages[target_message_index]["content"]
                 if content_list and isinstance(content_list[0], str):
                     original_content = content_list[0]
                 
-                # 2. 正常进行流式生成
-                for chunk in getAnswer():
-                    streamed_part += chunk
-                    updated_full_content = original_content + streamed_part
-                    # 实时将拼接后的完整内容存入session_state
-                    st.session_state.messages[target_message_index]["content"][0] = updated_full_content
-                    # 在界面上显示
-                    placeholder.markdown(updated_full_content + "▌")
-                
-                # 正常生成结束
-                placeholder.markdown(st.session_state.messages[target_message_index]["content"][0])
-                st.session_state.is_generating = False # 任务完成，关闭生成锁
+                temp_history = [{"role": ("model" if m["role"] == "assistant" else "user"), "parts": m["content"]} for m in st.session_state.messages[:target_message_index+1]]
+                last_chars = (original_content[-50:] + "...") if len(original_content) > 50 else original_content
+                continue_prompt = f"请严格地从以下文本的结尾处，无缝、自然地继续写下去。不要重复任何内容，不要添加任何前言或解释，直接输出续写的内容即可。文本片段：\n\"...{last_chars}\""
+                temp_history.append({"role": "user", "parts": [continue_prompt]})
+                api_history_override = temp_history
+            else:
+                if not st.session_state.messages or st.session_state.messages[-1]["role"] != "assistant":
+                    st.session_state.messages.append({"role": "assistant", "content": [""]})
 
-            except Exception as e:
-                # ★★★ 核心改动：移除自动续写 ★★★
-                # 当发生错误时，显示错误信息并停止生成。
-                st.error(f"回答生成时中断: {type(e).__name__}。部分内容可能已保存，您可以手动点击'继续'按钮尝试完成。")
-                st.session_state.is_generating = False # 关键：关闭生成锁，停止循环
+            # 2. 流式生成
+            streamed_part = ""
+            for chunk in getAnswer(custom_history=api_history_override):
+                streamed_part += chunk
+                updated_full_content = original_content + streamed_part
+                st.session_state.messages[target_message_index]["content"][0] = updated_full_content
+                placeholder.markdown(updated_full_content + "▌")
+            
+            # 3. 成功完成
+            st.session_state.is_generating = False
+            placeholder.markdown(st.session_state.messages[target_message_index]["content"][0])
+            rerun_on_success = True # 设置成功刷新标志
 
-            finally:
-                # 清理临时的续写指令（如果有的话）
-                if is_continuation_task:
-                    # 检查是否是因为错误中断，如果是，则不pop，否则用户无法再次点击继续
-                    if not st.session_state.is_generating:
-                        st.session_state.messages.pop()
+        except Exception as e:
+            # 4. ★ 错误处理：冷静地停止并显示错误 ★
+            # 在主聊天区域显示持久的错误信息
+            st.error(f"生成时遇到错误，操作已停止：\n\n`{type(e).__name__}: {e}`")
+            # 清理动态更新的占位符
+            placeholder.empty()
+            # 关键：停止生成状态，以便按钮和输入框能够重新显示
+            st.session_state.is_generating = False
+            
+        finally:
+            # 5. 统一清理和条件性刷新
+            if st.session_state.messages and st.session_state.messages[-1].get("temp"):
+                st.session_state.messages.pop()
 
-                # 清理可能产生的空助手消息
-                if not st.session_state.is_generating and st.session_state.messages and st.session_state.messages[-1]['role'] == 'assistant' and not st.session_state.messages[-1]["content"][0].strip():
-                    st.session_state.messages.pop()
-                
-                # 无论成功还是失败，都保存当前聊天记录并刷新页面
-                with open(log_file, "wb") as f:
-                    pickle.dump(_prepare_messages_for_save(st.session_state.messages), f)
-                st.experimental_rerun()
-
-# --- 底部控件 (保持不变) ---
-c1, c2 = st.columns(2)
-st.session_state.use_token = c1.checkbox("使用 Token", value=st.session_state.get("use_token", True))
-if c2.button("🔄", key="page_refresh", help="刷新页面"): st.experimental_rerun()
-
+            with open(log_file, "wb") as f:
+                pickle.dump(_prepare_messages_for_save(st.session_state.messages), f)
+            
+            # 只有在成功完成后才执行刷新
+            if rerun_on_success:
+                st.rerun()
