@@ -17,7 +17,7 @@ st.set_page_config(
 
 # --- API 密钥设置 ---
 API_KEYS = {
-    "主密钥": "AIzaSyCBjZbA78bPusYmUNvfsmHpt6rPx6Ur0QE",
+    "主密钥": "AIzaSyA5fPQo1F4qlywciLyZQknpCq0ScuOTpv4",
     "备用1号": "AIzaSyD-FD6mRTsdRlE1JlD_KODkDI5K36dwqDs",
     "备用2号":"AIzaSyD4UdMp5wndOAKxtO1CWpzuZEGEf78YKUQ",
     "备用3号":"AIzaSyBVbA7tEyyy_ASp7l9P60qSh1xOM2CSMNw",
