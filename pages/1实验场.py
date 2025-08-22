@@ -1152,10 +1152,6 @@ with st.sidebar:
 if not st.session_state.messages and not st.session_state.is_generating: load_history(log_file)
 
 for i, message in enumerate(st.session_state.messages):
-    # 如果当前消息是正在续写的任务目标，就跳过渲染，因为它将在下面的生成逻辑中被重新渲染
-    if st.session_state.is_generating and i == st.session_state.continue_task:
-        continue
-    
     if message.get("temp"):
         continue
     with st.chat_message(message["role"]):
@@ -1163,7 +1159,7 @@ for i, message in enumerate(st.session_state.messages):
             if isinstance(part, str): st.markdown(part, unsafe_allow_html=True)
             elif isinstance(part, Image.Image): st.image(part, width=400)
 				
-# --- 编辑界面显示逻辑 (保持不变) ---
+# --- 编辑界面显示逻辑 ---
 if st.session_state.get("editing"):
     i = st.session_state.editable_index
     message = st.session_state.messages[i]
@@ -1179,7 +1175,7 @@ if st.session_state.get("editing"):
             st.session_state.editing = False; st.experimental_rerun()
 
 
-# --- 续写/编辑/重生成按钮逻辑 (保持不变) ---
+# --- 续写/编辑/重生成按钮逻辑 ---
 if len(st.session_state.messages) >= 1 and not st.session_state.is_generating and not st.session_state.editing:
     last_real_msg_idx = -1
     for i in range(len(st.session_state.messages) - 1, -1, -1):
@@ -1198,38 +1194,13 @@ if len(st.session_state.messages) >= 1 and not st.session_state.is_generating an
                     st.session_state.editable_index = last_real_msg_idx
                     st.session_state.editing = True
                     st.rerun()
-                # 使用 on_click 绑定新函数
                 cols[1].button("♻️", key=f"regen_{last_real_msg_idx}", help="重新生成", on_click=regenerate_message, args=(last_real_msg_idx,))
                 cols[2].button("➕", key=f"cont_{last_real_msg_idx}", help="继续", on_click=continue_message, args=(last_real_msg_idx,))
         elif last_msg["role"] == "assistant":
-             # 同样使用 on_click
              st.columns(20)[0].button("♻️", key=f"regen_vision_{last_real_msg_idx}", help="重新生成", on_click=regenerate_message, args=(last_real_msg_idx,))
 
 
-# --- 核心交互逻辑 (主输入框) ---
-# 使用回调函数以获得更好的响应体验
-def send_from_main_input_callback():
-    raw_prompt = st.session_state.get("main_chat_input", "")
-    if not raw_prompt: return
-    prompt = raw_prompt.strip()
-    token = generate_token()
-    full_prompt = f"{prompt} (token: {token})" if st.session_state.use_token else prompt
-    st.session_state.messages.append({"role": "user", "content": [full_prompt]})
-    st.session_state.is_generating = True
-
-if not st.session_state.is_generating:
-    st.chat_input(
-        "输入你的消息...",
-        key="main_chat_input",
-        on_submit=send_from_main_input_callback,
-        disabled=st.session_state.editing
-    )
-
-# ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
-# ★★★ 核心生成逻辑 (已恢复并优化中断后自动续写功能) ★★★
-# ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
-# --- 核心生成逻辑 (自动续写模式) ---
-# 这个代码块只在“自动续写”开启且 is_generating 标志为 True 时运行
+# --- 核心生成逻辑 (仅在“自动续写”模式下，当生成任务进行时执行) ---
 if st.session_state.is_generating and st.session_state.get("auto_continue", True):
     is_continuation_task = st.session_state.messages and st.session_state.messages[-1].get("is_continue_prompt")
     
@@ -1281,14 +1252,14 @@ if st.session_state.is_generating and st.session_state.get("auto_continue", True
                     pickle.dump(_prepare_messages_for_save(st.session_state.messages), f)
                 st.experimental_rerun()
 
-
-# --- 统一的聊天输入框 ---
+# --- 唯一的聊天输入框 (处理所有新消息的提交) ---
 prompt = st.chat_input(
     "输入你的消息...",
-    key="main_chat_input", # 使用一个固定的 key
+    key="main_chat_input", # 使用一个固定的、唯一的 key
     disabled=st.session_state.editing or st.session_state.is_generating
 )
 
+# 当用户提交新消息时，此代码块执行
 if prompt:
     # 1. 准备并添加用户消息
     prompt = prompt.strip()
@@ -1296,13 +1267,14 @@ if prompt:
     full_prompt = f"{prompt} (token: {token})" if st.session_state.use_token else prompt
     st.session_state.messages.append({"role": "user", "content": [full_prompt]})
 
-    # 2. 根据复选框状态决定执行哪个逻辑
+    # 2. 根据“自动续写”复选框的状态，决定下一步操作
     if st.session_state.get("auto_continue", True):
-        # 模式一：开启自动续写 -> 设置标志并刷新，让上面的逻辑块接管
+        # 模式一 (自动续写 ON): 设置 is_generating 标志为 True，然后重新运行脚本。
+        # 脚本重新运行后，上面的“核心生成逻辑”块将被激活并处理响应。
         st.session_state.is_generating = True
         st.experimental_rerun()
     else:
-        # 模式二：关闭自动续写 -> 立即在此处执行简单生成逻辑
+        # 模式二 (自动续写 OFF): 立即在此处执行简单、直接的生成逻辑。
         with st.chat_message("user"):
             st.markdown(full_prompt)
         
@@ -1320,7 +1292,7 @@ if prompt:
                 if st.session_state.messages and st.session_state.messages[-1]["role"] == "user":
                     st.session_state.messages.pop()
         
-        # 保存并刷新，以确保UI状态正确
+        # 保存并重新运行脚本，以清理UI状态。
         with open(log_file, "wb") as f:
             pickle.dump(_prepare_messages_for_save(st.session_state.messages), f)
         st.experimental_rerun()
