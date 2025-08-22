@@ -191,10 +191,16 @@ tips:
                 history_to_send.append({"role": api_role, "parts": msg["content"]})
     
     final_contents = [msg for msg in history_to_send if msg.get("parts")]
-    # --- 关键修改：从 session_state 中获取 model 对象 ---
     response = st.session_state.model.generate_content(contents=final_contents, stream=True)
+    
+    # ★ 核心修改：增加try...except来处理无内容的结束信号块 ★
     for chunk in response:
-        yield chunk.text
+        try:
+            yield chunk.text
+        except ValueError:
+            # 优雅地忽略掉API在结束时发送的、不含文本的空数据块
+            # 这可以防止因达到max_tokens等原因导致的程序崩溃
+            continue
 
 def regenerate_message(index):
     """
@@ -1287,27 +1293,29 @@ if st.session_state.is_generating:
         original_content = ""
         api_history_override = None
         full_response_text = ""
+        
+        # 将成功和失败路径的公共清理步骤放在一个变量中
+        # 这样可以确保无论发生什么，状态都会被清理
+        generation_ended = False
 
         try:
-            # 1. 准备工作
+            # 1. 准备工作 (代码不变)
             if is_continuation_task and task_info:
                 target_message_index = task_info.get("target_index", -1)
                 if 0 <= target_message_index < len(st.session_state.messages):
                     content_list = st.session_state.messages[target_message_index]["content"]
                     if content_list and isinstance(content_list[0], str):
                         original_content = content_list[0]
-                else:
-                    is_continuation_task = False
+                else: is_continuation_task = False
 
             if not is_continuation_task:
                 st.session_state.messages.append({"role": "assistant", "content": [""]})
                 target_message_index = len(st.session_state.messages) - 1
             
-            # 调用辅助函数来准备API历史
             api_history_override = get_api_history(is_continuation_task, original_content, target_message_index)
             full_response_text = original_content
             
-            # 2. 流式生成与实时保存
+            # 2. 流式生成 (代码不变)
             for chunk in getAnswer(custom_history=api_history_override):
                 full_response_text += chunk
                 st.session_state.messages[target_message_index]["content"] = [full_response_text]
@@ -1317,19 +1325,15 @@ if st.session_state.is_generating:
             placeholder.markdown(full_response_text)
 
         except Exception as e:
-            # 4. 返回完整的、未经删改的原始报错信息
-            # a. 保留已生成的部分内容
+            # 4. 精确报错处理 (代码不变)
             if full_response_text != original_content:
                  placeholder.markdown(full_response_text)
             else:
                  placeholder.empty()
 
-            # b. 使用 st.error() 显示包含原始错误详情的独立提示框
             st.error(f"""
             **系统提示：生成时遇到API错误**
-
             **错误类型：** `{type(e).__name__}`
-            
             **原始报错信息：**
             ```
             {str(e)}
@@ -1337,13 +1341,19 @@ if st.session_state.is_generating:
             *已生成的内容（如有）已保留。请根据上述报错信息检查您的API密钥、模型名称或网络连接。*
             """)
             
-            # c. 如果没有生成任何新内容，则清理空的消息占位符
             if not (full_response_text.replace(original_content, '', 1)).strip():
                  if not is_continuation_task:
                      st.session_state.messages.pop(target_message_index)
+            
+            # ★ 核心修改：在错误发生后，立即触发UI刷新 ★
+            generation_ended = True # 标记生成已结束
+            st.session_state.is_generating = False
+            with open(log_file, "wb") as f:
+                pickle.dump(_prepare_messages_for_save(st.session_state.messages), f)
+            st.rerun() # 强制刷新页面，让按钮重新变为可用状态
 
-        finally:
-            # 5. 统一清理
+        # 5. 只有在没有发生异常的情况下，才会执行到这里
+        if not generation_ended:
             st.session_state.is_generating = False
             with open(log_file, "wb") as f:
                 pickle.dump(_prepare_messages_for_save(st.session_state.messages), f)
