@@ -15,7 +15,7 @@ st.set_page_config(
     layout="wide"
 )
 
-# --- API 密钥设置 (保持不变) ---
+# --- API 密钥设置 ---
 API_KEYS = {
     "主密钥": "AIzaSyCBjZbA78bPusYmUNvfsmHpt6rPx6Ur0QE",
     "备用1号": "AIzaSyAWfFf6zqy1DizINOwPfxPD8EF2ACdwCaQ",
@@ -30,6 +30,9 @@ API_KEYS = {
     "备用10号":"AIzaSyDOI2e-I1RdXBnk99jY2H00A3aymXREETA"
 }
 
+# ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
+# ★★★ 关键修正：所有 Session State 初始化必须在最前面 ★★★
+# ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
 # --- 初始化 Session State ---
 if "selected_api_key" not in st.session_state:
     st.session_state.selected_api_key = list(API_KEYS.keys())[0]
@@ -55,16 +58,15 @@ if "rerun_count" not in st.session_state:
     st.session_state.rerun_count = 0
 if "use_token" not in st.session_state:
     st.session_state.use_token = True
-# 加上您上次新增的状态
 if "auto_continue" not in st.session_state:
-    st.session_state.auto_continue = True 
+    st.session_state.auto_continue = True
 if "continue_count" not in st.session_state:
-    st.session_state.continue_count = 0 
-if "continue_task" not in st.session_state: # 这个也需要在这里初始化
-    st.session_state.continue_task = None 
+    st.session_state.continue_count = 0
+if "continue_task" not in st.session_state:
+    st.session_state.continue_task = None
 
 
-# --- API配置和模型定义 (保持不变) ---
+# --- API配置和模型定义 ---
 genai.configure(api_key=API_KEYS[st.session_state.selected_api_key])
 generation_config = {
   "temperature": 1.0, "top_p": 0.95, "top_k": 40, "max_output_tokens": 8192, "response_mime_type": "text/plain",
