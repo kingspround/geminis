@@ -159,17 +159,6 @@ def ensure_enabled_settings_exists():
         if setting_name not in st.session_state.enabled_settings: st.session_state.enabled_settings[setting_name] = False
 ensure_enabled_settings_exists()
 
-def get_api_history(is_continuation, original_text, target_idx):
-    """根据任务类型准备发送给API的历史记录"""
-    if is_continuation:
-        history = [{"role": ("model" if m["role"] == "assistant" else "user"), "parts": m["content"]} for m in st.session_state.messages[:target_idx+1]]
-        last_chars = (original_text[-100:] + "...") if len(original_text) > 100 else original_text
-        continue_prompt = f"请严格地从以下文本的结尾处，无缝、自然地继续写下去。不要重复任何内容，不要添加任何前言或解释，直接输出续写的内容即可。文本片段：\n\"...{last_chars}\""
-        history.append({"role": "user", "parts": [continue_prompt]})
-        return history
-    else:
-        # 对于新消息，返回None会让getAnswer使用默认的完整历史构建逻辑
-        return None
 
 def getAnswer(custom_history=None):
     if custom_history:
