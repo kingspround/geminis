@@ -208,7 +208,8 @@ def regenerate_message(index):
         
         # 启动生成状态
         st.session_state.is_generating = True
-        st.experimental_rerun()
+        # st.experimental_rerun() # <--- 移除此行！Streamlit会因on_click自动刷新
+
 
 def continue_message(index):
     """
@@ -235,18 +236,16 @@ def continue_message(index):
         
         # ★ 核心改动 ★
         # 添加一个带有特殊标记的临时用户消息。
-        # 主生成循环会识别这些标记，并在 `target_index` 指定的消息上进行续写，而不是创建新消息。
         st.session_state.messages.append({
             "role": "user", 
             "content": [continue_prompt], 
-            "temp": True,  # 标记为临时消息，不在UI上显示
-            "is_continue_prompt": True, # 告诉主循环这是一个续写任务
-            "target_index": index # 告诉主循环要续写的消息索引
+            "temp": True,
+            "is_continue_prompt": True,
+            "target_index": index 
         })
         
         # 启动生成状态
         st.session_state.is_generating = True
-        st.experimental_rerun()
 		
 def send_from_sidebar_callback():
     uploaded_files = st.session_state.get("sidebar_uploader", [])
