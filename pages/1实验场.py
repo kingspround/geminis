@@ -1228,9 +1228,6 @@ if st.session_state.get("editing"):
         if c2.button("取消 ❌", key=f"cancel_{i}"):
             st.session_state.editing = False; st.experimental_rerun()
 
-# --- 持久化错误信息显示区域 ---
-if st.session_state.get("error_message"):
-    st.error(st.session_state.error_message)
 
 # --- 续写/编辑/重生成按钮逻辑 (常驻UI版) ---
 if len(st.session_state.messages) >= 1 and not st.session_state.editing:
@@ -1273,10 +1270,11 @@ st.chat_input(
     disabled=st.session_state.is_generating or st.session_state.editing
 )
 
-# 3. 核心生成逻辑
+# ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
+# ★★★ 核心生成逻辑 (最终版：错误时不刷新，立即显示) ★★★
+# ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
 if st.session_state.is_generating:
-    # 开始新生成时，清除上一轮的错误和停止状态
-    st.session_state.error_message = None
+    # 开始生成时，总是重置停止状态
     st.session_state.stop_generating = False
 
     is_continuation_task = st.session_state.messages and st.session_state.messages[-1].get("is_continue_prompt")
@@ -1301,13 +1299,13 @@ if st.session_state.is_generating:
             api_history_override = get_api_history(is_continuation_task, original_content, target_message_index)
             full_response_text = original_content
             
-            # 流式生成，并响应停止信号
+            # 流式生成
             for chunk in getAnswer(custom_history=api_history_override):
                 full_response_text += chunk
                 st.session_state.messages[target_message_index]["content"] = [full_response_text]
                 placeholder.markdown(full_response_text + "▌")
             
-            # 判断是正常结束还是手动停止
+            # 处理手动停止
             if st.session_state.stop_generating:
                 final_text = full_response_text + "\n\n--- \n**系统提示：** 用户手动停止生成。"
                 st.session_state.messages[target_message_index]["content"] = [final_text]
@@ -1315,32 +1313,38 @@ if st.session_state.is_generating:
             else:
                 placeholder.markdown(full_response_text)
 
+            # ★ 成功路径：清理并刷新 ★
+            st.session_state.is_generating = False
+            st.session_state.stop_generating = False
+            with open(log_file, "wb") as f:
+                pickle.dump(_prepare_messages_for_save(st.session_state.messages), f)
+            st.rerun()
+
         except Exception as e:
-            # ★ 核心修改：将错误信息存入 session_state ★
+            # ★ 失败路径：立即显示错误，但不刷新 ★
             if full_response_text != original_content:
                  placeholder.markdown(full_response_text)
             else:
                  placeholder.empty()
 
-            st.session_state.error_message = f"""
+            # 立即在当前页面显示错误
+            st.error(f"""
             **系统提示：生成时遇到API错误**
             **错误类型：** `{type(e).__name__}`
             **原始报错信息：**
             ```
             {str(e)}
             ```
-            """
+            """)
             
             if not (full_response_text.replace(original_content, '', 1)).strip():
                  if not is_continuation_task: st.session_state.messages.pop(target_message_index)
-
-        finally:
-            # ★ 核心修改：无论成功、失败还是停止，最后都刷新一次 ★
+            
+            # 只更新状态，不刷新页面
             st.session_state.is_generating = False
             st.session_state.stop_generating = False
             with open(log_file, "wb") as f:
                 pickle.dump(_prepare_messages_for_save(st.session_state.messages), f)
-            st.rerun()
 
 # --- 底部控件 ---
 c1, c2 = st.columns(2)
