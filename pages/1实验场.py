@@ -75,6 +75,8 @@ if "rerun_count" not in st.session_state:
     st.session_state.rerun_count = 0
 if "use_token" not in st.session_state:
     st.session_state.use_token = False
+if "stop_generating" not in st.session_state:
+    st.session_state.stop_generating = False
 
 
 # --- API配置和模型定义 (保持不变) ---
@@ -193,13 +195,13 @@ tips:
     final_contents = [msg for msg in history_to_send if msg.get("parts")]
     response = st.session_state.model.generate_content(contents=final_contents, stream=True)
     
-    # ★ 核心修改：增加try...except来处理无内容的结束信号块 ★
     for chunk in response:
+        # ★ 核心修改：在生成每一块内容前，检查是否收到了停止信号 ★
+        if st.session_state.get("stop_generating"):
+            break # 如果需要停止，则跳出循环
         try:
             yield chunk.text
         except ValueError:
-            # 优雅地忽略掉API在结束时发送的、不含文本的空数据块
-            # 这可以防止因达到max_tokens等原因导致的程序崩溃
             continue
 
 def regenerate_message(index):
@@ -1256,7 +1258,17 @@ if len(st.session_state.messages) >= 1 and not st.session_state.editing:
              st.columns(20)[0].button("♻️", key=f"regen_vision_{last_real_msg_idx}", help="重新生成", on_click=regenerate_message, args=(last_real_msg_idx,), disabled=is_disabled)
 			
 
-# --- 核心交互逻辑 (主输入框) ---
+# --- 核心交互逻辑 (最终版：包含停止按钮 & 永久可操作UI) ---
+
+# 1. 显示“停止生成”按钮 (仅在生成时)
+if st.session_state.is_generating:
+    # 增加一个回调函数来设置停止标志
+    def stop_generation_callback():
+        st.session_state.stop_generating = True
+    
+    st.button("停止生成 ⏹️", on_click=stop_generation_callback, use_container_width=True, type="primary")
+
+# 2. 显示主输入框 (根据状态禁用)
 st.chat_input(
     "输入你的消息...",
     key="main_chat_input",
@@ -1264,23 +1276,11 @@ st.chat_input(
     disabled=st.session_state.is_generating or st.session_state.editing
 )
 
-# --- 辅助函数：准备API历史记录 (必须存在) ---
-def get_api_history(is_continuation, original_text, target_idx):
-    """根据任务类型准备发送给API的历史记录"""
-    if is_continuation:
-        history = [{"role": ("model" if m["role"] == "assistant" else "user"), "parts": m["content"]} for m in st.session_state.messages[:target_idx+1]]
-        last_chars = (original_text[-100:] + "...") if len(original_text) > 100 else original_text
-        continue_prompt = f"请严格地从以下文本的结尾处，无缝、自然地继续写下去。不要重复任何内容，不要添加任何前言或解释，直接输出续写的内容即可。文本片段：\n\"...{last_chars}\""
-        history.append({"role": "user", "parts": [continue_prompt]})
-        return history
-    else:
-        # 对于新消息，返回None会让getAnswer使用默认的完整历史构建逻辑
-        return None
-
-# ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
-# ★★★ 核心生成逻辑 (最终版：包含辅助函数 & 精确报错) ★★★
-# ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
+# 3. 核心生成逻辑 (全新重构)
 if st.session_state.is_generating:
+    # 在生成开始时，总是重置停止标志
+    st.session_state.stop_generating = False
+
     is_continuation_task = st.session_state.messages and st.session_state.messages[-1].get("is_continue_prompt")
     task_info = None
     if is_continuation_task:
@@ -1288,49 +1288,37 @@ if st.session_state.is_generating:
 
     with st.chat_message("assistant"):
         placeholder = st.empty()
+        target_message_index, original_content, api_history_override, full_response_text = -1, "", None, ""
         
-        target_message_index = -1
-        original_content = ""
-        api_history_override = None
-        full_response_text = ""
-        
-        # 将成功和失败路径的公共清理步骤放在一个变量中
-        # 这样可以确保无论发生什么，状态都会被清理
-        generation_ended = False
-
         try:
-            # 1. 准备工作 (代码不变)
+            # 准备工作
             if is_continuation_task and task_info:
                 target_message_index = task_info.get("target_index", -1)
                 if 0 <= target_message_index < len(st.session_state.messages):
-                    content_list = st.session_state.messages[target_message_index]["content"]
-                    if content_list and isinstance(content_list[0], str):
-                        original_content = content_list[0]
+                    original_content = st.session_state.messages[target_message_index]["content"][0]
                 else: is_continuation_task = False
-
             if not is_continuation_task:
                 st.session_state.messages.append({"role": "assistant", "content": [""]})
                 target_message_index = len(st.session_state.messages) - 1
-            
             api_history_override = get_api_history(is_continuation_task, original_content, target_message_index)
             full_response_text = original_content
             
-            # 2. 流式生成 (代码不变)
+            # 流式生成
             for chunk in getAnswer(custom_history=api_history_override):
                 full_response_text += chunk
                 st.session_state.messages[target_message_index]["content"] = [full_response_text]
                 placeholder.markdown(full_response_text + "▌")
             
-            # 3. 成功完成
-            placeholder.markdown(full_response_text)
+            # 判断是正常结束还是手动停止
+            if st.session_state.stop_generating:
+                final_text = full_response_text + "\n\n--- \n**系统提示：** 用户手动停止生成。"
+                st.session_state.messages[target_message_index]["content"] = [final_text]
+                placeholder.markdown(final_text)
+            else:
+                placeholder.markdown(full_response_text)
 
         except Exception as e:
-            # 4. 精确报错处理 (代码不变)
-            if full_response_text != original_content:
-                 placeholder.markdown(full_response_text)
-            else:
-                 placeholder.empty()
-
+            # 精确报错
             st.error(f"""
             **系统提示：生成时遇到API错误**
             **错误类型：** `{type(e).__name__}`
@@ -1338,28 +1326,21 @@ if st.session_state.is_generating:
             ```
             {str(e)}
             ```
-            *已生成的内容（如有）已保留。请根据上述报错信息检查您的API密钥、模型名称或网络连接。*
             """)
-            
             if not (full_response_text.replace(original_content, '', 1)).strip():
-                 if not is_continuation_task:
-                     st.session_state.messages.pop(target_message_index)
-            
-            # ★ 核心修改：在错误发生后，立即触发UI刷新 ★
-            generation_ended = True # 标记生成已结束
+                 if not is_continuation_task: st.session_state.messages.pop(target_message_index)
+
+        finally:
+            # 统一清理并立即刷新UI，让所有控件恢复可用
             st.session_state.is_generating = False
+            st.session_state.stop_generating = False
             with open(log_file, "wb") as f:
                 pickle.dump(_prepare_messages_for_save(st.session_state.messages), f)
-            st.rerun() # 强制刷新页面，让按钮重新变为可用状态
+            st.rerun()
 
-        # 5. 只有在没有发生异常的情况下，才会执行到这里
-        if not generation_ended:
-            st.session_state.is_generating = False
-            with open(log_file, "wb") as f:
-                pickle.dump(_prepare_messages_for_save(st.session_state.messages), f)
-
-
-# --- 底部控件 (保持不变) ---
+# --- 底部控件 (代码不变) ---
 c1, c2 = st.columns(2)
 st.session_state.use_token = c1.checkbox("使用 Token", value=st.session_state.get("use_token", True))
 if c2.button("🔄", key="page_refresh", help="刷新页面"): st.experimental_rerun()
+
+
