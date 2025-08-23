@@ -781,7 +781,7 @@ Excellent examples of scenarios loading......
 
 
 
-      ），"""}]})
+      ），"""
         history_to_send.append({"role": "user", "parts": [{"text": master_prompt}]})
         
         # (以下代码保持不变)
