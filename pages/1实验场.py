@@ -17,8 +17,8 @@ st.set_page_config(
 
 # --- API 密钥设置 ---
 API_KEYS = {
-    "主密钥20270168962": "AIzaSyCHRQSeBdUhcUSXMX6guLtJ-i-tHnb-bJM",
-    "备用1号": "AIzaSyD-FD6mRTsdRlE1JlD_KODkDI5K36dwqDs",
+    "1号20270168962": "AIzaSyCHRQSeBdUhcUSXMX6guLtJ-i-tHnb-bJM",
+    "2号20270168962": "AIzaSyCxZG9EUnp7pcgPVpWrFmR8PhhrQo677is",
     "备用2号":"AIzaSyD4UdMp5wndOAKxtO1CWpzuZEGEf78YKUQ",
     "备用3号":"AIzaSyBVbA7tEyyy_ASp7l9P60qSh1xOM2CSMNw",
     "备用4号":"AIzaSyDezEpxvtY1AKN6JACMU9XHte5sxATNcUs",
