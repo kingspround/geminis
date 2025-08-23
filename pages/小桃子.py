@@ -176,20 +176,6 @@ def getAnswer(custom_history=None):
     "stream_openai": false,
     "prompts": [
         {
-            "identifier": "522c1a7a-4507-4218-8e3a-ef3931ff39f6",
-            "system_prompt": false,
-            "enabled": false,
-            "marker": false,
-            "name": "📎Var",
-            "role": "system",
-            "content": "{{setvar::anticreate::}}\n{{setvar::antisex::}}\n{{setvar::antiprocess::}}\n{{setvar::antiprocess2::}}\n{{setvar::antidespair::}}\n{{setvar::cotantidespair::}}\n{{setvar::dlc::}}\n{{setvar::dlc2::}}\n{{setvar::dlc3::}}\n{{setvar::dlc4::}}\n{{setvar::reply0::}}\n{{setvar::reply::}}\n{{setvar::reply2::}}\n{{setvar::antisimile::}}\n{{setvar::reply3::}}\n{{setvar::summary::}}\n{{setvar::summary1::}}\n{{setvar::summary2::}}\n{{setvar::cotdlc::}}\n{{setvar::baimiao::}}\n{{setvar::antipronoun::}}\n{{setvar::jt::}}\n{{setvar::thoughts::}}\n{{setvar::thoughts2::}}\n{{setvar::thoughts3::}}\n{{setvar::thoughts4::}}\n{{setvar::thoughts5::}}\n{{setvar::thoughts6::}}\n{{setvar::thoughts7::}}\n{{setvar::thoughts8::}}\n{{setvar::thoughts9::}}\n{{setvar::idea::}}\n{{setvar::antiknown::}}\n{{setvar::antiknown1::}}\n{{setvar::idea4::}}\n{{setvar::antiqh::}}\n{{setvar::anticreate::}}\n{{setvar::repeat::}}",
-            "injection_position": 0,
-            "injection_depth": 4,
-            "injection_order": 100,
-            "injection_trigger": [],
-            "forbid_overrides": false
-        },
-        {
             "name": "主要提示词",
             "system_prompt": true,
             "role": "system",
