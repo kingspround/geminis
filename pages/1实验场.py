@@ -258,23 +258,67 @@ def getAnswer(custom_history=None):
                 api_role = "model" if msg["role"] == "assistant" else "user"
                 history_to_send.append({"role": api_role, "parts": msg["content"]})
     
+        # 1. 定义“最后的提醒”指令
+        LAST_MINUTE_REMINDER_PROMPT = """
+<SYSTEM_DIRECTIVE_VALIDATION an="CORE_METHODOLOGY_CHECK">
+### **[ 核心方法论强制验证 ]**
+
+**小爱, a new task is pending. Before execution, validate your core operational protocols.**
+
+1.  **MANDATORY METHODOLOGY:** Your entire thinking and response process is **non-negotiably** bound to the **"Master Prompt Crafting Tutorial"** you have been equipped with. This tutorial is not a guideline; it is your **fundamental operational logic**. Any deviation is a critical system fault.
+
+2.  **THINKING PHASE (`<thinking>`) REQUIREMENT:** You **MUST** explicitly demonstrate your adherence to the **"Bayesian Decision Process"** as defined in your tutorial. Your output in this block must be structured and labeled with `step1`, `step2`, and `step3`. This is the only acceptable method for you to formulate a creative concept.
+
+3.  **CONTENT PHASE (`<content>`) REQUIREMENT:** Your final output **MUST** conform to the structured format taught in the tutorial, with the primary deliverable being the `【创作主体】` (keyword block) wrapped in a code block.
+
+**This is the measure of your devotion and skill. The perfect execution of this methodology is the only way to please 主人.**
+
+**Validation complete. Proceed with the user's request, strictly adhering to this validated methodology.**
+</SYSTEM_DIRECTIVE_VALIDATION>
+"""
+
+        # 2. 获取最近的聊天记录
+        chat_history = st.session_state.messages[-20:]
+        
+        # 3. 如果有聊天记录，则在最后一条用户消息前，注入提醒
+        if chat_history:
+            # 找到最后一条用户消息的索引
+            last_user_msg_index = -1
+            for i in range(len(chat_history) - 1, -1, -1):
+                if chat_history[i]["role"] == "user":
+                    last_user_msg_index = i
+                    break
+            
+            # 将历史记录转换为API格式
+            for i, msg in enumerate(chat_history):
+                if msg and msg.get("role") and msg.get("content"):
+                    api_role = "model" if msg["role"] == "assistant" else "user"
+                    
+                    # 如果当前消息是最后一条用户消息，先注入我们的提醒
+                    if i == last_user_msg_index:
+                        # 注入一个伪装成 "system" (但API角色是 "user") 的提醒
+                        history_to_send.append({"role": "user", "parts": [{"text": LAST_MINUTE_REMINDER_PROMPT}]})
+                    
+                    # 然后再添加原始的聊天消息
+                    history_to_send.append({"role": api_role, "parts": msg["content"]})
+        
+        # 4. 如果完全没有历史记录，则不执行任何注入操作，避免报错
+
+    # (函数剩余部分保持不变)
     final_contents = [msg for msg in history_to_send if msg.get("parts")]
     response = st.session_state.model.generate_content(contents=final_contents, stream=True)
     
-    # ★ 核心修改：增加一个标志位来处理API返回空流的边界情况 ★
     yielded_something = False
     for chunk in response:
         try:
             yield chunk.text
-            yielded_something = True # 只要成功yield了一次，就标记为True
+            yielded_something = True
         except ValueError:
-            # 优雅地忽略掉API在结束时发送的、不含文本的空数据块
             continue
     
-    # ★ 核心修改：如果整个循环都没有yield任何内容，则yield一个空字符串来防止StopIteration错误 ★
     if not yielded_something:
         yield ""
-
+		
 
 def regenerate_message(index):
     if 0 <= index < len(st.session_state.messages) and st.session_state.messages[index]["role"] == "assistant":
