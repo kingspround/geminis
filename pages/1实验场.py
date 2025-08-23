@@ -1273,7 +1273,7 @@ def get_api_history(is_continuation, original_text, target_idx):
         return None
 
 # ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
-# ★★★ 核心生成邏輯 (最終版：智能預處理，完美還原格式且絕不崩潰) ★★★
+# ★★★ 核心生成邏輯 (最終版：防意外重跑，杜絕重複消息) ★★★
 # ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
 if st.session_state.is_generating:
     is_continuation_task = st.session_state.messages and st.session_state.messages[-1].get("is_continue_prompt")
@@ -1286,29 +1286,33 @@ if st.session_state.is_generating:
         target_message_index, original_content, api_history_override, full_response_text = -1, "", None, ""
         
         try:
-            # 1. 準備工作
+            # 1. 準備工作 (經過加固)
             if is_continuation_task and task_info:
                 target_message_index = task_info.get("target_index", -1)
                 if 0 <= target_message_index < len(st.session_state.messages):
                     original_content = st.session_state.messages[target_message_index]["content"][0]
                 else: is_continuation_task = False
-            if not is_continuation_task:
-                st.session_state.messages.append({"role": "assistant", "content": [""]})
-                target_message_index = len(st.session_state.messages) - 1
             
+            # ★ 核心修改：在創建新消息前，檢查是否已存在一個助手佔位符 ★
+            if not is_continuation_task:
+                # 只有在聊天記錄為空，或最後一條消息不是助手消息時，才創建新的佔位符
+                if not st.session_state.messages or st.session_state.messages[-1]["role"] != "assistant":
+                    st.session_state.messages.append({"role": "assistant", "content": [""]})
+                
+                # ★ 核心修改：無論是否新建，都從最後一條消息獲取狀態 ★
+                target_message_index = len(st.session_state.messages) - 1
+                original_content = st.session_state.messages[target_message_index]["content"][0]
+
             api_history_override = get_api_history(is_continuation_task, original_content, target_message_index)
             full_response_text = original_content
             
-            # 2. 流式生成
+            # 2. 流式生成 (現在它會正確地在殘缺消息上繼續)
             for chunk in getAnswer(custom_history=api_history_override):
                 full_response_text += chunk
                 st.session_state.messages[target_message_index]["content"] = [full_response_text]
-                
-                # ★ 核心修改：在渲染前對文本進行預處理，強制保留換行 ★
                 processed_text = full_response_text.replace('\n', '  \n')
                 placeholder.markdown(processed_text + "▌", unsafe_allow_html=False)
             
-            # ★ 核心修改：最終顯示也使用預處理過的文本 ★
             processed_text_final = full_response_text.replace('\n', '  \n')
             placeholder.markdown(processed_text_final, unsafe_allow_html=False)
 
@@ -1321,7 +1325,6 @@ if st.session_state.is_generating:
         except Exception as e:
             # 失敗路徑：顯示錯誤，但不刷新
             if full_response_text != original_content:
-                 # ★ 核心修改：錯誤時的部分內容也進行預處理後安全顯示 ★
                  processed_text_error = full_response_text.replace('\n', '  \n')
                  placeholder.markdown(processed_text_error, unsafe_allow_html=False)
             else:
