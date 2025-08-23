@@ -17,17 +17,12 @@ st.set_page_config(
 
 # --- API 密钥设置 ---
 API_KEYS = {
-    "1号20270168962": "AIzaSyCHRQSeBdUhcUSXMX6guLtJ-i-tHnb-bJM",
-    "2号510565214806": "AIzaSyBF0shOgfZ_aR_xrtUCazvhYcYC6tyG6xo",
-    "备用2号":"AIzaSyD4UdMp5wndOAKxtO1CWpzuZEGEf78YKUQ",
-    "备用3号":"AIzaSyBVbA7tEyyy_ASp7l9P60qSh1xOM2CSMNw",
-    "备用4号":"AIzaSyDezEpxvtY1AKN6JACMU9XHte5sxATNcUs",
-    "备用5号":"AIzaSyBgyyy2kTTAdsLB53OCR2omEbj7zlx1mjw",
-    "备用6号":"AIzaSyDPFZ7gRba9mhKTqbXA_Y7fhAxS8IEu0bY",
-    "备用7号":"AIzaSyDdyhqcowl0ftcbK9pMObXzM7cIOQMtlmA",
-    "备用8号":"AIzaSyAA7Qs9Lzy4UxxIqCIQ4RknchiWQt_1hgI",
-    "备用9号":"AIzaSyDfGxLEeD1N00aXPSZmEGql2-RH6FRtjNw",
-    "备用10号":"AIzaSyDOI2e-I1RdXBnk99jY2H00A3aymXREETA"
+    "04 1号20270168962": "AIzaSyCHRQSeBdUhcUSXMX6guLtJ-i-tHnb-bJM",
+    "04 2号510565214806": "AIzaSyBF0shOgfZ_aR_xrtUCazvhYcYC6tyG6xo",
+    "04 3号340384272853":"AIzaSyDOpwjm1V1cb7wpoUYrdXNdMwLE55TMn9c",
+    "04 4号375090949096":"AIzaSyAkx1BcgxXRj683mqgODa-_DB6tIA5ud2o",
+    "1 1号799638464939":"AIzaSyCdHq_XmlPGOr9ZzTVPoJfb3on6CuctHLE",
+    "2 1号866575601521":"AIzaSyD-FD6mRTsdRlE1JlD_KODkDI5K36dwqDs",
 }
 
 
