@@ -1273,7 +1273,7 @@ def get_api_history(is_continuation, original_text, target_idx):
         return None
 
 # ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
-# ★★★ 核心生成逻辑 (最终版：安全渲染Markdown，永久防止前端崩溃) ★★★
+# ★★★ 核心生成邏輯 (最終版：智能預處理，完美還原格式且絕不崩潰) ★★★
 # ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
 if st.session_state.is_generating:
     is_continuation_task = st.session_state.messages and st.session_state.messages[-1].get("is_continue_prompt")
@@ -1286,7 +1286,7 @@ if st.session_state.is_generating:
         target_message_index, original_content, api_history_override, full_response_text = -1, "", None, ""
         
         try:
-            # 1. 准备工作
+            # 1. 準備工作
             if is_continuation_task and task_info:
                 target_message_index = task_info.get("target_index", -1)
                 if 0 <= target_message_index < len(st.session_state.messages):
@@ -1303,30 +1303,34 @@ if st.session_state.is_generating:
             for chunk in getAnswer(custom_history=api_history_override):
                 full_response_text += chunk
                 st.session_state.messages[target_message_index]["content"] = [full_response_text]
-                # ★ 核心修改：使用更安全的渲染方式 ★
-                placeholder.markdown(full_response_text + "▌", unsafe_allow_html=False)
+                
+                # ★ 核心修改：在渲染前對文本進行預處理，強制保留換行 ★
+                processed_text = full_response_text.replace('\n', '  \n')
+                placeholder.markdown(processed_text + "▌", unsafe_allow_html=False)
             
-            # ★ 核心修改：最终显示也使用安全方式 ★
-            placeholder.markdown(full_response_text, unsafe_allow_html=False)
+            # ★ 核心修改：最終顯示也使用預處理過的文本 ★
+            processed_text_final = full_response_text.replace('\n', '  \n')
+            placeholder.markdown(processed_text_final, unsafe_allow_html=False)
 
-            # 成功路径：清理并刷新
+            # 成功路徑：清理並刷新
             st.session_state.is_generating = False
             with open(log_file, "wb") as f:
                 pickle.dump(_prepare_messages_for_save(st.session_state.messages), f)
             st.experimental_rerun()
 
         except Exception as e:
-            # 失败路径：显示错误，但不刷新
+            # 失敗路徑：顯示錯誤，但不刷新
             if full_response_text != original_content:
-                 # ★ 核心修改：错误时的部分内容也安全显示 ★
-                 placeholder.markdown(full_response_text, unsafe_allow_html=False)
+                 # ★ 核心修改：錯誤時的部分內容也進行預處理後安全顯示 ★
+                 processed_text_error = full_response_text.replace('\n', '  \n')
+                 placeholder.markdown(processed_text_error, unsafe_allow_html=False)
             else:
                  placeholder.empty()
 
             st.error(f"""
-            **系统提示：生成时遇到API错误**
-            **错误类型：** `{type(e).__name__}`
-            **原始报错信息：**
+            **系統提示：生成時遇到API錯誤**
+            **錯誤類型：** `{type(e).__name__}`
+            **原始報錯信息：**
             ```
             {str(e)}
             ```
