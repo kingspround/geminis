@@ -1211,8 +1211,11 @@ for i, message in enumerate(st.session_state.messages):
     if message.get("temp"): continue
     with st.chat_message(message["role"]):
         for part in message.get("content", []):
-            if isinstance(part, str): st.markdown(part, unsafe_allow_html=True)
-            elif isinstance(part, Image.Image): st.image(part, width=400)
+            if isinstance(part, str):
+                # ★ 核心修改：在这里也使用安全渲染，防止历史记录导致崩溃 ★
+                st.markdown(part, unsafe_allow_html=False)
+            elif isinstance(part, Image.Image):
+                st.image(part, width=400)
 				
 # --- 编辑界面显示逻辑 ---
 if st.session_state.get("editing"):
@@ -1269,7 +1272,9 @@ def get_api_history(is_continuation, original_text, target_idx):
     else:
         return None
 
-# --- 核心生成逻辑 ---
+# ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
+# ★★★ 核心生成逻辑 (最终版：安全渲染Markdown，永久防止前端崩溃) ★★★
+# ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
 if st.session_state.is_generating:
     is_continuation_task = st.session_state.messages and st.session_state.messages[-1].get("is_continue_prompt")
     task_info = None
@@ -1334,6 +1339,7 @@ if st.session_state.is_generating:
             st.session_state.is_generating = False
             with open(log_file, "wb") as f:
                 pickle.dump(_prepare_messages_for_save(st.session_state.messages), f)
+
 
 # --- 底部控件 ---
 c1, c2 = st.columns(2)
