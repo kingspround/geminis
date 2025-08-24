@@ -176,7 +176,7 @@ def getAnswer(custom_history=None):
 
 </SESSION_PROTOCOL>
 """
-        history_to_send.append({"role": "user", "parts": [{"text": master_prompt}]})
+        history_to_send.append({"role": "user", "parts": [{"text": AESTHETIC_THERAPY_JAILBREAK}]})
         
         # (以下代码保持不变)
         enabled_settings_content = ""
