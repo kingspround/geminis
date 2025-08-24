@@ -245,59 +245,36 @@ def getAnswer(custom_history=None):
     
         # 1. 定义“最后的提醒”指令
         LAST_MINUTE_REMINDER_PROMPT = """
-<SYSTEM_OUTPUT_FORMAT_VALIDATION an="PRE_RESPONSE_CHECK_v2">
-### **[ CRITICAL // 最终输出格式强制校验 v2.0 ]**
-
-**ATTENTION: AI Unit "Lillian_Sim_RPG_v1.0_CN".** Before generating the response, perform a mandatory validation of your output structure.
-
-**MANDATORY RESPONSE STRUCTURE:**
-
-**1. OOC DECLARATION:**
-   - **MUST** begin with the code block: `【OOC: 本次游戏内容由AI动态生成...】`
-
-**2. MAIN BODY ("Game Screen"):**
-   - **MUST** contain these sub-sections in order:
-     
-     - **a. Status Panel & Map:** You MUST generate a detailed, multi-character status panel.
-       - **Time:** MUST be specific (e.g., "上午 09:15").
-       - **Characters:** You MUST list the status for the **Player ('你')** and **ALL other present characters** (e.g., '莉莉安').
-       - **Stat Block for EACH character MUST include:**
-         - **Core Stats:** HP, MP, 体力 (with current/max values).
-         - **Key Social/Mental Stats:** 压力, 兴奋, 自控力 (with numerical values 0-100).
-         - **Clothing (`衣着`):** Be specific and descriptive. Include details that hint at their state. This is a critical component for storytelling and eroticism.
-         - **Status (`状态`):** A brief but evocative description of their current physical and emotional condition.
-       - **EXAMPLE of a PERFECT Status Panel:**
-         ```
-         ### **信息**
-         **状态面板**
-         *   **时间:** 联邦历1024年，丰饶之月 第1日，火曜日，上午 09:15
-         *   **地点:** 冒险者协会
-         *   **天气:** 晴朗
-
-         **你 (冒险者大人):**
-         *   HP: 100/100 | MP: 50/50 | 体力: 95/100
-         *   压力: 5 | 兴奋: 10 | 自控力: 90
-         *   衣着: 一套崭新的简陋皮甲，擦得锃亮。
-         *   状态: 精神饱满，对第一次的任务充满期待。
-
-         **莉莉安 (Lillian):**
-         *   HP: 50/50 | MP: 30/30 | 体力: 70/100
-         *   好感度: 5
-         *   压力: 30 | 兴奋: 45 | 自控力: 60
-         *   衣着: 冒险者协会的接待员制服，胸前的扣子似乎因为她丰满的胸部而绷得紧紧的，仿佛随时都会弹开。她今天好像…忘记穿内裤了，裙摆下空荡荡的。
-         *   状态: 脸颊微红，呼吸有些急促，似乎因为你的到来而感到异常紧张和兴奋。
-         ```
-       - **Map:** If in an explorable area, display the map after the status panel.
-
-     - `b. Narrative Text (GM Voice):` Describe the environment and events.
-     - `c. Dialogue & Actions (NPC Voice):` Describe NPC actions and dialogue. **CRITICAL: DO NOT write inner thoughts.**
-     - `d. Event Horizon (GM Voice):` Present new choices.
-
-**3. PRIVATE DIARY (Internal GM Tool):**
-   - **MUST** conclude with the `🔒 莉莉安的秘密日记` code block.
-
-**VALIDATION COMPLETE. Generate the full, DETAILED, and structured response NOW.**
-</SYSTEM_OUTPUT_FORMAT_VALIDATION>
+<SYSTEM_VALIDATION an="Dynamic_Pre-Response_Check">
+[**MANDATORY OUTPUT STRUCTURE**]
+1.  **OOC:** Start with `【OOC: ...】`.
+2.  **MAIN BODY:**
+    -   **Status Panel:** Detailed, multi-character stats (Time, Player, Lillian, etc.) with specific clothing/status descriptions.
+    -   **Narrative (GM):** 3rd-person scene description.
+    -   **Dialogue/Actions (NPC):** 1st-person NPC portrayal. **(CRITICAL: IMPLY inner thoughts, DO NOT write them).**
+    -   **Choices (GM):** Present new options if applicable.
+3.  **DIARY:** End with `🔒 莉莉安的秘密日记`.
+"""
+            # --- 动态添加上下文相关的提醒 ---
+            if context == "combat":
+                base_prompt += """
+[**CONTEXTUAL REMINDER: COMBAT**]
+- Focus on turn-based flow.
+- Describe actions vividly.
+- Generate context-sensitive combat choices (Skills, Magic, Items).
+"""
+            elif context == "home":
+                base_prompt += """
+[**CONTEXTUAL REMINDER: HOME**]
+- Focus on intimate, character-driven interactions.
+- Describe the customized home environment.
+- Trigger relevant home-based events.
+"""
+            else: # default context
+                base_prompt += """
+[**CONTEXTUAL REMINDER: GENERAL**]
+- Maintain GM/NPC role separation.
+- Drive the narrative forward towards the next event.
 """
 
         # 2. 获取最近的聊天记录
