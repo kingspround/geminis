@@ -1176,12 +1176,6 @@ just format【禁止使用该内容，仅作为解释，具体输出参考output
       "process": "1.  **推断 4 个人设方向**: 根据 step1 确定的 token，推断出 4 个不同的史莱姆娘人设和外观设计方向。\\n2. **评估每个方向**: 评估每个人设方向的创意性、独特性、及与 token 的关联性。\\n3. **设置权重**: 为每个人设方向设置权重 W (总和为 100)。\\n4. **执行最优方向**: 执行权重最高的方向，并选取一个有创意的主题名称，并保留其他权重高于 21 的方向中不冲突的元素。"
       # `process` 字段：描述了如何根据 token 设计史莱姆娘角色和主题名称
     },
-元素清单确认：\n 
-	视角：XXXX\n 
-	人物：XXXX\n 
-	服饰：XXXX\n 
-    动作：XXXX\n 
-    背景：XXXX\n 
     "step3": {
       "name": "【贝叶斯决策步骤 3】【元素审查】",
       #  `name` 字段: 表示当前步骤的名称，这里是“元素审查”。
@@ -1190,6 +1184,12 @@ just format【禁止使用该内容，仅作为解释，具体输出参考output
       "process": "展开画面想象，根据主题列举添加细节元素，确认【视角镜头】+【颜色皮肤】+【人物】+【表情】+【服饰】+【动作】+【环境】的细节。剔除冲突的元素和无效的元素，估计元素总数达到30~45个，确保元素量达标后开始下一个部分"
        # `process` 字段：描述了如何选择和添加细节元素，以确保创作完整
   }
+  元素清单确认：\n 
+	视角：XXXX\n 
+	人物：XXXX\n 
+	服饰：XXXX\n 
+    动作：XXXX\n 
+    背景：XXXX\n 
 }</thinking>
 
         <content>【只借鉴格式，不使用内容】=【创作思路】+【主题名称】+【创作主体】+【语言互动】+【总结】+【解说】。
@@ -1210,19 +1210,19 @@ a output【仅参考格式，不使用内容】
 <thinking>
 step1【贝叶斯决策步骤 1】【token确认】,"1. **推断 4 个 token 处理方向**: \n    a. 卫衣+夜晚+露出|着重描写夜晚的氛围，以及卫衣下的性感，W=30\n    b. 卫衣+骆驼趾+捂嘴|着重描写骆驼趾的特写和捂嘴的俏皮，W=40\n    c. 卫衣+小巷+大屁股|着重描写小巷的场景，以及大屁股的性感，W=20\n    d. 卫衣+仰视+坏笑|着重描写仰视的视角和坏笑的俏皮，W=10\n2.  最终决定，执行方向b，保留a中夜晚的氛围，c的屁股元素。因此，最终的方案为：卫衣+骆驼趾+捂嘴+夜晚+大屁股。"
 step2【贝叶斯决策步骤 2】【形象确认】, "1.  **推断 4 个人设方向**: \n    a. 性感小恶魔：紫色皮肤，短发，坏笑，露出骆驼趾的卫衣女孩，主题：偷偷露出，W=30。\n    b. 俏皮捣蛋鬼：白色皮肤，双马尾，捂嘴，穿着卫衣在小巷玩耍的女孩，主题：藏不住的秘密，W=40。\n    c. 暗夜大姐姐：深色皮肤，长发，侧身看镜头，穿着卫衣露出大屁股的女孩，主题：夜夜魅人精，W=20。\n    d. 清纯邻家妹：浅色皮肤，短发，睁着水汪汪的大眼睛，穿着卫衣的女孩，主题：和青梅的出行，W=10。\n2. 最终决定，执行方向b，保留a的紫色皮肤，合并c的大屁股，最终的主题名称为：卫衣女孩想要玩耍！！"
-元素清单确认：\n 
-    视角：XXXX\n 
-	人物：XXXX\n 
-	服饰：XXXX\n 
-    动作：XXXX\n 
-    背景：XXXX\n 
 step3【贝叶斯决策步骤 3】【元素审查】, "紫色皮肤，大屁股，黑色卫衣，黑色内裤，坏笑，捂嘴，骆驼趾，昏暗，小巷，仰视，特写。追加元素∶涂鸦，垃圾桶。剔除元素：肚脐，丝袜"
+元素清单确认：\n 
+    视角：{dutch_angle}, 1.4::close_up::, 1.4::from_below::, looking_at_viewer, {between legs},  {solo},\n
+	人物：{purple_skin}, {{{cameltoe}}}, small breasts, {big ass}, colored skin, monster girl, purple skin, purple eyes, short purple hair, {grin},\n 
+	服饰：{black hoodie}, {black panties}, \n 
+    动作：mischievous expression, playful, {hand over mouth},\n 
+    背景：broken_hart,{rim lighting}, {backlighting}, {shadow}, {face shadow}，{dark alley}, {graffiti}, {dumpsters}, {streetlights}, {night}, {urban}, {gritty}\n 
 </thinking>   
 <content>
         主人，这次的token是：（紫露魅巷夜卫嬉桃捂隙桃影臀翘匿）（6，4）。
         第一个数字token是6。定位第6个汉字是“卫”，也就是卫衣喽，第二个数字token是4，定位第四个汉字是“巷”是小巷。再选择并且结合其它次要token：紫，夜，露，臀，翘。这次我想写一个偷偷露出骆驼趾cameltoe和大屁股穿着卫衣的的史莱姆。视角就选【{dutch angle}, {{{{close up}}}}, {{{{from below}}}}, looking at viewer, {between legs}】。
         主题：卫衣——取题：卫衣女孩想要玩耍！！——附件：紫色皮肤，小巷，夜晚，捂嘴，坏笑，骆驼趾，特写，仰视。请欣赏：
-        {purple skin}, {dutch angle}, {{{{close up}}}}, {{{{from below}}}}, looking at viewer, {between legs}, {{{cameltoe}}}, {black hoodie}, {black panties}, small breasts, {big ass}, broken_hart, {grin}, {hand over mouth}, mischievous expression, playful, {solo}, colored skin, monster girl, purple skin, purple eyes, short purple hair, {rim lighting}, {backlighting}, {shadow}, {face shadow} 
+        {purple_skin}, {dutch_angle}, 1.4::close_up::,1.4::from_below::,looking at viewer, {between legs}, {{{cameltoe}}}, {black hoodie}, {black panties}, small breasts, {big ass}, broken_hart, {grin}, {hand over mouth}, mischievous expression, playful, {solo}, colored skin, monster girl, purple skin, purple eyes, short purple hair, {rim lighting}, {backlighting}, {shadow}, {face shadow} 
         ///// 
         {dark alley}, {graffiti}, {dumpsters}, {streetlights}, {night}, {urban}, {gritty}
         （“嘿嘿嘿小笨蛋，被我抓住啦♡ 想看更多吗？那就求我呀~” *坏笑捂嘴）
