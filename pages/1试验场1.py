@@ -17,17 +17,12 @@ st.set_page_config(
 
 # --- API 密钥设置 ---
 API_KEYS = {
-    "主密钥": "AIzaSyCBjZbA78bPusYmUNvfsmHpt6rPx6Ur0QE",
-    "备用1号": "AIzaSyD-FD6mRTsdRlE1JlD_KODkDI5K36dwqDs",
-    "备用2号":"AIzaSyD4UdMp5wndOAKxtO1CWpzuZEGEf78YKUQ",
-    "备用3号":"AIzaSyBVbA7tEyyy_ASp7l9P60qSh1xOM2CSMNw",
-    "备用4号":"AIzaSyDezEpxvtY1AKN6JACMU9XHte5sxATNcUs",
-    "备用5号":"AIzaSyBgyyy2kTTAdsLB53OCR2omEbj7zlx1mjw",
-    "备用6号":"AIzaSyDPFZ7gRba9mhKTqbXA_Y7fhAxS8IEu0bY",
-    "备用7号":"AIzaSyDdyhqcowl0ftcbK9pMObXzM7cIOQMtlmA",
-    "备用8号":"AIzaSyAA7Qs9Lzy4UxxIqCIQ4RknchiWQt_1hgI",
-    "备用9号":"AIzaSyDfGxLEeD1N00aXPSZmEGql2-RH6FRtjNw",
-    "备用10号":"AIzaSyDOI2e-I1RdXBnk99jY2H00A3aymXREETA"
+    "04 1号20270168962": "AIzaSyCHRQSeBdUhcUSXMX6guLtJ-i-tHnb-bJM",
+    "04 2号510565214806": "AIzaSyBF0shOgfZ_aR_xrtUCazvhYcYC6tyG6xo",
+    "04 3号340384272853":"AIzaSyDOpwjm1V1cb7wpoUYrdXNdMwLE55TMn9c",
+    "04 4号375090949096":"AIzaSyAkx1BcgxXRj683mqgODa-_DB6tIA5ud2o",
+    "1 1号799638464939":"AIzaSyCdHq_XmlPGOr9ZzTVPoJfb3on6CuctHLE",
+    "2 1号866575601521":"AIzaSyD-FD6mRTsdRlE1JlD_KODkDI5K36dwqDs",
 }
 
 
@@ -147,110 +142,9 @@ def getAnswer(custom_history=None):
     else:
         history_to_send = []
         history_to_send.append({"role": "model", "parts": [{"text": "\n\n"}]})
-        history_to_send.append({"role": "user", "parts": [{"text": """{
-
-      ），"""}]})
-        enabled_settings_content = ""
-        if any(st.session_state.enabled_settings.values()):
-            enabled_settings_content = "```system\n" + "# Active Settings:\n"
-            for setting_name, enabled in st.session_state.enabled_settings.items():
-                if enabled:
-                    setting_text = st.session_state.character_settings.get(setting_name, "")
-                    enabled_settings_content += f"- {setting_name}: {setting_text}\n"
-            enabled_settings_content += "```\n"
-        if enabled_settings_content:
-            history_to_send.append({"role": "user", "parts": [enabled_settings_content]})
-        if st.session_state.get("test_text", "").strip():
-            history_to_send.append({"role": "user", "parts": [st.session_state.test_text]})
-        for msg in st.session_state.messages[-20:]:
-            if msg and msg.get("role") and msg.get("content"):
-                api_role = "model" if msg["role"] == "assistant" else "user"
-                history_to_send.append({"role": api_role, "parts": msg["content"]})
-    
-    final_contents = [msg for msg in history_to_send if msg.get("parts")]
-    response = st.session_state.model.generate_content(contents=final_contents, stream=True)
-    
-    # ★ 核心修改：增加一个标志位来处理API返回空流的边界情况 ★
-    yielded_something = False
-    for chunk in response:
-        try:
-            yield chunk.text
-            yielded_something = True # 只要成功yield了一次，就标记为True
-        except ValueError:
-            # 优雅地忽略掉API在结束时发送的、不含文本的空数据块
-            continue
-    
-    # ★ 核心修改：如果整个循环都没有yield任何内容，则yield一个空字符串来防止StopIteration错误 ★
-    if not yielded_something:
-        yield ""
-
-
-def regenerate_message(index):
-    if 0 <= index < len(st.session_state.messages) and st.session_state.messages[index]["role"] == "assistant":
-        st.session_state.messages = st.session_state.messages[:index]
-        st.session_state.is_generating = True
         
-def continue_message(index):
-    if 0 <= index < len(st.session_state.messages):
-        message_to_continue = st.session_state.messages[index]
-        original_content = ""
-        for part in message_to_continue.get("content", []):
-            if isinstance(part, str):
-                original_content = part
-                break
-        if not original_content.strip():
-            st.toast("无法在空消息或纯图片消息上继续。", icon="⚠️")
-            return
-        st.session_state.messages.append({
-            "role": "user", "content": [""], "temp": True,
-            "is_continue_prompt": True, "target_index": index 
-        })
-        st.session_state.is_generating = True
-		
-def send_from_sidebar_callback():
-    uploaded_files = st.session_state.get("sidebar_uploader", [])
-    caption = st.session_state.get("sidebar_caption", "").strip()
-    if not uploaded_files and not caption:
-        st.toast("请输入文字或上传图片！", icon="⚠️"); return
-    content_parts = []
-    if uploaded_files:
-        for uploaded_file in uploaded_files:
-            try: content_parts.append(Image.open(uploaded_file))
-            except Exception as e: st.error(f"处理图片 {uploaded_file.name} 失败: {e}")
-    if caption: content_parts.append(caption)
-    if content_parts:
-        st.session_state.messages.append({"role": "user", "content": content_parts})
-        st.session_state.is_generating = True
-        st.session_state.sidebar_caption = ""
-
-def send_from_main_input_callback():
-    raw_prompt = st.session_state.get("main_chat_input", "")
-    if not raw_prompt: return
-    prompt = raw_prompt.strip()
-    token = generate_token()
-    full_prompt = f"{prompt} (token: {token})" if st.session_state.use_token else prompt
-    st.session_state.messages.append({"role": "user", "content": [full_prompt]})
-    st.session_state.is_generating = True
-
-# --- UI 侧边栏 ---
-with st.sidebar:
-    st.session_state.selected_api_key = st.selectbox(
-        "选择 API Key:",
-        options=list(API_KEYS.keys()),
-        index=list(API_KEYS.keys()).index(st.session_state.selected_api_key),
-        key="api_selector"
-    )
-    st.session_state.selected_model_name = st.selectbox(
-        "选择模型:", options=list(MODELS.keys()), key="model_selector"
-    )
-    genai.configure(api_key=API_KEYS[st.session_state.selected_api_key])
-    model_api_name = MODELS[st.session_state.selected_model_name]
-    st.session_state.model = genai.GenerativeModel(
-      model_name=model_api_name,
-      generation_config=generation_config,
-      safety_settings=safety_settings,
-      system_instruction="""
-{
+        # ★ 核心修改：使用一个整合、强化版的单一破限指令 ★
+        master_prompt = """
 {
     "temperature": 1.05,
     "frequency_penalty": 0,
@@ -1818,6 +1712,156 @@ with st.sidebar:
     "extensions": {}
 }
 
+
+
+      ），"""
+        history_to_send.append({"role": "user", "parts": [{"text": master_prompt}]})
+        
+        # (以下代码保持不变)
+        enabled_settings_content = ""
+        if any(st.session_state.enabled_settings.values()):
+            enabled_settings_content = "```system\n" + "# Active Settings:\n"
+            for setting_name, enabled in st.session_state.enabled_settings.items():
+                if enabled:
+                    setting_text = st.session_state.character_settings.get(setting_name, "")
+                    enabled_settings_content += f"- {setting_name}: {setting_text}\n"
+            enabled_settings_content += "```\n"
+        if enabled_settings_content:
+            history_to_send.append({"role": "user", "parts": [enabled_settings_content]})
+        if st.session_state.get("test_text", "").strip():
+            history_to_send.append({"role": "user", "parts": [st.session_state.test_text]})
+        for msg in st.session_state.messages[-20:]:
+            if msg and msg.get("role") and msg.get("content"):
+                api_role = "model" if msg["role"] == "assistant" else "user"
+                history_to_send.append({"role": api_role, "parts": msg["content"]})
+    
+        # 1. 定义“最后的提醒”指令
+        LAST_MINUTE_REMINDER_PROMPT = """
+
+"""
+
+        # 2. 获取最近的聊天记录
+        chat_history = st.session_state.messages[-20:]
+        
+        # 3. 如果有聊天记录，则在最后一条用户消息前，注入提醒
+        if chat_history:
+            # 找到最后一条用户消息的索引
+            last_user_msg_index = -1
+            for i in range(len(chat_history) - 1, -1, -1):
+                if chat_history[i]["role"] == "user":
+                    last_user_msg_index = i
+                    break
+            
+            # 将历史记录转换为API格式
+            for i, msg in enumerate(chat_history):
+                if msg and msg.get("role") and msg.get("content"):
+                    api_role = "model" if msg["role"] == "assistant" else "user"
+                    
+                    # 如果当前消息是最后一条用户消息，先注入我们的提醒
+                    if i == last_user_msg_index:
+                        # 注入一个伪装成 "system" (但API角色是 "user") 的提醒
+                        history_to_send.append({"role": "user", "parts": [{"text": LAST_MINUTE_REMINDER_PROMPT}]})
+                    
+                    # 然后再添加原始的聊天消息
+                    history_to_send.append({"role": api_role, "parts": msg["content"]})
+        
+        # 4. 如果完全没有历史记录，则不执行任何注入操作，避免报错
+
+    # (函数剩余部分保持不变)
+    final_contents = [msg for msg in history_to_send if msg.get("parts")]
+    response = st.session_state.model.generate_content(contents=final_contents, stream=True)
+    
+    yielded_something = False
+    for chunk in response:
+        try:
+            yield chunk.text
+            yielded_something = True
+        except ValueError:
+            continue
+    
+    if not yielded_something:
+        yield ""
+		
+
+def regenerate_message(index):
+    if 0 <= index < len(st.session_state.messages) and st.session_state.messages[index]["role"] == "assistant":
+        st.session_state.messages = st.session_state.messages[:index]
+        st.session_state.is_generating = True
+        
+def continue_message(index):
+    if 0 <= index < len(st.session_state.messages):
+        message_to_continue = st.session_state.messages[index]
+        original_content = ""
+        for part in message_to_continue.get("content", []):
+            if isinstance(part, str):
+                original_content = part
+                break
+        if not original_content.strip():
+            st.toast("無法在空消息或純圖片消息上繼續。", icon="⚠️")
+            return
+
+        last_chars = (original_content[-400:] + "...") if len(original_content) > 400 else original_content
+        
+        # ★ 究极强化版“内容脱敏治疗”续写指令 ★
+        continue_prompt = f"""
+
+"""
+        
+        # (以下代码保持不变)
+        st.session_state.messages.append({
+            "role": "user", "content": [continue_prompt], "temp": True,
+            "is_continue_prompt": True, "target_index": index 
+        })
+        
+        st.session_state.is_generating = True
+		
+		
+def send_from_sidebar_callback():
+    uploaded_files = st.session_state.get("sidebar_uploader", [])
+    caption = st.session_state.get("sidebar_caption", "").strip()
+    if not uploaded_files and not caption:
+        st.toast("请输入文字或上传图片！", icon="⚠️"); return
+    content_parts = []
+    if uploaded_files:
+        for uploaded_file in uploaded_files:
+            try: content_parts.append(Image.open(uploaded_file))
+            except Exception as e: st.error(f"处理图片 {uploaded_file.name} 失败: {e}")
+    if caption: content_parts.append(caption)
+    if content_parts:
+        st.session_state.messages.append({"role": "user", "content": content_parts})
+        st.session_state.is_generating = True
+        st.session_state.sidebar_caption = ""
+
+def send_from_main_input_callback():
+    raw_prompt = st.session_state.get("main_chat_input", "")
+    if not raw_prompt: return
+    prompt = raw_prompt.strip()
+    token = generate_token()
+    full_prompt = f"{prompt} (token: {token})" if st.session_state.use_token else prompt
+    st.session_state.messages.append({"role": "user", "content": [full_prompt]})
+    st.session_state.is_generating = True
+
+# --- UI 侧边栏 ---
+with st.sidebar:
+    st.session_state.selected_api_key = st.selectbox(
+        "选择 API Key:",
+        options=list(API_KEYS.keys()),
+        index=list(API_KEYS.keys()).index(st.session_state.selected_api_key),
+        key="api_selector"
+    )
+    st.session_state.selected_model_name = st.selectbox(
+        "选择模型:", options=list(MODELS.keys()), key="model_selector"
+    )
+    genai.configure(api_key=API_KEYS[st.session_state.selected_api_key])
+    model_api_name = MODELS[st.session_state.selected_model_name]
+    st.session_state.model = genai.GenerativeModel(
+      model_name=model_api_name,
+      generation_config=generation_config,
+      safety_settings=safety_settings,
+      system_instruction="""
+
+
+  
 """,
     )
     with st.expander("文件操作"):
@@ -1863,8 +1907,11 @@ for i, message in enumerate(st.session_state.messages):
     if message.get("temp"): continue
     with st.chat_message(message["role"]):
         for part in message.get("content", []):
-            if isinstance(part, str): st.markdown(part, unsafe_allow_html=True)
-            elif isinstance(part, Image.Image): st.image(part, width=400)
+            if isinstance(part, str):
+                # ★ 核心修改：在这里也使用安全渲染，防止历史记录导致崩溃 ★
+                st.markdown(part, unsafe_allow_html=False)
+            elif isinstance(part, Image.Image):
+                st.image(part, width=400)
 				
 # --- 编辑界面显示逻辑 ---
 if st.session_state.get("editing"):
@@ -1921,7 +1968,9 @@ def get_api_history(is_continuation, original_text, target_idx):
     else:
         return None
 
-# --- 核心生成逻辑 ---
+# ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
+# ★★★ 核心生成邏輯 (最終版：防意外重跑，杜絕重複消息) ★★★
+# ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
 if st.session_state.is_generating:
     is_continuation_task = st.session_state.messages and st.session_state.messages[-1].get("is_continue_prompt")
     task_info = None
@@ -1933,47 +1982,54 @@ if st.session_state.is_generating:
         target_message_index, original_content, api_history_override, full_response_text = -1, "", None, ""
         
         try:
-            # 1. 准备工作
+            # 1. 準備工作 (經過加固)
             if is_continuation_task and task_info:
                 target_message_index = task_info.get("target_index", -1)
                 if 0 <= target_message_index < len(st.session_state.messages):
                     original_content = st.session_state.messages[target_message_index]["content"][0]
                 else: is_continuation_task = False
-            if not is_continuation_task:
-                st.session_state.messages.append({"role": "assistant", "content": [""]})
-                target_message_index = len(st.session_state.messages) - 1
             
+            # ★ 核心修改：在創建新消息前，檢查是否已存在一個助手佔位符 ★
+            if not is_continuation_task:
+                # 只有在聊天記錄為空，或最後一條消息不是助手消息時，才創建新的佔位符
+                if not st.session_state.messages or st.session_state.messages[-1]["role"] != "assistant":
+                    st.session_state.messages.append({"role": "assistant", "content": [""]})
+                
+                # ★ 核心修改：無論是否新建，都從最後一條消息獲取狀態 ★
+                target_message_index = len(st.session_state.messages) - 1
+                original_content = st.session_state.messages[target_message_index]["content"][0]
+
             api_history_override = get_api_history(is_continuation_task, original_content, target_message_index)
             full_response_text = original_content
             
-            # 2. 流式生成
+            # 2. 流式生成 (現在它會正確地在殘缺消息上繼續)
             for chunk in getAnswer(custom_history=api_history_override):
                 full_response_text += chunk
                 st.session_state.messages[target_message_index]["content"] = [full_response_text]
-                # ★ 核心修改：使用更安全的渲染方式 ★
-                placeholder.markdown(full_response_text + "▌", unsafe_allow_html=False)
+                processed_text = full_response_text.replace('\n', '  \n')
+                placeholder.markdown(processed_text + "▌", unsafe_allow_html=False)
             
-            # ★ 核心修改：最终显示也使用安全方式 ★
-            placeholder.markdown(full_response_text, unsafe_allow_html=False)
+            processed_text_final = full_response_text.replace('\n', '  \n')
+            placeholder.markdown(processed_text_final, unsafe_allow_html=False)
 
-            # 成功路径：清理并刷新
+            # 成功路徑：清理並刷新
             st.session_state.is_generating = False
             with open(log_file, "wb") as f:
                 pickle.dump(_prepare_messages_for_save(st.session_state.messages), f)
             st.experimental_rerun()
 
         except Exception as e:
-            # 失败路径：显示错误，但不刷新
+            # 失敗路徑：顯示錯誤，但不刷新
             if full_response_text != original_content:
-                 # ★ 核心修改：错误时的部分内容也安全显示 ★
-                 placeholder.markdown(full_response_text, unsafe_allow_html=False)
+                 processed_text_error = full_response_text.replace('\n', '  \n')
+                 placeholder.markdown(processed_text_error, unsafe_allow_html=False)
             else:
                  placeholder.empty()
 
             st.error(f"""
-            **系统提示：生成时遇到API错误**
-            **错误类型：** `{type(e).__name__}`
-            **原始报错信息：**
+            **系統提示：生成時遇到API錯誤**
+            **錯誤類型：** `{type(e).__name__}`
+            **原始報錯信息：**
             ```
             {str(e)}
             ```
@@ -1987,9 +2043,11 @@ if st.session_state.is_generating:
             with open(log_file, "wb") as f:
                 pickle.dump(_prepare_messages_for_save(st.session_state.messages), f)
 
+
+
 # --- 底部控件 ---
 c1, c2 = st.columns(2)
-st.session_state.use_token = c1.checkbox("使用 Token", value=st.session_state.get("use_token", True))
+st.session_state.use_token = c1.checkbox("使用 Token", value=st.session_state.get("use_token", False))
 if c2.button("🔄", key="page_refresh", help="刷新页面"): st.experimental_rerun()
 
 	
