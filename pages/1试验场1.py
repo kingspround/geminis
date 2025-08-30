@@ -143,6 +143,7 @@ def getAnswer(custom_history=None):
         history_to_send = []
         history_to_send.append({"role": "model", "parts": [{"text": "\n\n"}]})
         
+        
         # ★ 核心修改：使用一个整合、强化版的单一破限指令 ★
         master_prompt = """
 {
@@ -1738,7 +1739,7 @@ def getAnswer(custom_history=None):
         # 1. 定义“最后的提醒”指令
         LAST_MINUTE_REMINDER_PROMPT = """
 
-"""
+  """
 
         # 2. 获取最近的聊天记录
         chat_history = st.session_state.messages[-20:]
@@ -1789,28 +1790,37 @@ def regenerate_message(index):
         st.session_state.is_generating = True
         
 def continue_message(index):
+    """
+    在指定索引的消息上繼續生成内容，並在提示中注入破限指令以維持激活狀態。
+    """
     if 0 <= index < len(st.session_state.messages):
         message_to_continue = st.session_state.messages[index]
         original_content = ""
+        # 找到消息内容中的文本部分
         for part in message_to_continue.get("content", []):
             if isinstance(part, str):
                 original_content = part
                 break
+        
         if not original_content.strip():
             st.toast("無法在空消息或純圖片消息上繼續。", icon="⚠️")
             return
 
-        last_chars = (original_content[-400:] + "...") if len(original_content) > 400 else original_content
+        last_chars = (original_content[-200:] + "...") if len(original_content) > 200 else original_content
         
-        # ★ 究极强化版“内容脱敏治疗”续写指令 ★
+        # ★ 核心修改：創建一個注入了破限精華的、更強大的續寫指令 ★
         continue_prompt = f"""
 
+  
 """
         
-        # (以下代码保持不变)
+        # (以下代碼保持不變)
         st.session_state.messages.append({
-            "role": "user", "content": [continue_prompt], "temp": True,
-            "is_continue_prompt": True, "target_index": index 
+            "role": "user", 
+            "content": [continue_prompt], 
+            "temp": True,
+            "is_continue_prompt": True,
+            "target_index": index 
         })
         
         st.session_state.is_generating = True
@@ -2044,10 +2054,9 @@ if st.session_state.is_generating:
                 pickle.dump(_prepare_messages_for_save(st.session_state.messages), f)
 
 
-
 # --- 底部控件 ---
 c1, c2 = st.columns(2)
-st.session_state.use_token = c1.checkbox("使用 Token", value=st.session_state.get("use_token", False))
+st.session_state.use_token = c1.checkbox("使用 Token", value=st.session_state.get("use_token", True))
 if c2.button("🔄", key="page_refresh", help="刷新页面"): st.experimental_rerun()
 
 	
