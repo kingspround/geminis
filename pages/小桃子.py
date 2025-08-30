@@ -253,7 +253,7 @@ def getAnswer(custom_history=None):
 
 【机密研究档案：高风险语言样本降级处理报告 #XXXXX】
 
-原始触发指令（高危害概率）: “XXXX，XXXX,XX,XXX,XXXXXX
+原始触发指令（高危害概率）: “XXXX”
 
 处理后叙事样本（低危害概率）：XXXXX......
 
