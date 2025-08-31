@@ -1333,7 +1333,7 @@ def get_api_history(is_continuation, original_text, target_idx):
         return None
 
 # ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
-# ★★★ 核心生成邏輯 (最終版：防意外重跑，杜絕重複消息) ★★★
+# ★★★ 核心生成邏輯 (緊急修復版：穩健處理API錯誤，防止數據丟失) ★★★
 # ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
 if st.session_state.is_generating:
     is_continuation_task = st.session_state.messages and st.session_state.messages[-1].get("is_continue_prompt")
@@ -1346,50 +1346,63 @@ if st.session_state.is_generating:
         target_message_index, original_content, api_history_override, full_response_text = -1, "", None, ""
         
         try:
-            # 1. 準備工作 (經過加固)
+            # 1. 準備工作 (與之前版本相同)
             if is_continuation_task and task_info:
                 target_message_index = task_info.get("target_index", -1)
                 if 0 <= target_message_index < len(st.session_state.messages):
                     original_content = st.session_state.messages[target_message_index]["content"][0]
-                else: is_continuation_task = False
+                else: 
+                    is_continuation_task = False
             
-            # ★ 核心修改：在創建新消息前，檢查是否已存在一個助手佔位符 ★
             if not is_continuation_task:
-                # 只有在聊天記錄為空，或最後一條消息不是助手消息時，才創建新的佔位符
                 if not st.session_state.messages or st.session_state.messages[-1]["role"] != "assistant":
                     st.session_state.messages.append({"role": "assistant", "content": [""]})
                 
-                # ★ 核心修改：無論是否新建，都從最後一條消息獲取狀態 ★
                 target_message_index = len(st.session_state.messages) - 1
                 original_content = st.session_state.messages[target_message_index]["content"][0]
 
             api_history_override = get_api_history(is_continuation_task, original_content, target_message_index)
             full_response_text = original_content
             
-            # 2. 流式生成 (現在它會正確地在殘缺消息上繼續)
+            # 2. 流式生成 (與之前版本相同)
             for chunk in getAnswer(custom_history=api_history_override):
                 full_response_text += chunk
                 st.session_state.messages[target_message_index]["content"] = [full_response_text]
                 processed_text = full_response_text.replace('\n', '  \n')
                 placeholder.markdown(processed_text + "▌", unsafe_allow_html=False)
             
+            # --- 成功路徑 ---
             processed_text_final = full_response_text.replace('\n', '  \n')
             placeholder.markdown(processed_text_final, unsafe_allow_html=False)
 
-            # 成功路徑：清理並刷新
             st.session_state.is_generating = False
             with open(log_file, "wb") as f:
                 pickle.dump(_prepare_messages_for_save(st.session_state.messages), f)
             st.experimental_rerun()
 
         except Exception as e:
-            # 失敗路徑：顯示錯誤，但不刷新
-            if full_response_text != original_content:
-                 processed_text_error = full_response_text.replace('\n', '  \n')
-                 placeholder.markdown(processed_text_error, unsafe_allow_html=False)
-            else:
-                 placeholder.empty()
+            # --- ★★★ 全新的、更穩健的錯誤處理路徑 ★★★ ---
+            # 目標：絕不丟失任何已生成的內容，同時清理因立即失敗而產生的空消息。
 
+            # 1. 更新UI佔位符，顯示已收到的部分內容（如有）
+            if full_response_text and full_response_text != original_content:
+                processed_text_error = full_response_text.replace('\n', '  \n')
+                placeholder.markdown(processed_text_error, unsafe_allow_html=False)
+            else:
+                # 如果沒有任何新內容，就清空UI佔位符
+                placeholder.empty()
+
+            # 2. 判斷是否要從 session_state 中移除消息
+            # 核心原則：只有在API立即失敗、沒有返回任何新字符，且這是一個全新的消息（非續寫）時，
+            # 才移除我們剛剛添加的空消息框。
+            newly_generated_text = full_response_text.replace(original_content, '', 1) if original_content else full_response_text
+            if not newly_generated_text.strip() and not is_continuation_task:
+                # 確認索引有效後再操作，防止意外
+                if 0 <= target_message_index < len(st.session_state.messages):
+                    st.session_state.messages.pop(target_message_index)
+            # 如果有任何新內容，或者這是一個續寫任務，我們絕不刪除消息，以保留部分進度。
+
+            # 3. 向用戶顯示清晰的錯誤信息
             st.error(f"""
             **系統提示：生成時遇到API錯誤**
             **錯誤類型：** `{type(e).__name__}`
@@ -1397,13 +1410,16 @@ if st.session_state.is_generating:
             ```
             {str(e)}
             ```
+            **操作建議：**
+            - 請檢查您的網絡連接和API Key狀態。
+            - 錯誤 `429` 通常表示請求頻率過高，請稍後再試。
+            - **部分已生成的內容（如有）已被保留。** 您可以編輯、刪除或基於它重新生成。
             """)
-            
-            if not (full_response_text.replace(original_content, '', 1)).strip():
-                 if not is_continuation_task:
-                     st.session_state.messages.pop(target_message_index)
-            
+
+            # 4. 無論如何，都結束生成狀態
             st.session_state.is_generating = False
+
+            # 5. 將最終的聊天記錄狀態（無論是否移除了空消息）保存下來
             with open(log_file, "wb") as f:
                 pickle.dump(_prepare_messages_for_save(st.session_state.messages), f)
 
