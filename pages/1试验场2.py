@@ -58,7 +58,7 @@ MODELS = {
     "gemini-exp-1206": "gemini-exp-1206",
     "gemini-embedding-001 (嵌入模型，会报错)": "gemini-embedding-001",
 }
-DEFAULT_VOICE_DISPLAY_NAME = "Erinome - Clear"
+DEFAULT_VOICE_DISPLAY_NAME = "Despina - Smooth"
 
 # --- 初始化 Session State ---
 if "model" not in st.session_state:
