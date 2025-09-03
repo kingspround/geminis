@@ -1880,8 +1880,9 @@ def clear_file_cache():
     st.success("文件缓存已清除！") # <--- 修改在这里
 
 
+# --- 【最终健壮版 V5】为指定消息生成语音 (增加了安全检查) ---
 def generate_speech_for_message(index):
-    """调用 Gemini TTS API 为指定索引的消息生成语音（兼容旧版SDK）"""
+    """调用 Gemini TTS API 为指定索引的消息生成语音（兼容旧版SDK并增加安全检查）"""
     if not (0 <= index < len(st.session_state.messages)):
         return
 
@@ -1898,11 +1899,8 @@ def generate_speech_for_message(index):
 
     try:
         with st.spinner("正在生成语音..."):
-            # 【核心修正】: 使用了文档中提供的完整模型名称，包含了 'models/' 前缀
             tts_model = genai.GenerativeModel('models/gemini-2.5-flash-preview-tts')
             
-            # 使用 `response_modalities` 参数来请求音频
-            # 这是告诉模型输出模式的正确方法
             generation_config_with_audio_modality = {
                 "response_modalities": ["AUDIO"],
                 "speech_config": {
@@ -1918,20 +1916,37 @@ def generate_speech_for_message(index):
                 contents=f"Read the following text clearly: {text_to_speak}",
                 generation_config=generation_config_with_audio_modality,
             )
+
+        # --- 【核心修正】: 在访问之前，先进行防御性检查 ---
+        # 1. 检查 response.candidates 列表是否为空
+        if not response.candidates:
+            # 如果列表为空，很可能是内容被过滤了
+            reason = "未知原因"
+            try:
+                # 尝试获取被阻止的原因并显示给用户
+                reason = response.prompt_feedback.block_reason.name
+            except Exception:
+                pass # 如果获取失败，则使用默认的“未知原因”
+            
+            st.error(f"语音生成失败：内容可能被安全策略阻止。原因: {reason}")
+            # 在后台打印完整的响应，以便调试
+            print("TTS Response Blocked:", response)
+            return # 提前结束函数，不再执行后面的代码
+
+        # 2. 如果检查通过，我们就可以安全地访问 [0] 了
+        first_part = response.candidates[0].content.parts[0]
         
-        # 尝试从新旧版本库可能的位置获取音频数据
+        # 3. 兼容不同版本的库，尝试从两个可能的位置获取音频数据
         try:
-            # 较新版本可能在这里
-            audio_data = response.candidates[0].content.parts[0].blob.data
+            audio_data = first_part.blob.data
         except AttributeError:
-            # 较旧版本可能在这里
-            audio_data = response.candidates[0].content.parts[0].inline_data.data
+            audio_data = first_part.inline_data.data
 
         st.session_state.messages[index]['audio_data'] = audio_data
         st.success("语音生成成功！")
             
     except Exception as e:
-        st.error(f"语音生成失败: {e}")
+        st.error(f"语音生成失败 (发生意外错误): {e}")
 
 
 
