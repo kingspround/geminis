@@ -8,6 +8,8 @@ from datetime import datetime
 from io import BytesIO
 import zipfile
 from PIL import Image
+from google.genai import types
+
 
 # --- Streamlit Page Configuration ---
 st.set_page_config(
