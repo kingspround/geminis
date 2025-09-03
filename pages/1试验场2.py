@@ -1855,9 +1855,7 @@ def continue_message(index):
 def clear_file_cache():
     """清除缓存的文件和文件上传器的状态"""
     st.session_state.cached_files = []
-    # 如果您希望点击清除按钮后，文件上传列表也清空，可以加上下面这行
-    # st.session_state.file_interpreter_uploader = [] 
-    st.toast("文件缓存已清除！", icon="🗑️")		
+    st.success("文件缓存已清除！") # <--- 修改在这里
 		
 def send_from_sidebar_callback():
     uploaded_files = st.session_state.get("sidebar_uploader", [])
@@ -1896,20 +1894,17 @@ def send_file_interpretation_request():
     prompt = st.session_state.get("file_interpreter_prompt", "").strip()
 
     if not prompt:
-        st.toast("请输入您的问题！", icon="⚠️")
+        st.warning("请输入您的问题！") # <--- 修改在这里
         return
 
-    # 检查是否需要使用文件（无论是新上传的还是已缓存的）
     if not uploaded_files and not st.session_state.cached_files:
-        st.toast("请先上传一个文件再提问！", icon="⚠️")
+        st.warning("请先上传一个文件再提问！") # <--- 修改在这里
         return
 
     content_parts = []
     
     try:
-        # 模式 A：检测到新上传的文件，执行上传和缓存操作
         if uploaded_files:
-            # 清空旧缓存，准备存入新文件
             st.session_state.cached_files = [] 
             
             with st.spinner(f"正在上传并缓存 {len(uploaded_files)} 个新文件..."):
@@ -1919,32 +1914,23 @@ def send_file_interpretation_request():
                         display_name=uploaded_file.name,
                         mime_type=uploaded_file.type
                     )
-                    # 将新上传成功的文件对象添加到缓存列表
                     st.session_state.cached_files.append(gemini_file)
             
-            st.toast(f"成功缓存 {len(st.session_state.cached_files)} 个文件！", icon="✅")
+            st.success(f"成功缓存 {len(st.session_state.cached_files)} 个文件！") # <--- 修改在这里
         
-        # 无论新旧，都从缓存中获取文件列表用于本次请求
-        # 模式 B 的逻辑也包含在这里：如果没有新文件，直接使用已有的 cached_files
         content_parts.extend(st.session_state.cached_files)
-        
-        # 添加用户的文本提示
         content_parts.append(prompt)
 
-        # 发送请求
         st.session_state.messages.append({"role": "user", "content": content_parts})
         st.session_state.is_generating = True
         
-        # 清空输入框和文件上传器，准备下一次交互
         st.session_state.file_interpreter_prompt = ""
-        st.session_state.file_interpreter_uploader = [] # 清空上传器是良好体验的关键
+        st.session_state.file_interpreter_uploader = [] 
         
-        # 使用 rerun 来立即更新UI，显示缓存状态和清空后的上传器
         st.experimental_rerun()
 
     except Exception as e:
         st.error(f"处理或上传文件时出错: {e}")
-
 
 
 # --- UI 侧边栏 ---
