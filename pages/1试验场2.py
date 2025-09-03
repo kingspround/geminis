@@ -1890,20 +1890,27 @@ def send_file_interpretation_request():
     - 如果上传了新文件，则上传并缓存它们。
     - 如果没有上传新文件但缓存存在，则直接使用缓存。
     """
+    # 1. 从 session_state 中“取走”文件列表
     uploaded_files = st.session_state.get("file_interpreter_uploader", [])
     prompt = st.session_state.get("file_interpreter_prompt", "").strip()
 
+    # 2. 【核心修正】立即清空上传器的 session state，避免冲突
+    st.session_state.file_interpreter_uploader = []
+
     if not prompt:
-        st.warning("请输入您的问题！") # <--- 修改在这里
+        st.warning("请输入您的问题！")
+        st.experimental_rerun() # 重新运行以清空上传器UI
         return
 
+    # 现在使用临时变量 'uploaded_files' 进行判断
     if not uploaded_files and not st.session_state.cached_files:
-        st.warning("请先上传一个文件再提问！") # <--- 修改在这里
+        st.warning("请先上传一个文件再提问！")
         return
 
     content_parts = []
     
     try:
+        # 使用临时变量 'uploaded_files'
         if uploaded_files:
             st.session_state.cached_files = [] 
             
@@ -1916,7 +1923,7 @@ def send_file_interpretation_request():
                     )
                     st.session_state.cached_files.append(gemini_file)
             
-            st.success(f"成功缓存 {len(st.session_state.cached_files)} 个文件！") # <--- 修改在这里
+            st.success(f"成功缓存 {len(st.session_state.cached_files)} 个文件！")
         
         content_parts.extend(st.session_state.cached_files)
         content_parts.append(prompt)
@@ -1925,7 +1932,7 @@ def send_file_interpretation_request():
         st.session_state.is_generating = True
         
         st.session_state.file_interpreter_prompt = ""
-        st.session_state.file_interpreter_uploader = [] 
+        # 之前导致错误的那一行已经移动到了函数开头，这里不再需要了
         
         st.experimental_rerun()
 
