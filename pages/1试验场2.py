@@ -8,8 +8,6 @@ from datetime import datetime
 from io import BytesIO
 import zipfile
 from PIL import Image
-from google.genai import types
-
 
 # --- Streamlit Page Configuration ---
 st.set_page_config(
@@ -1863,7 +1861,7 @@ def clear_file_cache():
 
 
 def generate_speech_for_message(index):
-    """调用 Gemini TTS API 为指定索引的消息生成语音"""
+    """调用 Gemini TTS API 为指定索引的消息生成语音（兼容旧版SDK）"""
     if not (0 <= index < len(st.session_state.messages)):
         return
 
@@ -1882,20 +1880,27 @@ def generate_speech_for_message(index):
         with st.spinner("正在生成语音..."):
             tts_model = genai.GenerativeModel('gemini-2.5-flash-preview-tts')
             
+            # 【核心修改】: 我们不再使用 types.Config 类，而是直接创建 Python 字典
+            # 这两个字典的结构和 API 要求完全一致
+            generation_config_dict = {
+                "response_mime_type": "audio/wav"
+            }
+            speech_config_dict = {
+                "voice_config": {
+                    "prebuilt_voice_config": {
+                        "voice_name": st.session_state.tts_api_voice_name
+                    }
+                }
+            }
+            
             response = tts_model.generate_content(
                 contents=f"Read the following text clearly: {text_to_speak}",
-                generation_config=types.GenerationConfig(
-                    response_mime_type="audio/wav",
-                ),
-                speech_config=types.SpeechConfig(
-                    voice_config=types.VoiceConfig(
-                        prebuilt_voice_config=types.PrebuiltVoiceConfig(
-                            voice_name=st.session_state.tts_api_voice_name,
-                        )
-                    )
-                ),
+                # 【核心修改】: 将上面创建的字典作为参数直接传递给函数
+                generation_config=generation_config_dict,
+                speech_config=speech_config_dict,
             )
         
+        # 响应结构通常在不同版本间保持稳定，这部分大概率无需修改
         audio_data = response.candidates[0].content.parts[0].blob.data
         
         st.session_state.messages[index]['audio_data'] = audio_data
@@ -1903,6 +1908,8 @@ def generate_speech_for_message(index):
 
     except Exception as e:
         st.error(f"语音生成失败: {e}")
+
+
 
 
 def send_from_sidebar_callback():
