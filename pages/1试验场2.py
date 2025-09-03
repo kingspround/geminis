@@ -9,6 +9,23 @@ from io import BytesIO
 import zipfile
 from PIL import Image
 
+
+# 【新增部分】: 将声音选项定义为全局常量
+VOICE_OPTIONS = {
+    "Puck - Upbeat": "Puck", "Zephyr - Bright": "Zephyr", "Charon - Practical": "Charon",
+    "Kore - Corporate": "Kore", "Fenrir - Excited": "Fenrir", "Leda - Youthful": "Leda",
+    "Orus - Firm": "Orus", "Aoede - Breezy": "Aoede", "Callirrhoe - Easy-going": "Callirrhoe",
+    "Autonoe - Bright": "Autonoe", "Enceladus - Breathy": "Enceladus", "Iapetus - Clear": "Iapetus",
+    "Umbriel - Easy-going": "Umbriel", "Algieba - Smooth": "Algieba", "Despina - Smooth": "Despina",
+    "Erinome - Clear": "Erinome", "Algenib - Gravelly": "Algenib", "Rasalgethi - Practical": "Rasalgethi",
+    "Laomedeia - Upbeat": "Laomedeia", "Achernar - Soft": "Achernar", "Alnilam - Firm": "Alnilam",
+    "Schedar - Even": "Schedar", "Gacrux - Mature": "Gacrux", "Pulcherrima - Forward": "Pulcherrima",
+    "Achird - Friendly": "Achird", "Zubenelgenubi - Casual": "Zubenelgenubi", "Vindemiatrix - Gentle": "Vindemiatrix",
+    "Sadachbia - Lively": "Sadachbia", "Sadaltager - Knowledgeable": "Sadaltager", "Sulafat - Warm": "Sulafat"
+}
+DEFAULT_VOICE_DISPLAY_NAME = "Puck - Upbeat"
+
+
 # --- Streamlit Page Configuration ---
 st.set_page_config(
     page_title="Gemini Chatbot with Vision",
@@ -69,8 +86,11 @@ if "use_token" not in st.session_state:
 if "cached_files" not in st.session_state:
     st.session_state.cached_files = []
 if "selected_voice" not in st.session_state:
-    st.session_state.selected_voice = "Puck - Upbeat" # 设置一个活泼的默认声音
+    st.session_state.selected_voice = DEFAULT_VOICE_DISPLAY_NAME
 
+# 【核心修正】: 在这里为 tts_api_voice_name 设置初始值
+if "tts_api_voice_name" not in st.session_state:
+    st.session_state.tts_api_voice_name = VOICE_OPTIONS[DEFAULT_VOICE_DISPLAY_NAME]
 
 # --- API配置和模型定义 ---
 genai.configure(api_key=API_KEYS[st.session_state.selected_api_key])
@@ -2014,31 +2034,25 @@ with st.sidebar:
       safety_settings=safety_settings,
       system_instruction="""
 
-    # 【新增部分】: 语音生成 (TTS) 设置
+""",
+
+		
     with st.expander("语音生成设置", expanded=True):
-        # 从文档中提取的所有可用声音
-        VOICE_OPTIONS = {
-            "Puck - Upbeat": "Puck", "Zephyr - Bright": "Zephyr", "Charon - Practical": "Charon",
-            "Kore - Corporate": "Kore", "Fenrir - Excited": "Fenrir", "Leda - Youthful": "Leda",
-            "Orus - Firm": "Orus", "Aoede - Breezy": "Aoede", "Callirrhoe - Easy-going": "Callirrhoe",
-            "Autonoe - Bright": "Autonoe", "Enceladus - Breathy": "Enceladus", "Iapetus - Clear": "Iapetus",
-            "Umbriel - Easy-going": "Umbriel", "Algieba - Smooth": "Algieba", "Despina - Smooth": "Despina",
-            "Erinome - Clear": "Erinome", "Algenib - Gravelly": "Algenib", "Rasalgethi - Practical": "Rasalgethi",
-            "Laomedeia - Upbeat": "Laomedeia", "Achernar - Soft": "Achernar", "Alnilam - Firm": "Alnilam",
-            "Schedar - Even": "Schedar", "Gacrux - Mature": "Gacrux", "Pulcherrima - Forward": "Pulcherrima",
-            "Achird - Friendly": "Achird", "Zubenelgenubi - Casual": "Zubenelgenubi", "Vindemiatrix - Gentle": "Vindemiatrix",
-            "Sadachbia - Lively": "Sadachbia", "Sadaltager - Knowledgeable": "Sadaltager", "Sulafat - Warm": "Sulafat"
-        }
-        
-        st.session_state.selected_voice = st.selectbox(
+        selected_display_name = st.selectbox(
             "选择声音:",
             options=list(VOICE_OPTIONS.keys()),
-            key="voice_selector"
+            # 使用已初始化的 st.session_state.selected_voice 作为默认值
+            index=list(VOICE_OPTIONS.keys()).index(st.session_state.selected_voice), 
+            key="voice_selector_widget" # 使用一个新key避免与 session_state 键混淆
         )
-        st.session_state.tts_api_voice_name = VOICE_OPTIONS[st.session_state.selected_voice]
+        
+        # 当用户的选择发生变化时，更新我们的两个 session_state 变量
+        if selected_display_name != st.session_state.selected_voice:
+            st.session_state.selected_voice = selected_display_name
+            st.session_state.tts_api_voice_name = VOICE_OPTIONS[selected_display_name]
+            st.experimental_rerun() # 立即刷新以确认更改
 
 
-""",
     )
     with st.expander("文件操作"):
         if len(st.session_state.messages) > 0: st.button("重置上一个输出 ⏪", on_click=lambda: st.session_state.messages.pop(-1))
