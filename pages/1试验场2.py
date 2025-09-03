@@ -1893,12 +1893,15 @@ def send_file_interpretation_request():
     content_parts = []
     
     try:
-        with st.spinner(f"正在上传 {len(uploaded_files)} 个文件到 Google AI Studio..."):
+        # 使用 with st.spinner(...) 可以在上传期间显示一个加载提示
+        with st.spinner(f"正在上传并处理 {len(uploaded_files)} 个文件..."):
             for uploaded_file in uploaded_files:
-                # 使用 File API 上传文件，这对于大文件是必须的
+                # 使用 File API 上传文件
                 gemini_file = genai.upload_file(
                     path=uploaded_file,
-                    display_name=uploaded_file.name
+                    display_name=uploaded_file.name,
+                    # <-- 核心修正：从 Streamlit 的上传对象中获取并传递 mime_type
+                    mime_type=uploaded_file.type  
                 )
                 content_parts.append(gemini_file)
         
@@ -1913,7 +1916,9 @@ def send_file_interpretation_request():
         st.session_state.file_interpreter_prompt = ""
 
     except Exception as e:
+        # 提供更详细的错误反馈
         st.error(f"处理或上传文件时出错: {e}")
+        st.error("请检查您的API密钥是否有效，以及网络连接是否正常。")
 
 
 # --- UI 侧边栏 ---
