@@ -1982,56 +1982,47 @@ with st.sidebar:
         st.text_area("输入文字 (可选)", key="sidebar_caption", height=100)
         st.button("发送到对话 ↗️", on_click=send_from_sidebar_callback, use_container_width=True)
 
-    # 使用 st.expander 包裹整个文件解读功能
     with st.expander("文件解读 (PDF, TXT等)", expanded=True):
-
-        # --- 第一部分：显示缓存状态 ---
-        # 这部分代码的缩进在 st.expander 内部
+        # --- 第一部分：显示缓存状态 (无变化) ---
         if st.session_state.cached_files:
             st.markdown("**当前已缓存的文件:**")
             for f in st.session_state.cached_files:
                 st.markdown(f"📄 `{f.display_name}`")
             st.markdown("---")
-            st.success("文件已缓存！现在您可以直接提问。")
+            st.success("文件已缓存！您可以继续追加文件或直接提问。")
 
         # --- 第二部分：使用 st.form 包裹输入和提交按钮 ---
-        # with st.form 的缩进也在 st.expander 内部
         with st.form(key="file_form", clear_on_submit=True):
-            # 表单内的组件，缩进在 st.form 内部
             st.file_uploader(
-                "上传新文件 (会覆盖现有缓存)",
+                # 【修改点 1】: 更新UI提示文本
+                "上传新文件 (将追加到现有缓存)", 
                 type=['pdf', 'txt', 'md', 'html', 'xml', 'py', 'json'],
                 accept_multiple_files=True,
                 key="file_interpreter_uploader"
             )
             st.text_area(
-                "根据缓存/上传的文件提问：",
+                "根据所有缓存文件提问：",
                 key="file_interpreter_prompt",
-                placeholder="例如：请总结这个PDF文档的核心观点。"
+                placeholder="例如：请综合分析以上所有文档，总结它们的共同点。"
             )
-            # 表单的提交按钮，缩进与上面的组件对齐
             submitted = st.form_submit_button("发送解读请求 ↗️")
 
         # --- 第三部分：处理表单提交后的逻辑 ---
-        # if submitted 的缩进与 with st.form 对齐，在 st.expander 内部
         if submitted:
-            # 读取表单提交的值
             uploaded_files = st.session_state.get("file_interpreter_uploader", [])
             prompt = st.session_state.get("file_interpreter_prompt", "").strip()
 
-            # 检查输入是否有效
             if not prompt:
                 st.warning("请输入您的问题！")
             elif not uploaded_files and not st.session_state.cached_files:
                 st.warning("请先上传一个文件再提问！")
             else:
-                # 只有在输入有效时才执行核心逻辑
                 try:
                     content_parts = []
-                    # 如果有新文件，则处理上传和缓存
                     if uploaded_files:
-                        st.session_state.cached_files = [] # 清空旧缓存
-                        with st.spinner(f"正在上传并缓存 {len(uploaded_files)} 个新文件..."):
+                        # 【修改点 2】: 删除了 `st.session_state.cached_files = []` 这一行
+                        #               现在它会直接在现有列表上追加
+                        with st.spinner(f"正在上传并追加 {len(uploaded_files)} 个新文件..."): # 【修改点 3】: 更新 spinner 文本
                             for uploaded_file in uploaded_files:
                                 gemini_file = genai.upload_file(
                                     path=uploaded_file,
@@ -2039,27 +2030,21 @@ with st.sidebar:
                                     mime_type=uploaded_file.type
                                 )
                                 st.session_state.cached_files.append(gemini_file)
-                        st.success(f"成功缓存 {len(uploaded_files)} 个文件！")
+                        st.success(f"成功追加 {len(uploaded_files)} 个文件！") # 【修改点 4】: 更新 success 文本
 
-                    # 将文件（无论是新是旧）和提示添加到请求中
                     content_parts.extend(st.session_state.cached_files)
                     content_parts.append(prompt)
 
-                    # 更新消息历史并触发生成
                     st.session_state.messages.append({"role": "user", "content": content_parts})
                     st.session_state.is_generating = True
-                    
-                    # 清空文本输入框的状态
                     st.session_state.file_interpreter_prompt = "" 
-                    
-                    # 重新运行以刷新界面
                     st.experimental_rerun()
 
                 except Exception as e:
                     st.error(f"处理或上传文件时出错: {e}")
 
-        # --- 第四部分：清除缓存按钮 ---
-        # 这个按钮在表单之外，缩进与 if submitted 和 with st.form 对齐
+        # --- 第四部分：清除缓存按钮 (无变化) ---
+        # 这个按钮现在变得更加重要，因为可以一键清空所有追加的文件
         if st.button("清除缓存"):
             clear_file_cache()
             st.experimental_rerun()
