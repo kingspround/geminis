@@ -1334,24 +1334,7 @@ step3【贝叶斯决策步骤 3】【元素审查】, "紫色皮肤，大屁股�
             on_click=send_file_interpretation_request,
             use_container_width=True
         )
-		
-	with st.expander("角色设定"):
-        uploaded_setting_file = st.file_uploader("读取本地设定文件 (txt) 📝", type=["txt"], key="setting_uploader")
-        if uploaded_setting_file is not None:
-            try:
-                setting_name = os.path.splitext(uploaded_setting_file.name)[0]
-                content = uploaded_setting_file.read().decode("utf-8")
-                st.session_state.character_settings[setting_name] = content
-                st.session_state.enabled_settings[setting_name] = False
-                st.experimental_rerun()
-            except Exception as e: st.error(f"读取文件失败: {e}")
-        for name in DEFAULT_CHARACTER_SETTINGS:
-            if name not in st.session_state.character_settings: st.session_state.character_settings[name] = DEFAULT_CHARACTER_SETTINGS[name]
-            st.session_state.enabled_settings[name] = st.checkbox(name, st.session_state.enabled_settings.get(name, False), key=f"cb_{name}")
-        st.session_state.test_text = st.text_area("System Message (Optional):", st.session_state.get("test_text", ""), key="system_msg")
-        enabled_list = [name for name, enabled in st.session_state.enabled_settings.items() if enabled]
-        if enabled_list: st.write("已加载设定:", ", ".join(enabled_list))
-        if st.button("刷新 🔄", key="sidebar_refresh"): st.experimental_rerun()
+
 
 # --- 加载和显示聊天记录 (修改后) ---
 if not st.session_state.messages and not st.session_state.is_generating: load_history(log_file)
