@@ -1906,7 +1906,7 @@ def generate_speech_for_message(index):
         with st.spinner("正在调教声音并生成..."):
             # --- 【核心修正】: 修正了上一版中灾难性的拼写错误 ---
             # 正确的模型名称是 'models/gemini-2.5-flash-preview-tts'
-            tts_model = genai.GenerativeModel('models/gemini-2.5-pro-preview-tts')
+            tts_model = genai.GenerativeModel('models/gemini-2.5-flash-preview-tts')
             
             generation_config_for_audio = {
                 "response_modalities": ["AUDIO"],
