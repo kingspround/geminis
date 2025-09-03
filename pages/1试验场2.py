@@ -1880,9 +1880,9 @@ def clear_file_cache():
     st.success("文件缓存已清除！") # <--- 修改在这里
 
 
-# --- 【最终健壮版 V5】为指定消息生成语音 (增加了安全检查) ---
+# --- 【最终健壮版 V6】为指定消息生成语音 (动态格式检测 + 终极调试) ---
 def generate_speech_for_message(index):
-    """调用 Gemini TTS API 为指定索引的消息生成语音（兼容旧版SDK并增加安全检查）"""
+    """调用 Gemini TTS API，动态检测音频格式并增加终极调试信息"""
     if not (0 <= index < len(st.session_state.messages)):
         return
 
@@ -1903,6 +1903,8 @@ def generate_speech_for_message(index):
             
             generation_config_with_audio_modality = {
                 "response_modalities": ["AUDIO"],
+                # 我们也可以在这里尝试明确要求WAV格式，增加成功率
+                "response_mime_type": "audio/wav", 
                 "speech_config": {
                     "voice_config": {
                         "prebuilt_voice_config": {
@@ -1917,36 +1919,40 @@ def generate_speech_for_message(index):
                 generation_config=generation_config_with_audio_modality,
             )
 
-        # --- 【核心修正】: 在访问之前，先进行防御性检查 ---
-        # 1. 检查 response.candidates 列表是否为空
         if not response.candidates:
-            # 如果列表为空，很可能是内容被过滤了
-            reason = "未知原因"
-            try:
-                # 尝试获取被阻止的原因并显示给用户
-                reason = response.prompt_feedback.block_reason.name
-            except Exception:
-                pass # 如果获取失败，则使用默认的“未知原因”
-            
+            reason = response.prompt_feedback.block_reason.name if hasattr(response, 'prompt_feedback') else "未知原因"
             st.error(f"语音生成失败：内容可能被安全策略阻止。原因: {reason}")
-            # 在后台打印完整的响应，以便调试
-            print("TTS Response Blocked:", response)
-            return # 提前结束函数，不再执行后面的代码
+            # 【终极调试工具 I】: 打印被阻止的响应
+            st.write("被阻止的API响应详情：", response)
+            return
 
-        # 2. 如果检查通过，我们就可以安全地访问 [0] 了
+        # --- 【核心修正】: 动态地从响应中获取音频数据和它的真实MIME类型 ---
         first_part = response.candidates[0].content.parts[0]
         
-        # 3. 兼容不同版本的库，尝试从两个可能的位置获取音频数据
         try:
+            # 尝试从 .blob 属性获取 (新版库)
             audio_data = first_part.blob.data
+            actual_mime_type = first_part.blob.mime_type
         except AttributeError:
+            # 如果失败，则尝试从 .inline_data 属性获取 (旧版库)
             audio_data = first_part.inline_data.data
+            actual_mime_type = first_part.inline_data.mime_type
+
+        # 检查是否成功获取了MIME类型，如果没有，给一个默认值以防万一
+        if not actual_mime_type:
+            actual_mime_type = "audio/wav" # 最后的备用方案
 
         st.session_state.messages[index]['audio_data'] = audio_data
+        # 将动态获取的MIME类型也保存起来，以便正确显示
+        st.session_state.messages[index]['audio_mime_type'] = actual_mime_type
         st.success("语音生成成功！")
             
     except Exception as e:
         st.error(f"语音生成失败 (发生意外错误): {e}")
+        # 【终极调试工具 II】: 在发生未知错误时，打印完整的响应对象
+        # 这可以帮助我们看到响应的真实结构
+        if 'response' in locals():
+            st.write("发生错误时的API响应详情：", response)
 
 
 
