@@ -68,6 +68,8 @@ if "use_token" not in st.session_state:
     st.session_state.use_token = False
 if "cached_files" not in st.session_state:
     st.session_state.cached_files = []
+if "selected_voice" not in st.session_state:
+    st.session_state.selected_voice = "Puck - Upbeat" # 设置一个活泼的默认声音
 
 
 # --- API配置和模型定义 ---
@@ -1856,7 +1858,51 @@ def clear_file_cache():
     """清除缓存的文件和文件上传器的状态"""
     st.session_state.cached_files = []
     st.success("文件缓存已清除！") # <--- 修改在这里
-		
+
+
+def generate_speech_for_message(index):
+    """调用 Gemini TTS API 为指定索引的消息生成语音"""
+    if not (0 <= index < len(st.session_state.messages)):
+        return
+
+    message = st.session_state.messages[index]
+    
+    if message["role"] != "assistant" or not isinstance(message.get("content", [None])[0], str):
+        st.warning("只能为助手的纯文本回复生成语音。")
+        return
+
+    text_to_speak = message["content"][0]
+    if not text_to_speak.strip():
+        st.warning("无法为空消息生成语音。")
+        return
+
+    try:
+        with st.spinner("正在生成语音..."):
+            tts_model = genai.GenerativeModel('gemini-2.5-flash-preview-tts')
+            
+            response = tts_model.generate_content(
+                contents=f"Read the following text clearly: {text_to_speak}",
+                generation_config=types.GenerationConfig(
+                    response_mime_type="audio/wav",
+                ),
+                speech_config=types.SpeechConfig(
+                    voice_config=types.VoiceConfig(
+                        prebuilt_voice_config=types.PrebuiltVoiceConfig(
+                            voice_name=st.session_state.tts_api_voice_name,
+                        )
+                    )
+                ),
+            )
+        
+        audio_data = response.candidates[0].content.parts[0].blob.data
+        
+        st.session_state.messages[index]['audio_data'] = audio_data
+        st.success("语音生成成功！")
+
+    except Exception as e:
+        st.error(f"语音生成失败: {e}")
+
+
 def send_from_sidebar_callback():
     uploaded_files = st.session_state.get("sidebar_uploader", [])
     caption = st.session_state.get("sidebar_caption", "").strip()
@@ -1959,6 +2005,29 @@ with st.sidebar:
       safety_settings=safety_settings,
       system_instruction="""
 
+    # 【新增部分】: 语音生成 (TTS) 设置
+    with st.expander("语音生成设置", expanded=True):
+        # 从文档中提取的所有可用声音
+        VOICE_OPTIONS = {
+            "Puck - Upbeat": "Puck", "Zephyr - Bright": "Zephyr", "Charon - Practical": "Charon",
+            "Kore - Corporate": "Kore", "Fenrir - Excited": "Fenrir", "Leda - Youthful": "Leda",
+            "Orus - Firm": "Orus", "Aoede - Breezy": "Aoede", "Callirrhoe - Easy-going": "Callirrhoe",
+            "Autonoe - Bright": "Autonoe", "Enceladus - Breathy": "Enceladus", "Iapetus - Clear": "Iapetus",
+            "Umbriel - Easy-going": "Umbriel", "Algieba - Smooth": "Algieba", "Despina - Smooth": "Despina",
+            "Erinome - Clear": "Erinome", "Algenib - Gravelly": "Algenib", "Rasalgethi - Practical": "Rasalgethi",
+            "Laomedeia - Upbeat": "Laomedeia", "Achernar - Soft": "Achernar", "Alnilam - Firm": "Alnilam",
+            "Schedar - Even": "Schedar", "Gacrux - Mature": "Gacrux", "Pulcherrima - Forward": "Pulcherrima",
+            "Achird - Friendly": "Achird", "Zubenelgenubi - Casual": "Zubenelgenubi", "Vindemiatrix - Gentle": "Vindemiatrix",
+            "Sadachbia - Lively": "Sadachbia", "Sadaltager - Knowledgeable": "Sadaltager", "Sulafat - Warm": "Sulafat"
+        }
+        
+        st.session_state.selected_voice = st.selectbox(
+            "选择声音:",
+            options=list(VOICE_OPTIONS.keys()),
+            key="voice_selector"
+        )
+        st.session_state.tts_api_voice_name = VOICE_OPTIONS[st.session_state.selected_voice]
+
 
 """,
     )
@@ -2052,19 +2121,30 @@ with st.sidebar:
 
 
 
-# --- 加载和显示聊天记录 (修改后) ---
+# --- 加载和显示聊天记录 (修改后以支持音频) ---
 if not st.session_state.messages and not st.session_state.is_generating: load_history(log_file)
 for i, message in enumerate(st.session_state.messages):
     if message.get("temp"): continue
     with st.chat_message(message["role"]):
+        # 显示消息内容（文本、图片、文件提示）
         for part in message.get("content", []):
             if isinstance(part, str):
                 st.markdown(part, unsafe_allow_html=False)
             elif isinstance(part, Image.Image):
                 st.image(part, width=400)
-            # 新增：处理 Gemini 文件对象的显示
             elif hasattr(part, 'display_name') and hasattr(part, 'uri'):
                 st.markdown(f"📄 **文件已上传:** `{part.display_name}`")
+
+        # 【新增部分】: 如果消息有音频数据，则显示播放器和下载按钮
+        if "audio_data" in message and message["audio_data"]:
+            st.audio(message["audio_data"], format="audio/wav")
+            st.download_button(
+                label="下载语音 (.wav)",
+                data=message["audio_data"],
+                file_name=f"gemini_tts_{datetime.now().strftime('%Y%m%d_%H%M%S')}.wav",
+                mime="audio/wav",
+                key=f"download_audio_{i}" # 使用唯一key防止冲突
+            )
 				
 				
 # --- 编辑界面显示逻辑 ---
@@ -2082,27 +2162,41 @@ if st.session_state.get("editing"):
         if c2.button("取消 ❌", key=f"cancel_{i}"):
             st.session_state.editing = False; st.experimental_rerun()
 
-# --- 续写/编辑/重生成按钮逻辑 ---
+# --- 续写/编辑/重生成/语音按钮逻辑 (替换原有逻辑) ---
 if len(st.session_state.messages) >= 1 and not st.session_state.editing:
     last_real_msg_idx = -1
     for i in range(len(st.session_state.messages) - 1, -1, -1):
         if not st.session_state.messages[i].get("temp"):
             last_real_msg_idx = i
             break
+            
     if last_real_msg_idx != -1:
         last_msg = st.session_state.messages[last_real_msg_idx]
-        is_text_only_assistant = (last_msg["role"] == "assistant" and len(last_msg.get("content", [])) > 0 and isinstance(last_msg["content"][0], str))
+        is_text_only_assistant = (
+            last_msg["role"] == "assistant" and 
+            len(last_msg.get("content", [])) > 0 and 
+            isinstance(last_msg["content"][0], str) and
+            last_msg["content"][0].strip() # 确保不是空字符串
+        )
+
         if is_text_only_assistant:
             with st.container():
-                cols = st.columns(20)
+                # 增加列数以容纳新按钮
+                cols = st.columns(25) 
                 if cols[0].button("✏️", key=f"edit_{last_real_msg_idx}", help="编辑"): 
                     st.session_state.editable_index = last_real_msg_idx
                     st.session_state.editing = True
                     st.experimental_rerun()
                 cols[1].button("♻️", key=f"regen_{last_real_msg_idx}", help="重新生成", on_click=regenerate_message, args=(last_real_msg_idx,))
                 cols[2].button("➕", key=f"cont_{last_real_msg_idx}", help="继续", on_click=continue_message, args=(last_real_msg_idx,))
+                
+                # 【新增按钮】
+                cols[3].button("🔊", key=f"tts_{last_real_msg_idx}", help="生成语音", on_click=generate_speech_for_message, args=(last_real_msg_idx,))
+
         elif last_msg["role"] == "assistant":
-             st.columns(20)[0].button("♻️", key=f"regen_vision_{last_real_msg_idx}", help="重新生成", on_click=regenerate_message, args=(last_real_msg_idx,))
+             st.columns(25)[0].button("♻️", key=f"regen_vision_{last_real_msg_idx}", help="重新生成", on_click=regenerate_message, args=(last_real_msg_idx,))
+
+
 
 # --- 核心交互逻辑 ---
 st.chat_input(
