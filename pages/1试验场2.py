@@ -24,7 +24,8 @@ VOICE_OPTIONS = {
     "Achird - Friendly": "Achird", "Zubenelgenubi - Casual": "Zubenelgenubi", "Vindemiatrix - Gentle": "Vindemiatrix",
     "Sadachbia - Lively": "Sadachbia", "Sadaltager - Knowledgeable": "Sadaltager", "Sulafat - Warm": "Sulafat"
 }
-DEFAULT_VOICE_DISPLAY_NAME = "Enceladus - Breathy"
+if "tts_prompt_prefix" not in st.session_state:
+    st.session_state.tts_prompt_prefix = "Say clearly: " # <--- 修改为这个最简单的版本
 
 
 # --- Streamlit Page Configuration ---
@@ -57,7 +58,7 @@ MODELS = {
     "gemini-exp-1206": "gemini-exp-1206",
     "gemini-embedding-001 (嵌入模型，会报错)": "gemini-embedding-001",
 }
-DEFAULT_MODEL_NAME = "gemini-2.5-flash-preview-05-20 (默认)"
+DEFAULT_VOICE_DISPLAY_NAME = "Enceladus - Breathy"
 
 # --- 初始化 Session State ---
 if "model" not in st.session_state:
@@ -91,8 +92,7 @@ if "selected_voice" not in st.session_state:
 
 # 【新增】: 为TTS表演指导提示词设置一个初始状态
 if "tts_prompt_prefix" not in st.session_state:
-    st.session_state.tts_prompt_prefix = "Read this in a smug, teasing, and alluring voice (雌小鬼 style), with a slightly breathy and cutesy tone: "
-
+    st.session_state.tts_prompt_prefix = "Say clearly: " # <--- 修改为这个最简单的版本
 
 # --- API配置和模型定义 ---
 genai.configure(api_key=API_KEYS[st.session_state.selected_api_key])
