@@ -2055,7 +2055,7 @@ with st.sidebar:
             st.experimental_rerun() # 立即刷新以确认更改
 
 
-    )
+    
     with st.expander("文件操作"):
         if len(st.session_state.messages) > 0: st.button("重置上一个输出 ⏪", on_click=lambda: st.session_state.messages.pop(-1))
         st.button("读取历史记录 📖", on_click=lambda: load_history(log_file))
