@@ -1898,13 +1898,14 @@ def generate_speech_for_message(index):
 
     try:
         with st.spinner("正在生成语音..."):
-            tts_model = genai.GenerativeModel('gemini-2.5-flash-preview-tts')
+            # 【核心修正】: 使用了文档中提供的完整模型名称，包含了 'models/' 前缀
+            tts_model = genai.GenerativeModel('models/gemini-2.5-flash-preview-tts')
             
-            # 【核心修改】: 将 speech_config 字典合并到 generation_config 字典内部
-            # 这是旧版 SDK 期望的配置方式
-            generation_config_with_speech = {
-                "response_mime_type": "audio/wav",
-                "speech_config": {  # <--- speech_config 现在是 generation_config 的一个键
+            # 使用 `response_modalities` 参数来请求音频
+            # 这是告诉模型输出模式的正确方法
+            generation_config_with_audio_modality = {
+                "response_modalities": ["AUDIO"],
+                "speech_config": {
                     "voice_config": {
                         "prebuilt_voice_config": {
                             "voice_name": st.session_state.tts_api_voice_name
@@ -1915,15 +1916,20 @@ def generate_speech_for_message(index):
             
             response = tts_model.generate_content(
                 contents=f"Read the following text clearly: {text_to_speak}",
-                # 【核心修改】: 只传递一个合并后的 generation_config 参数
-                generation_config=generation_config_with_speech,
+                generation_config=generation_config_with_audio_modality,
             )
         
-        audio_data = response.candidates[0].content.parts[0].blob.data
-        
+        # 尝试从新旧版本库可能的位置获取音频数据
+        try:
+            # 较新版本可能在这里
+            audio_data = response.candidates[0].content.parts[0].blob.data
+        except AttributeError:
+            # 较旧版本可能在这里
+            audio_data = response.candidates[0].content.parts[0].inline_data.data
+
         st.session_state.messages[index]['audio_data'] = audio_data
         st.success("语音生成成功！")
-
+            
     except Exception as e:
         st.error(f"语音生成失败: {e}")
 
