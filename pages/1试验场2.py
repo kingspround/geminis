@@ -2057,25 +2057,27 @@ with st.sidebar:
     )
 
 		
+# --- 【最终逻辑修正版】---
     with st.expander("语音生成设置", expanded=True):
+        # 1. 让用户通过 selectbox 选择声音的“显示名称”
         selected_display_name = st.selectbox(
             "选择声音:",
             options=list(VOICE_OPTIONS.keys()),
             # 使用已初始化的 st.session_state.selected_voice 作为默认值
             index=list(VOICE_OPTIONS.keys()).index(st.session_state.selected_voice), 
-            key="voice_selector_widget" # 使用一个新key避免与 session_state 键混淆
+            key="voice_selector_widget"
         )
         
-        # 当用户的选择发生变化时，更新我们的两个 session_state 变量
-        if selected_display_name != st.session_state.selected_voice:
-            st.session_state.selected_voice = selected_display_name
-            st.session_state.tts_api_voice_name = VOICE_OPTIONS[selected_display_name]
-            st.experimental_rerun() # 立即刷新以确认更改
-        # 【新增UI】: 添加一个文本区域，让您可以自由编辑“表演指导”
+        # 2. 【核心修正】: 不再使用 if 判断，而是每次渲染都直接更新状态
+        # 这保证了状态的绝对同步，彻底杜绝了逻辑漏洞
+        st.session_state.selected_voice = selected_display_name
+        st.session_state.tts_api_voice_name = VOICE_OPTIONS[selected_display_name]
+        
+        # 3. 添加表演指导的文本区域 (保持不变)
         st.text_area(
             "声音表演指导 (Prompt Prefix):",
-            key="tts_prompt_prefix", # 直接绑定到我们初始化的 session_state
-            help="在这里用自然语言描述您希望AI用什么样的语气、情感和风格来说话。例如：'用一种困倦又慵懒的语气说：', '用开心的、像唱歌一样的语调说：'"
+            key="tts_prompt_prefix",
+            help="在这里用自然语言描述您希望AI用什么样的语气、情感和风格来说话。"
         )
 
     
