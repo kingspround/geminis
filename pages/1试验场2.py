@@ -1903,7 +1903,9 @@ def generate_speech_for_message(index):
 
     try:
         with st.spinner("正在调教声音并生成..."):
-            tts_model = genai.GenerativeModel('models/gemini-2.session_state-flash-preview-tts')
+            # --- 【核心修正】: 修正了上一版中灾难性的拼写错误 ---
+            # 正确的模型名称是 'models/gemini-2.5-flash-preview-tts'
+            tts_model = genai.GenerativeModel('models/gemini-2.5-flash-preview-tts')
             
             generation_config_for_audio = {
                 "response_modalities": ["AUDIO"],
@@ -1916,11 +1918,10 @@ def generate_speech_for_message(index):
                 }
             }
             
-            # 【核心修改】: 将“表演指导”和要说的文本拼接在一起
             full_prompt = f"{st.session_state.tts_prompt_prefix}{text_to_speak}"
             
             response = tts_model.generate_content(
-                contents=full_prompt, # 使用拼接后的完整提示
+                contents=full_prompt,
                 generation_config=generation_config_for_audio,
             )
 
