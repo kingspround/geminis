@@ -24,7 +24,7 @@ VOICE_OPTIONS = {
     "Achird - Friendly": "Achird", "Zubenelgenubi - Casual": "Zubenelgenubi", "Vindemiatrix - Gentle": "Vindemiatrix",
     "Sadachbia - Lively": "Sadachbia", "Sadaltager - Knowledgeable": "Sadaltager", "Sulafat - Warm": "Sulafat"
 }
-DEFAULT_VOICE_DISPLAY_NAME = "Puck - Upbeat"
+DEFAULT_VOICE_DISPLAY_NAME = "Enceladus - Breathy"
 
 
 # --- Streamlit Page Configuration ---
@@ -89,9 +89,10 @@ if "cached_files" not in st.session_state:
 if "selected_voice" not in st.session_state:
     st.session_state.selected_voice = DEFAULT_VOICE_DISPLAY_NAME
 
-# 【核心修正】: 在这里为 tts_api_voice_name 设置初始值
-if "tts_api_voice_name" not in st.session_state:
-    st.session_state.tts_api_voice_name = VOICE_OPTIONS[DEFAULT_VOICE_DISPLAY_NAME]
+# 【新增】: 为TTS表演指导提示词设置一个初始状态
+if "tts_prompt_prefix" not in st.session_state:
+    st.session_state.tts_prompt_prefix = "Read this in a smug, teasing, and alluring voice (雌小鬼 style), with a slightly breathy and cutesy tone: "
+
 
 # --- API配置和模型定义 ---
 genai.configure(api_key=API_KEYS[st.session_state.selected_api_key])
@@ -1881,11 +1882,10 @@ def clear_file_cache():
     st.success("文件缓存已清除！") # <--- 修改在这里
 
 
-# --- 【最终正确版 V9】为指定消息生成语音 (手动构建WAV文件) ---
+# --- 【最终艺术创作版 V10】---
 def generate_speech_for_message(index):
     """
-    调用 Gemini TTS API，接收原始PCM数据，并手动构建一个有效的WAV文件。
-    这是基于诊断报告的最终解决方案。
+    调用 Gemini TTS API，并使用一个可定制的“表演指导”前缀来控制声音的风格。
     """
     if not (0 <= index < len(st.session_state.messages)):
         return
@@ -1902,8 +1902,8 @@ def generate_speech_for_message(index):
         return
 
     try:
-        with st.spinner("正在生成并处理语音..."):
-            tts_model = genai.GenerativeModel('models/gemini-2.5-flash-preview-tts')
+        with st.spinner("正在调教声音并生成..."):
+            tts_model = genai.GenerativeModel('models/gemini-2.session_state-flash-preview-tts')
             
             generation_config_for_audio = {
                 "response_modalities": ["AUDIO"],
@@ -1916,8 +1916,11 @@ def generate_speech_for_message(index):
                 }
             }
             
+            # 【核心修改】: 将“表演指导”和要说的文本拼接在一起
+            full_prompt = f"{st.session_state.tts_prompt_prefix}{text_to_speak}"
+            
             response = tts_model.generate_content(
-                contents=f"Read the following text clearly: {text_to_speak}",
+                contents=full_prompt, # 使用拼接后的完整提示
                 generation_config=generation_config_for_audio,
             )
 
@@ -1926,32 +1929,23 @@ def generate_speech_for_message(index):
             st.error(f"语音生成失败：内容可能被安全策略阻止。原因: {reason}")
             return
 
-        # 1. 从诊断报告确认的正确路径提取原始PCM“裸数据”
         raw_pcm_data = response.candidates[0].content.parts[0].inline_data.data
 
-        # 2. 【核心解决方案】: 手动为裸数据创建 WAV 文件头并打包
-        # 使用一个内存中的二进制缓冲区
         buffer = BytesIO()
-        
-        # 使用 wave 库打开缓冲区进行写入
         with wave.open(buffer, "wb") as wf:
-            wf.setnchannels(1)  # 单声道
-            wf.setsampwidth(2)  # 16位 = 2字节
-            wf.setframerate(24000)  # 采样率 24kHz
-            wf.writeframes(raw_pcm_data) # 写入裸数据
+            wf.setnchannels(1)
+            wf.setsampwidth(2)
+            wf.setframerate(24000)
+            wf.writeframes(raw_pcm_data)
         
-        # 获取缓冲区中完整的、包含头部的 WAV 文件数据
         wav_data = buffer.getvalue()
 
-        # 3. 将这个完美的 WAV 文件数据保存到 session state
         st.session_state.messages[index]['audio_data'] = wav_data
-        # 既然我们已经创建了WAV，MIME类型就是 audio/wav
         st.session_state.messages[index]['audio_mime_type'] = 'audio/wav'
         st.success("语音生成成功！")
             
     except Exception as e:
         st.error(f"语音生成失败 (发生意外错误): {e}")
-
 
 
 
@@ -2076,7 +2070,12 @@ with st.sidebar:
             st.session_state.selected_voice = selected_display_name
             st.session_state.tts_api_voice_name = VOICE_OPTIONS[selected_display_name]
             st.experimental_rerun() # 立即刷新以确认更改
-
+        # 【新增UI】: 添加一个文本区域，让您可以自由编辑“表演指导”
+        st.text_area(
+            "声音表演指导 (Prompt Prefix):",
+            key="tts_prompt_prefix", # 直接绑定到我们初始化的 session_state
+            help="在这里用自然语言描述您希望AI用什么样的语气、情感和风格来说话。例如：'用一种困倦又慵懒的语气说：', '用开心的、像唱歌一样的语调说：'"
+        )
 
     
     with st.expander("文件操作"):
