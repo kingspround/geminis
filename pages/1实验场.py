@@ -91,13 +91,23 @@ if not os.path.exists(log_file):
 def _prepare_messages_for_save(messages):
     picklable_messages = []
     for msg in messages:
-        new_msg = msg.copy(); new_content_list = []
+        new_msg = msg.copy()
+        new_content_list = []
         if isinstance(new_msg.get("content"), list):
             for part in new_msg["content"]:
                 if isinstance(part, Image.Image):
-                    buffered = BytesIO(); part.save(buffered, format="PNG")
+                    buffered = BytesIO()
+                    part.save(buffered, format="PNG")
                     new_content_list.append({"type": "image", "data": buffered.getvalue()})
-                else: new_content_list.append(part)
+                # 新增：处理 Gemini 文件对象的保存
+                elif hasattr(part, 'display_name') and hasattr(part, 'uri'):
+                    new_content_list.append({
+                        "type": "gemini_file",
+                        "display_name": part.display_name,
+                        "uri": part.uri
+                    })
+                else:
+                    new_content_list.append(part)
             new_msg["content"] = new_content_list
         new_msg.pop("placeholder_widget", None)
         picklable_messages.append(new_msg)
@@ -105,14 +115,26 @@ def _prepare_messages_for_save(messages):
 def _reconstitute_messages_after_load(messages):
     reconstituted_messages = []
     for msg in messages:
-        new_msg = msg.copy(); content = new_msg.get("content"); new_content = []
-        if isinstance(content, str): new_msg["content"] = [content]; reconstituted_messages.append(new_msg); continue
+        new_msg = msg.copy()
+        content = new_msg.get("content")
+        new_content = []
+        if isinstance(content, str):
+            new_msg["content"] = [content]
+            reconstituted_messages.append(new_msg)
+            continue
         if isinstance(content, list):
             for part in content:
                 if isinstance(part, dict) and part.get("type") == "image":
-                    try: new_content.append(Image.open(BytesIO(part["data"])))
-                    except Exception as e: new_content.append(f"[图片加载失败: {e}]")
-                else: new_content.append(part)
+                    try:
+                        new_content.append(Image.open(BytesIO(part["data"])))
+                    except Exception as e:
+                        new_content.append(f"[图片加载失败: {e}]")
+                # 新增：处理加载时恢复 Gemini 文件对象的显示
+                elif isinstance(part, dict) and part.get("type") == "gemini_file":
+                    display_name = part.get('display_name', '未知文件')
+                    new_content.append(f"📄 **[历史文件]** `{display_name}` (注意：文件已过期，无法再次用于生成)")
+                else:
+                    new_content.append(part)
             new_msg["content"] = new_content
         reconstituted_messages.append(new_msg)
     return reconstituted_messages
@@ -337,6 +359,46 @@ def send_from_main_input_callback():
     full_prompt = f"{prompt} (token: {token})" if st.session_state.use_token else prompt
     st.session_state.messages.append({"role": "user", "content": [full_prompt]})
     st.session_state.is_generating = True
+
+
+# --- 新增的文件解读回调函数 ---
+def send_file_interpretation_request():
+    """处理文件解读上传和发送的逻辑"""
+    uploaded_files = st.session_state.get("file_interpreter_uploader", [])
+    prompt = st.session_state.get("file_interpreter_prompt", "").strip()
+
+    if not uploaded_files:
+        st.toast("请至少上传一个文件！", icon="⚠️")
+        return
+    if not prompt:
+        st.toast("请输入您对文件的问题！", icon="⚠️")
+        return
+
+    content_parts = []
+    
+    try:
+        with st.spinner(f"正在上传 {len(uploaded_files)} 个文件到 Google AI Studio..."):
+            for uploaded_file in uploaded_files:
+                # 使用 File API 上传文件，这对于大文件是必须的
+                gemini_file = genai.upload_file(
+                    path=uploaded_file,
+                    display_name=uploaded_file.name
+                )
+                content_parts.append(gemini_file)
+        
+        # 添加用户的文本提示
+        content_parts.append(prompt)
+
+        # 将包含文件对象和提示的列表添加到消息历史中
+        st.session_state.messages.append({"role": "user", "content": content_parts})
+        st.session_state.is_generating = True
+        
+        # 清空输入框
+        st.session_state.file_interpreter_prompt = ""
+
+    except Exception as e:
+        st.error(f"处理或上传文件时出错: {e}")
+
 
 # --- UI 侧边栏 ---
 with st.sidebar:
@@ -1253,7 +1315,27 @@ step3【贝叶斯决策步骤 3】【元素审查】, "紫色皮肤，大屁股�
         st.file_uploader("上传图片", type=["png", "jpg", "jpeg", "webp"], accept_multiple_files=True, key="sidebar_uploader", label_visibility="collapsed")
         st.text_area("输入文字 (可选)", key="sidebar_caption", height=100)
         st.button("发送到对话 ↗️", on_click=send_from_sidebar_callback, use_container_width=True)
-    with st.expander("角色设定"):
+
+	# 使用新的文件解读功能替换旧的角色设定
+    with st.expander("文件解读 (PDF, TXT等)"):
+        st.file_uploader(
+            "上传文件进行解读",
+            type=['pdf', 'txt', 'md', 'html', 'xml', 'py', 'json'],
+            accept_multiple_files=True,
+            key="file_interpreter_uploader"
+        )
+        st.text_area(
+            "根据上传的文件提问：",
+            key="file_interpreter_prompt",
+            placeholder="例如：请总结这个PDF文档的核心观点。"
+        )
+        st.button(
+            "发送解读请求 ↗️",
+            on_click=send_file_interpretation_request,
+            use_container_width=True
+        )
+		
+	with st.expander("角色设定"):
         uploaded_setting_file = st.file_uploader("读取本地设定文件 (txt) 📝", type=["txt"], key="setting_uploader")
         if uploaded_setting_file is not None:
             try:
@@ -1271,17 +1353,20 @@ step3【贝叶斯决策步骤 3】【元素审查】, "紫色皮肤，大屁股�
         if enabled_list: st.write("已加载设定:", ", ".join(enabled_list))
         if st.button("刷新 🔄", key="sidebar_refresh"): st.experimental_rerun()
 
-# --- 加载和显示聊天记录 ---
+# --- 加载和显示聊天记录 (修改后) ---
 if not st.session_state.messages and not st.session_state.is_generating: load_history(log_file)
 for i, message in enumerate(st.session_state.messages):
     if message.get("temp"): continue
     with st.chat_message(message["role"]):
         for part in message.get("content", []):
             if isinstance(part, str):
-                # ★ 核心修改：在这里也使用安全渲染，防止历史记录导致崩溃 ★
                 st.markdown(part, unsafe_allow_html=False)
             elif isinstance(part, Image.Image):
                 st.image(part, width=400)
+            # 新增：处理 Gemini 文件对象的显示
+            elif hasattr(part, 'display_name') and hasattr(part, 'uri'):
+                st.markdown(f"📄 **文件已上传:** `{part.display_name}`")
+				
 				
 # --- 编辑界面显示逻辑 ---
 if st.session_state.get("editing"):
