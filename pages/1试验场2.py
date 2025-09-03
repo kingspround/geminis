@@ -58,7 +58,7 @@ MODELS = {
     "gemini-exp-1206": "gemini-exp-1206",
     "gemini-embedding-001 (嵌入模型，会报错)": "gemini-embedding-001",
 }
-DEFAULT_VOICE_DISPLAY_NAME = "Enceladus - Breathy"
+DEFAULT_VOICE_DISPLAY_NAME = "Erinome - Clear"
 
 # --- 初始化 Session State ---
 if "model" not in st.session_state:
@@ -92,7 +92,8 @@ if "selected_voice" not in st.session_state:
 
 # 【新增】: 为TTS表演指导提示词设置一个初始状态
 if "tts_prompt_prefix" not in st.session_state:
-    st.session_state.tts_prompt_prefix = "Say clearly: " # <--- 修改为这个最简单的版本
+    st.session_state.tts_prompt_prefix = "Read this in a smug, teasing, and alluring voice (雌小鬼 style), with a slightly breathy and cutesy tone: "
+
 
 # --- API配置和模型定义 ---
 genai.configure(api_key=API_KEYS[st.session_state.selected_api_key])
@@ -1905,7 +1906,7 @@ def generate_speech_for_message(index):
         with st.spinner("正在调教声音并生成..."):
             # --- 【核心修正】: 修正了上一版中灾难性的拼写错误 ---
             # 正确的模型名称是 'models/gemini-2.5-flash-preview-tts'
-            tts_model = genai.GenerativeModel('models/gemini-2.5-flash-preview-tts')
+            tts_model = genai.GenerativeModel('models/gemini-2.5-pro-preview-tts')
             
             generation_config_for_audio = {
                 "response_modalities": ["AUDIO"],
