@@ -1,3 +1,4 @@
+import wave
 import os
 import google.generativeai as genai
 import streamlit as st
@@ -1880,19 +1881,30 @@ def clear_file_cache():
     st.success("文件缓存已清除！") # <--- 修改在这里
 
 
-# --- 【终极诊断版 V8】---
+# --- 【最终正确版 V9】为指定消息生成语音 (手动构建WAV文件) ---
 def generate_speech_for_message(index):
-    """这个特殊版本的函数不生成音频，而是打印一份详细的诊断报告"""
+    """
+    调用 Gemini TTS API，接收原始PCM数据，并手动构建一个有效的WAV文件。
+    这是基于诊断报告的最终解决方案。
+    """
     if not (0 <= index < len(st.session_state.messages)):
         return
-    message = st.session_state.messages[index]
-    text_to_speak = message["content"][0]
 
-    st.info("正在执行终极调试步骤...")
+    message = st.session_state.messages[index]
     
+    if message["role"] != "assistant" or not isinstance(message.get("content", [None])[0], str):
+        st.warning("只能为助手的纯文本回复生成语音。")
+        return
+
+    text_to_speak = message["content"][0]
+    if not text_to_speak.strip():
+        st.warning("无法为空消息生成语音。")
+        return
+
     try:
-        with st.spinner("正在向 API 请求数据..."):
+        with st.spinner("正在生成并处理语音..."):
             tts_model = genai.GenerativeModel('models/gemini-2.5-flash-preview-tts')
+            
             generation_config_for_audio = {
                 "response_modalities": ["AUDIO"],
                 "speech_config": {
@@ -1903,85 +1915,42 @@ def generate_speech_for_message(index):
                     }
                 }
             }
+            
             response = tts_model.generate_content(
                 contents=f"Read the following text clearly: {text_to_speak}",
                 generation_config=generation_config_for_audio,
             )
 
-        # --- 诊断报告生成区 ---
-        st.success("成功从 API 获取响应！现在开始生成诊断报告。")
-        st.subheader("📋 诊断报告")
-        st.warning("请将下方虚线框内的所有内容，完整地复制并粘贴回复给我。")
-
-        report_content = []
-        report_content.append("--- 开始 ---")
-        
-        # 1. 检查 response 对象本身
-        report_content.append(f"1. Response 对象类型: {type(response)}")
-        
-        # 2. 检查 candidates 列表
         if not response.candidates:
-            report_content.append("2. 错误: response.candidates 列表为空！")
-            st.code("\n".join(report_content), language=None)
+            reason = response.prompt_feedback.block_reason.name if hasattr(response, 'prompt_feedback') else "未知原因"
+            st.error(f"语音生成失败：内容可能被安全策略阻止。原因: {reason}")
             return
+
+        # 1. 从诊断报告确认的正确路径提取原始PCM“裸数据”
+        raw_pcm_data = response.candidates[0].content.parts[0].inline_data.data
+
+        # 2. 【核心解决方案】: 手动为裸数据创建 WAV 文件头并打包
+        # 使用一个内存中的二进制缓冲区
+        buffer = BytesIO()
+        
+        # 使用 wave 库打开缓冲区进行写入
+        with wave.open(buffer, "wb") as wf:
+            wf.setnchannels(1)  # 单声道
+            wf.setsampwidth(2)  # 16位 = 2字节
+            wf.setframerate(24000)  # 采样率 24kHz
+            wf.writeframes(raw_pcm_data) # 写入裸数据
+        
+        # 获取缓冲区中完整的、包含头部的 WAV 文件数据
+        wav_data = buffer.getvalue()
+
+        # 3. 将这个完美的 WAV 文件数据保存到 session state
+        st.session_state.messages[index]['audio_data'] = wav_data
+        # 既然我们已经创建了WAV，MIME类型就是 audio/wav
+        st.session_state.messages[index]['audio_mime_type'] = 'audio/wav'
+        st.success("语音生成成功！")
             
-        report_content.append(f"2. response.candidates 列表包含 {len(response.candidates)} 个元素。")
-        candidate = response.candidates[0]
-        report_content.append(f"3. 第一个 Candidate 的类型: {type(candidate)}")
-
-        # 4. 检查 parts 列表
-        if not candidate.content.parts:
-            report_content.append("4. 错误: candidate.content.parts 列表为空！")
-            st.code("\n".join(report_content), language=None)
-            return
-
-        report_content.append(f"4. content.parts 列表包含 {len(candidate.content.parts)} 个部分。")
-        first_part = candidate.content.parts[0]
-        report_content.append(f"5. 第一个 Part 的类型: {type(first_part)}")
-        
-        # 6. 审问第一个 Part 的内部结构 (这是最关键的一步)
-        report_content.append("6. 第一个 Part 的详细属性:")
-        # 使用 dir() 来列出对象的所有属性和方法
-        part_attributes = [attr for attr in dir(first_part) if not attr.startswith('_')]
-        report_content.append(f"   - 所有可用属性: {part_attributes}")
-
-        # 7. 尝试访问我们预期的属性并报告结果
-        data_source_found = "未找到"
-        extracted_data = None
-        
-        if hasattr(first_part, 'blob'):
-            report_content.append("   - 发现 '.blob' 属性!")
-            report_content.append(f"     - .blob 的类型: {type(first_part.blob)}")
-            report_content.append(f"     - .blob.mime_type: {first_part.blob.mime_type}")
-            report_content.append(f"     - .blob.data 的类型: {type(first_part.blob.data)}")
-            report_content.append(f"     - .blob.data 的长度: {len(first_part.blob.data)} 字节")
-            data_source_found = ".blob"
-            extracted_data = first_part.blob.data
-        elif hasattr(first_part, 'inline_data'):
-            report_content.append("   - 发现 '.inline_data' 属性!")
-            report_content.append(f"     - .inline_data 的类型: {type(first_part.inline_data)}")
-            report_content.append(f"     - .inline_data.mime_type: {first_part.inline_data.mime_type}")
-            report_content.append(f"     - .inline_data.data 的类型: {type(first_part.inline_data.data)}")
-            report_content.append(f"     - .inline_data.data 的长度: {len(first_part.inline_data.data)} 字节")
-            data_source_found = ".inline_data"
-            extracted_data = first_part.inline_data.data
-        else:
-            report_content.append("   - 错误: 未能找到 '.blob' 或 '.inline_data' 属性！")
-
-        # 8. 打印提取出的数据样本
-        if extracted_data is not None:
-            report_content.append(f"7. 从 '{data_source_found}' 提取的数据样本 (前100个字节):")
-            report_content.append(f"   - {extracted_data[:100]}")
-        
-        report_content.append("--- 结束 ---")
-        
-        # 在页面上显示完整的报告
-        st.code("\n".join(report_content), language=None)
-
     except Exception as e:
-        st.error(f"在诊断过程中发生意外错误: {e}")
-        if 'response' in locals():
-            st.write("发生错误时的API响应详情：", response)
+        st.error(f"语音生成失败 (发生意外错误): {e}")
 
 
 
