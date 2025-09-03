@@ -1900,27 +1900,25 @@ def generate_speech_for_message(index):
         with st.spinner("正在生成语音..."):
             tts_model = genai.GenerativeModel('gemini-2.5-flash-preview-tts')
             
-            # 【核心修改】: 我们不再使用 types.Config 类，而是直接创建 Python 字典
-            # 这两个字典的结构和 API 要求完全一致
-            generation_config_dict = {
-                "response_mime_type": "audio/wav"
-            }
-            speech_config_dict = {
-                "voice_config": {
-                    "prebuilt_voice_config": {
-                        "voice_name": st.session_state.tts_api_voice_name
+            # 【核心修改】: 将 speech_config 字典合并到 generation_config 字典内部
+            # 这是旧版 SDK 期望的配置方式
+            generation_config_with_speech = {
+                "response_mime_type": "audio/wav",
+                "speech_config": {  # <--- speech_config 现在是 generation_config 的一个键
+                    "voice_config": {
+                        "prebuilt_voice_config": {
+                            "voice_name": st.session_state.tts_api_voice_name
+                        }
                     }
                 }
             }
             
             response = tts_model.generate_content(
                 contents=f"Read the following text clearly: {text_to_speak}",
-                # 【核心修改】: 将上面创建的字典作为参数直接传递给函数
-                generation_config=generation_config_dict,
-                speech_config=speech_config_dict,
+                # 【核心修改】: 只传递一个合并后的 generation_config 参数
+                generation_config=generation_config_with_speech,
             )
         
-        # 响应结构通常在不同版本间保持稳定，这部分大概率无需修改
         audio_data = response.candidates[0].content.parts[0].blob.data
         
         st.session_state.messages[index]['audio_data'] = audio_data
