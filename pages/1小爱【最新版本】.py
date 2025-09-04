@@ -88,8 +88,6 @@ if "sidebar_caption" not in st.session_state:
     st.session_state.sidebar_caption = ""
 if "use_token" not in st.session_state:
     st.session_state.use_token = False
-if "cached_files" not in st.session_state:
-    st.session_state.cached_files = []
 if "selected_voice" not in st.session_state:
     st.session_state.selected_voice = DEFAULT_VOICE_DISPLAY_NAME
 if "tts_api_voice_name" not in st.session_state:
@@ -382,11 +380,7 @@ def continue_message(index):
         })
         
         st.session_state.is_generating = True
-		
-def clear_file_cache():
-    """清除缓存的文件和文件上传器的状态"""
-    st.session_state.cached_files = []
-    st.success("文件缓存已清除！") # <--- 修改在这里
+
 
 
 # --- 【最终艺术创作版 V10】---
@@ -483,61 +477,48 @@ def send_from_main_input_callback():
     st.session_state.is_generating = True
 
 
-# --- 新增的文件解读回调函数 ---
 def send_file_interpretation_request():
     """
-    处理文件解读请求，具备缓存逻辑。
-    - 如果上传了新文件，则上传并缓存它们。
-    - 如果没有上传新文件但缓存存在，则直接使用缓存。
+    处理文件解读请求，逻辑与发送图片完全一致。
+    每次点击都会上传当前选中的文件。
     """
-    # 1. 从 session_state 中“取走”文件列表
     uploaded_files = st.session_state.get("file_interpreter_uploader", [])
     prompt = st.session_state.get("file_interpreter_prompt", "").strip()
 
-    # 2. 【核心修正】立即清空上传器的 session state，避免冲突
-    st.session_state.file_interpreter_uploader = []
-
-    if not prompt:
-        st.warning("请输入您的问题！")
-        st.experimental_rerun() # 重新运行以清空上传器UI
+    if not uploaded_files:
+        st.warning("请至少上传一个文件！")
         return
-
-    # 现在使用临时变量 'uploaded_files' 进行判断
-    if not uploaded_files and not st.session_state.cached_files:
-        st.warning("请先上传一个文件再提问！")
+    if not prompt:
+        st.warning("请输入您对文件的问题！")
         return
 
     content_parts = []
     
     try:
-        # 使用临时变量 'uploaded_files'
-        if uploaded_files:
-            st.session_state.cached_files = [] 
-            
-            with st.spinner(f"正在上传并缓存 {len(uploaded_files)} 个新文件..."):
-                for uploaded_file in uploaded_files:
-                    gemini_file = genai.upload_file(
-                        path=uploaded_file,
-                        display_name=uploaded_file.name,
-                        mime_type=uploaded_file.type
-                    )
-                    st.session_state.cached_files.append(gemini_file)
-            
-            st.success(f"成功缓存 {len(st.session_state.cached_files)} 个文件！")
+        # 使用 with st.spinner(...) 可以在上传期间显示一个加载提示
+        with st.spinner(f"正在上传 {len(uploaded_files)} 个文件..."):
+            for uploaded_file in uploaded_files:
+                # 每次都调用 File API 上传文件，返回一个可用的文件对象
+                gemini_file = genai.upload_file(
+                    path=uploaded_file,
+                    display_name=uploaded_file.name,
+                    mime_type=uploaded_file.type
+                )
+                content_parts.append(gemini_file)
         
-        content_parts.extend(st.session_state.cached_files)
+        # 将用户的文本提示添加到文件对象列表之后
         content_parts.append(prompt)
 
+        # 将包含【本次请求】的文件对象和提示，作为一个整体添加到消息历史中
         st.session_state.messages.append({"role": "user", "content": content_parts})
         st.session_state.is_generating = True
         
+        # 清空输入框，准备下一次交互
         st.session_state.file_interpreter_prompt = ""
-        # 之前导致错误的那一行已经移动到了函数开头，这里不再需要了
         
-        st.experimental_rerun()
-
     except Exception as e:
         st.error(f"处理或上传文件时出错: {e}")
+
 
 
 # --- UI 侧边栏 ---
@@ -1481,73 +1462,26 @@ step3【贝叶斯决策步骤 3】【元素审查】, "紫色皮肤，大屁股�
             help="在这里用自然语言描述您希望AI用什么样的语气、情感和风格来说话。"
         )
 
+	
     with st.expander("大文件解读", expanded=False):
-        # --- 第一部分：显示缓存状态 (无变化) ---
-        if st.session_state.cached_files:
-            st.markdown("**当前已缓存的文件:**")
-            for f in st.session_state.cached_files:
-                st.markdown(f"📄 `{f.display_name}`")
-            st.markdown("---")
-            st.success("文件已缓存！您可以继续追加文件或直接提问。")
-
-        # --- 第二部分：使用 st.form 包裹输入和提交按钮 ---
-        with st.form(key="file_form", clear_on_submit=True):
-            st.file_uploader(
-                # 【修改点 1】: 更新UI提示文本
-                "上传新文件 (将追加到现有缓存)", 
-                type=['pdf', 'txt', 'md', 'html', 'xml', 'py', 'json'],
-                accept_multiple_files=True,
-                key="file_interpreter_uploader"
-            )
-            st.text_area(
-                "根据所有缓存文件提问：",
-                key="file_interpreter_prompt",
-                placeholder="例如：请综合分析以上所有文档，总结它们的共同点。"
-            )
-            submitted = st.form_submit_button("发送解读请求 ↗️")
-
-        # --- 第三部分：处理表单提交后的逻辑 ---
-        if submitted:
-            uploaded_files = st.session_state.get("file_interpreter_uploader", [])
-            prompt = st.session_state.get("file_interpreter_prompt", "").strip()
-
-            if not prompt:
-                st.warning("请输入您的问题！")
-            elif not uploaded_files and not st.session_state.cached_files:
-                st.warning("请先上传一个文件再提问！")
-            else:
-                try:
-                    content_parts = []
-                    if uploaded_files:
-                        # 【修改点 2】: 删除了 `st.session_state.cached_files = []` 这一行
-                        #               现在它会直接在现有列表上追加
-                        with st.spinner(f"正在上传并追加 {len(uploaded_files)} 个新文件..."): # 【修改点 3】: 更新 spinner 文本
-                            for uploaded_file in uploaded_files:
-                                gemini_file = genai.upload_file(
-                                    path=uploaded_file,
-                                    display_name=uploaded_file.name,
-                                    mime_type=uploaded_file.type
-                                )
-                                st.session_state.cached_files.append(gemini_file)
-                        st.success(f"成功追加 {len(uploaded_files)} 个文件！") # 【修改点 4】: 更新 success 文本
-
-                    content_parts.extend(st.session_state.cached_files)
-                    content_parts.append(prompt)
-
-                    st.session_state.messages.append({"role": "user", "content": content_parts})
-                    st.session_state.is_generating = True
-                    st.session_state.file_interpreter_prompt = "" 
-                    st.experimental_rerun()
-
-                except Exception as e:
-                    st.error(f"处理或上传文件时出错: {e}")
-
-        # --- 第四部分：清除缓存按钮 (无变化) ---
-        # 这个按钮现在变得更加重要，因为可以一键清空所有追加的文件
-        if st.button("清除缓存"):
-            clear_file_cache()
-            st.experimental_rerun()
-
+        st.file_uploader(
+            "上传文件进行解读",
+            type=['pdf', 'txt', 'md', 'html', 'xml', 'py', 'json'],
+            accept_multiple_files=True,
+            key="file_interpreter_uploader"
+        )
+        st.text_area(
+            "根据上传的文件提问：",
+            key="file_interpreter_prompt",
+            placeholder="例如：请总结这个PDF文档的核心观点。"
+        )
+        st.button(
+            "发送解读请求 ↗️",
+            # 我们将创建一个新的、简单的回调函数
+            on_click=send_file_interpretation_request, 
+            use_container_width=True,
+            type="primary"
+        )
 
 
 
