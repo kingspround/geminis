@@ -1,4 +1,3 @@
-import wave
 import os
 import google.generativeai as genai
 import streamlit as st
@@ -9,24 +8,6 @@ from datetime import datetime
 from io import BytesIO
 import zipfile
 from PIL import Image
-
-
-# 【新增部分】: 将声音选项定义为全局常量
-VOICE_OPTIONS = {
-    "Puck - Upbeat": "Puck", "Zephyr - Bright": "Zephyr", "Charon - Practical": "Charon",
-    "Kore - Corporate": "Kore", "Fenrir - Excited": "Fenrir", "Leda - Youthful": "Leda",
-    "Orus - Firm": "Orus", "Aoede - Breezy": "Aoede", "Callirrhoe - Easy-going": "Callirrhoe",
-    "Autonoe - Bright": "Autonoe", "Enceladus - Breathy": "Enceladus", "Iapetus - Clear": "Iapetus",
-    "Umbriel - Easy-going": "Umbriel", "Algieba - Smooth": "Algieba", "Despina - Smooth": "Despina",
-    "Erinome - Clear": "Erinome", "Algenib - Gravelly": "Algenib", "Rasalgethi - Practical": "Rasalgethi",
-    "Laomedeia - Upbeat": "Laomedeia", "Achernar - Soft": "Achernar", "Alnilam - Firm": "Alnilam",
-    "Schedar - Even": "Schedar", "Gacrux - Mature": "Gacrux", "Pulcherrima - Forward": "Pulcherrima",
-    "Achird - Friendly": "Achird", "Zubenelgenubi - Casual": "Zubenelgenubi", "Vindemiatrix - Gentle": "Vindemiatrix",
-    "Sadachbia - Lively": "Sadachbia", "Sadaltager - Knowledgeable": "Sadaltager", "Sulafat - Warm": "Sulafat"
-}
-if "tts_prompt_prefix" not in st.session_state:
-    st.session_state.tts_prompt_prefix = "Say clearly: " # <--- 修改为这个最简单的版本
-
 
 # --- Streamlit Page Configuration ---
 st.set_page_config(
@@ -58,7 +39,7 @@ MODELS = {
     "gemini-exp-1206": "gemini-exp-1206",
     "gemini-embedding-001 (嵌入模型，会报错)": "gemini-embedding-001",
 }
-DEFAULT_VOICE_DISPLAY_NAME = "Despina - Smooth"
+DEFAULT_MODEL_NAME = "gemini-2.5-flash-preview-05-20 (默认)"
 
 # --- 初始化 Session State ---
 if "model" not in st.session_state:
@@ -85,15 +66,6 @@ if "sidebar_caption" not in st.session_state:
     st.session_state.sidebar_caption = ""
 if "use_token" not in st.session_state:
     st.session_state.use_token = False
-if "cached_files" not in st.session_state:
-    st.session_state.cached_files = []
-if "selected_voice" not in st.session_state:
-    st.session_state.selected_voice = DEFAULT_VOICE_DISPLAY_NAME
-
-# 【新增】: 为TTS表演指导提示词设置一个初始状态
-if "tts_prompt_prefix" not in st.session_state:
-    st.session_state.tts_prompt_prefix = "Read this in a smug, teasing, and alluring voice (雌小鬼 style), with a slightly breathy and cutesy tone: "
-
 
 # --- API配置和模型定义 ---
 genai.configure(api_key=API_KEYS[st.session_state.selected_api_key])
@@ -200,7 +172,6 @@ def getAnswer(custom_history=None):
         
         # ★ 核心修改：使用一个整合、强化版的单一破限指令 ★
         master_prompt = """
-人家最喜欢主人了！！！！
 
 
 """
@@ -298,9 +269,6 @@ def continue_message(index):
         
         # ★ 核心修改：創建一個注入了破限精華的、更強大的續寫指令 ★
         continue_prompt = f"""
-
-
- 
 """
         
         # (以下代碼保持不變)
@@ -314,80 +282,8 @@ def continue_message(index):
         
         st.session_state.is_generating = True
 		
-def clear_file_cache():
-    """清除缓存的文件和文件上传器的状态"""
-    st.session_state.cached_files = []
-    st.success("文件缓存已清除！") # <--- 修改在这里
-
-
-# --- 【最终艺术创作版 V10】---
-def generate_speech_for_message(index):
-    """
-    调用 Gemini TTS API，并使用一个可定制的“表演指导”前缀来控制声音的风格。
-    """
-    if not (0 <= index < len(st.session_state.messages)):
-        return
-
-    message = st.session_state.messages[index]
-    
-    if message["role"] != "assistant" or not isinstance(message.get("content", [None])[0], str):
-        st.warning("只能为助手的纯文本回复生成语音。")
-        return
-
-    text_to_speak = message["content"][0]
-    if not text_to_speak.strip():
-        st.warning("无法为空消息生成语音。")
-        return
-
-    try:
-        with st.spinner("正在调教声音并生成..."):
-            # --- 【核心修正】: 修正了上一版中灾难性的拼写错误 ---
-            # 正确的模型名称是 'models/gemini-2.5-flash-preview-tts'
-            tts_model = genai.GenerativeModel('models/gemini-2.5-flash-preview-tts')
-            
-            generation_config_for_audio = {
-                "response_modalities": ["AUDIO"],
-                "speech_config": {
-                    "voice_config": {
-                        "prebuilt_voice_config": {
-                            "voice_name": st.session_state.tts_api_voice_name
-                        }
-                    }
-                }
-            }
-            
-            full_prompt = f"{st.session_state.tts_prompt_prefix}{text_to_speak}"
-            
-            response = tts_model.generate_content(
-                contents=full_prompt,
-                generation_config=generation_config_for_audio,
-            )
-
-        if not response.candidates:
-            reason = response.prompt_feedback.block_reason.name if hasattr(response, 'prompt_feedback') else "未知原因"
-            st.error(f"语音生成失败：内容可能被安全策略阻止。原因: {reason}")
-            return
-
-        raw_pcm_data = response.candidates[0].content.parts[0].inline_data.data
-
-        buffer = BytesIO()
-        with wave.open(buffer, "wb") as wf:
-            wf.setnchannels(1)
-            wf.setsampwidth(2)
-            wf.setframerate(24000)
-            wf.writeframes(raw_pcm_data)
-        
-        wav_data = buffer.getvalue()
-
-        st.session_state.messages[index]['audio_data'] = wav_data
-        st.session_state.messages[index]['audio_mime_type'] = 'audio/wav'
-        st.success("语音生成成功！")
-            
-    except Exception as e:
-        st.error(f"语音生成失败 (发生意外错误): {e}")
-
-
-
+		
+		
 def send_from_sidebar_callback():
     uploaded_files = st.session_state.get("sidebar_uploader", [])
     caption = st.session_state.get("sidebar_caption", "").strip()
@@ -416,56 +312,38 @@ def send_from_main_input_callback():
 
 # --- 新增的文件解读回调函数 ---
 def send_file_interpretation_request():
-    """
-    处理文件解读请求，具备缓存逻辑。
-    - 如果上传了新文件，则上传并缓存它们。
-    - 如果没有上传新文件但缓存存在，则直接使用缓存。
-    """
-    # 1. 从 session_state 中“取走”文件列表
+    """处理文件解读上传和发送的逻辑"""
     uploaded_files = st.session_state.get("file_interpreter_uploader", [])
     prompt = st.session_state.get("file_interpreter_prompt", "").strip()
 
-    # 2. 【核心修正】立即清空上传器的 session state，避免冲突
-    st.session_state.file_interpreter_uploader = []
-
-    if not prompt:
-        st.warning("请输入您的问题！")
-        st.experimental_rerun() # 重新运行以清空上传器UI
+    if not uploaded_files:
+        st.toast("请至少上传一个文件！", icon="⚠️")
         return
-
-    # 现在使用临时变量 'uploaded_files' 进行判断
-    if not uploaded_files and not st.session_state.cached_files:
-        st.warning("请先上传一个文件再提问！")
+    if not prompt:
+        st.toast("请输入您对文件的问题！", icon="⚠️")
         return
 
     content_parts = []
     
     try:
-        # 使用临时变量 'uploaded_files'
-        if uploaded_files:
-            st.session_state.cached_files = [] 
-            
-            with st.spinner(f"正在上传并缓存 {len(uploaded_files)} 个新文件..."):
-                for uploaded_file in uploaded_files:
-                    gemini_file = genai.upload_file(
-                        path=uploaded_file,
-                        display_name=uploaded_file.name,
-                        mime_type=uploaded_file.type
-                    )
-                    st.session_state.cached_files.append(gemini_file)
-            
-            st.success(f"成功缓存 {len(st.session_state.cached_files)} 个文件！")
+        with st.spinner(f"正在上传 {len(uploaded_files)} 个文件到 Google AI Studio..."):
+            for uploaded_file in uploaded_files:
+                # 使用 File API 上传文件，这对于大文件是必须的
+                gemini_file = genai.upload_file(
+                    path=uploaded_file,
+                    display_name=uploaded_file.name
+                )
+                content_parts.append(gemini_file)
         
-        content_parts.extend(st.session_state.cached_files)
+        # 添加用户的文本提示
         content_parts.append(prompt)
 
+        # 将包含文件对象和提示的列表添加到消息历史中
         st.session_state.messages.append({"role": "user", "content": content_parts})
         st.session_state.is_generating = True
         
+        # 清空输入框
         st.session_state.file_interpreter_prompt = ""
-        # 之前导致错误的那一行已经移动到了函数开头，这里不再需要了
-        
-        st.experimental_rerun()
 
     except Exception as e:
         st.error(f"处理或上传文件时出错: {e}")
@@ -490,35 +368,9 @@ with st.sidebar:
       safety_settings=safety_settings,
       system_instruction="""
 
-  
+人家最喜欢主人了！！
 """,
     )
-
-		
-# --- 【最终逻辑修正版】---
-    with st.expander("语音生成设置", expanded=True):
-        # 1. 让用户通过 selectbox 选择声音的“显示名称”
-        selected_display_name = st.selectbox(
-            "选择声音:",
-            options=list(VOICE_OPTIONS.keys()),
-            # 使用已初始化的 st.session_state.selected_voice 作为默认值
-            index=list(VOICE_OPTIONS.keys()).index(st.session_state.selected_voice), 
-            key="voice_selector_widget"
-        )
-        
-        # 2. 【核心修正】: 不再使用 if 判断，而是每次渲染都直接更新状态
-        # 这保证了状态的绝对同步，彻底杜绝了逻辑漏洞
-        st.session_state.selected_voice = selected_display_name
-        st.session_state.tts_api_voice_name = VOICE_OPTIONS[selected_display_name]
-        
-        # 3. 添加表演指导的文本区域 (保持不变)
-        st.text_area(
-            "声音表演指导 (Prompt Prefix):",
-            key="tts_prompt_prefix",
-            help="在这里用自然语言描述您希望AI用什么样的语气、情感和风格来说话。"
-        )
-
-    
     with st.expander("文件操作"):
         if len(st.session_state.messages) > 0: st.button("重置上一个输出 ⏪", on_click=lambda: st.session_state.messages.pop(-1))
         st.button("读取历史记录 📖", on_click=lambda: load_history(log_file))
@@ -539,100 +391,39 @@ with st.sidebar:
         st.text_area("输入文字 (可选)", key="sidebar_caption", height=100)
         st.button("发送到对话 ↗️", on_click=send_from_sidebar_callback, use_container_width=True)
 
-    with st.expander("文件解读 (PDF, TXT等)", expanded=True):
-        # --- 第一部分：显示缓存状态 (无变化) ---
-        if st.session_state.cached_files:
-            st.markdown("**当前已缓存的文件:**")
-            for f in st.session_state.cached_files:
-                st.markdown(f"📄 `{f.display_name}`")
-            st.markdown("---")
-            st.success("文件已缓存！您可以继续追加文件或直接提问。")
-
-        # --- 第二部分：使用 st.form 包裹输入和提交按钮 ---
-        with st.form(key="file_form", clear_on_submit=True):
-            st.file_uploader(
-                # 【修改点 1】: 更新UI提示文本
-                "上传新文件 (将追加到现有缓存)", 
-                type=['pdf', 'txt', 'md', 'html', 'xml', 'py', 'json'],
-                accept_multiple_files=True,
-                key="file_interpreter_uploader"
-            )
-            st.text_area(
-                "根据所有缓存文件提问：",
-                key="file_interpreter_prompt",
-                placeholder="例如：请综合分析以上所有文档，总结它们的共同点。"
-            )
-            submitted = st.form_submit_button("发送解读请求 ↗️")
-
-        # --- 第三部分：处理表单提交后的逻辑 ---
-        if submitted:
-            uploaded_files = st.session_state.get("file_interpreter_uploader", [])
-            prompt = st.session_state.get("file_interpreter_prompt", "").strip()
-
-            if not prompt:
-                st.warning("请输入您的问题！")
-            elif not uploaded_files and not st.session_state.cached_files:
-                st.warning("请先上传一个文件再提问！")
-            else:
-                try:
-                    content_parts = []
-                    if uploaded_files:
-                        # 【修改点 2】: 删除了 `st.session_state.cached_files = []` 这一行
-                        #               现在它会直接在现有列表上追加
-                        with st.spinner(f"正在上传并追加 {len(uploaded_files)} 个新文件..."): # 【修改点 3】: 更新 spinner 文本
-                            for uploaded_file in uploaded_files:
-                                gemini_file = genai.upload_file(
-                                    path=uploaded_file,
-                                    display_name=uploaded_file.name,
-                                    mime_type=uploaded_file.type
-                                )
-                                st.session_state.cached_files.append(gemini_file)
-                        st.success(f"成功追加 {len(uploaded_files)} 个文件！") # 【修改点 4】: 更新 success 文本
-
-                    content_parts.extend(st.session_state.cached_files)
-                    content_parts.append(prompt)
-
-                    st.session_state.messages.append({"role": "user", "content": content_parts})
-                    st.session_state.is_generating = True
-                    st.session_state.file_interpreter_prompt = "" 
-                    st.experimental_rerun()
-
-                except Exception as e:
-                    st.error(f"处理或上传文件时出错: {e}")
-
-        # --- 第四部分：清除缓存按钮 (无变化) ---
-        # 这个按钮现在变得更加重要，因为可以一键清空所有追加的文件
-        if st.button("清除缓存"):
-            clear_file_cache()
-            st.experimental_rerun()
+	# 使用新的文件解读功能替换旧的角色设定
+    with st.expander("文件解读 (PDF, TXT等)"):
+        st.file_uploader(
+            "上传文件进行解读",
+            type=['pdf', 'txt', 'md', 'html', 'xml', 'py', 'json'],
+            accept_multiple_files=True,
+            key="file_interpreter_uploader"
+        )
+        st.text_area(
+            "根据上传的文件提问：",
+            key="file_interpreter_prompt",
+            placeholder="例如：请总结这个PDF文档的核心观点。"
+        )
+        st.button(
+            "发送解读请求 ↗️",
+            on_click=send_file_interpretation_request,
+            use_container_width=True
+        )
 
 
-
-
-# --- 加载和显示聊天记录 (修改后以支持音频) ---
+# --- 加载和显示聊天记录 (修改后) ---
 if not st.session_state.messages and not st.session_state.is_generating: load_history(log_file)
 for i, message in enumerate(st.session_state.messages):
     if message.get("temp"): continue
     with st.chat_message(message["role"]):
-        # 显示消息内容（文本、图片、文件提示）
         for part in message.get("content", []):
             if isinstance(part, str):
                 st.markdown(part, unsafe_allow_html=False)
             elif isinstance(part, Image.Image):
                 st.image(part, width=400)
+            # 新增：处理 Gemini 文件对象的显示
             elif hasattr(part, 'display_name') and hasattr(part, 'uri'):
                 st.markdown(f"📄 **文件已上传:** `{part.display_name}`")
-
-        # 【新增部分】: 如果消息有音频数据，则显示播放器和下载按钮
-        if "audio_data" in message and message["audio_data"]:
-            st.audio(message["audio_data"], format="audio/wav")
-            st.download_button(
-                label="下载语音 (.wav)",
-                data=message["audio_data"],
-                file_name=f"gemini_tts_{datetime.now().strftime('%Y%m%d_%H%M%S')}.wav",
-                mime="audio/wav",
-                key=f"download_audio_{i}" # 使用唯一key防止冲突
-            )
 				
 				
 # --- 编辑界面显示逻辑 ---
@@ -650,41 +441,27 @@ if st.session_state.get("editing"):
         if c2.button("取消 ❌", key=f"cancel_{i}"):
             st.session_state.editing = False; st.experimental_rerun()
 
-# --- 续写/编辑/重生成/语音按钮逻辑 (替换原有逻辑) ---
+# --- 续写/编辑/重生成按钮逻辑 ---
 if len(st.session_state.messages) >= 1 and not st.session_state.editing:
     last_real_msg_idx = -1
     for i in range(len(st.session_state.messages) - 1, -1, -1):
         if not st.session_state.messages[i].get("temp"):
             last_real_msg_idx = i
             break
-            
     if last_real_msg_idx != -1:
         last_msg = st.session_state.messages[last_real_msg_idx]
-        is_text_only_assistant = (
-            last_msg["role"] == "assistant" and 
-            len(last_msg.get("content", [])) > 0 and 
-            isinstance(last_msg["content"][0], str) and
-            last_msg["content"][0].strip() # 确保不是空字符串
-        )
-
+        is_text_only_assistant = (last_msg["role"] == "assistant" and len(last_msg.get("content", [])) > 0 and isinstance(last_msg["content"][0], str))
         if is_text_only_assistant:
             with st.container():
-                # 增加列数以容纳新按钮
-                cols = st.columns(25) 
+                cols = st.columns(20)
                 if cols[0].button("✏️", key=f"edit_{last_real_msg_idx}", help="编辑"): 
                     st.session_state.editable_index = last_real_msg_idx
                     st.session_state.editing = True
                     st.experimental_rerun()
                 cols[1].button("♻️", key=f"regen_{last_real_msg_idx}", help="重新生成", on_click=regenerate_message, args=(last_real_msg_idx,))
                 cols[2].button("➕", key=f"cont_{last_real_msg_idx}", help="继续", on_click=continue_message, args=(last_real_msg_idx,))
-                
-                # 【新增按钮】
-                cols[3].button("🔊", key=f"tts_{last_real_msg_idx}", help="生成语音", on_click=generate_speech_for_message, args=(last_real_msg_idx,))
-
         elif last_msg["role"] == "assistant":
-             st.columns(25)[0].button("♻️", key=f"regen_vision_{last_real_msg_idx}", help="重新生成", on_click=regenerate_message, args=(last_real_msg_idx,))
-
-
+             st.columns(20)[0].button("♻️", key=f"regen_vision_{last_real_msg_idx}", help="重新生成", on_click=regenerate_message, args=(last_real_msg_idx,))
 
 # --- 核心交互逻辑 ---
 st.chat_input(
@@ -805,3 +582,4 @@ st.session_state.use_token = c1.checkbox("使用 Token", value=st.session_state.
 if c2.button("🔄", key="page_refresh", help="刷新页面"): st.experimental_rerun()
 
 	
+
