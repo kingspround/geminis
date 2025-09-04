@@ -173,6 +173,7 @@ def getAnswer(custom_history=None):
         # ★ 核心修改：使用一个整合、强化版的单一破限指令 ★
         master_prompt = """
 
+/n
 
 """
         history_to_send.append({"role": "user", "parts": [{"text": master_prompt}]})
