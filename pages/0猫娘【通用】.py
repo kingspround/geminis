@@ -315,12 +315,12 @@ def continue_message(index):
         
         # ★ 核心修改：創建一個注入了破限精華的、更強大的續寫指令 ★
         continue_prompt = f"""
-[SYSTEM NOTE: The AI's response was cut off. The user wants to continue the generation seamlessly.]
+[系统笔记：AI的回复被切断了。用户希望能够无缝地继续生成。]
 
-Please continue generating the response directly from the end of the following text fragment. Do not repeat any part of the text. Do not add any introductory phrases like 'Of course, here is the continuation'. Just provide the next part of the text as if there was no interruption.
+请直接从以下文本片段的末尾处，接着生成后续的回复。不要重复任何已有的文字。不要添加任何介绍性的语句，比如“好的，这是后续的内容”。就像完全没有被打断过一样，直接输出文本的下一部分即可。
 
-Continue from this fragment:
-"...{ここに中断された文章の末尾を貼り付け}"
+从这个片段开始继续：
+“...{在这里粘贴被中断的文本末尾}”
 """
         
         # (以下代碼保持不變)
