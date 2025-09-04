@@ -535,9 +535,28 @@ with st.sidebar:
 """,
     )
 
-		
-# --- 【最终逻辑修正版】---
-    with st.expander("语音生成设置", expanded=True):
+    with st.expander("文件操作"):
+        if len(st.session_state.messages) > 0: st.button("重置上一个输出 ⏪", on_click=lambda: st.session_state.messages.pop(-1))
+        st.button("读取历史记录 📖", on_click=lambda: load_history(log_file))
+        if st.button("清除历史记录 🗑️"): st.session_state.clear_confirmation = True
+        if st.session_state.get("clear_confirmation"):
+            c1, c2 = st.columns(2)
+            if c1.button("确认清除", key="clear_confirm"): clear_history(log_file); st.session_state.clear_confirmation = False; st.experimental_rerun()
+            if c2.button("取消", key="clear_cancel"): st.session_state.clear_confirmation = False
+        st.download_button("下载当前聊天记录 ⬇️", data=pickle.dumps(_prepare_messages_for_save(st.session_state.messages)), file_name=os.path.basename(log_file), mime="application/octet-stream")
+        uploaded_pkl = st.file_uploader("读取本地pkl文件 📁", type=["pkl"], key="pkl_uploader")
+        if uploaded_pkl is not None:
+            try:
+                st.session_state.messages = _reconstitute_messages_after_load(pickle.load(uploaded_pkl))
+                st.success("成功读取本地pkl文件！"); st.experimental_rerun()
+            except Exception as e: st.error(f"读取本地pkl文件失败：{e}")
+
+	with st.expander("发送图片与文字"):
+        st.file_uploader("上传图片", type=["png", "jpg", "jpeg", "webp"], accept_multiple_files=True, key="sidebar_uploader", label_visibility="collapsed")
+        st.text_area("输入文字 (可选)", key="sidebar_caption", height=100)
+        st.button("发送到对话 ↗️", on_click=send_from_sidebar_callback, use_container_width=True)
+
+    with st.expander("语音生成设置", expanded=False):
         # 1. 让用户通过 selectbox 选择声音的“显示名称”
         selected_display_name = st.selectbox(
             "选择声音:",
@@ -559,28 +578,7 @@ with st.sidebar:
             help="在这里用自然语言描述您希望AI用什么样的语气、情感和风格来说话。"
         )
 
-    
-    with st.expander("文件操作"):
-        if len(st.session_state.messages) > 0: st.button("重置上一个输出 ⏪", on_click=lambda: st.session_state.messages.pop(-1))
-        st.button("读取历史记录 📖", on_click=lambda: load_history(log_file))
-        if st.button("清除历史记录 🗑️"): st.session_state.clear_confirmation = True
-        if st.session_state.get("clear_confirmation"):
-            c1, c2 = st.columns(2)
-            if c1.button("确认清除", key="clear_confirm"): clear_history(log_file); st.session_state.clear_confirmation = False; st.experimental_rerun()
-            if c2.button("取消", key="clear_cancel"): st.session_state.clear_confirmation = False
-        st.download_button("下载当前聊天记录 ⬇️", data=pickle.dumps(_prepare_messages_for_save(st.session_state.messages)), file_name=os.path.basename(log_file), mime="application/octet-stream")
-        uploaded_pkl = st.file_uploader("读取本地pkl文件 📁", type=["pkl"], key="pkl_uploader")
-        if uploaded_pkl is not None:
-            try:
-                st.session_state.messages = _reconstitute_messages_after_load(pickle.load(uploaded_pkl))
-                st.success("成功读取本地pkl文件！"); st.experimental_rerun()
-            except Exception as e: st.error(f"读取本地pkl文件失败：{e}")
-    with st.expander("发送图片与文字"):
-        st.file_uploader("上传图片", type=["png", "jpg", "jpeg", "webp"], accept_multiple_files=True, key="sidebar_uploader", label_visibility="collapsed")
-        st.text_area("输入文字 (可选)", key="sidebar_caption", height=100)
-        st.button("发送到对话 ↗️", on_click=send_from_sidebar_callback, use_container_width=True)
-
-    with st.expander("文件解读 (PDF, TXT等)", expanded=True):
+    with st.expander("文件解读 (PDF, TXT等)", expanded=False):
         # --- 第一部分：显示缓存状态 (无变化) ---
         if st.session_state.cached_files:
             st.markdown("**当前已缓存的文件:**")
