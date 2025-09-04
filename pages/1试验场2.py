@@ -94,7 +94,7 @@ if "selected_voice" not in st.session_state:
 if "tts_api_voice_name" not in st.session_state:
     st.session_state.tts_api_voice_name = VOICE_OPTIONS[DEFAULT_VOICE_DISPLAY_NAME]
 if "tts_prompt_prefix" not in st.session_state:
-    st.session_state.tts_prompt_prefix = "In a smug, condescending, and teasing voice that is also a little breathy and alluring, speak slowly and draw out the vowels. This is a classic 'mesugaki' style."
+    st.session_state.tts_prompt_prefix = "CRITICAL INSTRUCTION: Perform this in a Kansai dialect (関西弁). Your voice must be extremely high-pitched, childish, and cutesy, like a stereotypical 'loli'. IMPORTANT: Do not speak too clearly; you should mumble slightly and slur your words together a bit, as if you are a real, slightly clumsy young child. Your attitude must be completely 'mesugaki' - smug, teasing, and condescending. Now, say: "
 
 
 # --- API配置和模型定义 ---
