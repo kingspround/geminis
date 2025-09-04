@@ -536,29 +536,23 @@ with st.sidebar:
     )
 
 
-
-with st.expander("文件操作", expanded=False):
+    with st.expander("文件操作", expanded=False):
+        # 这一层使用 8 个空格缩进
         if len(st.session_state.messages) > 0:
             st.button("重置上一个输出 ⏪", on_click=lambda: st.session_state.messages.pop(-1))
         st.button("读取历史记录 📖", on_click=lambda: load_history(log_file))
         if st.button("清除历史记录 🗑️"):
-            st.session_state.clear_confirmation = True   
+            st.session_state.clear_confirmation = True
         if st.session_state.get("clear_confirmation"):
+            # 这一层使用 12 个空格缩进
             c1, c2 = st.columns(2)
-            with c1:
-                if st.button("确认清除", key="clear_confirm", type="primary"):
-                    clear_history(log_file)
-                    st.session_state.clear_confirmation = False
-                    st.experimental_rerun()
-            with c2:
-                if st.button("取消", key="clear_cancel"):
-                    st.session_state.clear_confirmation = False           
-        st.download_button(
-            "下载当前聊天记录 ⬇️",
-            data=pickle.dumps(_prepare_messages_for_save(st.session_state.messages)),
-            file_name=os.path.basename(log_file),
-            mime="application/octet-stream"
-        )
+            if c1.button("确认清除", key="clear_confirm"):
+                clear_history(log_file)
+                st.session_state.clear_confirmation = False
+                st.experimental_rerun()
+            if c2.button("取消", key="clear_cancel"):
+                st.session_state.clear_confirmation = False
+        st.download_button("下载当前聊天记录 ⬇️", data=pickle.dumps(_prepare_messages_for_save(st.session_state.messages)), file_name=os.path.basename(log_file), mime="application/octet-stream")
         uploaded_pkl = st.file_uploader("读取本地pkl文件 📁", type=["pkl"], key="pkl_uploader")
         if uploaded_pkl is not None:
             try:
@@ -569,15 +563,9 @@ with st.expander("文件操作", expanded=False):
                 st.error(f"读取本地pkl文件失败：{e}")
 
 
-
     with st.expander("发送图片与文字", expanded=False):
-        st.file_uploader(
-            "上传图片",
-            type=["png", "jpg", "jpeg", "webp"],
-            accept_multiple_files=True,
-            key="sidebar_uploader",
-            label_visibility="collapsed"
-        )
+        # 这一层使用 8 个空格缩进
+        st.file_uploader("上传图片", type=["png", "jpg", "jpeg", "webp"], accept_multiple_files=True, key="sidebar_uploader", label_visibility="collapsed")
         st.text_area("输入文字 (可选)", key="sidebar_caption", height=100)
         st.button("发送到对话 ↗️", on_click=send_from_sidebar_callback, use_container_width=True)
 
