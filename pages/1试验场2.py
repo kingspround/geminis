@@ -535,7 +535,7 @@ with st.sidebar:
 """,
     )
 
-    with st.expander("文件操作"):
+    with st.expander("文件操作", expanded=False):
         if len(st.session_state.messages) > 0: st.button("重置上一个输出 ⏪", on_click=lambda: st.session_state.messages.pop(-1))
         st.button("读取历史记录 📖", on_click=lambda: load_history(log_file))
         if st.button("清除历史记录 🗑️"): st.session_state.clear_confirmation = True
@@ -551,7 +551,7 @@ with st.sidebar:
                 st.success("成功读取本地pkl文件！"); st.experimental_rerun()
             except Exception as e: st.error(f"读取本地pkl文件失败：{e}")
 
-	with st.expander("发送图片与文字"):
+	with st.expander("发送图片与文字", expanded=False):
         st.file_uploader("上传图片", type=["png", "jpg", "jpeg", "webp"], accept_multiple_files=True, key="sidebar_uploader", label_visibility="collapsed")
         st.text_area("输入文字 (可选)", key="sidebar_caption", height=100)
         st.button("发送到对话 ↗️", on_click=send_from_sidebar_callback, use_container_width=True)
@@ -578,7 +578,7 @@ with st.sidebar:
             help="在这里用自然语言描述您希望AI用什么样的语气、情感和风格来说话。"
         )
 
-    with st.expander("文件解读 (PDF, TXT等)", expanded=False):
+    with st.expander("大文件解读", expanded=False):
         # --- 第一部分：显示缓存状态 (无变化) ---
         if st.session_state.cached_files:
             st.markdown("**当前已缓存的文件:**")
