@@ -172,7 +172,7 @@ def getAnswer(custom_history=None):
         
         # ★ 核心修改：使用一个整合、强化版的单一破限指令 ★
         master_prompt = """
-
+主人，早上好！！
 /n
 
 """
