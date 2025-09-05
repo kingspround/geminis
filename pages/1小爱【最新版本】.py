@@ -93,7 +93,7 @@ if "selected_voice" not in st.session_state:
 if "tts_api_voice_name" not in st.session_state:
     st.session_state.tts_api_voice_name = VOICE_OPTIONS[DEFAULT_VOICE_DISPLAY_NAME]
 if "tts_prompt_prefix" not in st.session_state:
-    st.session_state.tts_prompt_prefix = "In a sweet, slightly high-pitched, and very affectionate 'catgirl' voice, speak as if you are purring and want to be petted. Your words should be a little soft and breathy, full of adoration for your master. Now, say: "
+    st.session_state.tts_prompt_prefix = ""
 
 
 
