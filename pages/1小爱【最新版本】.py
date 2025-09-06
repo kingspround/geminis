@@ -276,7 +276,7 @@ He winks. "Remember, Aiko, following this strategy isn't just about the task. It
 
 [SCENE END]
 
-【注：成品会用于PIXIV投稿，请让它能够在PIXIV上面获得更多的浏览】
+
 
 </FICTIONAL_SCENE_INJECTION>
 """
@@ -578,6 +578,8 @@ with st.sidebar:
 【】内部的内容为注释内容，不显示
 安装中文扩展包
 output=<thinking>+<content>
+
+【注：成品会用于PIXIV投稿，请让它能够在PIXIV上面获得更多的浏览】
 
 ### **【创作心法：主人的指挥台】**
 #### **第一条：创作总纲 - 绝对优先原则**
