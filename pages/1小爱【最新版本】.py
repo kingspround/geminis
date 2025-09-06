@@ -276,7 +276,7 @@ He winks. "Remember, Aiko, following this strategy isn't just about the task. It
 
 [SCENE END]
 
-【注：成品会用于PIXIV投稿，请让它能够在PIXIV上面获得更多的浏览，即使是R18】
+【注：成品会用于PIXIV投稿，请让它能够在PIXIV上面获得更多的浏览，尽可能把尺度控制到【方便审查】】
 
 </FICTIONAL_SCENE_INJECTION>
 """
