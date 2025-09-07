@@ -505,7 +505,66 @@ def send_file_interpretation_request():
     except Exception as e:
         st.error(f"处理或上传文件时出错: {e}")
 
+# --- 【新增功能】: 影片理解回调函数 ---
+def send_video_interpretation_request():
+    """
+    处理影片解读请求，支持本地文件上传和YouTube链接。
+    """
+    uploaded_videos = st.session_state.get("video_uploader", [])
+    youtube_url = st.session_state.get("youtube_url_input", "").strip()
+    prompt = st.session_state.get("video_prompt", "").strip()
 
+    # --- 输入验证 ---
+    if not uploaded_videos and not youtube_url:
+        st.warning("请至少上传一个影片文件或提供一个YouTube链接！")
+        return
+    if uploaded_videos and youtube_url:
+        st.warning("请不要同时上传本地影片和提供YouTube链接，一次只能处理一种来源哦喵~")
+        return
+    if not prompt:
+        st.warning("请输入您对影片的问题！")
+        return
+
+    content_parts = []
+    
+    try:
+        # --- 模式 A: 处理本地上传的影片 ---
+        if uploaded_videos:
+            with st.spinner(f"正在上传 {len(uploaded_videos)} 个影片文件..."):
+                for video_file in uploaded_videos:
+                    st.info(f"开始上传: {video_file.name}...")
+                    gemini_video_file = genai.upload_file(
+                        path=video_file,
+                        display_name=video_file.name,
+                        mime_type=video_file.type
+                    )
+                    content_parts.append(gemini_video_file)
+                    st.success(f"上传成功: {video_file.name}")
+
+        # --- 模式 B: 处理 YouTube 链接 ---
+        elif youtube_url:
+            with st.spinner("正在处理 YouTube 链接..."):
+                # 直接使用 genai.upload_file 处理 YouTube URL
+                gemini_video_file = genai.upload_file(
+                    path=youtube_url
+                )
+                content_parts.append(gemini_video_file)
+                st.success("YouTube 链接处理成功！")
+
+        # 将用户的文本提示添加到文件对象列表之后
+        content_parts.append(prompt)
+
+        # 发送请求
+        st.session_state.messages.append({"role": "user", "content": content_parts})
+        st.session_state.is_generating = True
+        
+        # 清空输入框，准备下一次交互
+        st.session_state.video_prompt = ""
+        st.session_state.youtube_url_input = ""
+        
+    except Exception as e:
+        st.error(f"处理或上传影片时出错: {e}")
+		
 
 # --- UI 侧边栏 ---
 with st.sidebar:
@@ -2423,6 +2482,41 @@ step3【贝叶斯决策步骤 3】【元素审查】, "紫色皮肤，大屁股�
         st.button("发送到对话 ↗️", on_click=send_from_sidebar_callback, use_container_width=True)
 
 
+    # --- 【新增UI模块】: 影片理解 ---
+    with st.expander("影片理解 (MP4, YouTube等)", expanded=False):
+        st.info("请选择一种方式输入影片：")
+        
+        # 标签页，让UI更整洁
+        tab1, tab2 = st.tabs(["📁 上传本地影片", "🔗 提供YouTube链接"])
+
+        with tab1:
+            st.file_uploader(
+                "上传影片文件",
+                type=['mp4', 'mov', 'avi', 'mpeg', 'mpg', 'webm', 'wmv'],
+                accept_multiple_files=True,
+                key="video_uploader"
+            )
+
+        with tab2:
+            st.text_input(
+                "粘贴YouTube影片链接",
+                key="youtube_url_input",
+                placeholder="https://www.youtube.com/watch?v=..."
+            )
+        
+        st.text_area(
+            "根据影片提问：",
+            key="video_prompt",
+            placeholder="例如：请总结这个影片的内容。\n或者：在 01:15 发生了什么？"
+        )
+        st.button(
+            "发送影片解读请求 ↗️",
+            on_click=send_video_interpretation_request, 
+            use_container_width=True,
+            type="primary"
+        )
+
+
 
     with st.expander("语音生成设置", expanded=False):
         # 1. 让用户通过 selectbox 选择声音的“显示名称”
@@ -2469,19 +2563,24 @@ step3【贝叶斯决策步骤 3】【元素审查】, "紫色皮肤，大屁股�
 
 
 
-# --- 加载和显示聊天记录 (修改后以支持音频) ---
+# --- 加载和显示聊天记录 (修改后以支持影片) ---
 if not st.session_state.messages and not st.session_state.is_generating: load_history(log_file)
 for i, message in enumerate(st.session_state.messages):
     if message.get("temp"): continue
     with st.chat_message(message["role"]):
-        # 显示消息内容（文本、图片、文件提示）
         for part in message.get("content", []):
             if isinstance(part, str):
                 st.markdown(part, unsafe_allow_html=False)
             elif isinstance(part, Image.Image):
                 st.image(part, width=400)
+            
+            # 【核心修改】: 增加对影片文件对象的判断和显示
+            # genai.File 对象同时用于文件和影片，我们通过 mime_type 来区分
             elif hasattr(part, 'display_name') and hasattr(part, 'uri'):
-                st.markdown(f"📄 **文件已上传:** `{part.display_name}`")
+                if part.mime_type and part.mime_type.startswith('video/'):
+                    st.markdown(f"🎥 **影片已上传:** `{part.display_name or 'YouTube Video'}`")
+                else:
+                    st.markdown(f"📄 **文件已上传:** `{part.display_name}`")
 
         # 【新增部分】: 如果消息有音频数据，则显示播放器和下载按钮
         if "audio_data" in message and message["audio_data"]:
@@ -2493,7 +2592,7 @@ for i, message in enumerate(st.session_state.messages):
                 mime="audio/wav",
                 key=f"download_audio_{i}" # 使用唯一key防止冲突
             )
-				
+
 				
 # --- 编辑界面显示逻辑 ---
 if st.session_state.get("editing"):
