@@ -9,6 +9,7 @@ from io import BytesIO
 import zipfile
 from PIL import Image
 import wave
+import time
 # 删除了不再需要的 `from google.genai import types`
 
 # ==============================================================================
@@ -508,13 +509,12 @@ def send_file_interpretation_request():
 # --- 【新增功能】: 影片理解回调函数 ---
 def send_video_interpretation_request():
     """
-    处理影片解读请求，支持本地文件上传和YouTube链接。
+    处理影片解读请求，并在上传后耐心等待文件变为 ACTIVE 状态。
     """
     uploaded_videos = st.session_state.get("video_uploader", [])
     youtube_url = st.session_state.get("youtube_url_input", "").strip()
     prompt = st.session_state.get("video_prompt", "").strip()
 
-    # --- 输入验证 ---
     if not uploaded_videos and not youtube_url:
         st.warning("请至少上传一个影片文件或提供一个YouTube链接！")
         return
@@ -526,39 +526,45 @@ def send_video_interpretation_request():
         return
 
     content_parts = []
+    gemini_video_file = None # 先声明一个变量
     
     try:
-        # --- 模式 A: 处理本地上传的影片 ---
+        # --- 步骤 1: 上传文件或处理链接，得到文件对象 ---
         if uploaded_videos:
-            with st.spinner(f"正在上传 {len(uploaded_videos)} 个影片文件..."):
-                for video_file in uploaded_videos:
-                    st.info(f"开始上传: {video_file.name}...")
-                    gemini_video_file = genai.upload_file(
-                        path=video_file,
-                        display_name=video_file.name,
-                        mime_type=video_file.type
-                    )
-                    content_parts.append(gemini_video_file)
-                    st.success(f"上传成功: {video_file.name}")
-
-        # --- 模式 B: 处理 YouTube 链接 ---
+            # 为了简化，我们一次只处理一个上传的视频
+            video_file = uploaded_videos[0] 
+            with st.spinner(f"正在上传影片: {video_file.name}..."):
+                gemini_video_file = genai.upload_file(
+                    path=video_file,
+                    display_name=video_file.name,
+                    mime_type=video_file.type
+                )
         elif youtube_url:
             with st.spinner("正在处理 YouTube 链接..."):
-                # 直接使用 genai.upload_file 处理 YouTube URL
                 gemini_video_file = genai.upload_file(
                     path=youtube_url
                 )
-                content_parts.append(gemini_video_file)
-                st.success("YouTube 链接处理成功！")
 
-        # 将用户的文本提示添加到文件对象列表之后
+        # --- 【核心修正】: 步骤 2: 耐心等待文件处理完成 ---
+        if gemini_video_file:
+            with st.spinner(f"文件 '{gemini_video_file.display_name or 'YouTube Video'}' 正在后台处理中，请稍候..."):
+                while gemini_video_file.state.name == "PROCESSING":
+                    # 每隔 5 秒检查一次文件状态
+                    time.sleep(5) 
+                    gemini_video_file = genai.get_file(name=gemini_video_file.name)
+
+            if gemini_video_file.state.name == "FAILED":
+                st.error(f"影片处理失败: {gemini_video_file.state.name}")
+                return
+            
+            # 当循环结束，文件状态就是 ACTIVE 了！
+            st.success(f"影片 '{gemini_video_file.display_name or 'YouTube Video'}' 已准备就绪！")
+            content_parts.append(gemini_video_file)
+
+        # --- 步骤 3: 发送提问请求 ---
         content_parts.append(prompt)
-
-        # 发送请求
         st.session_state.messages.append({"role": "user", "content": content_parts})
         st.session_state.is_generating = True
-        
-        # 清空输入框，准备下一次交互
         st.session_state.video_prompt = ""
         st.session_state.youtube_url_input = ""
         
