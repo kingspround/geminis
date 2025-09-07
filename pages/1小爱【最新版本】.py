@@ -618,7 +618,7 @@ AI训练通过使用Danbooru的标签查找，获得一堆图片训练集，将�
 ####1，画风(请见文档最后)
 
 ####2，视角画面镜头全解析
- 01. 基础篇: 画面景别 (Shot Scale)
+     01. 基础篇: 画面景别 (Shot Scale)
 视角（Perspective）
 这个就像相机离人物的远近，决定了画面中人物占据了多大的比例，它们是构图的基础骨架哦！
 一、你想要的画面大小（镜头远近）
@@ -684,7 +684,7 @@ POV作为主角：female_pov , pov_breasts , 1girl , skirt , white_background, s
 ●vanishing_point (远景透视画法): 创建一个深远、有层次感的画面，引导观众视线。
 ●fisheye (鱼眼镜头): 制造出广阔而扭曲的特殊效果，非常适合表现独特的环境或怪诞的角色。
 
-02. 进阶篇1: 光影与色彩 (Lighting & Color)
+    02. 进阶篇1: 光影与色彩 (Lighting & Color)
 即控制画面中光源的位置和光照的效果，明暗，雾气和阴影等等效果。
 光线方向与强度： frontlight (正面光), sidelight (侧面光), backlight (背光), rim_light (边缘光), strong_rim_light (强边缘光), god_rays (自上而下的光线), light_rays (明亮的射线光束), ambient_light (环境光), specular_lighting (镜面高光/高亮), overexposure (过曝).
 自然光与氛围： sunlight (阳光), sunbeam (太阳光束), dappled_sunlight (斑驳的阳光), sunlight_filtering_through_trees (阳光透过树木), moonlight (月光), glowing_light (荧光), atrium (光线照射), sunrise (日出), sunset (日落), twilight (黄昏), golden_hour_lighting (黄金时段照明), against_backlight_at_dusk (傍晚背对阳光), night (晚上), full_moon (满月), cloudy (多云), in_the_rain (雨中), rainy_days (雨天).
@@ -692,7 +692,7 @@ sun_light , shade  , 1girl , solo , Lean forward , backlight  , frontlight , cow
 色彩调性： light (亮的), dark (暗的), pale (苍白/薄), shade (阴影/树荫), intense_shadows (强阴影), deep (加深/浓), obscure (模糊), dim (昏暗/朦胧), shady (成荫的), dimly lit (昏暗), monochrome (单色), greyscale (灰度), partially_colored (部分着色), flat_color (色块), spot_color (纯色), halftone (半色调).
 特殊效果： see-through_silhouette (通过透光织物看轮廓), chromatic_aberration (色差/色失焦).
 
-03. 进阶篇2: 镜头效果 (Camera Effects)
+    03. 进阶篇2: 镜头效果 (Camera Effects)
 这些词条就像是给你的画面加上了一层“魔法滤镜”，让它们更具有电影感和冲击力。
 一、聚焦与景深
 ●close-up (特写): 将镜头无限拉近，聚焦人物面部的微小表情、她胸口的纹路，或是任何你想强调的微小细节，放大它的魅力！
@@ -706,7 +706,7 @@ sun_light , shade  , 1girl , solo , Lean forward , backlight  , frontlight , cow
 ●caustics (焦散): 模拟光线穿透水或玻璃后形成的复杂光斑，适合在水边的画面中加入哦！
 ●chromatic_aberration (色差 / 色失焦): 制造轻微的色彩边缘分离效果，可以增加画面艺术感或某种“复古”或“ glitch”的风格。
 
-04. 心得: 如何灵活运用这些魔法？
+    04. 心得: 如何灵活运用这些魔法？
 
 根据主题量身定制：你想画的是宏大的史诗场面，还是私密的二人世界？不同的主题需要不同的视角。
 学会组合，而非堆砌：不要把所有喜欢的词条都堆在一起哦！选择最能表达你想法的2-3个核心视角词条，再用其他词条去丰富它们。比如：{close-up}, {looking_at_viewer}, {blush}, {small breasts}，就能营造出很强的亲密感和害羞情绪啦！
