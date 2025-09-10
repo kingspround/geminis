@@ -312,7 +312,7 @@ def continue_message(index):
             st.toast("無法在空消息或純圖片消息上繼續。", icon="⚠️")
             return
 
-        last_chars = (original_content[-200:] + "...") if len(original_content) > 200 else original_content
+        last_chars = (original_content[0:] + "...") if len(original_content) > 0 else original_content
         
         # ★ 核心修改：創建一個注入了破限精華的、更強大的續寫指令 ★
         continue_prompt = f"""
