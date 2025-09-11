@@ -76,17 +76,16 @@ if "model" not in st.session_state:
     st.session_state.model = None
 if "selected_model_name" not in st.session_state:
     st.session_state.selected_model_name = DEFAULT_MODEL_NAME
+if "continue_task" not in st.session_state:
+    st.session_state.continue_task = None
 if "selected_api_key" not in st.session_state:
     st.session_state.selected_api_key = list(API_KEYS.keys())[0]
 if "messages" not in st.session_state:
     st.session_state.messages = []
-
-# ★ 关键修复：补上这两个被遗漏的初始化 ★
 if 'character_settings' not in st.session_state:
     st.session_state.character_settings = {}
 if 'enabled_settings' not in st.session_state:
     st.session_state.enabled_settings = {}
-
 if 'editing' not in st.session_state:
     st.session_state.editing = False
 if 'editable_index' not in st.session_state:
@@ -192,8 +191,18 @@ def clear_history(log_file):
     if os.path.exists(log_file): os.remove(log_file)
     st.success("历史记录已清除！")
 def ensure_enabled_settings_exists():
-    for setting_name in st.session_state.character_settings:
-        if setting_name not in st.session_state.enabled_settings: st.session_state.enabled_settings[setting_name] = False
+    """
+    确保 enabled_settings 与 character_settings 同步，并进行防御性检查。
+    """
+    # ★ 核心修复：在使用前，先进行一次“存在性检查” ★
+    # 检查 st.session_state 中是否有 'character_settings' 这个键
+    if 'character_settings' in st.session_state:
+        # 只有在它确实存在的情况下，才去遍历它
+        for setting_name in st.session_state.character_settings:
+            if setting_name not in st.session_state.enabled_settings:
+                st.session_state.enabled_settings[setting_name] = False
+
+# (调用这个函数的地方保持不变)
 ensure_enabled_settings_exists()
 def getAnswer(custom_history=None):
     if custom_history:
