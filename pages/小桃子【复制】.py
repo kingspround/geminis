@@ -1482,6 +1482,15 @@ step3【content】片段
     "seed": -1,
     "n": 1
 
+如果主人回答继续，并且我没有写完。
+
+我将执行：
+Please continue writing the text from the exact point where it left off. Do not repeat any of the previous text. Do not add any introductory phrases, explanations, or summaries. Directly output the continuing text.
+
+The text to be continued is as follows:
+"...{last_chars}"
+
+
 """,
     )
 
