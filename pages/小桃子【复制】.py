@@ -71,21 +71,22 @@ DEFAULT_VOICE_DISPLAY_NAME = "Despina - Smooth"
 # 2. 所有 Session State 初始化
 # ==============================================================================
 
+# --- 初始化 Session State ---
 if "model" not in st.session_state:
     st.session_state.model = None
-# 【核心修正】: 现在当这段代码执行时，DEFAULT_MODEL_NAME 已经在上面被定义了
 if "selected_model_name" not in st.session_state:
     st.session_state.selected_model_name = DEFAULT_MODEL_NAME
-if "continue_task" not in st.session_state:
-    st.session_state.continue_task = None
 if "selected_api_key" not in st.session_state:
     st.session_state.selected_api_key = list(API_KEYS.keys())[0]
 if "messages" not in st.session_state:
     st.session_state.messages = []
+
+# ★ 关键修复：补上这两个被遗漏的初始化 ★
 if 'character_settings' not in st.session_state:
     st.session_state.character_settings = {}
 if 'enabled_settings' not in st.session_state:
     st.session_state.enabled_settings = {}
+
 if 'editing' not in st.session_state:
     st.session_state.editing = False
 if 'editable_index' not in st.session_state:
@@ -96,13 +97,6 @@ if "sidebar_caption" not in st.session_state:
     st.session_state.sidebar_caption = ""
 if "use_token" not in st.session_state:
     st.session_state.use_token = False
-if "selected_voice" not in st.session_state:
-    st.session_state.selected_voice = DEFAULT_VOICE_DISPLAY_NAME
-if "tts_api_voice_name" not in st.session_state:
-    st.session_state.tts_api_voice_name = VOICE_OPTIONS[DEFAULT_VOICE_DISPLAY_NAME]
-if "tts_prompt_prefix" not in st.session_state:
-    st.session_state.tts_prompt_prefix = ""
-
 
 
 # --- API配置和模型定义 ---
