@@ -1537,18 +1537,14 @@ st.chat_input(
 
 
 # ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
-# ★★★ 核心生成逻辑 (最终版：抗会话超时，究极防御性编程) ★★★
+# ★★★ 核心生成逻辑 (最终版：修复NameError，逻辑完整) ★★★
 # ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
 if st.session_state.get("is_generating", False):
-    # 使用 .get() 安全地访问 is_generating
-    
-    # 使用 .get() 安全地访问 messages
     messages = st.session_state.get("messages", [])
     is_continuation_task = messages and messages[-1].get("is_continuation_task")
     
     task_info = None
     if is_continuation_task:
-        # 即使在pop前，也最好能确认messages存在
         if st.session_state.get("messages"):
             task_info = st.session_state.messages.pop()
 
@@ -1557,11 +1553,9 @@ if st.session_state.get("is_generating", False):
         target_message_index, original_content, full_response_text = -1, "", ""
         
         try:
-            # 1. 准备工作 (全面使用 .get() 进行防御)
+            # (准备工作和流式生成部分保持不变，已加入防御性编程)
             if is_continuation_task and task_info:
                 target_message_index = task_info.get("target_index", -1)
-                
-                # 在访问前，再次确认 messages 存在且索引有效
                 current_messages = st.session_state.get("messages", [])
                 if 0 <= target_message_index < len(current_messages):
                     original_content = current_messages[target_message_index].get("content", [""])[0]
@@ -1571,29 +1565,23 @@ if st.session_state.get("is_generating", False):
             if not is_continuation_task:
                 current_messages = st.session_state.get("messages", [])
                 if not current_messages or current_messages[-1].get("role") != "assistant":
-                    # 只有在 messages 存在时才进行 append
                     if "messages" in st.session_state:
                         st.session_state.messages.append({"role": "assistant", "content": [""]})
                 
-                # 再次安全地获取状态
                 current_messages = st.session_state.get("messages", [])
                 if current_messages:
                     target_message_index = len(current_messages) - 1
                     original_content = current_messages[target_message_index].get("content", [""])[0]
-                else: # 如果此时 messages 突然消失，则优雅地失败
+                else:
                     raise RuntimeError("Session state lost during initialization.")
 
             full_response_text = original_content
             
-            # 2. 流式生成 (在循环内部也进行防御)
             for chunk in getAnswer(is_continuation=is_continuation_task, target_idx=target_message_index):
                 full_response_text += chunk
-                
-                # ★ 究极修复：在写入前，检查 session_state 和 messages 是否还存在 ★
                 if "messages" in st.session_state and 0 <= target_message_index < len(st.session_state.messages):
                     st.session_state.messages[target_message_index]["content"] = [full_response_text]
                 else:
-                    # 如果 session_state 在中途消失，则记录日志并优雅地中断
                     print("Session state 'messages' disappeared during generation. Breaking loop.")
                     break 
                 
@@ -1610,21 +1598,45 @@ if st.session_state.get("is_generating", False):
             st.experimental_rerun()
 
         except Exception as e:
-            # 在 except 块中也进行防御
+            # ★ 核心修复：在这里确保 error_details 总是被定义 ★
             if "messages" in st.session_state and 0 <= target_message_index < len(st.session_state.messages):
-                # 1. [抢救数据]
                 if full_response_text and full_response_text != original_content:
                     st.session_state.messages[target_message_index]["content"] = [full_response_text]
                     processed_text_error = full_response_text.replace('\n', '  \n')
                     placeholder.markdown(processed_text_error, unsafe_allow_html=False)
                 else:
                      placeholder.empty()
-            else: # 如果连messages都没了，就只能清空占位符
+            else:
                 placeholder.empty()
 
-            # ... (显示错误的逻辑保持不变) ...
             error_title = "**系統提示：生成時遇到API錯誤**"
-            # ... (智能识别429错误) ...
+            
+            # 先定义一个默认的 error_details
+            error_details = f"""
+            **錯誤類型：** `{type(e).__name__}`
+            **原始報錯信息：**
+            ```
+            {str(e)}
+            ```
+            """
+            
+            # 然后，如果错误是 429，再覆盖它
+            if "429" in str(e) and "quota" in str(e).lower():
+                error_title = "**系統提示：API請求頻率超限 (429)**"
+                error_details = """
+                **您觸發了Google API免費套餐的請求頻率限制。**
+                
+                **這不是Token超限，而是您在短時間內（例如一分鐘內）發送請求的次數過多。**
+                
+                **解決方案：**
+                - **請等待大約一分鐘**，然後再嘗試“繼續”或發送新消息。
+
+                **原始報錯信息（供參考）：**
+                ```
+                {str(e)}
+                ```
+                """
+
             st.error(error_title + "\n" + error_details)
             
             if "messages" in st.session_state and not (full_response_text.replace(original_content, '', 1)).strip():
