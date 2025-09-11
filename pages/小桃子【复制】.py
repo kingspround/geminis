@@ -721,8 +721,6 @@ def getAnswer(custom_history=None):
             "forbid_overrides": false
         },
 
-""",
-
 """
         history_to_send.append({"role": "user", "parts": [{"text": master_prompt}]})
         
