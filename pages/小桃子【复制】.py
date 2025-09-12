@@ -10,7 +10,6 @@ import zipfile
 from PIL import Image
 import wave
 import time
-# 删除了不再需要的 `from google.genai import types`
 
 # ==============================================================================
 # 1. 所有常量定义 (Constants)
@@ -105,7 +104,6 @@ if "use_token" not in st.session_state:
     st.session_state.use_token = False
 if "selected_voice" not in st.session_state:
     st.session_state.selected_voice = "默认语音" # 或者您VOICE_OPTIONS中的任何一个键名
-
 
 
 # --- 默认角色设定 ---
