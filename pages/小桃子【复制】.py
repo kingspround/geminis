@@ -1546,10 +1546,9 @@ if not st.session_state.is_generating:
 
 
 # ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
-# ★★★ 核心生成逻辑 (已加入重试计数与冷却机制，防止无限循环) ★★★
+# ★★★ 核心生成逻辑 (已修复状态死锁问题) ★★★
 # ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
 if st.session_state.is_generating:
-    # 💡 初始化重试计数器，如果它不存在的话
     if 'auto_continue_count' not in st.session_state:
         st.session_state.auto_continue_count = 0
 
@@ -1567,10 +1566,11 @@ if st.session_state.is_generating:
             
             if not (-len(st.session_state.messages) <= target_message_index < len(st.session_state.messages)):
                  st.error("续写目标消息索引无效，已停止生成。")
-                 st.session_state.is_generating = False
+                 st.session_state.is_generating = False # 出错，解锁
+                 st.experimental_rerun() # 立即刷新以显示错误并解锁输入框
             else:
+                should_rerun = True # 默认情况下，操作结束后应刷新
                 try:
-                    # 这部分 try 的逻辑完全不变，还是正常生成
                     original_content = ""
                     content_list = st.session_state.messages[target_message_index]["content"]
                     if content_list and isinstance(content_list[0], str):
@@ -1584,17 +1584,12 @@ if st.session_state.is_generating:
                         placeholder.markdown(updated_full_content + "▌")
                     
                     placeholder.markdown(st.session_state.messages[target_message_index]["content"][0])
-                    st.session_state.is_generating = False # 正常结束
+                    # ★★★ 改动点1: 移除了这里的 is_generating = False ★★★
 
                 except Exception as e:
-                    # ★★★ 核心改动在这里 ★★★
-                    # 1. 定义一个最大重试次数
                     MAX_AUTO_CONTINUE = 2
-                    
-                    # 2. 检查当前重试次数是否小于上限
                     if st.session_state.auto_continue_count < MAX_AUTO_CONTINUE:
-                        # --- 如果次数没超，就执行自动续写 ---
-                        st.session_state.auto_continue_count += 1 # 计数器加 1
+                        st.session_state.auto_continue_count += 1
                         st.toast(f"回答中断，正在尝试自动续写… (第 {st.session_state.auto_continue_count}/{MAX_AUTO_CONTINUE} 次)")
                         
                         partial_content = st.session_state.messages[target_message_index]["content"][0]
@@ -1605,21 +1600,38 @@ if st.session_state.is_generating:
                             st.session_state.messages.append({"role": "user", "content": [continue_prompt], "temp": True, "is_continue_prompt": True, "target_index": target_message_index})
                         else:
                             st.error(f"回答生成失败 ({type(e).__name__})，且无部分内容可续写。")
-                            st.session_state.is_generating = False # 无法续写，踩下刹车
+                            st.session_state.is_generating = False # 无法续写，解锁
                     else:
-                        # --- 🛑 如果已经达到上限，就踩下刹车，终止循环！ ---
-                        st.error(f"自动续写 {MAX_AUTO_CONTINUE} 次后仍然失败。请检查网络连接或API密钥，然后手动【继续】或【重新生成】。错误: {e}")
-                        st.session_state.is_generating = False # 关键：这是“刹车”！
-                        st.session_state.auto_continue_count = 0 # 为下一次手动操作重置计数器
+                        st.error(f"自动续写 {MAX_AUTO_CONTINUE} 次后仍然失败。请检查网络或API密钥，然后手动操作。错误: {e}")
+                        st.session_state.is_generating = False # 达到上限，解锁
+                        st.session_state.auto_continue_count = 0
+                
                 finally:
-                    # 这部分 finally 的逻辑完全不变
-                    if not st.session_state.is_generating and is_continuation_task:
+                    # ★★★ 改动点2: 重新组织 finally 块的逻辑 ★★★
+                    
+                    # 1. 决定是否需要解锁 (只有在生成真正结束时才解锁)
+                    is_still_generating = True
+                    if 'is_generating' in st.session_state and not st.session_state.is_generating:
+                        is_still_generating = False # 状态已在 except 块中被手动解锁
+                    elif st.session_state.messages and st.session_state.messages[-1].get("is_continue_prompt"):
+                        is_still_generating = True # 准备进行下一次续写，不能解锁
+                    else:
+                        is_still_generating = False # 正常结束，准备解锁
+
+                    # 2. 清理临时消息 (只有在生成真正结束时)
+                    if not is_still_generating and is_continuation_task:
                         st.session_state.messages.pop()
-                    if not st.session_state.is_generating and st.session_state.messages and st.session_state.messages[-1]['role'] == 'assistant' and not st.session_state.messages[-1]["content"][0].strip():
+
+                    # 3. 清理空的助手消息 (只有在生成真正结束时)
+                    if not is_still_generating and st.session_state.messages and st.session_state.messages[-1]['role'] == 'assistant' and not st.session_state.messages[-1]["content"][0].strip():
                         st.session_state.messages.pop()
                     
+                    # 4. 保存文件
                     with open(log_file, "wb") as f:
                         pickle.dump(_prepare_messages_for_save(st.session_state.messages), f)
+
+                    # 5. 最后一步：更新状态并刷新
+                    st.session_state.is_generating = is_still_generating
                     st.experimental_rerun()
 
 
