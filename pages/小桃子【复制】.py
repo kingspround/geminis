@@ -1533,15 +1533,15 @@ if len(st.session_state.messages) >= 1 and not st.session_state.editing:
 
 
 
-# --- 核心交互逻辑 ---
+# --- 核心交互逻辑 (主输入框) ---
 if not st.session_state.is_generating:
     if prompt := st.chat_input("输入你的消息...", key="main_chat_input", disabled=st.session_state.editing):
         token = generate_token()
         full_prompt = f"{prompt} (token: {token})" if st.session_state.use_token else prompt
         st.session_state.messages.append({"role": "user", "content": [full_prompt]})
         st.session_state.is_generating = True
-        st.session_state.auto_continue_count = 0 # ★★★ 🔄 重置计数器 ★★★
-        st.experimental_rerun()
+        st.session_state.auto_continue_count = 0 
+        st.experimental_rerun() # <--- 就是这一行有问题
 
 
 
