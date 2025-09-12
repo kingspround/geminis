@@ -1563,116 +1563,63 @@ st.chat_input(
 
 
 # ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
-# ★★★ 核心生成逻辑 (最终版：修复NameError，逻辑完整) ★★★
+# ★★★ 核心生成逻辑 (已加入动态加载指示器并优化) ★★★
 # ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
-if st.session_state.get("is_generating", False):
-    messages = st.session_state.get("messages", [])
-    is_continuation_task = messages and messages[-1].get("is_continuation_task")
+if st.session_state.is_generating:
+    is_continuation_task = st.session_state.messages and st.session_state.messages[-1].get("is_continue_prompt")
     
-    task_info = None
-    if is_continuation_task:
-        if st.session_state.get("messages"):
-            task_info = st.session_state.messages.pop()
-
     with st.chat_message("assistant"):
-        placeholder = st.empty()
-        target_message_index, original_content, full_response_text = -1, "", ""
-        
-        try:
-            # (准备工作和流式生成部分保持不变，已加入防御性编程)
-            if is_continuation_task and task_info:
-                target_message_index = task_info.get("target_index", -1)
-                current_messages = st.session_state.get("messages", [])
-                if 0 <= target_message_index < len(current_messages):
-                    original_content = current_messages[target_message_index].get("content", [""])[0]
-                else: 
-                    is_continuation_task = False
+        # ★★★ 新增 ★★★ 在真正开始获取数据前，显示一个动态的 spinner
+        with st.spinner("AI 正在思考中..."):
+            placeholder = st.empty()
             
-            if not is_continuation_task:
-                current_messages = st.session_state.get("messages", [])
-                if not current_messages or current_messages[-1].get("role") != "assistant":
-                    if "messages" in st.session_state:
-                        st.session_state.messages.append({"role": "assistant", "content": [""]})
-                
-                current_messages = st.session_state.get("messages", [])
-                if current_messages:
-                    target_message_index = len(current_messages) - 1
-                    original_content = current_messages[target_message_index].get("content", [""])[0]
-                else:
-                    raise RuntimeError("Session state lost during initialization.")
-
-            full_response_text = original_content
+            target_message_index = -1
+            if is_continuation_task:
+                target_message_index = st.session_state.messages[-1].get("target_index", -1)
+            elif not st.session_state.messages or st.session_state.messages[-1]["role"] != "assistant":
+                st.session_state.messages.append({"role": "assistant", "content": [""]})
             
-            for chunk in getAnswer(is_continuation=is_continuation_task, target_idx=target_message_index):
-                full_response_text += chunk
-                if "messages" in st.session_state and 0 <= target_message_index < len(st.session_state.messages):
-                    st.session_state.messages[target_message_index]["content"] = [full_response_text]
-                else:
-                    print("Session state 'messages' disappeared during generation. Breaking loop.")
-                    break 
-                
-                processed_text = full_response_text.replace('\n', '  \n')
-                placeholder.markdown(processed_text + "▌", unsafe_allow_html=False)
-            
-            processed_text_final = full_response_text.replace('\n', '  \n')
-            placeholder.markdown(processed_text_final, unsafe_allow_html=False)
-
-            st.session_state.is_generating = False
-            if "messages" in st.session_state:
-                with open(log_file, "wb") as f:
-                    pickle.dump(_prepare_messages_for_save(st.session_state.messages), f)
-            st.experimental_rerun()
-
-        except Exception as e:
-            # ★ 核心修复：在这里确保 error_details 总是被定义 ★
-            if "messages" in st.session_state and 0 <= target_message_index < len(st.session_state.messages):
-                if full_response_text and full_response_text != original_content:
-                    st.session_state.messages[target_message_index]["content"] = [full_response_text]
-                    processed_text_error = full_response_text.replace('\n', '  \n')
-                    placeholder.markdown(processed_text_error, unsafe_allow_html=False)
-                else:
-                     placeholder.empty()
+            if not (-len(st.session_state.messages) <= target_message_index < len(st.session_state.messages)):
+                 st.error("续写目标消息索引无效，已停止生成。")
+                 st.session_state.is_generating = False
             else:
-                placeholder.empty()
+                streamed_part = ""
+                try:
+                    original_content = ""
+                    content_list = st.session_state.messages[target_message_index]["content"]
+                    if content_list and isinstance(content_list[0], str):
+                        original_content = content_list[0]
+                    
+                    for chunk in getAnswer():
+                        streamed_part += chunk
+                        updated_full_content = original_content + streamed_part
+                        st.session_state.messages[target_message_index]["content"][0] = updated_full_content
+                        # 当第一个 chunk 到来时，spinner 会自动被下面的 markdown 替换掉
+                        placeholder.markdown(updated_full_content + "▌")
+                    
+                    placeholder.markdown(st.session_state.messages[target_message_index]["content"][0])
+                    st.session_state.is_generating = False
 
-            error_title = "**系統提示：生成時遇到API錯誤**"
-            
-            # 先定义一个默认的 error_details
-            error_details = f"""
-            **錯誤類型：** `{type(e).__name__}`
-            **原始報錯信息：**
-            ```
-            {str(e)}
-            ```
-            """
-            
-            # 然后，如果错误是 429，再覆盖它
-            if "429" in str(e) and "quota" in str(e).lower():
-                error_title = "**系統提示：API請求頻率超限 (429)**"
-                error_details = """
-                **您觸發了Google API免費套餐的請求頻率限制。**
-                
-                **這不是Token超限，而是您在短時間內（例如一分鐘內）發送請求的次數過多。**
-                
-                **解決方案：**
-                - **請等待大約一分鐘**，然後再嘗試“繼續”或發送新消息。
-
-                **原始報錯信息（供參考）：**
-                ```
-                {str(e)}
-                ```
-                """
-
-            st.error(error_title + "\n" + error_details)
-            
-            if "messages" in st.session_state and not (full_response_text.replace(original_content, '', 1)).strip():
-                 if not is_continuation_task and 0 <= target_message_index < len(st.session_state.messages):
-                     st.session_state.messages.pop(target_message_index)
-            
-            st.session_state.is_generating = False
-            if "messages" in st.session_state:
-                with open(log_file, "wb") as f:
-                    pickle.dump(_prepare_messages_for_save(st.session_state.messages), f)
+                except Exception as e:
+                    st.toast("回答中断，正在尝试自动续写…")
+                    partial_content = st.session_state.messages[target_message_index]["content"][0]
+                    if partial_content.strip():
+                        last_chars = (partial_content[-50:] + "...") if len(partial_content) > 50 else partial_content
+                        continue_prompt = f"请严格地从以下文本的结尾处，无缝、自然地继续写下去。不要重复任何内容，不要添加任何前言或解释，直接输出续写的内容即可。文本片段：\n\"...{last_chars}\""
+                        if is_continuation_task: st.session_state.messages.pop()
+                        st.session_state.messages.append({"role": "user", "content": [continue_prompt], "temp": True, "is_continue_prompt": True, "target_index": target_message_index})
+                    else:
+                        st.error(f"回答生成失败 ({type(e).__name__})，请重试。")
+                        st.session_state.is_generating = False
+                finally:
+                    if not st.session_state.is_generating and is_continuation_task:
+                        st.session_state.messages.pop()
+                    if not st.session_state.is_generating and st.session_state.messages and st.session_state.messages[-1]['role'] == 'assistant' and not st.session_state.messages[-1]["content"][0].strip():
+                        st.session_state.messages.pop()
+                    
+                    with open(log_file, "wb") as f:
+                        pickle.dump(_prepare_messages_for_save(st.session_state.messages), f)
+                    st.experimental_rerun()
 
 
 # --- 底部控件 ---
