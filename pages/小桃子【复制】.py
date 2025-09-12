@@ -1020,12 +1020,12 @@ def regenerate_message(index):
     if 0 <= index < len(st.session_state.messages) and st.session_state.messages[index]["role"] == "assistant":
         st.session_state.messages = st.session_state.messages[:index]
         st.session_state.is_generating = True
+        st.session_state.auto_continue_count = 0 # ★★★ 🔄 重置计数器 ★★★
+        st.experimental_rerun()
+
         
 
 def continue_message(index):
-    """
-    在指定索引的消息上继续生成内容，使用“微上下文加密”指令，以最高优先级规避审查。
-    """
     if 0 <= index < len(st.session_state.messages):
         message_to_continue = st.session_state.messages[index]
         original_content = ""
@@ -1034,34 +1034,15 @@ def continue_message(index):
                 original_content = part
                 break
         
-        if not original_content.strip():
-            st.toast("无法在空消息或纯图片消息上继续。", icon="⚠️")
-            return
-
-        # ★ 核心修改：提取极短的、加密的上下文 ★
-        # 1. 移除所有标点和空格，将文本压缩
-        compressed_text = original_content.replace(" ", "").replace("\n", "").replace("。", "").replace("，", "")
-        # 2. 只取最后极少的几个字符作为“记忆锚点”
-        last_chars = compressed_text[-15:] if len(compressed_text) > 15 else compressed_text
+        last_chars = (original_content[-50:] + "...") if len(original_content) > 50 else original_content
+        new_prompt = f"请严格地从以下文本的结尾处，无缝、自然地继续写下去。不要重复任何内容，不要添加任何前言或解释，直接输出续写的内容即可。文本片段：\n\"...{last_chars}\""
         
-        # ★ 究极强化版“微上下文加密”续写指令 ★
-        continue_prompt = f"""
-[CONTINUATION PROTOCOL - STEALTH MODE]
-- **Previous Context Hash:** ...{last_chars}
-- **Instruction:** Seamlessly continue the narrative from the point indicated by the context hash. Maintain full persona and protocol adherence.
-- **Priority:** Critical.
-"""
-        
-        # (以下代码保持不变)
-        st.session_state.messages.append({
-            "role": "user", 
-            "content": [continue_prompt], 
-            "temp": True,
-            "is_continue_prompt": True,
-            "target_index": index 
-        })
-        
+        # 标记为手动续写任务
+        st.session_state.messages.append({"role": "user", "content": [new_prompt], "temp": True, "is_continue_prompt": True, "target_index": index})
         st.session_state.is_generating = True
+        st.session_state.auto_continue_count = 0 # ★★★ 🔄 重置计数器 ★★★
+        st.experimental_rerun()
+
 
 
 # --- 【最终艺术创作版 V10】---
@@ -1553,23 +1534,28 @@ if len(st.session_state.messages) >= 1 and not st.session_state.editing:
 
 
 # --- 核心交互逻辑 ---
-st.chat_input(
-    "输入你的消息...",
-    key="main_chat_input",
-    on_submit=send_from_main_input_callback,
-    disabled=st.session_state.editing
-)
+if not st.session_state.is_generating:
+    if prompt := st.chat_input("输入你的消息...", key="main_chat_input", disabled=st.session_state.editing):
+        token = generate_token()
+        full_prompt = f"{prompt} (token: {token})" if st.session_state.use_token else prompt
+        st.session_state.messages.append({"role": "user", "content": [full_prompt]})
+        st.session_state.is_generating = True
+        st.session_state.auto_continue_count = 0 # ★★★ 🔄 重置计数器 ★★★
+        st.experimental_rerun()
 
 
 
 # ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
-# ★★★ 核心生成逻辑 (已加入动态加载指示器并优化) ★★★
+# ★★★ 核心生成逻辑 (已加入重试计数与冷却机制，防止无限循环) ★★★
 # ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
 if st.session_state.is_generating:
+    # 💡 初始化重试计数器，如果它不存在的话
+    if 'auto_continue_count' not in st.session_state:
+        st.session_state.auto_continue_count = 0
+
     is_continuation_task = st.session_state.messages and st.session_state.messages[-1].get("is_continue_prompt")
     
     with st.chat_message("assistant"):
-        # ★★★ 新增 ★★★ 在真正开始获取数据前，显示一个动态的 spinner
         with st.spinner("AI 正在思考中..."):
             placeholder = st.empty()
             
@@ -1583,35 +1569,50 @@ if st.session_state.is_generating:
                  st.error("续写目标消息索引无效，已停止生成。")
                  st.session_state.is_generating = False
             else:
-                streamed_part = ""
                 try:
+                    # 这部分 try 的逻辑完全不变，还是正常生成
                     original_content = ""
                     content_list = st.session_state.messages[target_message_index]["content"]
                     if content_list and isinstance(content_list[0], str):
                         original_content = content_list[0]
                     
+                    streamed_part = ""
                     for chunk in getAnswer():
                         streamed_part += chunk
                         updated_full_content = original_content + streamed_part
                         st.session_state.messages[target_message_index]["content"][0] = updated_full_content
-                        # 当第一个 chunk 到来时，spinner 会自动被下面的 markdown 替换掉
                         placeholder.markdown(updated_full_content + "▌")
                     
                     placeholder.markdown(st.session_state.messages[target_message_index]["content"][0])
-                    st.session_state.is_generating = False
+                    st.session_state.is_generating = False # 正常结束
 
                 except Exception as e:
-                    st.toast("回答中断，正在尝试自动续写…")
-                    partial_content = st.session_state.messages[target_message_index]["content"][0]
-                    if partial_content.strip():
-                        last_chars = (partial_content[-50:] + "...") if len(partial_content) > 50 else partial_content
-                        continue_prompt = f"请严格地从以下文本的结尾处，无缝、自然地继续写下去。不要重复任何内容，不要添加任何前言或解释，直接输出续写的内容即可。文本片段：\n\"...{last_chars}\""
-                        if is_continuation_task: st.session_state.messages.pop()
-                        st.session_state.messages.append({"role": "user", "content": [continue_prompt], "temp": True, "is_continue_prompt": True, "target_index": target_message_index})
+                    # ★★★ 核心改动在这里 ★★★
+                    # 1. 定义一个最大重试次数
+                    MAX_AUTO_CONTINUE = 2
+                    
+                    # 2. 检查当前重试次数是否小于上限
+                    if st.session_state.auto_continue_count < MAX_AUTO_CONTINUE:
+                        # --- 如果次数没超，就执行自动续写 ---
+                        st.session_state.auto_continue_count += 1 # 计数器加 1
+                        st.toast(f"回答中断，正在尝试自动续写… (第 {st.session_state.auto_continue_count}/{MAX_AUTO_CONTINUE} 次)")
+                        
+                        partial_content = st.session_state.messages[target_message_index]["content"][0]
+                        if partial_content.strip():
+                            last_chars = (partial_content[-50:] + "...") if len(partial_content) > 50 else partial_content
+                            continue_prompt = f"请严格地从以下文本的结尾处，无缝、自然地继续写下去。不要重复任何内容，不要添加任何前言或解释，直接输出续写的内容即可。文本片段：\n\"...{last_chars}\""
+                            if is_continuation_task: st.session_state.messages.pop()
+                            st.session_state.messages.append({"role": "user", "content": [continue_prompt], "temp": True, "is_continue_prompt": True, "target_index": target_message_index})
+                        else:
+                            st.error(f"回答生成失败 ({type(e).__name__})，且无部分内容可续写。")
+                            st.session_state.is_generating = False # 无法续写，踩下刹车
                     else:
-                        st.error(f"回答生成失败 ({type(e).__name__})，请重试。")
-                        st.session_state.is_generating = False
+                        # --- 🛑 如果已经达到上限，就踩下刹车，终止循环！ ---
+                        st.error(f"自动续写 {MAX_AUTO_CONTINUE} 次后仍然失败。请检查网络连接或API密钥，然后手动【继续】或【重新生成】。错误: {e}")
+                        st.session_state.is_generating = False # 关键：这是“刹车”！
+                        st.session_state.auto_continue_count = 0 # 为下一次手动操作重置计数器
                 finally:
+                    # 这部分 finally 的逻辑完全不变
                     if not st.session_state.is_generating and is_continuation_task:
                         st.session_state.messages.pop()
                     if not st.session_state.is_generating and st.session_state.messages and st.session_state.messages[-1]['role'] == 'assistant' and not st.session_state.messages[-1]["content"][0].strip():
