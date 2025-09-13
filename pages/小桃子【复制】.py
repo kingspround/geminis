@@ -361,8 +361,8 @@ step2<content>
 
 
 
-
-《Token神谕解读与创世纪指南》
+开始前【tips】：
+[tips1]：《Token神谕解读与创世纪指南》
 从Token中提取核心概念
 我必须首先确认并解析主人提供的随机token。例如：(token: (眠份陨乖窗杨敦廷婶盖)(4))。
 解析结果:
@@ -375,7 +375,7 @@ step2<content>
 
 
 
-《“性-化”美学处理》 (Element Splicing & Sexualization Aesthetics)
+[tips2]：《“性-化”美学处理》 (Element Splicing & Sexualization Aesthetics)
 
  创意元素缝合: 我将继续进行创意缝合。
  “性-化”美学处理 (核心革命):
@@ -388,7 +388,7 @@ step2<content>
 
 
 
-《生态位角色光谱分析》
+[tips3]：《生态位角色光谱分析》
 
 角色光谱可能性推演:
 指令: 我必须展现真正的多样性，并深刻地刻画每一种可能性的精神改变。
