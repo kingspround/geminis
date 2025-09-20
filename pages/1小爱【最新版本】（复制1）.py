@@ -2512,111 +2512,90 @@ if not st.session_state.is_generating:
 
 
 # ==============================================================================
-# ★★★★★★★ 核心生成逻辑 (V-Lock 终极稳定版) ★★★★★★★
-# 这个版本引入了二级“验证锁”来彻底防止在API等待期间的重入问题
+# ★★★★★★★ 核心生成逻辑 (最终耐心协议版) ★★★★★★★
+# 这个版本解决了快速刷新和对慢API不耐烦的核心问题。
+# 请用这段代码完整替换您原来的 if st.session_state.is_generating: 代码块。
 # ==============================================================================
 if st.session_state.is_generating:
-    
-    # V-Lock: 检查二级锁。如果锁已存在且为True，说明一个生成任务已在后台运行。
-    # 我们立即退出本次脚本运行，静静等待那个任务完成即可。
-    if st.session_state.get("generation_v_lock", False):
-        # st.toast("V-Lock Engaged: Generation already in progress.") # (可选) 调试时可开启
-        pass # 静默处理，不执行任何操作
+    # --- 1. 初始化或恢复状态 ---
+    # 检查是否已经有一个正在进行的“对话通道”（生成器）
+    if "generator" not in st.session_state:
+        st.session_state.generator = None
+    # 存储已经接收到的完整回复
+    if "full_response" not in st.session_state:
+        st.session_state.full_response = ""
 
+    # 确定续写任务和目标消息
+    is_continuation_task = st.session_state.messages[-1].get("is_continue_prompt", False)
+    if is_continuation_task:
+        target_index = st.session_state.messages[-1].get("target_index", -1)
+        # 续写任务开始时，将已有的内容作为初始内容
+        if not st.session_state.full_response: # 仅在第一次设置
+             st.session_state.full_response = st.session_state.messages[target_index]["content"][0]
     else:
-        # V-Lock: 上锁！我们是第一个进入此代码块的进程。
-        # 立刻设置二级锁，防止任何后续的“幽灵刷新”重入此逻辑。
-        st.session_state.generation_v_lock = True
-        # st.toast("V-Lock Acquired: Starting generation...") # (可选) 调试时可开启
+        # 新任务，在消息列表中为AI的回复创建一个占位
+        if len(st.session_state.messages) == 0 or st.session_state.messages[-1].get("role") != "assistant":
+            st.session_state.messages.append({"role": "assistant", "content": [""]})
+        target_index = -1
 
-        # ------------------------------------------------------------------
-        # --- 从这里开始，是我们受保护的、安全的生成逻辑 ---
-        # ------------------------------------------------------------------
-        try:
-            # 1. 准备工作：确定任务类型并找到目标消息
-            last_message = st.session_state.messages[-1]
-            is_continuation_task = last_message.get("is_continue_prompt", False)
+    # --- 2. 显示UI占位符 ---
+    with st.chat_message("assistant"):
+        placeholder = st.empty()
+        # 无论刷新多少次，都先显示当前已有的内容
+        placeholder.markdown(st.session_state.full_response + "▌")
 
-            if is_continuation_task:
-                target_index = last_message.get("target_index", -1)
-            else:
-                st.session_state.messages.append({"role": "assistant", "content": [""]})
-                target_index = -1
+    # --- 3. 核心生成与处理逻辑 ---
+    try:
+        # 如果“对话通道”还未建立，则只建立一次
+        if st.session_state.generator is None:
+            # st.write("DEBUG: Creating new generator...") # 调试信息
+            st.session_state.generator = getAnswer(
+                is_continuation=is_continuation_task, 
+                target_idx=target_index
+            )
 
-            original_content = ""
-            if is_continuation_task:
-                content_list = st.session_state.messages[target_index].get("content", [])
-                if content_list and isinstance(content_list[0], str):
-                    original_content = content_list[0]
+        # 持续从“对话通道”中拉取数据，直到它枯竭
+        for chunk in st.session_state.generator:
+            st.session_state.full_response += chunk
+            placeholder.markdown(st.session_state.full_response + "▌")
 
-            # 2. UI 准备
-            with st.chat_message("assistant"):
-                placeholder = st.empty()
-                
-                # 3. 核心生成循环 (现在是绝对安全的，不会被重入了)
-                streamed_part = ""
-                # st.session_state.model.generate_content(...) 是阻塞操作，脚本会在此等待
-                for chunk in getAnswer(is_continuation=is_continuation_task, target_idx=target_index):
-                    streamed_part += chunk
-                    current_full_content = original_content + streamed_part
-                    st.session_state.messages[target_index]["content"][0] = current_full_content
-                    placeholder.markdown(current_full_content + "▌")
+        # --- 4. 成功完成的清理工作 (当 for 循环正常结束) ---
+        # st.write("DEBUG: Generation successful.") # 调试信息
+        # 将最终的完整回复更新到消息列表中
+        st.session_state.messages[target_index]["content"][0] = st.session_state.full_response
 
-                # 4. 成功路径
-                final_content = st.session_state.messages[target_index]["content"][0]
-                placeholder.markdown(final_content)
+        # 如果是续写任务，移除临时的用户提示
+        if is_continuation_task:
+            st.session_state.messages.pop(-2) # 移除倒数第二个，即续写提示
 
-        except Exception as e:
-            # 5. 失败/中断路径
-            MAX_AUTO_CONTINUE = 2
-            if 'auto_continue_count' not in st.session_state:
-                st.session_state.auto_continue_count = 0
-            
-            # 只有在非V-Lock触发的真实中断时，才执行续写
-            if st.session_state.auto_continue_count < MAX_AUTO_CONTINUE:
-                st.session_state.auto_continue_count += 1
-                st.warning(f"回答中断，正在尝试自动续写… (第 {st.session_state.auto_continue_count}/{MAX_AUTO_CONTINUE} 次)")
-                # 续写逻辑保持不变，但它现在只会在真实中断时触发
-                if is_continuation_task: st.session_state.messages.pop()
-                partial_content = st.session_state.messages[target_index]["content"][0]
-                last_chars = (partial_content[-50:] + "...") if len(partial_content) > 50 else partial_content
-                continue_prompt = f"请严格地从以下文本的结尾处，无缝、自然地继续写下去。文本片段：\n\"...{last_chars}\""
-                st.session_state.messages.append({"role": "user", "content": [continue_prompt], "temp": True, "is_continue_prompt": True, "target_index": target_index})
-                
-                # V-Lock: 在触发重试前，必须先释放锁，允许下一次运行进入
-                st.session_state.generation_v_lock = False
-                st.experimental_rerun()
-                # 使用st.stop()确保当前脚本的剩余部分不会被执行
-                st.stop()
+        # 如果AI返回空内容，清理占位消息
+        if not st.session_state.full_response.strip():
+            st.session_state.messages.pop()
 
-            else:
-                st.error(f"自动续写 {MAX_AUTO_CONTINUE} 次后仍然失败。请手动继续。错误: {e}")
-                
-        # ------------------------------------------------------------------
-        # --- 任务完成（无论成功或失败），进入清理和解锁阶段 ---
-        # ------------------------------------------------------------------
-        finally:
-            # 清理临时消息和空消息
-            if st.session_state.messages and st.session_state.messages[-1].get("is_continue_prompt"):
-                st.session_state.messages.pop()
-            if st.session_state.messages and st.session_state.messages[-1]['role'] == 'assistant' and not st.session_state.messages[-1].get("content", [""])[0].strip():
-                st.session_state.messages.pop()
-            
-            # 保存最终的聊天记录
-            with open(log_file, "wb") as f:
-                pickle.dump(_prepare_messages_for_save(st.session_state.messages), f)
-            
-            # 重置所有状态，准备下一次全新的交互
-            st.session_state.is_generating = False
-            st.session_state.auto_continue_count = 0
-            
-            # V-Lock: 解锁！这是最关键的一步，必须在 finally 块中确保执行。
-            # 这样无论成功还是失败，锁都会被释放，应用不会被卡死。
-            st.session_state.generation_v_lock = False
-            # st.toast("V-Lock Released: Generation complete.") # (可选) 调试时可开启
-            
-            # 进行一次最终的、干净的UI刷新
-            st.experimental_rerun()
+        # 保存记录并进行一次干净的刷新
+        with open(log_file, "wb") as f:
+            pickle.dump(_prepare_messages_for_save(st.session_state.messages), f)
+        
+        # 重置所有生成相关的状态
+        st.session_state.is_generating = False
+        del st.session_state.generator
+        del st.session_state.full_response
+        st.experimental_rerun()
+
+    except Exception as e:
+        # --- 5. 真正发生错误时的处理逻辑 ---
+        # st.write(f"DEBUG: Exception caught: {e}") # 调试信息
+        # 在这里可以放置您的重试逻辑，但现在它只会在真实的网络错误或API错误时触发
+        st.error(f"生成过程中发生错误: {e}. 请检查API Key或网络连接后重试。")
+        
+        # 即使出错，也要重置状态，防止卡死
+        st.session_state.is_generating = False
+        if "generator" in st.session_state:
+            del st.session_state.generator
+        if "full_response" in st.session_state:
+            del st.session_state.full_response
+        st.experimental_rerun()
+
 
 
 
