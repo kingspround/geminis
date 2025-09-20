@@ -2476,7 +2476,7 @@ if not st.session_state.is_generating:
 # ==============================================================================
 if st.session_state.is_generating:
 
-    # 准备工作 (这部分不变)
+    # --- 准备工作 (这部分不变) ---
     if 'auto_continue_count' not in st.session_state:
         st.session_state.auto_continue_count = 0
     is_continuation_task = st.session_state.messages and st.session_state.messages[-1].get("is_continue_prompt")
@@ -2486,70 +2486,61 @@ if st.session_state.is_generating:
     elif not st.session_state.messages or st.session_state.messages[-1]["role"] != "assistant":
         st.session_state.messages.append({"role": "assistant", "content": [""]})
 
-    # 核心生成与显示
+    # --- 核心生成与显示 ---
     with st.chat_message("assistant"):
         placeholder = st.empty()
         
         try:
             with st.spinner("AI 正在思考中..."):
                 original_content = ""
-                if st.session_state.messages[target_message_index]["content"]:
-                     original_content = st.session_state.messages[target_message_index]["content"][0]
+                if st.session_state.messages[target_message_index]["content"] and isinstance(st.session_state.messages[target_message_index]["content"][0], str):
+                    original_content = st.session_state.messages[target_message_index]["content"][0]
                 
                 streamed_part = ""
+                # 开始流式传输
                 for chunk in getAnswer():
                     streamed_part += chunk
                     placeholder.markdown(original_content + streamed_part + "▌")
-                
-            # 流式结束后，将完整内容写入state
+
+            # --- 流式成功结束后 ---
             full_response = original_content + streamed_part
             st.session_state.messages[target_message_index]["content"][0] = full_response
-            placeholder.markdown(full_response)
+            placeholder.markdown(full_response) # 显示最终结果
+            
+            # 清理和保存
+            if is_continuation_task:
+                st.session_state.messages.pop()
+            if st.session_state.messages and not st.session_state.messages[-1]["content"][0].strip():
+                st.session_state.messages.pop()
+            with open(log_file, "wb") as f:
+                pickle.dump(_prepare_messages_for_save(st.session_state.messages), f)
+            
+            # 改变状态，让Streamlit自动刷新
             st.session_state.auto_continue_count = 0
+            st.session_state.is_generating = False
+            st.rerun() # 这是成功的、安全的最终刷新
 
         except Exception as e:
+            # --- 流式异常时 ---
             MAX_AUTO_CONTINUE = 2
             if st.session_state.auto_continue_count < MAX_AUTO_CONTINUE:
                 st.session_state.auto_continue_count += 1
-                st.toast(f"回答中断，正在尝试自动续写… (第 {st.session_state.auto_continue_count}/{MAX_AUTO_CONTINUE} 次)")
                 
-                # 准备续写prompt
-                partial_content = st.session_state.messages[target_message_index]["content"][0]
+                # 准备续写prompt (只改状态，不做UI操作)
+                partial_content = st.session_state.messages[target_message_index]["content"][0] if st.session_state.messages[target_message_index]["content"] else ""
                 last_chars = (partial_content[-50:] + "...") if len(partial_content) > 50 else partial_content
                 continue_prompt = f"请严格地从以下文本的结尾处，无缝、自然地继续写下去。文本片段：\n\"...{last_chars}\""
                 if is_continuation_task: st.session_state.messages.pop()
                 st.session_state.messages.append({"role": "user", "content": [continue_prompt], "temp": True, "is_continue_prompt": True, "target_index": target_message_index})
                 
-                # 【关键】这是唯一必要的rerun，用于触发重试
+                # 【关键】这是唯一必要的rerun，用于干净地触发重试
                 st.rerun()
             else:
+                # 最终失败
                 st.error(f"自动续写 {MAX_AUTO_CONTINUE} 次后仍然失败。请手动继续。错误: {e}")
                 st.session_state.auto_continue_count = 0
-                # 【关键】最终失败后，也要将状态置为False
                 st.session_state.is_generating = False
-    
-    # --- 统一的清理与状态变更 ---
-    
-    # 仅在生成成功或最终失败后执行 (重试时不会执行到这里)
-    if not st.session_state.is_generating:
-        # 清理临时的续写prompt
-        if is_continuation_task:
-            st.session_state.messages.pop()
-            
-        # 移除可能产生的空消息
-        if st.session_state.messages and st.session_state.messages[-1]['role'] == 'assistant' and not st.session_state.messages[-1]["content"][0].strip():
-            st.session_state.messages.pop()
-        
-        # 保存历史记录
-        with open(log_file, "wb") as f:
-            pickle.dump(_prepare_messages_for_save(st.session_state.messages), f)
-        
-        # 【核心】在脚本自然结束前，再次确保状态正确
-        # 并触发一次最终的、安全的、由框架管理的刷新
-        st.rerun()
-    else:
-        # 这一步是为了处理成功生成的情况
-        st.session_state.is_generating = False
+                st.rerun() # 最终失败后的安全刷新
 
 
 
