@@ -2529,7 +2529,7 @@ if st.session_state.is_generating:
 
     is_continuation_task = st.session_state.messages and st.session_state.messages[-1].get("is_continue_prompt")
     
-    # 【核心修正】将所有清理和最终刷新逻辑，移到 try...except 块之后
+    # 【核心修正】将所有清理和最终刷新逻辑，移到 try...except 块之外
     # 这样可以确保它们只在整个流程结束后执行一次
     try:
         with st.chat_message("assistant"):
@@ -2568,7 +2568,9 @@ if st.session_state.is_generating:
         MAX_AUTO_CONTINUE = 2
         if st.session_state.auto_continue_count < MAX_AUTO_CONTINUE:
             st.session_state.auto_continue_count += 1
-            st.toast(f"回答中断，正在尝试自动续写… (第 {st.session_state.auto_continue_count}/{MAX_AUTO_CONTINUE} 次)")
+            
+            # 【核心修正】将 st.toast 替换为 st.info，以兼容旧版本
+            st.info(f"回答中断 (可能是API限额)，正在尝试自动续写… (第 {st.session_state.auto_continue_count}/{MAX_AUTO_CONTINUE} 次)")
             
             partial_content = st.session_state.messages[target_message_index]["content"][0] if st.session_state.messages[target_message_index]["content"] else ""
             last_chars = (partial_content[-50:] + "...") if len(partial_content) > 50 else partial_content
@@ -2579,7 +2581,7 @@ if st.session_state.is_generating:
             # 触发重试，这是正确的，并且使用您原来的函数
             st.experimental_rerun()
         else:
-            st.error(f"自动续写 {MAX_AUTO_CONTINUE} 次后仍然失败。请手动继续。错误: {e}")
+            st.error(f"自动续写 {MAX_AUTO_CONTINUE} 次后仍然失败。请更换API Key后手动继续。错误: {e}")
             st.session_state.is_generating = False # 关键：这是“刹车”！
             st.session_state.auto_continue_count = 0
     
