@@ -97,7 +97,7 @@ if "sidebar_caption" not in st.session_state:
 if "use_token" not in st.session_state:
     st.session_state.use_token = False
 if "selected_voice" not in st.session_state:
-    st.session_state.selected_voice = "默认语音" # 或者您VOICE_OPTIONS中的任何一个键名
+    st.session_state.selected_voice = DEFAULT_VOICE_DISPLAY_NAME # 使用您在常量中定义的有效默认值
 
 
 # --- 默认角色设定 ---
