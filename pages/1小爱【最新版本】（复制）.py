@@ -2472,11 +2472,11 @@ if not st.session_state.is_generating:
 
 
 # ==============================================================================
-# ★★★★★★★ 核心生成逻辑 (真正最终稳定版 V2) ★★★★★★★
+# ★★★★★★★ 核心生成逻辑 (回归本源的最终稳定版) ★★★★★★★
 # ==============================================================================
 if st.session_state.is_generating:
-    
-    # --- 1. 准备工作 (不变) ---
+
+    # 准备工作 (这部分不变)
     if 'auto_continue_count' not in st.session_state:
         st.session_state.auto_continue_count = 0
     is_continuation_task = st.session_state.messages and st.session_state.messages[-1].get("is_continue_prompt")
@@ -2486,16 +2486,12 @@ if st.session_state.is_generating:
     elif not st.session_state.messages or st.session_state.messages[-1]["role"] != "assistant":
         st.session_state.messages.append({"role": "assistant", "content": [""]})
 
-    # --- 2. 核心生成逻辑 ---
-    
-    # 【关键】用一个标志位来决定是否需要重试
-    should_retry = False
-    
+    # 核心生成与显示
     with st.chat_message("assistant"):
-        with st.spinner("AI 正在思考中..."):
-            placeholder = st.empty()
-            
-            try:
+        placeholder = st.empty()
+        
+        try:
+            with st.spinner("AI 正在思考中..."):
                 original_content = ""
                 if st.session_state.messages[target_message_index]["content"]:
                      original_content = st.session_state.messages[target_message_index]["content"][0]
@@ -2505,53 +2501,56 @@ if st.session_state.is_generating:
                     streamed_part += chunk
                     placeholder.markdown(original_content + streamed_part + "▌")
                 
-                full_response = original_content + streamed_part
-                st.session_state.messages[target_message_index]["content"][0] = full_response
-                placeholder.markdown(full_response)
-                st.session_state.auto_continue_count = 0 # 成功后重置
+            # 流式结束后，将完整内容写入state
+            full_response = original_content + streamed_part
+            st.session_state.messages[target_message_index]["content"][0] = full_response
+            placeholder.markdown(full_response)
+            st.session_state.auto_continue_count = 0
 
-            except Exception as e:
-                MAX_AUTO_CONTINUE = 2
-                if st.session_state.auto_continue_count < MAX_AUTO_CONTINUE:
-                    st.session_state.auto_continue_count += 1
-                    st.toast(f"回答中断，正在尝试自动续写… (第 {st.session_state.auto_continue_count}/{MAX_AUTO_CONTINUE} 次)")
-                    
-                    # 准备续写prompt
-                    partial_content = st.session_state.messages[target_message_index]["content"][0]
-                    last_chars = (partial_content[-50:] + "...") if len(partial_content) > 50 else partial_content
-                    continue_prompt = f"请严格地从以下文本的结尾处，无缝、自然地继续写下去。文本片段：\n\"...{last_chars}\""
-                    if is_continuation_task: st.session_state.messages.pop()
-                    st.session_state.messages.append({"role": "user", "content": [continue_prompt], "temp": True, "is_continue_prompt": True, "target_index": target_message_index})
-                    
-                    # 【关键】只设置标志，不立即rerun
-                    should_retry = True
-                else:
-                    st.error(f"自动续写 {MAX_AUTO_CONTINUE} 次后仍然失败。请手动继续。错误: {e}")
-                    st.session_state.auto_continue_count = 0
+        except Exception as e:
+            MAX_AUTO_CONTINUE = 2
+            if st.session_state.auto_continue_count < MAX_AUTO_CONTINUE:
+                st.session_state.auto_continue_count += 1
+                st.toast(f"回答中断，正在尝试自动续写… (第 {st.session_state.auto_continue_count}/{MAX_AUTO_CONTINUE} 次)")
+                
+                # 准备续写prompt
+                partial_content = st.session_state.messages[target_message_index]["content"][0]
+                last_chars = (partial_content[-50:] + "...") if len(partial_content) > 50 else partial_content
+                continue_prompt = f"请严格地从以下文本的结尾处，无缝、自然地继续写下去。文本片段：\n\"...{last_chars}\""
+                if is_continuation_task: st.session_state.messages.pop()
+                st.session_state.messages.append({"role": "user", "content": [continue_prompt], "temp": True, "is_continue_prompt": True, "target_index": target_message_index})
+                
+                # 【关键】这是唯一必要的rerun，用于触发重试
+                st.rerun()
+            else:
+                st.error(f"自动续写 {MAX_AUTO_CONTINUE} 次后仍然失败。请手动继续。错误: {e}")
+                st.session_state.auto_continue_count = 0
+                # 【关键】最终失败后，也要将状态置为False
+                st.session_state.is_generating = False
     
-    # --- 3. 统一的出口逻辑 ---
+    # --- 统一的清理与状态变更 ---
     
-    # 清理临时的续写prompt (无论如何都执行)
-    if is_continuation_task:
-        st.session_state.messages.pop()
+    # 仅在生成成功或最终失败后执行 (重试时不会执行到这里)
+    if not st.session_state.is_generating:
+        # 清理临时的续写prompt
+        if is_continuation_task:
+            st.session_state.messages.pop()
+            
+        # 移除可能产生的空消息
+        if st.session_state.messages and st.session_state.messages[-1]['role'] == 'assistant' and not st.session_state.messages[-1]["content"][0].strip():
+            st.session_state.messages.pop()
         
-    # 如果 assistant 消息为空, 则清理 (无论如何都执行)
-    if st.session_state.messages and st.session_state.messages[-1]['role'] == 'assistant' and not st.session_state.messages[-1]["content"][0].strip():
-        st.session_state.messages.pop()
-    
-    # 保存历史记录 (无论如何都执行)
-    with open(log_file, "wb") as f:
-        pickle.dump(_prepare_messages_for_save(st.session_state.messages), f)
-
-    # 【核心】根据标志位决定下一步
-    if should_retry:
-        # 如果需要重试，is_generating 保持 True, 直接 rerun
+        # 保存历史记录
+        with open(log_file, "wb") as f:
+            pickle.dump(_prepare_messages_for_save(st.session_state.messages), f)
+        
+        # 【核心】在脚本自然结束前，再次确保状态正确
+        # 并触发一次最终的、安全的、由框架管理的刷新
         st.rerun()
     else:
-        # 如果不需要重试 (即成功或最终失败), 将 is_generating 设为 False
+        # 这一步是为了处理成功生成的情况
         st.session_state.is_generating = False
-        # 然后 rerun 来应用这个最终状态，显示输入框
-        st.rerun()
+
 
 
 # --- 底部控件 ---
