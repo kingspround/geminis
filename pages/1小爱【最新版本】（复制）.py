@@ -2579,9 +2579,8 @@ if st.session_state.is_generating:
                 finally:
                     # 您的原始 finally 逻辑，现在可以安全执行了
                     if not st.session_state.is_generating and is_continuation_task:
-                        # 确保在重试前，临时的续写prompt也被正确处理
                         if st.session_state.messages and st.session_state.messages[-1].get("is_continue_prompt"):
-                             pass # 如果是续写任务，让它保留以便rerun
+                             pass 
                         else:
                             st.session_state.messages.pop()
 
