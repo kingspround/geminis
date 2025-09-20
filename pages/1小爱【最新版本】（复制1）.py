@@ -2512,87 +2512,98 @@ if not st.session_state.is_generating:
 
 
 # ==============================================================================
-# ★★★★★★★ 核心生成逻辑 (终极防重入“抢锁”版) ★★★★★★★
+# ★★★★★★★ 核心生成逻辑 (稳定重构版) ★★★★★★★
+# 请用这段代码完整替换您原来的 if st.session_state.is_generating: 代码块
 # ==============================================================================
-
-# 引入一个锁状态，防止任何形式的重入
-if 'is_locked' not in st.session_state:
-    st.session_state.is_locked = False
-
-# 检查是否有正在生成的任务
-if st.session_state.get("is_generating", False):
-
-    # --- 1. 抢锁 ---
-    # 如果锁已经被占用，说明有另一个实例正在运行，当前这个实例必须立即退出
-    if st.session_state.is_locked:
-        st.stop() # st.stop() 会温和地终止当前脚本的运行，不显示任何错误
-    
-    # 如果锁是可用的，立即抢占它
-    st.session_state.is_locked = True
-
-    # --- 2. 查找或创建目标消息 ---
+if st.session_state.is_generating:
+    # 1. 准备工作：确定我们是在续写还是新生成，并找到目标消息
     last_message = st.session_state.messages[-1]
     is_continuation_task = last_message.get("is_continue_prompt", False)
-    target_message_index = -1
+
     if is_continuation_task:
-        target_message_index = last_message.get("target_index", -1)
-    elif last_message["role"] != "assistant":
+        # 如果是续写任务，目标是之前消息列表中的某条消息
+        target_index = last_message.get("target_index", -1)
+    else:
+        # 如果是新任务，我们先为AI的回复创建一个空的占位消息
         st.session_state.messages.append({"role": "assistant", "content": [""]})
-        target_message_index = -1
-    if target_message_index < 0:
-        target_message_index = len(st.session_state.messages) + target_message_index
+        target_index = -1  # 目标是列表中的最后一条消息
 
-    # --- 3. 执行生成，并用 finally 确保锁会被释放 ---
-    try:
-        with st.chat_message("assistant"):
-            placeholder = st.empty()
-            with st.spinner("AI 正在思考中..."):
-                original_content = st.session_state.messages[target_message_index].get("content", [""])[0]
-                streamed_part = ""
-                yielded_something = False
-                
-                response_generator = getAnswer(is_continuation=is_continuation_task, target_idx=target_message_index)
-                
-                for chunk in response_generator:
-                    yielded_something = True
-                    streamed_part += chunk
-                    updated_full_content = original_content + streamed_part
-                    st.session_state.messages[target_message_index]["content"][0] = updated_full_content
-                    placeholder.markdown(updated_full_content + "▌")
+    # 从目标消息中获取原始内容（如果是续写的话）
+    original_content = ""
+    if is_continuation_task:
+        content_list = st.session_state.messages[target_index].get("content", [])
+        if content_list and isinstance(content_list[0], str):
+            original_content = content_list[0]
 
-        # 处理最终结果
-        if yielded_something:
-            placeholder.markdown(st.session_state.messages[target_message_index]["content"][0])
-        else:
-            st.warning("AI 模型返回为空，可能触发了安全策略或无话可说。")
-            if not st.session_state.messages[target_message_index].get("content", [""])[0]:
-                st.session_state.messages.pop(target_message_index)
-
-    except Exception as e:
-        st.error(f"生成过程中发生错误: {e}")
-        if not st.session_state.messages[target_message_index].get("content", [""])[0]:
-            st.session_state.messages.pop(target_message_index)
-    
-    finally:
-        # --- 4. 释放锁并清理 ---
-        # 无论成功或失败，都在这里结束任务
+    # 2. UI 准备：显示 "assistant" 头像和用于流式输出的占位符
+    with st.chat_message("assistant"):
+        placeholder = st.empty()
         
-        # 清理临时的续写指令
-        if st.session_state.messages and st.session_state.messages[-1].get("is_continue_prompt"):
-            st.session_state.messages.pop()
-            
-        # 保存记录
-        with open(log_file, "wb") as f:
-            pickle.dump(_prepare_messages_for_save(st.session_state.messages), f)
+        try:
+            # 3. 核心生成循环
+            streamed_part = ""
+            for chunk in getAnswer(is_continuation=is_continuation_task, target_idx=target_index):
+                streamed_part += chunk
+                # 实时更新 session_state 和 UI
+                current_full_content = original_content + streamed_part
+                st.session_state.messages[target_index]["content"][0] = current_full_content
+                placeholder.markdown(current_full_content + "▌")
 
-        # 释放主状态和锁
-        st.session_state.is_generating = False
-        st.session_state.is_locked = False
-        
-        # 触发最后一次UI刷新
-        st.experimental_rerun()
+            # 4. 成功路径：当循环正常结束
+            # ------------------------------------
+            final_content = st.session_state.messages[target_index]["content"][0]
+            placeholder.markdown(final_content) # 更新最终内容，去掉光标
 
+            # 如果是续写任务，现在可以安全地移除那个临时的 "user" 续写提示了
+            if is_continuation_task:
+                st.session_state.messages.pop()
 
+            # 清理空消息（如果AI返回了空内容）
+            if not final_content.strip():
+                st.session_state.messages.pop()
+
+            # 保存聊天记录
+            with open(log_file, "wb") as f:
+                pickle.dump(_prepare_messages_for_save(st.session_state.messages), f)
+
+            # 重置状态，准备下一次交互
+            st.session_state.is_generating = False
+            st.session_state.auto_continue_count = 0
+            st.experimental_rerun() # 在一切都完成后，进行一次干净的刷新，重置UI
+
+        except Exception as e:
+            # 5. 失败/中断路径：只有发生真实错误时才会进入这里
+            # ----------------------------------------------------
+            MAX_AUTO_CONTINUE = 2
+            if 'auto_continue_count' not in st.session_state:
+                st.session_state.auto_continue_count = 0
+
+            if st.session_state.auto_continue_count < MAX_AUTO_CONTINUE:
+                st.session_state.auto_continue_count += 1
+                st.warning(f"回答中断，正在尝试自动续写… (第 {st.session_state.auto_continue_count}/{MAX_AUTO_CONTINUE} 次)")
+                time.sleep(1) # 增加一个短暂的延迟，避免过快刷新
+
+                # 我们已经通过流式更新保存了部分内容，所以只需再次触发续写即可
+                # 移除旧的临时续写提示（如果存在）
+                if is_continuation_task:
+                    st.session_state.messages.pop()
+
+                # 创建一个新的续写提示
+                partial_content = st.session_state.messages[target_index]["content"][0]
+                last_chars = (partial_content[-50:] + "...") if len(partial_content) > 50 else partial_content
+                continue_prompt = f"请严格地从以下文本的结尾处，无缝、自然地继续写下去。文本片段：\n\"...{last_chars}\""
+                st.session_state.messages.append({"role": "user", "content": [continue_prompt], "temp": True, "is_continue_prompt": True, "target_index": target_index})
+                
+                # 触发重试
+                st.experimental_rerun()
+            else:
+                # 达到最大重试次数，彻底停止
+                st.error(f"自动续写 {MAX_AUTO_CONTINUE} 次后仍然失败。请手动继续或检查网络连接。错误: {e}")
+                
+                # 停止生成循环，重置计数器
+                st.session_state.is_generating = False
+                st.session_state.auto_continue_count = 0
+                st.experimental_rerun() # 刷新UI以显示最终错误信息并停止加载动画
 
 
 # --- 底部控件 ---
