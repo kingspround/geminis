@@ -271,19 +271,33 @@ def getAnswer(is_continuation=False, target_idx=-1):
         history_to_send.append({"role": "user", "parts": [{"text": LAST_MINUTE_REMINDER_PROMPT}]})
 
 
+    # V--- 核心修改在这里 ---V
     final_contents = [msg for msg in history_to_send if msg.get("parts")]
-    response = st.session_state.model.generate_content(contents=final_contents, stream=True)
     
-    yielded_something = False
-    for chunk in response:
-        try:
+    try:
+        response = st.session_state.model.generate_content(
+            contents=final_contents, 
+            stream=True
+        )
+        
+        # 显式地检查 prompt_feedback，这是 Gemini API 用来指示内容安全问题的官方方式
+        if response.prompt_feedback.block_reason:
+            # 如果请求在开始前就被阻止，直接返回一个空的迭代器
+            # 我们将在主循环中处理这个“无内容”的情况
+            return
+            
+        # 正常迭代返回的内容
+        for chunk in response:
+            # 再次检查，因为流式传输过程中也可能被拦截
+            if chunk.prompt_feedback.block_reason:
+                 return
             yield chunk.text
-            yielded_something = True
-        except ValueError:
-            continue
-    
-    if not yielded_something:
-        yield ""
+            
+    except Exception as e:
+        # 如果在API调用本身发生网络错误或其他底层错误，
+        # 我们不再自己处理，而是将异常原封不动地抛给上层的主循环
+        # 主循环会知道这是一个需要重试的“硬性错误”
+        raise e
 
 
 def regenerate_message(index):
@@ -2513,104 +2527,98 @@ if not st.session_state.is_generating:
 
 
 # ==============================================================================
-# ★★★★★★★ 核心生成逻辑 (最终完美版 - 带Spinner防刷新) ★★★★★★★
+# ★★★★★★★ 核心生成逻辑 (防心急循环最终版) ★★★★★★★
 # ==============================================================================
 
-# 步骤 1: 检查是否有刚刚完成的生成任务需要清理
-if st.session_state.get("generation_complete", False):
-    st.session_state.generation_complete = False
-    if st.session_state.messages and st.session_state.messages[-1].get("is_continue_prompt"):
-        st.session_state.messages.pop()
-    if st.session_state.messages and st.session_state.messages[-1]['role'] == 'assistant':
-        content = st.session_state.messages[-1].get("content", [])
-        if not content or not content[0].strip():
-            st.session_state.messages.pop()
-    with open(log_file, "wb") as f:
-        pickle.dump(_prepare_messages_for_save(st.session_state.messages), f)
-    st.experimental_rerun()
+if st.session_state.get("is_generating", False):
 
-
-# 步骤 2: 执行生成任务 (如果正在进行中)
-if st.session_state.is_generating:
-
-    # 初始化必要的 session_state 变量
+    # 初始化必要的变量
     if 'auto_continue_count' not in st.session_state:
         st.session_state.auto_continue_count = 0
 
-    # 判断任务类型并找到目标消息
+    # 查找或创建目标消息
     last_message = st.session_state.messages[-1]
     is_continuation_task = last_message.get("is_continue_prompt", False)
-    
-    target_message_index = -1
-    if is_continuation_task:
-        target_message_index = last_message.get("target_index", -1)
-    elif last_message["role"] != "assistant":
+    target_message_index = last_message.get("target_index", -1) if is_continuation_task else -1
+    if not is_continuation_task and last_message["role"] != "assistant":
         st.session_state.messages.append({"role": "assistant", "content": [""]})
         target_message_index = -1 
-    
-    # 将负数索引转换为正数索引以便安全访问
     if target_message_index < 0:
         target_message_index = len(st.session_state.messages) + target_message_index
 
-    # 提前创建聊天气泡和占位符
-    with st.chat_message("assistant"):
-        placeholder = st.empty()
-        
-        # V-- 核心修正：在这里重新加入 spinner --V
-        # spinner 会包裹整个生成过程
-        with st.spinner("AI 正在思考中..."):
-            try:
-                # 获取续写前的原始内容
+    # --- 主生成流程 ---
+    yielded_something = False
+    try:
+        with st.chat_message("assistant"):
+            placeholder = st.empty()
+            with st.spinner("AI 正在思考中..."):
+                
                 original_content = ""
                 if is_continuation_task:
                     content_list = st.session_state.messages[target_message_index].get("content", [])
-                    if content_list and isinstance(content_list[0], str):
-                        original_content = content_list[0]
+                    if content_list: original_content = content_list[0]
 
-                # 开始流式生成
                 streamed_part = ""
+                # V--- 现在我们完全信任 getAnswer ---V
                 response_generator = getAnswer(is_continuation=is_continuation_task, target_idx=target_message_index)
                 
                 for chunk in response_generator:
+                    yielded_something = True # 只要进入循环，就说明不是内容安全问题
                     streamed_part += chunk
                     updated_full_content = original_content + streamed_part
                     st.session_state.messages[target_message_index]["content"][0] = updated_full_content
                     placeholder.markdown(updated_full_content + "▌")
-                
-                # 成功结束后，spinner会自动消失
-                final_content = st.session_state.messages[target_message_index]["content"][0]
-                placeholder.markdown(final_content)
+        
+        # --- 正常结束后的处理 ---
+        if yielded_something:
+            placeholder.markdown(st.session_state.messages[target_message_index]["content"][0])
+        else:
+            # 如果循环从未执行，说明 getAnswer 返回为空，这是内容安全信号
+            st.error("AI模型返回为空，您的提示可能触发了安全策略。")
+            if st.session_state.messages[target_message_index]["role"] == 'assistant':
+                st.session_state.messages.pop(target_message_index)
+    
+    except Exception as e:
+        # V--- 只有 getAnswer 向上抛出真正的异常时，才会进入这里 ---V
+        # 这现在是我们唯一需要触发续写的地方！
+        MAX_AUTO_CONTINUE = 2
+        if st.session_state.auto_continue_count < MAX_AUTO_CONTINUE:
+            st.session_state.auto_continue_count += 1
+            
+            # 准备续写用的临时消息
+            partial_content = st.session_state.messages[target_message_index].get("content", [""])[0]
+            last_chars = (partial_content[-50:] + "...") if len(partial_content) > 50 else partial_content
+            continue_prompt = f"请严格地从以下文本的结尾处，无缝、自然地继续写下去。文本片段：\n\"...{last_chars}\""
+            
+            if is_continuation_task: st.session_state.messages.pop()
+            st.session_state.messages.append({"role": "user", "content": [continue_prompt], "temp": True, "is_continue_prompt": True, "target_index": target_message_index})
+            
+            # 【关键】在这里 rerun 来触发续写
+            st.experimental_rerun()
+        else:
+            # 达到重试上限
+            st.error(f"网络中断，自动续写 {MAX_AUTO_CONTINUE} 次后仍失败: {e}")
+            
+    finally:
+        # V--- 只有在任务不需要重试时，才会最终在这里释放锁 ---V
+        # 检查是否仍在重试循环中
+        is_retrying = st.session_state.get('auto_continue_count', 0) > 0 and st.session_state.get('auto_continue_count', 0) <= MAX_AUTO_CONTINUE
+        
+        if not is_retrying:
+            # 清理临时的续写指令
+            if st.session_state.messages and st.session_state.messages[-1].get("is_continue_prompt"):
+                st.session_state.messages.pop()
+            
+            with open(log_file, "wb") as f:
+                pickle.dump(_prepare_messages_for_save(st.session_state.messages), f)
 
-            except Exception as e:
-                # 发生异常，进入重试逻辑
-                MAX_AUTO_CONTINUE = 2
-                if st.session_state.auto_continue_count < MAX_AUTO_CONTINUE:
-                    st.session_state.auto_continue_count += 1
-                    # 在UI上显示警告，但不要用st.warning,因为它会留在页面上
-                    placeholder.markdown(f"⚠️ 回答中断，正在尝试自动续写… (第 {st.session_state.auto_continue_count}/{MAX_AUTO_CONTINUE} 次)")
-                    
-                    partial_content = st.session_state.messages[target_message_index].get("content", [""])[0]
-                    last_chars = (partial_content[-50:] + "...") if len(partial_content) > 50 else partial_content
-                    continue_prompt = f"请严格地从以下文本的结尾处，无缝、自然地继续写下去。文本片段：\n\"...{last_chars}\""
-                    
-                    if is_continuation_task:
-                        st.session_state.messages.pop()
-                    st.session_state.messages.append({"role": "user", "content": [continue_prompt], "temp": True, "is_continue_prompt": True, "target_index": target_message_index})
-                    
-                    # 延时一小下，让用户能看到重试提示
-                    time.sleep(1) 
-                    st.experimental_rerun()
-                else:
-                    st.error(f"自动续写 {MAX_AUTO_CONTINUE} 次后仍然失败。请手动继续。错误: {e}")
-                    placeholder.markdown(st.session_state.messages[target_message_index].get("content", [""])[0] + " [生成中断]")
+            # 释放锁
+            st.session_state.is_generating = False
+            st.session_state.auto_continue_count = 0 # 重置计数器
+            
+            # 最后一次刷新，更新UI
+            st.experimental_rerun()
 
-            finally:
-                # 只有在不需要重试时（即成功或最终失败时），才会执行这里的逻辑
-                if not (st.session_state.auto_continue_count > 0 and st.session_state.auto_continue_count <= MAX_AUTO_CONTINUE):
-                    st.session_state.is_generating = False
-                    st.session_state.generation_complete = True
-                    st.session_state.auto_continue_count = 0
-                    st.experimental_rerun()
 
 
 
