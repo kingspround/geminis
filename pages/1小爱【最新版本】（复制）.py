@@ -2472,82 +2472,99 @@ if not st.session_state.is_generating:
 
 
 
-# ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
-# ★★★ 核心生成逻辑 (已加入重试计数与冷却机制，防止无限循环) ★★★
-# ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
+# ==============================================================================
+# ★★★★★★★ 核心生成逻辑 (稳定版) ★★★★★★★
+# ==============================================================================
 if st.session_state.is_generating:
-    # 💡 初始化重试计数器，如果它不存在的话
+    # 初始化重试计数器
     if 'auto_continue_count' not in st.session_state:
         st.session_state.auto_continue_count = 0
 
+    # 判断是否为续写任务
     is_continuation_task = st.session_state.messages and st.session_state.messages[-1].get("is_continue_prompt")
     
     with st.chat_message("assistant"):
-        with st.spinner("AI 正在思考中..."):
-            placeholder = st.empty()
-            
-            target_message_index = -1
-            if is_continuation_task:
-                target_message_index = st.session_state.messages[-1].get("target_index", -1)
-            elif not st.session_state.messages or st.session_state.messages[-1]["role"] != "assistant":
-                st.session_state.messages.append({"role": "assistant", "content": [""]})
-            
-            if not (-len(st.session_state.messages) <= target_message_index < len(st.session_state.messages)):
-                 st.error("续写目标消息索引无效，已停止生成。")
-                 st.session_state.is_generating = False
-            else:
-                try:
-                    # 这部分 try 的逻辑完全不变，还是正常生成
-                    original_content = ""
-                    content_list = st.session_state.messages[target_message_index]["content"]
-                    if content_list and isinstance(content_list[0], str):
-                        original_content = content_list[0]
-                    
-                    streamed_part = ""
-                    for chunk in getAnswer():
-                        streamed_part += chunk
-                        updated_full_content = original_content + streamed_part
-                        st.session_state.messages[target_message_index]["content"][0] = updated_full_content
-                        placeholder.markdown(updated_full_content + "▌")
-                    
-                    placeholder.markdown(st.session_state.messages[target_message_index]["content"][0])
-                    st.session_state.is_generating = False # 正常结束
+        placeholder = st.empty()
+        
+        target_message_index = -1
+        # 如果是续写任务，找到目标消息
+        if is_continuation_task:
+            target_message_index = st.session_state.messages[-1].get("target_index", -1)
+        # 如果是新消息，创建新的助手消息条目
+        elif not st.session_state.messages or st.session_state.messages[-1]["role"] != "assistant":
+            st.session_state.messages.append({"role": "assistant", "content": [""]})
+        
+        # 确保目标索引有效
+        if not (-len(st.session_state.messages) <= target_message_index < len(st.session_state.messages)):
+             st.error("续写目标消息索引无效，已停止生成。")
+             st.session_state.is_generating = False
+             st.rerun() # 出错后刷新
+        else:
+            full_response = ""
+            try:
+                # 获取原始文本（用于续写）
+                original_content = ""
+                content_list = st.session_state.messages[target_message_index]["content"]
+                if content_list and isinstance(content_list[0], str):
+                    original_content = content_list[0]
+                
+                # 开始流式接收
+                streamed_part = ""
+                for chunk in getAnswer():
+                    streamed_part += chunk
+                    # 实时更新UI，这不会导致刷新
+                    placeholder.markdown(original_content + streamed_part + "▌")
+                
+                # 流式结束后，将完整内容保存到session_state
+                full_response = original_content + streamed_part
+                st.session_state.messages[target_message_index]["content"][0] = full_response
+                
+                # **正常结束，重置计数器，准备结束生成状态**
+                st.session_state.auto_continue_count = 0
 
-                except Exception as e:
-                    # ★★★ 核心改动在这里 ★★★
-                    # 1. 定义一个最大重试次数
-                    MAX_AUTO_CONTINUE = 2
+            except Exception as e:
+                # --- 异常处理：自动续写机制 ---
+                MAX_AUTO_CONTINUE = 2
+                if st.session_state.auto_continue_count < MAX_AUTO_CONTINUE:
+                    st.session_state.auto_continue_count += 1
+                    st.toast(f"回答中断，正在尝试自动续写… (第 {st.session_state.auto_continue_count}/{MAX_AUTO_CONTINUE} 次)")
                     
-                    # 2. 检查当前重试次数是否小于上限
-                    if st.session_state.auto_continue_count < MAX_AUTO_CONTINUE:
-                        # --- 如果次数没超，就执行自动续写 ---
-                        st.session_state.auto_continue_count += 1 # 计数器加 1
-                        st.toast(f"回答中断，正在尝试自动续写… (第 {st.session_state.auto_continue_count}/{MAX_AUTO_CONTINUE} 次)")
-                        
-                        partial_content = st.session_state.messages[target_message_index]["content"][0]
-                        if partial_content.strip():
-                            last_chars = (partial_content[-50:] + "...") if len(partial_content) > 50 else partial_content
-                            continue_prompt = f"请严格地从以下文本的结尾处，无缝、自然地继续写下去。不要重复任何内容，不要添加任何前言或解释，直接输出续写的内容即可。文本片段：\n\"...{last_chars}\""
-                            if is_continuation_task: st.session_state.messages.pop()
-                            st.session_state.messages.append({"role": "user", "content": [continue_prompt], "temp": True, "is_continue_prompt": True, "target_index": target_message_index})
-                        else:
-                            st.error(f"回答生成失败 ({type(e).__name__})，且无部分内容可续写。")
-                            st.session_state.is_generating = False # 无法续写，踩下刹车
-                    else:
-                        # --- 🛑 如果已经达到上限，就踩下刹车，终止循环！ ---
-                        st.error(f"自动续写 {MAX_AUTO_CONTINUE} 次后仍然失败。请检查网络连接或API密钥，然后手动【继续】或【重新生成】。错误: {e}")
-                        st.session_state.is_generating = False # 关键：这是“刹车”！
-                        st.session_state.auto_continue_count = 0 # 为下一次手动操作重置计数器
-                finally:
-                    # 这部分 finally 的逻辑完全不变
-                    if not st.session_state.is_generating and is_continuation_task:
-                        st.session_state.messages.pop()
-                    if not st.session_state.is_generating and st.session_state.messages and st.session_state.messages[-1]['role'] == 'assistant' and not st.session_state.messages[-1]["content"][0].strip():
-                        st.session_state.messages.pop()
+                    partial_content = st.session_state.messages[target_message_index]["content"][0]
+                    last_chars = (partial_content[-50:] + "...") if len(partial_content) > 50 else partial_content
+                    continue_prompt = f"请严格地从以下文本的结尾处，无缝、自然地继续写下去。文本片段：\n\"...{last_chars}\""
                     
-                    with open(log_file, "wb") as f:
-                        pickle.dump(_prepare_messages_for_save(st.session_state.messages), f)
-                    st.experimental_rerun()
+                    if is_continuation_task: st.session_state.messages.pop()
+                    st.session_state.messages.append({"role": "user", "content": [continue_prompt], "temp": True, "is_continue_prompt": True, "target_index": target_message_index})
+                    
+                    # **触发一次刷新以重新进入生成逻辑**
+                    st.rerun() 
+                else:
+                    st.error(f"自动续写 {MAX_AUTO_CONTINUE} 次后仍然失败。请手动继续或重新生成。错误: {e}")
+                    # **达到上限，重置计数器，准备结束生成状态**
+                    st.session_state.auto_continue_count = 0
+            
+            # --- 所有逻辑结束后 ---
+            # 1. 最终显示完整内容（去掉光标）
+            placeholder.markdown(full_response)
+            
+            # 2. 清理临时用户消息
+            if is_continuation_task:
+                st.session_state.messages.pop()
+            
+            # 3. 如果最后一条消息为空，则移除
+            if st.session_state.messages and st.session_state.messages[-1]['role'] == 'assistant' and not st.session_state.messages[-1]["content"][0].strip():
+                st.session_state.messages.pop()
+            
+            # 4. 保存历史记录
+            with open(log_file, "wb") as f:
+                pickle.dump(_prepare_messages_for_save(st.session_state.messages), f)
+            
+            # 5. **【关键】在这里才把生成状态设为False**
+            st.session_state.is_generating = False
+            
+            # 6. **【关键】在这里才执行最后一次刷新，以更新整个页面状态**
+            st.rerun()
+
 
 
 # --- 底部控件 ---
