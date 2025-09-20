@@ -2528,16 +2528,17 @@ if not st.session_state.is_generating:
 
 
 # ==============================================================================
-# ★★★ 核心生成逻辑 (只修正您原始代码的 finally 缺陷) ★★★
+# ★★★★★★★ 核心生成逻辑 (最终正确版 - 修复您的原始代码) ★★★★★★★
 # ==============================================================================
 if st.session_state.is_generating:
+    # 💡 初始化重试计数器 (您的原始逻辑)
     if 'auto_continue_count' not in st.session_state:
         st.session_state.auto_continue_count = 0
 
     is_continuation_task = st.session_state.messages and st.session_state.messages[-1].get("is_continue_prompt")
     
-    # 【核心修正】我们不再使用 try...finally，而是将清理逻辑移到外面
-    # 这样可以确保它只在整个流程结束后执行一次
+    # 【核心修正】将所有清理和最终刷新逻辑，移到 try...except 块之后
+    # 这样可以确保它们只在整个流程结束后执行一次
     try:
         with st.chat_message("assistant"):
             with st.spinner("AI 正在思考中..."):
@@ -2553,6 +2554,7 @@ if st.session_state.is_generating:
                      st.error("续写目标消息索引无效，已停止生成。")
                      st.session_state.is_generating = False
                 else:
+                    # --- 1. 核心生成循环 (您的原始逻辑) ---
                     original_content = ""
                     content_list = st.session_state.messages[target_message_index]["content"]
                     if content_list and isinstance(content_list[0], str):
@@ -2565,44 +2567,51 @@ if st.session_state.is_generating:
                         st.session_state.messages[target_message_index]["content"][0] = updated_full_content
                         placeholder.markdown(updated_full_content + "▌")
                     
+                    # --- 2. 成功结束后的状态变更 ---
                     placeholder.markdown(st.session_state.messages[target_message_index]["content"][0])
                     st.session_state.is_generating = False # 正常结束
 
     except Exception as e:
+        # --- 3. 异常处理 (您的原始逻辑) ---
         MAX_AUTO_CONTINUE = 2
-        if st.session_state.auto_continue_count < MAX_AUTO_CONTINUE:
+        # 我们只在特定的、可能是网络问题的错误上重试
+        from google.api_core import exceptions as google_exceptions
+        if isinstance(e, (google_exceptions.DeadlineExceeded, google_exceptions.ServiceUnavailable, google_exceptions.InternalServerError, google_exceptions.ResourceExhausted)) and st.session_state.auto_continue_count < MAX_AUTO_CONTINUE:
             st.session_state.auto_continue_count += 1
-            st.warning(f"回答中断，正在尝试自动续写… (第 {st.session_state.auto_continue_count}/{MAX_AUTO_CONTINUE} 次)") # 使用 warning 避免崩溃
+            st.warning(f"回答因网络或API临时问题中断，正在尝试自动续写… (第 {st.session_state.auto_continue_count}/{MAX_AUTO_CONTINUE} 次)")
             
+            # 在重试前加入一个短暂的延时，以避免因请求过快而连续失败
+            time.sleep(1)
+
             partial_content = st.session_state.messages[target_message_index]["content"][0] if st.session_state.messages[target_message_index]["content"] else ""
             last_chars = (partial_content[-50:] + "...") if len(partial_content) > 50 else partial_content
             continue_prompt = f"请严格地从以下文本的结尾处，无缝、自然地继续写下去。文本片段：\n\"...{last_chars}\""
             if is_continuation_task: st.session_state.messages.pop()
             st.session_state.messages.append({"role": "user", "content": [continue_prompt], "temp": True, "is_continue_prompt": True, "target_index": target_message_index})
-
-            # 触发重试，这是正确的，并且使用您原来的函数
+            
+            # 触发重试，这是正确的
             st.experimental_rerun()
         else:
-            st.error(f"自动续写 {MAX_AUTO_CONTINUE} 次后仍然失败。请手动继续。错误: {e}")
-            st.session_state.is_generating = False
+            # 对于所有其他错误，或达到重试上限时，直接报错并终止
+            st.error(f"回答生成失败，这是一个无法自动续写的错误。请检查API Key或更换提问。错误: {e}")
+            st.session_state.is_generating = False # 关键：这是“刹车”！
             st.session_state.auto_continue_count = 0
     
-    # --- 4. 统一的、安全的清理和刷新逻辑 (取代了 finally) ---
+    # --- 4. 统一的、安全的清理和刷新逻辑 ---
     # 这段代码只会在 try...except 块完全结束后，并且需要刷新时才执行
     # (即，在成功或最终失败后，而不是在触发重试时)
     if not st.session_state.is_generating:
         if is_continuation_task:
             if st.session_state.messages and st.session_state.messages[-1].get("is_continue_prompt"):
                 st.session_state.messages.pop()
-
         if st.session_state.messages and st.session_state.messages[-1]['role'] == 'assistant' and not st.session_state.messages[-1]["content"][0].strip():
             st.session_state.messages.pop()
         
         with open(log_file, "wb") as f:
             pickle.dump(_prepare_messages_for_save(st.session_state.messages), f)
         
+        # 进行最后一次安全的刷新
         st.experimental_rerun()
-
 
 
 
