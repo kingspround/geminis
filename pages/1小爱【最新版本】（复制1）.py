@@ -2558,28 +2558,29 @@ if st.session_state.is_generating:
                     MAX_AUTO_CONTINUE = 2
                     if st.session_state.auto_continue_count < MAX_AUTO_CONTINUE:
                         st.session_state.auto_continue_count += 1
-                        st.warning(f"回答中断，正在尝试自动续写… (第 {st.session_state.auto_continue_count}/{MAX_AUTO_CONTINUE} 次)") # 使用 warning 避免崩溃
+                        st.warning(f"回答中断，正在尝试自动续写… (第 {st.session_state.auto_continue_count}/{MAX_AUTO_CONTINUE} 次)")
                         
                         partial_content = st.session_state.messages[target_message_index]["content"][0] if st.session_state.messages[target_message_index]["content"] else ""
-                        # 【核心修正】在这里，我们不再显示令人困惑的“无内容可续写”错误
-                        # 如果是初次生成失败，partial_content为空，直接准备一个空的续写prompt即可
                         last_chars = (partial_content[-50:] + "...") if len(partial_content) > 50 else partial_content
                         continue_prompt = f"请严格地从以下文本的结尾处，无缝、自然地继续写下去。不要重复任何内容，不要添加任何前言或解释，直接输出续写的内容即可。文本片段：\n\"...{last_chars}\""
                         if is_continuation_task: st.session_state.messages.pop()
                         st.session_state.messages.append({"role": "user", "content": [continue_prompt], "temp": True, "is_continue_prompt": True, "target_index": target_message_index})
+                        
+                        # 【核心修正】在准备重试时，直接rerun，不再进入finally
+                        st.experimental_rerun()
                     else:
                         st.error(f"自动续写 {MAX_AUTO_CONTINUE} 次后仍然失败。请手动【继续】或【重新生成】。错误: {e}")
                         st.session_state.is_generating = False 
                         st.session_state.auto_continue_count = 0 
-                finally:
-                    # 您的原始 finally 逻辑，现在可以安全执行了
-                    if not st.session_state.is_generating and is_continuation_task:
+                
+                # 【核心修正】彻底移除 finally 块，将它的逻辑只放在“寿终正寝”的地方
+                if not st.session_state.is_generating:
+                    if is_continuation_task:
+                        # 检查临时的续写prompt是否存在，如果存在则移除
                         if st.session_state.messages and st.session_state.messages[-1].get("is_continue_prompt"):
-                             pass 
-                        else:
-                            st.session_state.messages.pop()
+                             st.session_state.messages.pop()
 
-                    if not st.session_state.is_generating and st.session_state.messages and st.session_state.messages[-1]['role'] == 'assistant' and not st.session_state.messages[-1]["content"][0].strip():
+                    if st.session_state.messages and st.session_state.messages[-1]['role'] == 'assistant' and not st.session_state.messages[-1]["content"][0].strip():
                         st.session_state.messages.pop()
                     
                     with open(log_file, "wb") as f:
