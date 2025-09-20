@@ -2435,7 +2435,7 @@ for i, message in enumerate(st.session_state.messages):
         for part in message.get("content", []):
             if isinstance(part, str):
                 # 【核心修正】允许在历史记录中渲染HTML，以正确显示错误信息
-                st.markdown(part, unsafe_allow_html=True)
+                st.markdown(part, unsafe_allow_html=False)
             elif isinstance(part, Image.Image):
                 st.image(part, width=400)
             
@@ -2521,12 +2521,12 @@ if not st.session_state.is_generating:
 
 
 # ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
-# ★★★ 核心生成逻辑 (最终健壮版 V4：修复HTML渲染并丰富错误信息) ★★★
+# ★★★ 核心生成逻辑 (最终简洁版：方案A不rerun) ★★★
 # ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
 if st.session_state.is_generating:
     with st.chat_message("assistant"):
         placeholder = st.empty()
-
+        
         # 将 spinner 作为最外层包裹
         with st.spinner("AI 正在思考中..."):
             try:
@@ -2553,50 +2553,51 @@ if st.session_state.is_generating:
                     streamed_part += chunk
                     updated_full_content = original_content + streamed_part
                     st.session_state.messages[real_idx]["content"][0] = updated_full_content
-                    placeholder.markdown(updated_full_content + "▌", unsafe_allow_html=True)
+                    placeholder.markdown(updated_full_content + "▌")
 
+                # --- 成功流程 ---
                 final_content = st.session_state.messages[real_idx]["content"][0]
-                placeholder.markdown(final_content, unsafe_allow_html=True)
-                st.session_state.is_generating = False 
-
-            except Exception as e:
-                # 【核心修正】优化错误信息，使其更具可读性
-                error_type_name = type(e).__name__
-                # 安全地获取错误的详细参数
-                error_details = str(e.args) if e.args else "无更多细节"
-                
-                error_message_html = f"""
-<br><br>
-<div style="border: 1px solid #ff4b4b; border-radius: 5px; padding: 10px; background-color: #330000;">
-<span style='color: #ff4b4b; font-weight:bold;'>[ 🔴 生成中断 ]</span><br>
-<span style='color: #ffc4c4;'>错误类型: {error_type_name}</span><br>
-<span style='color: #ffc4c4;'>详情: {error_details}</span><br>
-<span style='color: white;'>您可以尝试【♻️重新生成】或【➕继续】。</span>
-</div>
-"""
-                
-                real_idx = locals().get("target_message_index", -1)
-                if real_idx == -1: real_idx = len(st.session_state.messages) - 1
-
-                if -len(st.session_state.messages) <= real_idx < len(st.session_state.messages):
-                     st.session_state.messages[real_idx]['content'][0] += error_message_html
-                     placeholder.markdown(st.session_state.messages[real_idx]['content'][0], unsafe_allow_html=True)
-                
+                placeholder.markdown(final_content)
                 st.session_state.is_generating = False
-            
-            finally:
-                is_continuation_task_finally = st.session_state.messages and st.session_state.messages[-1].get("is_continue_prompt")
-                if is_continuation_task_finally:
+                
+                # 清理和保存
+                if is_continuation_task:
                     if st.session_state.messages and st.session_state.messages[-1].get("is_continue_prompt"):
                         st.session_state.messages.pop()
-
-                if st.session_state.messages and st.session_state.messages[-1]['role'] == 'assistant' and not st.session_state.messages[-1]["content"][0].strip():
-                    st.session_state.messages.pop()
-                
                 with open(log_file, "wb") as f:
                     pickle.dump(_prepare_messages_for_save(st.session_state.messages), f)
-        
-        st.experimental_rerun()
+
+                # 成功后才 rerun
+                st.experimental_rerun()
+
+            except Exception as e:
+                # --- 错误流程 ---
+                error_type_name = type(e).__name__
+                error_details = str(e.args) if e.args else "无更多细节"
+
+                # 1. 直接用 st.error 显示错误，它会出现在 placeholder 下方
+                st.error(f"""
+                    **[ 🔴 生成中断 ]**\n
+                    **错误类型:** {error_type_name}\n
+                    **详情:** {error_details}\n
+                    您可以尝试【♻️重新生成】或【➕继续】。
+                """)
+
+                # 2. 清理 UI：移除 "▌" 光标
+                real_idx = locals().get("target_message_index", -1)
+                if real_idx == -1: real_idx = len(st.session_state.messages) - 1
+                if -len(st.session_state.messages) <= real_idx < len(st.session_state.messages):
+                     current_content = st.session_state.messages[real_idx]["content"][0]
+                     placeholder.markdown(current_content)
+                
+                # 3. 如果最后一条消息是空的，就移除它
+                if st.session_state.messages and st.session_state.messages[-1]['role'] == 'assistant' and not st.session_state.messages[-1]["content"][0].strip():
+                    st.session_state.messages.pop()
+
+                # 4. 停止生成状态
+                st.session_state.is_generating = False
+                
+                # 5. 【关键】不调用 rerun()！脚本到此自然结束。
 
 
 
