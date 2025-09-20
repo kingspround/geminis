@@ -2519,81 +2519,83 @@ if not st.session_state.is_generating:
 
 
 # ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
-# ★★★ 核心生成逻辑 (保留Spinner，错误以Toast弹窗形式显示，UI可交互) ★★★
+# ★★★ 核心生成逻辑 (增加状态保险，Toast报错，UI可交互的最终稳定版) ★★★
 # ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
 if st.session_state.is_generating:
-    is_continuation_task = st.session_state.messages and st.session_state.messages[-1].get("is_continue_prompt")
-    
-    with st.chat_message("assistant"):
-        placeholder = st.empty()
-        
-        target_message_index = -1
-        if is_continuation_task:
-            target_message_index = st.session_state.messages[-1].get("target_index", -1)
-        elif not st.session_state.messages or st.session_state.messages[-1]["role"] != "assistant":
-            st.session_state.messages.append({"role": "assistant", "content": [""]})
-            target_message_index = -1
-        
-        # 索引检查现在只在内部处理，如果出错会直接进入except
-        
-        try:
-            # Spinner 保证了在生成期间云服务不会认为程序空闲
-            with st.spinner("AI 正在思考中..."):
-                # 再次检查索引，以防万一
-                if not (-len(st.session_state.messages) <= target_message_index < len(st.session_state.messages)):
-                     raise ValueError("生成失败：续写目标消息索引无效。")
 
-                original_content = ""
-                real_idx = target_message_index if target_message_index != -1 else len(st.session_state.messages) - 1
-                content_list = st.session_state.messages[real_idx]["content"]
-                if content_list and isinstance(content_list[0], str):
-                    original_content = content_list[0]
+    # 【关键修复】增加一道最终的状态保险，防止 AttributeError
+    if "messages" not in st.session_state:
+        st.session_state.messages = []
+        st.toast("检测到状态异常，已自动修复。请重试。", icon="🔧")
+        st.session_state.is_generating = False
+        st.experimental_rerun()
+    else:
+        # 只有在 messages 确认存在后，才继续执行
+        is_continuation_task = st.session_state.messages and st.session_state.messages[-1].get("is_continue_prompt")
+        
+        with st.chat_message("assistant"):
+            placeholder = st.empty()
+            
+            try:
+                # 只有在 try 块内部才启动 spinner
+                with st.spinner("AI 正在思考中..."):
+                    
+                    target_message_index = -1
+                    if is_continuation_task:
+                        target_message_index = st.session_state.messages[-1].get("target_index", -1)
+                    elif not st.session_state.messages or st.session_state.messages[-1]["role"] != "assistant":
+                        st.session_state.messages.append({"role": "assistant", "content": [""]})
+                        target_message_index = -1
+
+                    if not (-len(st.session_state.messages) <= target_message_index < len(st.session_state.messages)):
+                         raise ValueError("生成失败：续写目标消息索引无效。")
+
+                    original_content = ""
+                    real_idx = target_message_index if target_message_index != -1 else len(st.session_state.messages) - 1
+                    content_list = st.session_state.messages[real_idx]["content"]
+                    if content_list and isinstance(content_list[0], str):
+                        original_content = content_list[0]
+                    
+                    streamed_part = ""
+                    for chunk in getAnswer():
+                        streamed_part += chunk
+                        updated_full_content = original_content + streamed_part
+                        st.session_state.messages[real_idx]["content"][0] = updated_full_content
+                        placeholder.markdown(updated_full_content + "▌")
+
+                # 生成完成，正式定稿UI并停止
+                final_content = st.session_state.messages[real_idx]["content"][0]
+                placeholder.markdown(final_content)
+                st.session_state.is_generating = False 
+
+            except Exception as e:
+                # 【简化且稳定的错误处理】
+                st.toast(
+                    f"🔴 生成中断: {e}",
+                    icon="⚠️"
+                )
+                # 关键：踩下刹车，让UI恢复可操作状态
+                st.session_state.is_generating = False
+            
+            finally:
+                # 无论成功或失败，都执行清理和保存
+                if is_continuation_task:
+                    if st.session_state.messages and st.session_state.messages[-1].get("is_continue_prompt"):
+                        st.session_state.messages.pop()
+
+                # 如果助手消息是空的（通常是因错误导致），则移除
+                # 增加检查确保 messages 存在
+                if "messages" in st.session_state and st.session_state.messages:
+                    if st.session_state.messages[-1]['role'] == 'assistant' and not st.session_state.messages[-1]["content"][0].strip():
+                        st.session_state.messages.pop()
                 
-                streamed_part = ""
-                for chunk in getAnswer():
-                    streamed_part += chunk
-                    updated_full_content = original_content + streamed_part
-                    st.session_state.messages[real_idx]["content"][0] = updated_full_content
-                    placeholder.markdown(updated_full_content + "▌")
-
-            # 生成完成，正式定稿UI并停止
-            final_content = st.session_state.messages[real_idx]["content"][0]
-            placeholder.markdown(final_content)
-            st.session_state.is_generating = False 
-
-        except Exception as e:
-            # 【核心改动】使用 st.toast() 以弹窗形式显示错误
-            st.toast(
-                f"🔴 生成中断: {e}",
-                icon="⚠️"
-            )
-            
-            # 即使出错，也要把已生成的部分内容（如果有）更新到UI
-            # 这样用户可以看到中断发生在哪里
-            real_idx = target_message_index if target_message_index != -1 else len(st.session_state.messages) - 1
-            if -len(st.session_state.messages) <= real_idx < len(st.session_state.messages):
-                 current_content = st.session_state.messages[real_idx]["content"][0]
-                 placeholder.markdown(current_content) # 显示已生成的内容，不带光标
-
-            # 关键：踩下刹车，让UI恢复可操作状态
-            st.session_state.is_generating = False
-        
-        finally:
-            # 无论成功或失败，都执行清理和保存
-            if is_continuation_task:
-                if st.session_state.messages and st.session_state.messages[-1].get("is_continue_prompt"):
-                    st.session_state.messages.pop()
-
-            # 如果助手消息是空的（通常是因错误导致），则移除
-            if st.session_state.messages and st.session_state.messages[-1]['role'] == 'assistant' and not st.session_state.messages[-1]["content"][0].strip():
-                st.session_state.messages.pop()
-            
-            with open(log_file, "wb") as f:
-                pickle.dump(_prepare_messages_for_save(st.session_state.messages), f)
-            
-            # 必须刷新一次，以便UI能根据最新的状态（is_generating=False）进行重绘
-            # 这会移除 spinner, 让页面恢复正常交互状态
-            st.experimental_rerun()
+                # 增加检查确保 messages 存在
+                if "messages" in st.session_state:
+                    with open(log_file, "wb") as f:
+                        pickle.dump(_prepare_messages_for_save(st.session_state.messages), f)
+                
+                # 必须刷新一次，以便UI能根据最新的状态（is_generating=False）进行重绘
+                st.experimental_rerun()
 
 
 
