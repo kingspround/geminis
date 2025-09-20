@@ -760,99 +760,128 @@ def get_api_history(is_continuation, original_text, target_idx):
     else:
         return None
 
-# ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
-# ★★★ 核心生成邏輯 (精準修復版：保留原始邏輯，僅修復Exception導致的數據丟失) ★★★
-# ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
+# ==============================================================================
+# ★★★★★★★ 核心生成逻辑 (终极融合版) ★★★★★★★
+# 底层采用“耐心协议”解决刷新问题
+# 成功路径清晰稳定
+# 失败路径融合了“数据抢救”和“智能重试”
+# ==============================================================================
 if st.session_state.is_generating:
-    is_continuation_task = st.session_state.messages and st.session_state.messages[-1].get("is_continue_prompt")
-    task_info = None
-    if is_continuation_task:
-        task_info = st.session_state.messages.pop()
+    # --- 1. 初始化或恢复状态 (耐心协议) ---
+    if "generator" not in st.session_state:
+        st.session_state.generator = None
+    if "full_response" not in st.session_state:
+        st.session_state.full_response = ""
+    if 'auto_continue_count' not in st.session_state:
+        st.session_state.auto_continue_count = 0
 
+    # 确定任务类型和目标消息
+    last_message = st.session_state.messages[-1] if st.session_state.messages else {}
+    is_continuation_task = last_message.get("is_continue_prompt", False)
+
+    if is_continuation_task:
+        target_index = last_message.get("target_index", -1)
+        if not st.session_state.full_response:  # 仅在续写任务开始时设置一次
+            original_content = st.session_state.messages[target_index]["content"][0] if 0 <= target_index < len(st.session_state.messages) and st.session_state.messages[target_index].get("content") else ""
+            st.session_state.full_response = original_content
+    else:
+        # 新任务，在消息列表中为AI的回复创建一个占位
+        if not st.session_state.messages or last_message.get("role") != "assistant":
+            st.session_state.messages.append({"role": "assistant", "content": [""]})
+        target_index = -1
+
+    # --- 2. 显示UI占位符 ---
     with st.chat_message("assistant"):
         placeholder = st.empty()
-        target_message_index, original_content, api_history_override, full_response_text = -1, "", None, ""
+        # 每次刷新都显示当前已累积的内容
+        placeholder.markdown(st.session_state.full_response + "▌")
+
+    # --- 3. 核心生成与处理逻辑 ---
+    try:
+        # 如果“对话通道”还未建立，则只建立一次
+        if st.session_state.generator is None:
+            st.session_state.generator = getAnswer(
+                is_continuation=is_continuation_task,
+                target_idx=target_index
+            )
+
+        # 持续从“对话通道”中拉取数据
+        for chunk in st.session_state.generator:
+            st.session_state.full_response += chunk
+            placeholder.markdown(st.session_state.full_response + "▌")
+
+        # --- 4. 成功完成的路径 ---
+        # (当 for 循环正常结束，说明API已返回所有内容)
+        final_content = st.session_state.full_response
+        placeholder.markdown(final_content)
+        st.session_state.messages[target_index]["content"][0] = final_content
+
+        if is_continuation_task:
+            st.session_state.messages.pop(-2) # 移除续写提示
+
+        if not final_content.strip():
+            st.session_state.messages.pop()
+
+        st.session_state.is_generating = False
+        st.session_state.auto_continue_count = 0 # 成功后重置计数器
+        # 清理状态并保存
+        del st.session_state.generator
+        del st.session_state.full_response
+        with open(log_file, "wb") as f:
+            pickle.dump(_prepare_messages_for_save(st.session_state.messages), f)
+        st.experimental_rerun()
+
+    except Exception as e:
+        # --- 5. 失败/中断路径 (融合逻辑) ---
         
-        try:
-            # 1. 準備工作 (您的原始邏輯，完全保留)
-            if is_continuation_task and task_info:
-                target_message_index = task_info.get("target_index", -1)
-                if 0 <= target_message_index < len(st.session_state.messages):
-                    # 確保content至少有一個str元素
-                    if st.session_state.messages[target_message_index].get("content") and isinstance(st.session_state.messages[target_message_index]["content"][0], str):
-                         original_content = st.session_state.messages[target_message_index]["content"][0]
-                    else: # 如果是純圖片等情況，original_content為空
-                         original_content = ""
-                else: 
-                    is_continuation_task = False # 索引無效，降級為常規任務
+        # 步骤 A: [抢救数据] (来自代码3的稳健性)
+        # 无论发生什么，都先把已经收到的内容保存到消息列表中
+        st.session_state.messages[target_index]["content"][0] = st.session_state.full_response
+        placeholder.markdown(st.session_state.full_response) # 更新UI，去掉光标
+
+        # 步骤 B: [智能续写] (来自代码2的韧性)
+        MAX_AUTO_CONTINUE = 2
+        if st.session_state.auto_continue_count < MAX_AUTO_CONTINUE:
+            st.session_state.auto_continue_count += 1
+            st.toast(f"回答中断，正在尝试自动续写… (第 {st.session_state.auto_continue_count}/{MAX_AUTO_CONTINUE} 次)")
             
-            if not is_continuation_task:
-                if not st.session_state.messages or st.session_state.messages[-1]["role"] != "assistant":
-                    st.session_state.messages.append({"role": "assistant", "content": [""]})
-                target_message_index = len(st.session_state.messages) - 1
-                original_content = st.session_state.messages[target_message_index].get("content", [""])[0]
+            # 清理旧的生成器和响应状态，为续写做准备
+            del st.session_state.generator
+            del st.session_state.full_response
 
-            api_history_override = get_api_history(is_continuation_task, original_content, target_message_index)
-            full_response_text = original_content
+            # 创建新的续写提示
+            partial_content = st.session_state.messages[target_index]["content"][0]
+            if is_continuation_task: # 如果本来就是续写任务，先移除旧的提示
+                 st.session_state.messages.pop()
             
-            # 2. 流式生成 (您的原始邏輯，完全保留)
-            for chunk in getAnswer(custom_history=api_history_override):
-                full_response_text += chunk
-                st.session_state.messages[target_message_index]["content"] = [full_response_text]
-                processed_text = full_response_text.replace('\n', '  \n')
-                placeholder.markdown(processed_text + "▌", unsafe_allow_html=False)
+            last_chars = (partial_content[-50:] + "...") if len(partial_content) > 50 else partial_content
+            continue_prompt = f"请严格地从以下文本的结尾处，无缝、自然地继续写下去。文本片段：\n\"...{last_chars}\""
+            st.session_state.messages.append({"role": "user", "content": [continue_prompt], "temp": True, "is_continue_prompt": True, "target_index": target_index})
             
-            processed_text_final = full_response_text.replace('\n', '  \n')
-            placeholder.markdown(processed_text_final, unsafe_allow_html=False)
+            st.experimental_rerun() # 触发续写
 
-            # 成功路徑：清理並刷新 (您的原始邏輯)
-            st.session_state.is_generating = False
-            with open(log_file, "wb") as f:
-                pickle.dump(_prepare_messages_for_save(st.session_state.messages), f)
-            st.experimental_rerun()
-
-        except Exception as e:
-            # --- ★★★ 精準修復點 START ★★★ ---
-            # 當API拋出異常時，代碼會跳到這裡。
-            # 此時 `full_response_text` 包含了崩潰前收到的所有內容（例如 "【我覺得】"）。
-            # 我們的首要任務就是把它保存下來。
-
-            # 1. [搶救數據] 檢查是否收到了任何新內容，如果收到了，立即將其寫入 session_state。
-            # 這是解決數據丟失問題的唯一且最關鍵的一步。
-            if full_response_text and full_response_text != original_content:
-                st.session_state.messages[target_message_index]["content"] = [full_response_text]
-                # 同時，將UI更新為最終的、已保存的狀態（去掉光標）
-                processed_text_error = full_response_text.replace('\n', '  \n')
-                placeholder.markdown(processed_text_error, unsafe_allow_html=False)
-            else:
-                placeholder.empty()
-
-            # 2. [顯示錯誤] 告訴用戶發生了什麼。
+        else:
+            # 步骤 C: [最终失败] (来自代码3的清晰报错)
             st.error(f"""
-            **系統提示：生成時遇到API錯誤**
-            **錯誤類型：** `{type(e).__name__}`
-            **原始報錯信息：**
+            **系统提示：自动续写 {MAX_AUTO_CONTINUE} 次后仍然失败**
+            **最终错误类型：** `{type(e).__name__}`
+            **原始报错信息：**
             ```
             {str(e)}
             ```
-            **關鍵提示：** 您已生成的內容 **已被成功保留**，刷新頁面不會丟失。
+            **关键提示：** 您已生成的 `{len(st.session_state.full_response)}` 字内容 **已被成功保留**。
+            请检查网络或API Key，然后手动【继续】或【重新生成】。
             """)
             
-            # 3. [清理空殼] 執行您原有的清理邏輯：僅當API立即失敗、一個字都沒生成，
-            # 且這是一個全新的消息時，才移除那個空的消息框。
-            if not (full_response_text.replace(original_content, '', 1)).strip():
-                 if not is_continuation_task:
-                     # 確保索引有效，防止意外
-                     if 0 <= target_message_index < len(st.session_state.messages):
-                        st.session_state.messages.pop(target_message_index)
-            
-            # 4. [結束流程] 無論如何，都結束生成狀態並保存最終的、正確的歷史記錄。
             st.session_state.is_generating = False
+            st.session_state.auto_continue_count = 0 # 重置计数器
+            # 清理状态并保存
+            del st.session_state.generator
+            del st.session_state.full_response
             with open(log_file, "wb") as f:
                 pickle.dump(_prepare_messages_for_save(st.session_state.messages), f)
-            
-            # [重要] 失敗後不執行 rerun，讓用戶能看到錯誤信息和已保存的內容。
-            # --- ★★★ 精準修復點 END ★★★ ---
+            # 这里不需要 rerun，让用户看到最终错误信息
+
 
 
 # --- 底部控件 ---
