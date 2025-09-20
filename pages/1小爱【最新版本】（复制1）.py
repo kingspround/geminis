@@ -2513,106 +2513,104 @@ if not st.session_state.is_generating:
 
 
 # ==============================================================================
-# ★★★★★★★ 核心生成逻辑 (Spinner修复 + 防无限刷新最终版) ★★★★★★★
+# ★★★★★★★ 核心生成逻辑 (最终完美版 - 带Spinner防刷新) ★★★★★★★
 # ==============================================================================
+
+# 步骤 1: 检查是否有刚刚完成的生成任务需要清理
+if st.session_state.get("generation_complete", False):
+    st.session_state.generation_complete = False
+    if st.session_state.messages and st.session_state.messages[-1].get("is_continue_prompt"):
+        st.session_state.messages.pop()
+    if st.session_state.messages and st.session_state.messages[-1]['role'] == 'assistant':
+        content = st.session_state.messages[-1].get("content", [])
+        if not content or not content[0].strip():
+            st.session_state.messages.pop()
+    with open(log_file, "wb") as f:
+        pickle.dump(_prepare_messages_for_save(st.session_state.messages), f)
+    st.experimental_rerun()
+
+
+# 步骤 2: 执行生成任务 (如果正在进行中)
 if st.session_state.is_generating:
 
-    # 标志位，用于判断是否因“重试”而触发了rerun
-    rerun_for_retry_triggered = False
+    # 初始化必要的 session_state 变量
+    if 'auto_continue_count' not in st.session_state:
+        st.session_state.auto_continue_count = 0
 
-    try:
-        with st.chat_message("assistant"):
-            # 将spinner和placeholder正确地结合，这是显示spinner的关键
-            placeholder = st.empty()
-            with st.spinner("AI 正在思考中..."):
-                # 确定需要更新哪条消息
-                last_message = st.session_state.messages[-1]
-                is_continuation_task = last_message.get("is_continue_prompt", False)
+    # 判断任务类型并找到目标消息
+    last_message = st.session_state.messages[-1]
+    is_continuation_task = last_message.get("is_continue_prompt", False)
+    
+    target_message_index = -1
+    if is_continuation_task:
+        target_message_index = last_message.get("target_index", -1)
+    elif last_message["role"] != "assistant":
+        st.session_state.messages.append({"role": "assistant", "content": [""]})
+        target_message_index = -1 
+    
+    # 将负数索引转换为正数索引以便安全访问
+    if target_message_index < 0:
+        target_message_index = len(st.session_state.messages) + target_message_index
 
+    # 提前创建聊天气泡和占位符
+    with st.chat_message("assistant"):
+        placeholder = st.empty()
+        
+        # V-- 核心修正：在这里重新加入 spinner --V
+        # spinner 会包裹整个生成过程
+        with st.spinner("AI 正在思考中..."):
+            try:
+                # 获取续写前的原始内容
+                original_content = ""
                 if is_continuation_task:
-                    target_index = last_message.get("target_index")
-                    original_content = st.session_state.messages[target_index].get("content", [""])[0]
-                else:
-                    # 对于新消息，目标就是最后一条（刚刚添加的空助手消息）
-                    target_index = len(st.session_state.messages) - 1
-                    original_content = ""
+                    content_list = st.session_state.messages[target_message_index].get("content", [])
+                    if content_list and isinstance(content_list[0], str):
+                        original_content = content_list[0]
 
-                # 获取调用API的生成器
-                response_generator = getAnswer(
-                    is_continuation=is_continuation_task,
-                    target_idx=target_index
-                )
-
-                # 流式处理响应
+                # 开始流式生成
                 streamed_part = ""
+                response_generator = getAnswer(is_continuation=is_continuation_task, target_idx=target_message_index)
+                
                 for chunk in response_generator:
                     streamed_part += chunk
-                    full_content = original_content + streamed_part
-                    st.session_state.messages[target_index]["content"][0] = full_content
-                    # 第一次更新时，会自动替换掉 spinner 的消息文本，但保留动画
-                    placeholder.markdown(full_content + "▌")
-            
-            # 循环结束后（即生成完成），spinner自动消失
-            # 更新最终内容，去掉光标
-            final_content = st.session_state.messages[target_index]["content"][0]
-            placeholder.markdown(final_content)
+                    updated_full_content = original_content + streamed_part
+                    st.session_state.messages[target_message_index]["content"][0] = updated_full_content
+                    placeholder.markdown(updated_full_content + "▌")
+                
+                # 成功结束后，spinner会自动消失
+                final_content = st.session_state.messages[target_message_index]["content"][0]
+                placeholder.markdown(final_content)
 
-    except Exception as e:
-        MAX_AUTO_CONTINUE = 2
-        if 'auto_continue_count' not in st.session_state:
-            st.session_state.auto_continue_count = 0
+            except Exception as e:
+                # 发生异常，进入重试逻辑
+                MAX_AUTO_CONTINUE = 2
+                if st.session_state.auto_continue_count < MAX_AUTO_CONTINUE:
+                    st.session_state.auto_continue_count += 1
+                    # 在UI上显示警告，但不要用st.warning,因为它会留在页面上
+                    placeholder.markdown(f"⚠️ 回答中断，正在尝试自动续写… (第 {st.session_state.auto_continue_count}/{MAX_AUTO_CONTINUE} 次)")
+                    
+                    partial_content = st.session_state.messages[target_message_index].get("content", [""])[0]
+                    last_chars = (partial_content[-50:] + "...") if len(partial_content) > 50 else partial_content
+                    continue_prompt = f"请严格地从以下文本的结尾处，无缝、自然地继续写下去。文本片段：\n\"...{last_chars}\""
+                    
+                    if is_continuation_task:
+                        st.session_state.messages.pop()
+                    st.session_state.messages.append({"role": "user", "content": [continue_prompt], "temp": True, "is_continue_prompt": True, "target_index": target_message_index})
+                    
+                    # 延时一小下，让用户能看到重试提示
+                    time.sleep(1) 
+                    st.experimental_rerun()
+                else:
+                    st.error(f"自动续写 {MAX_AUTO_CONTINUE} 次后仍然失败。请手动继续。错误: {e}")
+                    placeholder.markdown(st.session_state.messages[target_message_index].get("content", [""])[0] + " [生成中断]")
 
-        if st.session_state.auto_continue_count < MAX_AUTO_CONTINUE:
-            st.session_state.auto_continue_count += 1
-            st.warning(f"回答中断，正在尝试自动续写… (第 {st.session_state.auto_continue_count}/{MAX_AUTO_CONTINUE} 次)")
-
-            # 找到需要续写的助手消息索引
-            if is_continuation_task:
-                assistant_msg_idx = last_message.get("target_index")
-            else:
-                assistant_msg_idx = len(st.session_state.messages) - 1 if st.session_state.messages[-1]['role'] == 'assistant' else len(st.session_state.messages) - 2
-
-            partial_content = st.session_state.messages[assistant_msg_idx].get("content", [""])[0]
-            last_chars = (partial_content[-50:] + "...") if len(partial_content) > 50 else partial_content
-            continue_prompt = f"请严格地从以下文本的结尾处，无缝、自然地继续写下去。文本片段：\n\"...{last_chars}\""
-
-            # 移除上一个临时的续写指令（如果存在）
-            if is_continuation_task:
-                st.session_state.messages.pop()
-            
-            # 添加新的续写指令
-            st.session_state.messages.append({"role": "user", "content": [continue_prompt], "temp": True, "is_continue_prompt": True, "target_index": assistant_msg_idx})
-            
-            rerun_for_retry_triggered = True
-            st.experimental_rerun()
-        else:
-            st.error(f"自动续写 {MAX_AUTO_CONTINUE} 次后仍然失败。请手动继续。错误: {e}")
-            # 即使重试失败，我们也要让程序流继续向下，以便进行最终的清理
-            st.session_state.is_generating = False
-
-    # 只有在生成流程自然结束（成功或重试耗尽），且没有触发新的重试rerun时，才执行最终的清理和刷新
-    if not rerun_for_retry_triggered:
-        st.session_state.is_generating = False
-        st.session_state.auto_continue_count = 0 # 重置计数器
-
-        # --- 所有清理工作在这里进行 ---
-        # 移除最后的临时用户消息（如果存在）
-        if st.session_state.messages and st.session_state.messages[-1].get("is_continue_prompt"):
-            st.session_state.messages.pop()
-        
-        # 移除可能产生的空助手消息
-        if st.session_state.messages and st.session_state.messages[-1]['role'] == 'assistant':
-            content = st.session_state.messages[-1].get("content", [])
-            if not content or not content[0].strip():
-                st.session_state.messages.pop()
-        
-        # 保存最终的历史记录
-        with open(log_file, "wb") as f:
-            pickle.dump(_prepare_messages_for_save(st.session_state.messages), f)
-        
-        # 进行最后一次刷新，让UI恢复到干净的等待状态
-        st.experimental_rerun()
-
+            finally:
+                # 只有在不需要重试时（即成功或最终失败时），才会执行这里的逻辑
+                if not (st.session_state.auto_continue_count > 0 and st.session_state.auto_continue_count <= MAX_AUTO_CONTINUE):
+                    st.session_state.is_generating = False
+                    st.session_state.generation_complete = True
+                    st.session_state.auto_continue_count = 0
+                    st.experimental_rerun()
 
 
 
