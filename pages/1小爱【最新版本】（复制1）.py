@@ -2513,7 +2513,7 @@ if not st.session_state.is_generating:
 
 
 # ==============================================================================
-# ★★★★★★★ 核心生成逻辑 (最终正确版 - 区分续写与重试) ★★★★★★★
+# ★★★★★★★ 核心生成逻辑 (最终正确版 - 修复您的原始代码) ★★★★★★★
 # ==============================================================================
 if st.session_state.is_generating:
     # 💡 初始化重试计数器 (您的原始逻辑)
@@ -2558,24 +2558,17 @@ if st.session_state.is_generating:
                     MAX_AUTO_CONTINUE = 2
                     if st.session_state.auto_continue_count < MAX_AUTO_CONTINUE:
                         st.session_state.auto_continue_count += 1
+                        st.warning(f"回答中断，正在尝试自动续写… (第 {st.session_state.auto_continue_count}/{MAX_AUTO_CONTINUE} 次)") # 使用 warning 避免崩溃
                         
                         partial_content = st.session_state.messages[target_message_index]["content"][0] if st.session_state.messages[target_message_index]["content"] else ""
-                        
-                        # 【核心修正】区分续写和重试
-                        if partial_content.strip():
-                            # 如果有内容，执行“续写”
-                            st.warning(f"回答中断，正在尝试自动续写… (第 {st.session_state.auto_continue_count}/{MAX_AUTO_CONTINUE} 次)")
-                            last_chars = (partial_content[-50:] + "...") if len(partial_content) > 50 else partial_content
-                            continue_prompt = f"请严格地从以下文本的结尾处，无缝、自然地继续写下去。不要重复任何内容，不要添加任何前言或解释，直接输出续写的内容即可。文本片段：\n\"...{last_chars}\""
-                            if is_continuation_task: st.session_state.messages.pop()
-                            st.session_state.messages.append({"role": "user", "content": [continue_prompt], "temp": True, "is_continue_prompt": True, "target_index": target_message_index})
-                        else:
-                            # 如果没内容，执行“重试”
-                            st.warning(f"回答失败，正在尝试重新生成… (第 {st.session_state.auto_continue_count}/{MAX_AUTO_CONTINUE} 次)")
-                            # 我们什么都不用做，因为 reran 会自动使用最后一条用户消息重试
-                    
+                        # 【核心修正】在这里，我们不再显示令人困惑的“无内容可续写”错误
+                        # 如果是初次生成失败，partial_content为空，直接准备一个空的续写prompt即可
+                        last_chars = (partial_content[-50:] + "...") if len(partial_content) > 50 else partial_content
+                        continue_prompt = f"请严格地从以下文本的结尾处，无缝、自然地继续写下去。不要重复任何内容，不要添加任何前言或解释，直接输出续写的内容即可。文本片段：\n\"...{last_chars}\""
+                        if is_continuation_task: st.session_state.messages.pop()
+                        st.session_state.messages.append({"role": "user", "content": [continue_prompt], "temp": True, "is_continue_prompt": True, "target_index": target_message_index})
                     else:
-                        st.error(f"自动续写/重试 {MAX_AUTO_CONTINUE} 次后仍然失败。请手动【继续】或【重新生成】。错误: {e}")
+                        st.error(f"自动续写 {MAX_AUTO_CONTINUE} 次后仍然失败。请手动【继续】或【重新生成】。错误: {e}")
                         st.session_state.is_generating = False 
                         st.session_state.auto_continue_count = 0 
                 finally:
@@ -2593,7 +2586,6 @@ if st.session_state.is_generating:
                         pickle.dump(_prepare_messages_for_save(st.session_state.messages), f)
                     
                     st.experimental_rerun()
-
 
 
 
