@@ -2512,120 +2512,100 @@ if not st.session_state.is_generating:
 
 
 # ==============================================================================
-# ★★★★★★★★★★★★★ 核心生成逻辑 (最终稳健版) ★★★★★★★★★★★★★
-# 该版本采用“状态机耐心等待”逻辑，从根本上解决刷新和API延迟问题
+# ★★★★★★★★★★★★★ 核心生成逻辑 (最终稳健版 v2) ★★★★★★★★★★★★★
+# 修复了上一版中因状态管理不当导致的 NameError 问题
 # ==============================================================================
 if st.session_state.is_generating:
 
-    # --- 步骤 1: 初始化或恢复 “对话状态” ---
-    # 检查会话中是否已存在一个与AI的“对话通道”(generator)
-    # 这是实现“耐心”的关键：我们只建立一次通道，之后反复从这个通道里取数据
+    # --- 步骤 1: 初始化或恢复所有需要的 “对话状态” ---
+    # 这是实现“耐心”和“不出错”的基石
     if "generator" not in st.session_state:
         st.session_state.generator = None
-
-    # 用来存储从通道中累积接收到的文本
     if "full_response" not in st.session_state:
         st.session_state.full_response = ""
-    
-    # 用来记录这条回复的目标消息在列表中的索引
+    # 【核心修正】: target_index 必须在这里初始化，以确保在整个生命周期中都存在
     if "target_index" not in st.session_state:
         st.session_state.target_index = -1
 
-
     # --- 步骤 2: 准备工作 (只在第一次运行时执行) ---
-    # 如果通道还未建立，说明这是本次生成的第一次运行
+    # 如果对话通道还未建立，说明这是本次生成的第一次运行
     if st.session_state.generator is None:
         
-        # 判断是新生成任务还是续写任务
         is_continuation_task = st.session_state.messages and st.session_state.messages[-1].get("is_continue_prompt")
 
         if is_continuation_task:
-            # 如果是续写，目标索引由续写提示信息提供
+            # 【核心修正】: 将 target_index 赋值给 session_state 变量
             st.session_state.target_index = st.session_state.messages[-1].get("target_index", -1)
-            # 将已有内容作为初始回复内容
-            st.session_state.full_response = st.session_state.messages[st.session_state.target_index]["content"][0]
+            # 检查索引有效性
+            if not (-len(st.session_state.messages) <= st.session_state.target_index < len(st.session_state.messages)):
+                 st.error("续写目标消息索引无效，已停止生成。")
+                 st.session_state.is_generating = False # 停止执行
+                 st.experimental_rerun()
+            else:
+                st.session_state.full_response = st.session_state.messages[st.session_state.target_index]["content"][0]
         else:
-            # 如果是新生成，为AI的回复在消息列表中创建一个新的空位
             st.session_state.messages.append({"role": "assistant", "content": [""]})
-            # 目标索引就是列表的最后一位
+            # 【核心修正】: 将 target_index 赋值给 session_state 变量
             st.session_state.target_index = len(st.session_state.messages) - 1
         
-        # 【核心动作】: 建立与AI的“对话通道”，并将其保存下来。
-        # 这一步之后，即使页面刷新，我们也不会再重新执行 getAnswer()
+        # 建立对话通道
         st.session_state.generator = getAnswer(is_continuation=is_continuation_task, target_idx=st.session_state.target_index)
 
-
     # --- 步骤 3: 渲染UI并处理数据流 ---
-    # 无论刷新多少次，我们都用 assistant 的身份显示内容
     with st.chat_message("assistant"):
         placeholder = st.empty()
-        # 始终显示当前已经收到的所有内容，并加上光标
         placeholder.markdown(st.session_state.full_response + "▌")
 
         try:
-            # 从已经建立好的“对话通道”中获取下一块数据
-            # next() 函数在这里非常关键，它会“拉取”一个数据块。
-            # 如果AI还在思考，这里会暂停等待，但不会报错，从而实现了“耐心”。
-            # 如果通道已经空了，它会抛出 StopIteration 异常，被我们用来判断生成是否结束。
+            # 从已建立的对话通道中获取下一块数据
             chunk = next(st.session_state.generator)
-            
-            # 如果成功获取到数据块
             st.session_state.full_response += chunk
-            # 更新UI显示
             placeholder.markdown(st.session_state.full_response + "▌")
-            # 强制页面重新运行，去获取下一个数据块
-            # 这是受控的、必要的刷新，目的是驱动数据流的持续获取
+            # 驱动数据流前进
             st.experimental_rerun()
 
         except StopIteration:
             # --- 步骤 4: 成功完成的收尾工作 ---
-            # 当 next() 抛出 StopIteration，意味着AI已经说完了所有话
-            
-            # 更新UI，显示最终的、没有光标的完整内容
             placeholder.markdown(st.session_state.full_response)
             
-            # 将最终结果存回 messages 列表
-            st.session_state.messages[st.session_state.target_index]["content"][0] = st.session_state.full_response
-
-            # 如果是续写任务，现在可以安全地移除那个临时的 "user" 续写提示了
+            # 只有当索引有效时才更新内容
+            if -len(st.session_state.messages) <= st.session_state.target_index < len(st.session_state.messages):
+                st.session_state.messages[st.session_state.target_index]["content"][0] = st.session_state.full_response
+            
+            # 清理续写提示
             if st.session_state.messages[-1].get("is_continue_prompt"):
                 st.session_state.messages.pop()
 
-            # 清理可能产生的空消息
+            # 清理空消息
             if not st.session_state.full_response.strip():
-                 # 检查目标索引是否有效，防止意外删除
                 if -len(st.session_state.messages) <= st.session_state.target_index < len(st.session_state.messages):
                     del st.session_state.messages[st.session_state.target_index]
 
-
-            # 保存聊天记录到文件
             with open(log_file, "wb") as f:
                 pickle.dump(_prepare_messages_for_save(st.session_state.messages), f)
             
-            # 【关键】: 重置所有与本次生成相关的状态，清理现场，为下一次对话做准备
+            # 【关键】: 重置所有与本次生成相关的状态
             st.session_state.is_generating = False
             del st.session_state.generator
             del st.session_state.full_response
             del st.session_state.target_index
-            
-            # 在一切都尘埃落定后，进行最后一次干净的刷新
             st.experimental_rerun()
             
         except Exception as e:
             # --- 步骤 5: 真正发生错误的收尾工作 ---
-            # 只有在从通道获取数据时发生真实的网络/API错误才会进入这里
-            st.error(f"生成过程中发生严重错误: {e}")
-            
-            # 同样需要重置所有状态，防止程序卡死在生成状态
+            st.error(f"生成过程中发生错误: {e}")
+
+            # 【关键】: 即使出错也要清理现场，防止下次运行出错
             st.session_state.is_generating = False
             if "generator" in st.session_state:
                 del st.session_state.generator
             if "full_response" in st.session_state:
                 del st.session_state.full_response
+            # 【核心修正】: 即使 target_index 可能未被正确设置，也要尝试删除，防止残留
             if "target_index" in st.session_state:
                 del st.session_state.target_index
             
-            # 刷新页面以显示错误信息并停止加载动画
+            # 刷新页面以显示错误信息
             st.experimental_rerun()
 
 
