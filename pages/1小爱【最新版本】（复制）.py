@@ -2574,15 +2574,10 @@ if st.session_state.is_generating:
     except Exception as e:
         # --- 3. 异常处理 (您的原始逻辑) ---
         MAX_AUTO_CONTINUE = 2
-        # 我们只在特定的、可能是网络问题的错误上重试
-        from google.api_core import exceptions as google_exceptions
-        if isinstance(e, (google_exceptions.DeadlineExceeded, google_exceptions.ServiceUnavailable, google_exceptions.InternalServerError, google_exceptions.ResourceExhausted)) and st.session_state.auto_continue_count < MAX_AUTO_CONTINUE:
+        if st.session_state.auto_continue_count < MAX_AUTO_CONTINUE:
             st.session_state.auto_continue_count += 1
-            st.warning(f"回答因网络或API临时问题中断，正在尝试自动续写… (第 {st.session_state.auto_continue_count}/{MAX_AUTO_CONTINUE} 次)")
+            st.warning(f"回答中断，正在尝试自动续写… (第 {st.session_state.auto_continue_count}/{MAX_AUTO_CONTINUE} 次)")
             
-            # 在重试前加入一个短暂的延时，以避免因请求过快而连续失败
-            time.sleep(1)
-
             partial_content = st.session_state.messages[target_message_index]["content"][0] if st.session_state.messages[target_message_index]["content"] else ""
             last_chars = (partial_content[-50:] + "...") if len(partial_content) > 50 else partial_content
             continue_prompt = f"请严格地从以下文本的结尾处，无缝、自然地继续写下去。文本片段：\n\"...{last_chars}\""
@@ -2592,8 +2587,7 @@ if st.session_state.is_generating:
             # 触发重试，这是正确的
             st.experimental_rerun()
         else:
-            # 对于所有其他错误，或达到重试上限时，直接报错并终止
-            st.error(f"回答生成失败，这是一个无法自动续写的错误。请检查API Key或更换提问。错误: {e}")
+            st.error(f"自动续写 {MAX_AUTO_CONTINUE} 次后仍然失败。请手动继续。错误: {e}")
             st.session_state.is_generating = False # 关键：这是“刹车”！
             st.session_state.auto_continue_count = 0
     
