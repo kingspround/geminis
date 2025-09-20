@@ -2473,28 +2473,24 @@ if not st.session_state.is_generating:
 
 
 # ==============================================================================
-# ★★★★★★★ 核心生成逻辑 (最终稳定版 - 带Spinner) ★★★★★★★
+# ★★★★★★★ 核心生成逻辑 (真正最终稳定版) ★★★★★★★
 # ==============================================================================
 if st.session_state.is_generating:
-    # --- 1. 准备工作 ---
+
+    # 准备工作 (这部分不变)
     if 'auto_continue_count' not in st.session_state:
         st.session_state.auto_continue_count = 0
-
     is_continuation_task = st.session_state.messages and st.session_state.messages[-1].get("is_continue_prompt")
-    
-    # 找到或创建我们的目标消息框
     target_message_index = -1
     if is_continuation_task:
         target_message_index = st.session_state.messages[-1].get("target_index", -1)
     elif not st.session_state.messages or st.session_state.messages[-1]["role"] != "assistant":
         st.session_state.messages.append({"role": "assistant", "content": [""]})
 
-    # --- 2. 核心生成与显示 ---
+    # 核心生成与显示
     with st.chat_message("assistant"):
-        # 【关键】将Spinner放在这里，它会一直显示直到代码块结束
         with st.spinner("AI 正在思考中..."):
             placeholder = st.empty()
-            full_response = ""
             
             try:
                 original_content = ""
@@ -2507,9 +2503,11 @@ if st.session_state.is_generating:
                     streamed_part += chunk
                     placeholder.markdown(original_content + streamed_part + "▌")
                 
+                # 成功后，将完整内容写入state
                 full_response = original_content + streamed_part
                 st.session_state.messages[target_message_index]["content"][0] = full_response
-                st.session_state.auto_continue_count = 0 # 成功后重置
+                placeholder.markdown(full_response) # 最终显示，去掉光标
+                st.session_state.auto_continue_count = 0
 
             except Exception as e:
                 MAX_AUTO_CONTINUE = 2
@@ -2517,41 +2515,31 @@ if st.session_state.is_generating:
                     st.session_state.auto_continue_count += 1
                     st.toast(f"回答中断，正在尝试自动续写… (第 {st.session_state.auto_continue_count}/{MAX_AUTO_CONTINUE} 次)")
                     
-                    # 准备续写prompt (这部分逻辑不变)
+                    # 准备续写prompt
                     partial_content = st.session_state.messages[target_message_index]["content"][0]
                     last_chars = (partial_content[-50:] + "...") if len(partial_content) > 50 else partial_content
                     continue_prompt = f"请严格地从以下文本的结尾处，无缝、自然地继续写下去。文本片段：\n\"...{last_chars}\""
                     if is_continuation_task: st.session_state.messages.pop()
                     st.session_state.messages.append({"role": "user", "content": [continue_prompt], "temp": True, "is_continue_prompt": True, "target_index": target_message_index})
                     
-                    # 【关键】触发重试的唯一rerun
+                    # 触发重试的rerun是正确的，因为它需要重启生成流程
                     st.rerun()
                 else:
                     st.error(f"自动续写 {MAX_AUTO_CONTINUE} 次后仍然失败。请手动继续。错误: {e}")
                     st.session_state.auto_continue_count = 0
-            
-            # --- 3. 生成结束后（无论成功或失败）的清理工作 ---
-            # 用最终内容更新占位符，并去掉光标
-            placeholder.markdown(full_response)
-            
-            # 清理临时的续写prompt
-            if is_continuation_task:
-                st.session_state.messages.pop()
-            
-            # 移除可能产生的空消息
-            if st.session_state.messages and not st.session_state.messages[-1]["content"][0].strip():
-                st.session_state.messages.pop()
-            
-            # 保存历史记录
-            with open(log_file, "wb") as f:
-                pickle.dump(_prepare_messages_for_save(st.session_state.messages), f)
-            
-            # 【核心】将生成状态设为False
-            st.session_state.is_generating = False
-            
-            # 【核心】触发最后一次刷新，以更新整个页面的状态（如输入框）
-            st.rerun()
+    
+    # --- 清理工作 ---
+    if is_continuation_task:
+        st.session_state.messages.pop()
+    if st.session_state.messages and not st.session_state.messages[-1]["content"][0].strip():
+        st.session_state.messages.pop()
+    
+    # 保存历史记录
+    with open(log_file, "wb") as f:
+        pickle.dump(_prepare_messages_for_save(st.session_state.messages), f)
 
+    # 【核心！】只改变状态，不发命令！
+    st.session_state.is_generating = False
 
 
 # --- 底部控件 ---
