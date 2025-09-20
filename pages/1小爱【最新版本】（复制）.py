@@ -102,7 +102,7 @@ if "selected_voice" not in st.session_state:
 # --- 默认角色设定 ---
 DEFAULT_CHARACTER_SETTINGS = { "理外祝福": """【理外祝福】的核心概念：\n\n""" }
 
-
+ 
 
 def _prepare_messages_for_save(messages):
     picklable_messages = []
