@@ -2521,7 +2521,7 @@ if not st.session_state.is_generating:
 
 
 # ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
-# ★★★ 核心生成逻辑 (最终健壮版 V3：将错误直接写入聊天记录并保留) ★★★
+# ★★★ 核心生成逻辑 (最终健壮版 V4：修复HTML渲染并丰富错误信息) ★★★
 # ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
 if st.session_state.is_generating:
     with st.chat_message("assistant"):
@@ -2553,29 +2553,33 @@ if st.session_state.is_generating:
                     streamed_part += chunk
                     updated_full_content = original_content + streamed_part
                     st.session_state.messages[real_idx]["content"][0] = updated_full_content
-                    placeholder.markdown(updated_full_content + "▌")
+                    placeholder.markdown(updated_full_content + "▌", unsafe_allow_html=True)
 
                 final_content = st.session_state.messages[real_idx]["content"][0]
-                placeholder.markdown(final_content)
+                placeholder.markdown(final_content, unsafe_allow_html=True)
                 st.session_state.is_generating = False 
 
             except Exception as e:
-                # 【核心修正】将格式化后的错误信息直接追加到当前消息内容中
+                # 【核心修正】优化错误信息，使其更具可读性
                 error_type_name = type(e).__name__
+                # 安全地获取错误的详细参数
+                error_details = str(e.args) if e.args else "无更多细节"
+                
                 error_message_html = f"""
 <br><br>
-<span style='color:red; font-weight:bold;'>[ 🔴 生成中断 ]</span><br>
-<span style='color:red;'>错误类型: {error_type_name}</span><br>
-<span style='color:red;'>您可以尝试【♻️重新生成】或【➕继续】。</span>
+<div style="border: 1px solid #ff4b4b; border-radius: 5px; padding: 10px; background-color: #330000;">
+<span style='color: #ff4b4b; font-weight:bold;'>[ 🔴 生成中断 ]</span><br>
+<span style='color: #ffc4c4;'>错误类型: {error_type_name}</span><br>
+<span style='color: #ffc4c4;'>详情: {error_details}</span><br>
+<span style='color: white;'>您可以尝试【♻️重新生成】或【➕继续】。</span>
+</div>
 """
                 
                 real_idx = locals().get("target_message_index", -1)
                 if real_idx == -1: real_idx = len(st.session_state.messages) - 1
 
                 if -len(st.session_state.messages) <= real_idx < len(st.session_state.messages):
-                     # 将错误信息写入 session_state
                      st.session_state.messages[real_idx]['content'][0] += error_message_html
-                     # 立即更新UI，让用户看到错误
                      placeholder.markdown(st.session_state.messages[real_idx]['content'][0], unsafe_allow_html=True)
                 
                 st.session_state.is_generating = False
