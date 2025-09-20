@@ -2470,7 +2470,6 @@ if not st.session_state.is_generating:
         st.session_state.auto_continue_count = 0 
 
 
-
 # ==============================================================================
 # ★★★★★★★ 核心生成逻辑 (回归本源的最终稳定版) ★★★★★★★
 # ==============================================================================
@@ -2491,6 +2490,7 @@ if st.session_state.is_generating:
         placeholder = st.empty()
         
         try:
+            # 【关键】将Spinner放在这里，它会在API调用期间显示
             with st.spinner("AI 正在思考中..."):
                 original_content = ""
                 if st.session_state.messages[target_message_index]["content"] and isinstance(st.session_state.messages[target_message_index]["content"][0], str):
@@ -2507,18 +2507,9 @@ if st.session_state.is_generating:
             st.session_state.messages[target_message_index]["content"][0] = full_response
             placeholder.markdown(full_response) # 显示最终结果
             
-            # 清理和保存
-            if is_continuation_task:
-                st.session_state.messages.pop()
-            if st.session_state.messages and not st.session_state.messages[-1]["content"][0].strip():
-                st.session_state.messages.pop()
-            with open(log_file, "wb") as f:
-                pickle.dump(_prepare_messages_for_save(st.session_state.messages), f)
-            
-            # 改变状态，让Streamlit自动刷新
+            # 成功后，重置计数器并改变状态
             st.session_state.auto_continue_count = 0
             st.session_state.is_generating = False
-            st.rerun() # 这是成功的、安全的最终刷新
 
         except Exception as e:
             # --- 流式异常时 ---
@@ -2540,7 +2531,20 @@ if st.session_state.is_generating:
                 st.error(f"自动续写 {MAX_AUTO_CONTINUE} 次后仍然失败。请手动继续。错误: {e}")
                 st.session_state.auto_continue_count = 0
                 st.session_state.is_generating = False
-                st.rerun() # 最终失败后的安全刷新
+
+    # --- 统一的清理工作 (仅在生成不再进行时执行) ---
+    if not st.session_state.is_generating:
+        # 清理临时的续写prompt
+        if is_continuation_task:
+            st.session_state.messages.pop()
+            
+        # 移除可能产生的空消息
+        if st.session_state.messages and st.session_state.messages[-1]['role'] == 'assistant' and not st.session_state.messages[-1]["content"][0].strip():
+            st.session_state.messages.pop()
+        
+        # 保存历史记录
+        with open(log_file, "wb") as f:
+            pickle.dump(_prepare_messages_for_save(st.session_state.messages), f)
 
 
 
