@@ -98,6 +98,12 @@ if "use_token" not in st.session_state:
     st.session_state.use_token = False
 if "selected_voice" not in st.session_state:
     st.session_state.selected_voice = DEFAULT_VOICE_DISPLAY_NAME # 使用您在常量中定义的有效默认值
+if "generation_error" in st.session_state and st.session_state.generation_error:
+    st.error(st.session_state.generation_error)
+    # 显示后立即清除，这样它只会在本次刷新中出现一次
+    # 如果用户再次手动刷新页面，它就会消失
+    st.session_state.generation_error = None
+
 
 # --- 默认角色设定 ---
 DEFAULT_CHARACTER_SETTINGS = { "理外祝福": """【理外祝福】的核心概念：\n\n""" }
@@ -2517,7 +2523,7 @@ if not st.session_state.is_generating:
 
 
 # ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
-# ★★★ 核心生成逻辑 (已移除自动续写，防止无限刷新循环) ★★★
+# ★★★ 核心生成逻辑 (保留Spinner，错误独立显示，UI可交互) ★★★
 # ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
 if st.session_state.is_generating:
     is_continuation_task = st.session_state.messages and st.session_state.messages[-1].get("is_continue_prompt")
@@ -2528,71 +2534,57 @@ if st.session_state.is_generating:
         target_message_index = -1
         if is_continuation_task:
             target_message_index = st.session_state.messages[-1].get("target_index", -1)
-        # 如果不是续写任务，且最后一条消息不是助手的，就新建一个助手消息
         elif not st.session_state.messages or st.session_state.messages[-1]["role"] != "assistant":
             st.session_state.messages.append({"role": "assistant", "content": [""]})
-            target_message_index = -1 # 指向刚刚新建的最后一条消息
+            target_message_index = -1
         
-        # 确保索引有效
         if not (-len(st.session_state.messages) <= target_message_index < len(st.session_state.messages)):
-             st.error("续写目标消息索引无效，已停止生成。")
+             # 使用新的错误处理机制
+             st.session_state.generation_error = "生成失败：续写目标消息索引无效。"
              st.session_state.is_generating = False
         else:
             try:
-                # 【第一步】获取原始文本（如果是续写任务）
-                original_content = ""
-                # 使用真实索引来获取内容
-                real_idx = target_message_index if target_message_index != -1 else len(st.session_state.messages) - 1
-                content_list = st.session_state.messages[real_idx]["content"]
-                if content_list and isinstance(content_list[0], str):
-                    original_content = content_list[0]
-                
-                # 【第二步】流式生成
-                streamed_part = ""
-                # 显示加载提示
-                placeholder.markdown("AI 正在思考中... ▌")
-                for chunk in getAnswer():
-                    streamed_part += chunk
-                    updated_full_content = original_content + streamed_part
-                    st.session_state.messages[real_idx]["content"][0] = updated_full_content
-                    # 实时更新UI
-                    placeholder.markdown(updated_full_content + "▌")
-                
-                # 【第三步】生成完成，设置最终状态
+                # 【核心改动】将 spinner 放在 try 内部
+                with st.spinner("AI 正在思考中..."):
+                    original_content = ""
+                    real_idx = target_message_index if target_message_index != -1 else len(st.session_state.messages) - 1
+                    content_list = st.session_state.messages[real_idx]["content"]
+                    if content_list and isinstance(content_list[0], str):
+                        original_content = content_list[0]
+                    
+                    streamed_part = ""
+                    for chunk in getAnswer():
+                        streamed_part += chunk
+                        updated_full_content = original_content + streamed_part
+                        st.session_state.messages[real_idx]["content"][0] = updated_full_content
+                        placeholder.markdown(updated_full_content + "▌")
+
+                # 生成完成，正式定稿UI并停止
                 final_content = st.session_state.messages[real_idx]["content"][0]
                 placeholder.markdown(final_content)
-                # 正常结束，踩下刹车
                 st.session_state.is_generating = False 
 
-            # 【核心改动】用简单的错误处理替换复杂的自动续写逻辑
             except Exception as e:
-                # 在当前生成的部分内容后面追加一条明确的错误信息
-                error_message = f"\n\n**[生成中断]** 错误: `{e}`\n\n请检查API密钥或网络连接，然后手动【♻️重新生成】或【➕继续】。"
-                real_idx = target_message_index if target_message_index != -1 else len(st.session_state.messages) - 1
-                st.session_state.messages[real_idx]["content"][0] += error_message
-                # 更新UI显示错误
-                placeholder.markdown(st.session_state.messages[real_idx]["content"][0])
+                # 【核心改动】发生错误时，不再修改聊天内容，而是将错误信息存入 session_state
+                st.session_state.generation_error = f"🔴 **生成中断**\n\n错误详情: `{e}`\n\n您可以尝试【♻️重新生成】或【➕继续】上一次的回答，或发起新的对话。"
                 
-                # 关键：发生任何错误时，都必须踩下“刹车”，防止循环！
+                # 关键：必须在这里踩下刹车，让UI恢复可操作状态
                 st.session_state.is_generating = False
             
-            # 【最后一步】无论成功还是失败，都执行清理和保存
             finally:
-                # 如果是续写任务，完成后移除临时的user prompt
+                # 无论成功或失败，都执行清理和保存
                 if is_continuation_task:
-                    # 确保弹出的就是那个临时消息
                     if st.session_state.messages and st.session_state.messages[-1].get("is_continue_prompt"):
                         st.session_state.messages.pop()
 
-                # 如果最后一条助手消息是空的（例如，一开始就出错），则移除
+                # 如果助手消息是空的（通常是因错误导致），则移除
                 if st.session_state.messages and st.session_state.messages[-1]['role'] == 'assistant' and not st.session_state.messages[-1]["content"][0].strip():
                     st.session_state.messages.pop()
                 
-                # 保存最终的聊天记录
                 with open(log_file, "wb") as f:
                     pickle.dump(_prepare_messages_for_save(st.session_state.messages), f)
                 
-                # 执行一次最终的刷新来清理UI状态（比如移除最后的'▌'光标）
+                # 必须刷新一次，以便UI能根据最新的状态（is_generating=False, generation_error=True）进行重绘
                 st.experimental_rerun()
 
 
