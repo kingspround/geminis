@@ -98,7 +98,10 @@ if "use_token" not in st.session_state:
     st.session_state.use_token = False
 if "selected_voice" not in st.session_state:
     st.session_state.selected_voice = DEFAULT_VOICE_DISPLAY_NAME # 使用您在常量中定义的有效默认值
-
+if "generation_error" in st.session_state and st.session_state.generation_error:
+    st.error(st.session_state.generation_error)
+    # 在显示后将错误信息清除，这样它只在本次刷新中出现
+    st.session_state.generation_error = None
 
 
 # --- 默认角色设定 ---
@@ -2519,7 +2522,7 @@ if not st.session_state.is_generating:
 
 
 # ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
-# ★★★ 核心生成逻辑 (最终健壮版 V2：修复Toast报错问题) ★★★
+# ★★★ 核心生成逻辑 (最终兼容版：使用 st.error 替代 st.toast) ★★★
 # ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
 if st.session_state.is_generating:
     with st.chat_message("assistant"):
@@ -2558,13 +2561,13 @@ if st.session_state.is_generating:
                 st.session_state.is_generating = False 
 
             except Exception as e:
-                # 【核心修正】使用 type(e).__name__ 来安全地获取错误类型，防止toast自身报错
-                st.toast(f"🔴 生成中断，错误类型: {type(e).__name__}", icon="⚠️")
-                
+                # 【核心修正】将错误信息存入 session_state，而不是调用不存在的 st.toast()
+                st.session_state.generation_error = f"🔴 **生成中断，错误类型: {type(e).__name__}**\n\n您可以尝试【♻️重新生成】或【➕继续】上一次的回答。"
+
                 # 在主界面显示已生成的部分内容（如果有）
                 real_idx = locals().get("target_message_index", -1)
                 if real_idx == -1: real_idx = len(st.session_state.messages) - 1
-
+                
                 if -len(st.session_state.messages) <= real_idx < len(st.session_state.messages):
                      current_content = st.session_state.messages[real_idx]["content"][0]
                      placeholder.markdown(current_content)
