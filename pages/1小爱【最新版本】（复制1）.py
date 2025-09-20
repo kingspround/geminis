@@ -2512,98 +2512,112 @@ if not st.session_state.is_generating:
 
 
 # ==============================================================================
-# ★★★★★★★ 核心生成逻辑 (稳定重构版) ★★★★★★★
-# 请用这段代码完整替换您原来的 if st.session_state.is_generating: 代码块
+# ★★★★★★★ 核心生成逻辑 (V-Lock 终极稳定版) ★★★★★★★
+# 这个版本引入了二级“验证锁”来彻底防止在API等待期间的重入问题
 # ==============================================================================
 if st.session_state.is_generating:
-    # 1. 准备工作：确定我们是在续写还是新生成，并找到目标消息
-    last_message = st.session_state.messages[-1]
-    is_continuation_task = last_message.get("is_continue_prompt", False)
+    
+    # V-Lock: 检查二级锁。如果锁已存在且为True，说明一个生成任务已在后台运行。
+    # 我们立即退出本次脚本运行，静静等待那个任务完成即可。
+    if st.session_state.get("generation_v_lock", False):
+        # st.toast("V-Lock Engaged: Generation already in progress.") # (可选) 调试时可开启
+        pass # 静默处理，不执行任何操作
 
-    if is_continuation_task:
-        # 如果是续写任务，目标是之前消息列表中的某条消息
-        target_index = last_message.get("target_index", -1)
     else:
-        # 如果是新任务，我们先为AI的回复创建一个空的占位消息
-        st.session_state.messages.append({"role": "assistant", "content": [""]})
-        target_index = -1  # 目标是列表中的最后一条消息
+        # V-Lock: 上锁！我们是第一个进入此代码块的进程。
+        # 立刻设置二级锁，防止任何后续的“幽灵刷新”重入此逻辑。
+        st.session_state.generation_v_lock = True
+        # st.toast("V-Lock Acquired: Starting generation...") # (可选) 调试时可开启
 
-    # 从目标消息中获取原始内容（如果是续写的话）
-    original_content = ""
-    if is_continuation_task:
-        content_list = st.session_state.messages[target_index].get("content", [])
-        if content_list and isinstance(content_list[0], str):
-            original_content = content_list[0]
-
-    # 2. UI 准备：显示 "assistant" 头像和用于流式输出的占位符
-    with st.chat_message("assistant"):
-        placeholder = st.empty()
-        
+        # ------------------------------------------------------------------
+        # --- 从这里开始，是我们受保护的、安全的生成逻辑 ---
+        # ------------------------------------------------------------------
         try:
-            # 3. 核心生成循环
-            streamed_part = ""
-            for chunk in getAnswer(is_continuation=is_continuation_task, target_idx=target_index):
-                streamed_part += chunk
-                # 实时更新 session_state 和 UI
-                current_full_content = original_content + streamed_part
-                st.session_state.messages[target_index]["content"][0] = current_full_content
-                placeholder.markdown(current_full_content + "▌")
+            # 1. 准备工作：确定任务类型并找到目标消息
+            last_message = st.session_state.messages[-1]
+            is_continuation_task = last_message.get("is_continue_prompt", False)
 
-            # 4. 成功路径：当循环正常结束
-            # ------------------------------------
-            final_content = st.session_state.messages[target_index]["content"][0]
-            placeholder.markdown(final_content) # 更新最终内容，去掉光标
-
-            # 如果是续写任务，现在可以安全地移除那个临时的 "user" 续写提示了
             if is_continuation_task:
-                st.session_state.messages.pop()
+                target_index = last_message.get("target_index", -1)
+            else:
+                st.session_state.messages.append({"role": "assistant", "content": [""]})
+                target_index = -1
 
-            # 清理空消息（如果AI返回了空内容）
-            if not final_content.strip():
-                st.session_state.messages.pop()
+            original_content = ""
+            if is_continuation_task:
+                content_list = st.session_state.messages[target_index].get("content", [])
+                if content_list and isinstance(content_list[0], str):
+                    original_content = content_list[0]
 
-            # 保存聊天记录
-            with open(log_file, "wb") as f:
-                pickle.dump(_prepare_messages_for_save(st.session_state.messages), f)
+            # 2. UI 准备
+            with st.chat_message("assistant"):
+                placeholder = st.empty()
+                
+                # 3. 核心生成循环 (现在是绝对安全的，不会被重入了)
+                streamed_part = ""
+                # st.session_state.model.generate_content(...) 是阻塞操作，脚本会在此等待
+                for chunk in getAnswer(is_continuation=is_continuation_task, target_idx=target_index):
+                    streamed_part += chunk
+                    current_full_content = original_content + streamed_part
+                    st.session_state.messages[target_index]["content"][0] = current_full_content
+                    placeholder.markdown(current_full_content + "▌")
 
-            # 重置状态，准备下一次交互
-            st.session_state.is_generating = False
-            st.session_state.auto_continue_count = 0
-            st.experimental_rerun() # 在一切都完成后，进行一次干净的刷新，重置UI
+                # 4. 成功路径
+                final_content = st.session_state.messages[target_index]["content"][0]
+                placeholder.markdown(final_content)
 
         except Exception as e:
-            # 5. 失败/中断路径：只有发生真实错误时才会进入这里
-            # ----------------------------------------------------
+            # 5. 失败/中断路径
             MAX_AUTO_CONTINUE = 2
             if 'auto_continue_count' not in st.session_state:
                 st.session_state.auto_continue_count = 0
-
+            
+            # 只有在非V-Lock触发的真实中断时，才执行续写
             if st.session_state.auto_continue_count < MAX_AUTO_CONTINUE:
                 st.session_state.auto_continue_count += 1
                 st.warning(f"回答中断，正在尝试自动续写… (第 {st.session_state.auto_continue_count}/{MAX_AUTO_CONTINUE} 次)")
-                time.sleep(1) # 增加一个短暂的延迟，避免过快刷新
-
-                # 我们已经通过流式更新保存了部分内容，所以只需再次触发续写即可
-                # 移除旧的临时续写提示（如果存在）
-                if is_continuation_task:
-                    st.session_state.messages.pop()
-
-                # 创建一个新的续写提示
+                # 续写逻辑保持不变，但它现在只会在真实中断时触发
+                if is_continuation_task: st.session_state.messages.pop()
                 partial_content = st.session_state.messages[target_index]["content"][0]
                 last_chars = (partial_content[-50:] + "...") if len(partial_content) > 50 else partial_content
                 continue_prompt = f"请严格地从以下文本的结尾处，无缝、自然地继续写下去。文本片段：\n\"...{last_chars}\""
                 st.session_state.messages.append({"role": "user", "content": [continue_prompt], "temp": True, "is_continue_prompt": True, "target_index": target_index})
                 
-                # 触发重试
+                # V-Lock: 在触发重试前，必须先释放锁，允许下一次运行进入
+                st.session_state.generation_v_lock = False
                 st.experimental_rerun()
+                # 使用st.stop()确保当前脚本的剩余部分不会被执行
+                st.stop()
+
             else:
-                # 达到最大重试次数，彻底停止
-                st.error(f"自动续写 {MAX_AUTO_CONTINUE} 次后仍然失败。请手动继续或检查网络连接。错误: {e}")
+                st.error(f"自动续写 {MAX_AUTO_CONTINUE} 次后仍然失败。请手动继续。错误: {e}")
                 
-                # 停止生成循环，重置计数器
-                st.session_state.is_generating = False
-                st.session_state.auto_continue_count = 0
-                st.experimental_rerun() # 刷新UI以显示最终错误信息并停止加载动画
+        # ------------------------------------------------------------------
+        # --- 任务完成（无论成功或失败），进入清理和解锁阶段 ---
+        # ------------------------------------------------------------------
+        finally:
+            # 清理临时消息和空消息
+            if st.session_state.messages and st.session_state.messages[-1].get("is_continue_prompt"):
+                st.session_state.messages.pop()
+            if st.session_state.messages and st.session_state.messages[-1]['role'] == 'assistant' and not st.session_state.messages[-1].get("content", [""])[0].strip():
+                st.session_state.messages.pop()
+            
+            # 保存最终的聊天记录
+            with open(log_file, "wb") as f:
+                pickle.dump(_prepare_messages_for_save(st.session_state.messages), f)
+            
+            # 重置所有状态，准备下一次全新的交互
+            st.session_state.is_generating = False
+            st.session_state.auto_continue_count = 0
+            
+            # V-Lock: 解锁！这是最关键的一步，必须在 finally 块中确保执行。
+            # 这样无论成功还是失败，锁都会被释放，应用不会被卡死。
+            st.session_state.generation_v_lock = False
+            # st.toast("V-Lock Released: Generation complete.") # (可选) 调试时可开启
+            
+            # 进行一次最终的、干净的UI刷新
+            st.experimental_rerun()
+
 
 
 # --- 底部控件 ---
