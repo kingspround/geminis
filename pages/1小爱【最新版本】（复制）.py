@@ -2529,7 +2529,10 @@ if st.session_state.is_generating:
         with open(log_file, "wb") as f:
             pickle.dump(_prepare_messages_for_save(st.session_state.messages), f)
         
-    
+        # 【核心】这里不再有任何st.rerun()
+        # 脚本将在这里自然结束，Streamlit会安全地处理刷新
+        st.rerun() # 最后一次安全的刷新，以确保UI状态正确
+
 
 
 # --- 底部控件 ---
