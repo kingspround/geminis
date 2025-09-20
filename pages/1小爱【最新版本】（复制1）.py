@@ -2517,7 +2517,7 @@ if not st.session_state.is_generating:
 
 
 # ==============================================================================
-# ★★★ 核心生成逻辑 v5 (精确诊断，用户主导) ★★★
+# ★★★ 核心生成逻辑 v6 (临时错误提示 + 用户主导) ★★★
 # ==============================================================================
 if st.session_state.is_generating:
 
@@ -2526,10 +2526,8 @@ if st.session_state.is_generating:
     
     # 确定要操作的目标消息索引
     if is_manual_continuation:
-        # 如果是手动续写，目标是前一条助手消息
         target_message_index = st.session_state.messages[-1].get("target_index", -1)
     else:
-        # 如果是新问题，先为助手创建一个空的消息占位
         if not st.session_state.messages or st.session_state.messages[-1]["role"] != "assistant":
             st.session_state.messages.append({"role": "assistant", "content": [""]})
         target_message_index = len(st.session_state.messages) - 1
@@ -2538,7 +2536,6 @@ if st.session_state.is_generating:
     with st.chat_message("assistant"):
         placeholder = st.empty()
         
-        # 如果是手动续写，获取原始文本
         original_content = ""
         if is_manual_continuation:
             original_content = st.session_state.messages[target_message_index]["content"][0]
@@ -2547,58 +2544,67 @@ if st.session_state.is_generating:
             # --- 核心生成流程 ---
             streamed_part = ""
             with st.spinner("AI 正在思考中..."):
-                # 调用API，传入正确的参数
                 response_stream = getAnswer(
                     is_continuation=is_manual_continuation,
                     target_idx=target_message_index
                 )
                 
-                # 流式接收并更新UI
                 for chunk in response_stream:
                     streamed_part += chunk
                     current_full_content = original_content + streamed_part
+                    # 更新 session_state 中的数据
                     st.session_state.messages[target_message_index]["content"][0] = current_full_content
+                    # 实时更新 UI 占位符
                     placeholder.markdown(current_full_content + "▌")
 
             # --- 生成成功 ---
             final_content = st.session_state.messages[target_message_index]["content"][0]
-            placeholder.markdown(final_content)
+            placeholder.markdown(final_content) # 最终显示完整内容
 
         except Exception as e:
             # --- 生成失败 ---
-            # 1. 保留已经生成的部分内容
+            # 1. 在UI上显示已经生成的部分内容
             partial_content = st.session_state.messages[target_message_index]["content"][0]
+            if partial_content:
+                placeholder.markdown(partial_content) # 显示已有的部分，不再追加错误信息
+            else:
+                placeholder.empty() # 如果什么都没生成，就清空占位符
+
+            # 2. 【核心修改】使用 st.error 显示临时的、红色的错误信息
+            st.error(f"""
+            **回答生成中断**
             
-            # 2. 构造详细的错误信息
-            error_message = f"""
-            \n\n---
-            **ERROR**: 回答生成中断。
-            - **原因**: `{type(e).__name__}`
-            - **详情**: `{e}`
-            - **操作建议**: 
-                - 如果是网络问题或回答过长被截断，请点击下方的【➕ 继续】按钮。
-                - 如果是内容安全策略或API Key问题，请【✏️ 编辑】您的提问或更换API Key后，点击【♻️ 重新生成】。
-            """
+            **原因**: `{type(e).__name__}`
             
-            # 3. 将错误信息附加到部分内容的末尾
-            st.session_state.messages[target_message_index]["content"][0] = partial_content + error_message
-            placeholder.markdown(st.session_state.messages[target_message_index]["content"][0])
+            **详情**: `{e}`
+            
+            **操作建议**: 
+            - 若因网络或长度问题中断，请点击【➕ 继续】。
+            - 若因内容安全或API问题，请【✏️ 编辑】或【♻️ 重新生成】。
+            
+            *(此错误提示将在下次操作后消失)*
+            """)
         
         finally:
-            # --- 无论成功或失败，都执行清理工作 ---
-            
-            # 1. 如果是手动续写任务，完成后移除那个临时的续写指令
+            # --- 清理工作 ---
+            # 1. 如果是手动续写任务，完成后移除临时的续写指令
             if is_manual_continuation:
                 st.session_state.messages.pop()
 
-            # 2. 将生成标志位设为False，停止循环
+            # 2. 如果最后一条助手消息是空的（比如一开始就报错），就把它删掉
+            if (st.session_state.messages and 
+                st.session_state.messages[-1]["role"] == "assistant" and 
+                not st.session_state.messages[-1]["content"][0].strip()):
+                st.session_state.messages.pop()
+
+            # 3. 将生成标志位设为False，停止循环
             st.session_state.is_generating = False
             
-            # 3. 保存聊天记录
+            # 4. 保存最终的聊天记录（不包含错误信息）
             with open(log_file, "wb") as f:
                 pickle.dump(_prepare_messages_for_save(st.session_state.messages), f)
             
-            # 4. 触发一次UI刷新，以移除加载动画并显示最终状态
+            # 5. 触发UI刷新
             st.experimental_rerun()
 
 
