@@ -2469,17 +2469,13 @@ if not st.session_state.is_generating:
         # 1. 将新消息添加到 session_state
         st.session_state.messages.append({"role": "user", "content": [full_prompt]})
         
-        # 2. 【核心修正】在改变状态、触发刷新之前，立刻手动渲染用户的消息
-        with st.chat_message("user"):
-            st.markdown(full_prompt)
-            
-        # 3. 然后再设置状态，这将会自动触发一次安全的刷新
+        # 2. 设置标志，告诉 Streamlit 在下一次刷新时开始生成
         st.session_state.is_generating = True
-        st.session_state.auto_continue_count = 0 # 重置续写计数器
+        st.session_state.auto_continue_count = 0
 
 
 # ==============================================================================
-# ★★★★★★★ 核心生成逻辑 (最终正确版 - 恢复自动续写) ★★★★★★★
+# ★★★★★★★ 核心生成逻辑 (最终正确版 - 恢复并净化自动续写) ★★★★★★★
 # ==============================================================================
 if st.session_state.is_generating:
 
@@ -2512,7 +2508,6 @@ if st.session_state.is_generating:
         st.session_state.messages[target_message_index]["content"][0] = full_response
         placeholder.markdown(full_response)
         
-        # 成功后，重置计数器并改变状态
         st.session_state.auto_continue_count = 0
         st.session_state.is_generating = False
 
@@ -2521,7 +2516,8 @@ if st.session_state.is_generating:
         MAX_AUTO_CONTINUE = 2
         if st.session_state.auto_continue_count < MAX_AUTO_CONTINUE:
             st.session_state.auto_continue_count += 1
-            st.toast(f"回答中断，正在尝试自动续写… (第 {st.session_state.auto_continue_count}/{MAX_AUTO_CONTINUE} 次)")
+            
+            # 【净化】删除了这里引起崩溃的 st.toast
             
             # 准备续写prompt
             partial_content = st.session_state.messages[target_message_index]["content"][0] if st.session_state.messages[target_message_index]["content"] else ""
