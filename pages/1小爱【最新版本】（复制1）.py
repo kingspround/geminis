@@ -98,10 +98,7 @@ if "use_token" not in st.session_state:
     st.session_state.use_token = False
 if "selected_voice" not in st.session_state:
     st.session_state.selected_voice = DEFAULT_VOICE_DISPLAY_NAME # 使用您在常量中定义的有效默认值
-if "generation_error" in st.session_state and st.session_state.generation_error:
-    st.error(st.session_state.generation_error)
-    # 在显示后将错误信息清除，这样它只在本次刷新中出现
-    st.session_state.generation_error = None
+
 
 
 # --- 默认角色设定 ---
@@ -2522,7 +2519,7 @@ if not st.session_state.is_generating:
 
 
 # ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
-# ★★★ 核心生成逻辑 (最终兼容版：使用 st.error 替代 st.toast) ★★★
+# ★★★ 核心生成逻辑 (最终健壮版 V3：将错误直接写入聊天记录并保留) ★★★
 # ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
 if st.session_state.is_generating:
     with st.chat_message("assistant"):
@@ -2561,16 +2558,23 @@ if st.session_state.is_generating:
                 st.session_state.is_generating = False 
 
             except Exception as e:
-                # 【核心修正】将错误信息存入 session_state，而不是调用不存在的 st.toast()
-                st.session_state.generation_error = f"🔴 **生成中断，错误类型: {type(e).__name__}**\n\n您可以尝试【♻️重新生成】或【➕继续】上一次的回答。"
-
-                # 在主界面显示已生成的部分内容（如果有）
+                # 【核心修正】将格式化后的错误信息直接追加到当前消息内容中
+                error_type_name = type(e).__name__
+                error_message_html = f"""
+<br><br>
+<span style='color:red; font-weight:bold;'>[ 🔴 生成中断 ]</span><br>
+<span style='color:red;'>错误类型: {error_type_name}</span><br>
+<span style='color:red;'>您可以尝试【♻️重新生成】或【➕继续】。</span>
+"""
+                
                 real_idx = locals().get("target_message_index", -1)
                 if real_idx == -1: real_idx = len(st.session_state.messages) - 1
-                
+
                 if -len(st.session_state.messages) <= real_idx < len(st.session_state.messages):
-                     current_content = st.session_state.messages[real_idx]["content"][0]
-                     placeholder.markdown(current_content)
+                     # 将错误信息写入 session_state
+                     st.session_state.messages[real_idx]['content'][0] += error_message_html
+                     # 立即更新UI，让用户看到错误
+                     placeholder.markdown(st.session_state.messages[real_idx]['content'][0], unsafe_allow_html=True)
                 
                 st.session_state.is_generating = False
             
