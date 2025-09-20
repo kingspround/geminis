@@ -270,34 +270,19 @@ def getAnswer(is_continuation=False, target_idx=-1):
 """
         history_to_send.append({"role": "user", "parts": [{"text": LAST_MINUTE_REMINDER_PROMPT}]})
 
-
-    # V--- 核心修改在这里 ---V
     final_contents = [msg for msg in history_to_send if msg.get("parts")]
+    response = st.session_state.model.generate_content(contents=final_contents, stream=True)
     
-    try:
-        response = st.session_state.model.generate_content(
-            contents=final_contents, 
-            stream=True
-        )
-        
-        # 显式地检查 prompt_feedback，这是 Gemini API 用来指示内容安全问题的官方方式
-        if response.prompt_feedback.block_reason:
-            # 如果请求在开始前就被阻止，直接返回一个空的迭代器
-            # 我们将在主循环中处理这个“无内容”的情况
-            return
-            
-        # 正常迭代返回的内容
-        for chunk in response:
-            # 再次检查，因为流式传输过程中也可能被拦截
-            if chunk.prompt_feedback.block_reason:
-                 return
+    yielded_something = False
+    for chunk in response:
+        try:
             yield chunk.text
-            
-    except Exception as e:
-        # 如果在API调用本身发生网络错误或其他底层错误，
-        # 我们不再自己处理，而是将异常原封不动地抛给上层的主循环
-        # 主循环会知道这是一个需要重试的“硬性错误”
-        raise e
+            yielded_something = True
+        except ValueError:
+            continue
+    
+    if not yielded_something:
+        yield ""
 
 
 def regenerate_message(index):
