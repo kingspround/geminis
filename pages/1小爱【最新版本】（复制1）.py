@@ -2560,57 +2560,35 @@ if st.session_state.is_generating:
         # --- 流式生成 ---
         with st.spinner("AI 正在思考中..."):
             streamed_part = ""
+            task_cancelled = False # <-- 新增一个标志位
             for chunk in getAnswer(is_continuation=is_continuation_task, target_idx=target_message_index):
                 # 每次循环都检查任务ID是否已改变
                 if st.session_state.task_id != current_task_id:
                     # 如果任务ID变了，说明新的任务已经启动，这个旧任务必须立即停止
-                    # st.warning("检测到新的生成请求，当前任务已中止。") # 可以取消注释用于调试
-                    return # 直接退出生成循环
+                    task_cancelled = True # <-- 设置标志位
+                    break # <-- 使用 break 跳出 for 循环，这是合法的
 
                 streamed_part += chunk
                 updated_full_content = original_content + streamed_part
                 st.session_state.messages[target_message_index]["content"][0] = updated_full_content
                 placeholder.markdown(updated_full_content + "▌")
-        
-        # --- 正常完成 ---
-        placeholder.markdown(st.session_state.messages[target_message_index]["content"][0])
-        if is_continuation_task:
-            st.session_state.messages.pop()
-        
-        st.session_state.is_generating = False
-        with open(log_file, "wb") as f: pickle.dump(_prepare_messages_for_save(st.session_state.messages), f)
-        st.experimental_rerun()
-
-    except Exception as e:
-        # --- 异常处理：熔断与冷却重试 ---
-        MAX_AUTO_CONTINUE = 2
-        
-        # 只有当前任务还是活跃任务时，才进行重试处理
-        if st.session_state.task_id == current_task_id:
-            if st.session_state.auto_continue_count < MAX_AUTO_CONTINUE:
-                st.session_state.auto_continue_count += 1
-                placeholder.warning(f"回答生成中断，将在3秒后自动尝试续写… ({st.session_state.auto_continue_count}/{MAX_AUTO_CONTINUE})\n\n错误: `{e}`")
-                time.sleep(3)
-
-                # 准备续写请求
-                partial_content = st.session_state.messages[target_message_index]["content"][0]
-                last_chars = (partial_content[-50:] + "...") if len(partial_content) > 50 else partial_content
-                continue_prompt = f"请严格地从以下文本的结尾处...{last_chars}\"" # (省略部分提示词)
-                
-                if is_continuation_task: st.session_state.messages.pop()
-                st.session_state.messages.append({"role": "user", "content": [continue_prompt], "temp": True, "is_continue_prompt": True, "target_index": target_message_index})
-
-                # 注意：这里我们不再设置 is_generating = True，因为脚本即将结束，
-                # 下一次 rerun 会自然地再次进入这个 if 块。我们只需要确保 is_generating 没被设为 False。
-                st.experimental_rerun()
+            
+            # --- 在 for 循环结束后，检查任务是否被取消了 ---
+            if task_cancelled:
+                 # 如果任务被取消了，我们就在这里直接结束，不执行后续的成功或失败逻辑
+                 # 因为新的任务已经在新的脚本运行中处理了
+                 # 我们不需要做任何事，直接让脚本自然结束即可
+                 pass # 或者直接省略这个 if 块
             else:
-                # 彻底熔断
+                # --- 正常完成 ---
+                placeholder.markdown(st.session_state.messages[target_message_index]["content"][0])
+                if is_continuation_task:
+                    st.session_state.messages.pop()
+                
                 st.session_state.is_generating = False
-                placeholder.error(f"自动续写失败。请手动重试。\n\n最终错误: `{e}`")
-                if is_continuation_task: st.session_state.messages.pop()
-                st.session_state.auto_continue_count = 0
                 with open(log_file, "wb") as f: pickle.dump(_prepare_messages_for_save(st.session_state.messages), f)
                 st.experimental_rerun()
+
 
 
 
