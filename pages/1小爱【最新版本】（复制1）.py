@@ -2521,10 +2521,8 @@ if st.session_state.is_generating:
 
     is_continuation_task = st.session_state.messages and st.session_state.messages[-1].get("is_continue_prompt")
     
-    # 【核心修正】用一个标志位来决定是否应该执行最后的刷新逻辑
-    # 我们只在需要重试时才立即rerun，否则都等到最后
-    should_retry_now = False
-
+    # 【核心修正】我们不再使用 try...finally，而是将清理逻辑移到外面
+    # 这样可以确保它只在整个流程结束后执行一次
     try:
         with st.chat_message("assistant"):
             with st.spinner("AI 正在思考中..."):
@@ -2567,19 +2565,17 @@ if st.session_state.is_generating:
             if is_continuation_task: st.session_state.messages.pop()
             st.session_state.messages.append({"role": "user", "content": [continue_prompt], "temp": True, "is_continue_prompt": True, "target_index": target_message_index})
 
-            # 【核心修正】只设置标志，不立即rerun
-            should_retry_now = True
+            # 触发重试，这是正确的，并且使用您原来的函数
+            st.experimental_rerun()
         else:
             st.error(f"自动续写 {MAX_AUTO_CONTINUE} 次后仍然失败。请手动继续。错误: {e}")
             st.session_state.is_generating = False
             st.session_state.auto_continue_count = 0
     
-    # 【核心修正】我们不再使用 finally，而是用标志位来判断
-    if should_retry_now:
-        # 如果需要重试，我们只做一件事：rerun
-        st.experimental_rerun()
-    elif not st.session_state.is_generating:
-        # 否则，如果流程已结束（成功或最终失败），我们才执行清理和最终刷新
+    # --- 4. 统一的、安全的清理和刷新逻辑 (取代了 finally) ---
+    # 这段代码只会在 try...except 块完全结束后，并且需要刷新时才执行
+    # (即，在成功或最终失败后，而不是在触发重试时)
+    if not st.session_state.is_generating:
         if is_continuation_task:
             if st.session_state.messages and st.session_state.messages[-1].get("is_continue_prompt"):
                 st.session_state.messages.pop()
