@@ -2471,13 +2471,12 @@ if not st.session_state.is_generating:
 
 
 
-
 # ==============================================================================
-# ★★★★★★★ 核心生成逻辑 (真正最终稳定版) ★★★★★★★
+# ★★★★★★★ 核心生成逻辑 (真正最终稳定版 V2) ★★★★★★★
 # ==============================================================================
 if st.session_state.is_generating:
-
-    # 准备工作 (这部分不变)
+    
+    # --- 1. 准备工作 (不变) ---
     if 'auto_continue_count' not in st.session_state:
         st.session_state.auto_continue_count = 0
     is_continuation_task = st.session_state.messages and st.session_state.messages[-1].get("is_continue_prompt")
@@ -2487,27 +2486,29 @@ if st.session_state.is_generating:
     elif not st.session_state.messages or st.session_state.messages[-1]["role"] != "assistant":
         st.session_state.messages.append({"role": "assistant", "content": [""]})
 
-    # 核心生成与显示
+    # --- 2. 核心生成逻辑 ---
+    
+    # 【关键】用一个标志位来决定是否需要重试
+    should_retry = False
+    
     with st.chat_message("assistant"):
         with st.spinner("AI 正在思考中..."):
             placeholder = st.empty()
             
             try:
                 original_content = ""
-                content_list = st.session_state.messages[target_message_index]["content"]
-                if content_list and isinstance(content_list[0], str):
-                    original_content = content_list[0]
+                if st.session_state.messages[target_message_index]["content"]:
+                     original_content = st.session_state.messages[target_message_index]["content"][0]
                 
                 streamed_part = ""
                 for chunk in getAnswer():
                     streamed_part += chunk
                     placeholder.markdown(original_content + streamed_part + "▌")
                 
-                # 成功后，将完整内容写入state
                 full_response = original_content + streamed_part
                 st.session_state.messages[target_message_index]["content"][0] = full_response
-                placeholder.markdown(full_response) # 最终显示，去掉光标
-                st.session_state.auto_continue_count = 0
+                placeholder.markdown(full_response)
+                st.session_state.auto_continue_count = 0 # 成功后重置
 
             except Exception as e:
                 MAX_AUTO_CONTINUE = 2
@@ -2522,24 +2523,35 @@ if st.session_state.is_generating:
                     if is_continuation_task: st.session_state.messages.pop()
                     st.session_state.messages.append({"role": "user", "content": [continue_prompt], "temp": True, "is_continue_prompt": True, "target_index": target_message_index})
                     
-                    # 触发重试的rerun是正确的，因为它需要重启生成流程
-                    st.rerun()
+                    # 【关键】只设置标志，不立即rerun
+                    should_retry = True
                 else:
                     st.error(f"自动续写 {MAX_AUTO_CONTINUE} 次后仍然失败。请手动继续。错误: {e}")
                     st.session_state.auto_continue_count = 0
     
-    # --- 清理工作 ---
+    # --- 3. 统一的出口逻辑 ---
+    
+    # 清理临时的续写prompt (无论如何都执行)
     if is_continuation_task:
         st.session_state.messages.pop()
-    if st.session_state.messages and not st.session_state.messages[-1]["content"][0].strip():
+        
+    # 如果 assistant 消息为空, 则清理 (无论如何都执行)
+    if st.session_state.messages and st.session_state.messages[-1]['role'] == 'assistant' and not st.session_state.messages[-1]["content"][0].strip():
         st.session_state.messages.pop()
     
-    # 保存历史记录
+    # 保存历史记录 (无论如何都执行)
     with open(log_file, "wb") as f:
         pickle.dump(_prepare_messages_for_save(st.session_state.messages), f)
 
-    # 【核心！】只改变状态，不发命令！
-    st.session_state.is_generating = False
+    # 【核心】根据标志位决定下一步
+    if should_retry:
+        # 如果需要重试，is_generating 保持 True, 直接 rerun
+        st.rerun()
+    else:
+        # 如果不需要重试 (即成功或最终失败), 将 is_generating 设为 False
+        st.session_state.is_generating = False
+        # 然后 rerun 来应用这个最终状态，显示输入框
+        st.rerun()
 
 
 # --- 底部控件 ---
