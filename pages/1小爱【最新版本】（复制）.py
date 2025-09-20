@@ -2507,7 +2507,6 @@ if len(st.session_state.messages) >= 1 and not st.session_state.editing:
              st.columns(25)[0].button("♻️", key=f"regen_vision_{last_real_msg_idx}", help="重新生成", on_click=regenerate_message, args=(last_real_msg_idx,))
 
 
-
 # --- 核心交互逻辑 (主输入框 - 最终正确版) ---
 if not st.session_state.is_generating:
     if prompt := st.chat_input("输入你的消息...", key="main_chat_input", disabled=st.session_state.editing):
@@ -2523,7 +2522,7 @@ if not st.session_state.is_generating:
 
 
 # ==============================================================================
-# ★★★★★★★ 核心生成逻辑 (最终正确版 - 恢复并净化自动续写) ★★★★★★★
+# ★★★★★★★ 核心生成逻辑 (最终正确版 - 恢复自动续写) ★★★★★★★
 # ==============================================================================
 if st.session_state.is_generating:
 
@@ -2560,24 +2559,20 @@ if st.session_state.is_generating:
         st.session_state.is_generating = False
 
     except Exception as e:
-        # --- 4. 流式异常时 ---
+        # --- 4. 流式异常时 (您确认是正常工作的逻辑) ---
         MAX_AUTO_CONTINUE = 2
         if st.session_state.auto_continue_count < MAX_AUTO_CONTINUE:
             st.session_state.auto_continue_count += 1
+            st.toast(f"回答中断，正在尝试自动续写… (第 {st.session_state.auto_continue_count}/{MAX_AUTO_CONTINUE} 次)")
             
-            # 【净化】删除了这里引起崩溃的 st.toast
-            
-            # 准备续写prompt
             partial_content = st.session_state.messages[target_message_index]["content"][0] if st.session_state.messages[target_message_index]["content"] else ""
             last_chars = (partial_content[-50:] + "...") if len(partial_content) > 50 else partial_content
             continue_prompt = f"请严格地从以下文本的结尾处，无缝、自然地继续写下去。文本片段：\n\"...{last_chars}\""
             if is_continuation_task: st.session_state.messages.pop()
             st.session_state.messages.append({"role": "user", "content": [continue_prompt], "temp": True, "is_continue_prompt": True, "target_index": target_message_index})
             
-            # 【关键】这是唯一必要的rerun，用于干净地触发重试
             st.rerun()
         else:
-            # 最终失败
             with st.chat_message("assistant"):
                 st.error(f"自动续写 {MAX_AUTO_CONTINUE} 次后仍然失败。请手动继续。错误: {e}")
             st.session_state.auto_continue_count = 0
@@ -2585,18 +2580,15 @@ if st.session_state.is_generating:
 
     # --- 5. 统一的清理工作 (在不再生成时执行) ---
     if not st.session_state.is_generating:
-        # 清理临时的续写prompt
         if st.session_state.messages and st.session_state.messages[-1].get("is_continue_prompt"):
             st.session_state.messages.pop()
             
-        # 移除可能产生的空消息
         if st.session_state.messages and st.session_state.messages[-1]['role'] == 'assistant' and not st.session_state.messages[-1]["content"][0].strip():
             st.session_state.messages.pop()
         
-        # 保存历史记录
         with open(log_file, "wb") as f:
             pickle.dump(_prepare_messages_for_save(st.session_state.messages), f)
-
+     
 
 
 
