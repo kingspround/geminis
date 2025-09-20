@@ -2471,7 +2471,7 @@ if not st.session_state.is_generating:
 
 
 # ==============================================================================
-# ★★★★★★★ 核心生成逻辑 (最终正确版 - 无错误rerun) ★★★★★★★
+# ★★★★★★★ 核心生成逻辑 (最终正确版) ★★★★★★★
 # ==============================================================================
 if st.session_state.is_generating:
 
@@ -2504,9 +2504,8 @@ if st.session_state.is_generating:
         st.session_state.messages[target_message_index]["content"][0] = full_response
         placeholder.markdown(full_response)
         
-        # 成功后，重置计数器并改变状态
         st.session_state.auto_continue_count = 0
-        st.session_state.is_generating = False
+        st.session_state.is_generating = False # <--- 只改变状态
 
     except Exception as e:
         # --- 4. 流式异常时 ---
@@ -2514,7 +2513,7 @@ if st.session_state.is_generating:
         if st.session_state.auto_continue_count < MAX_AUTO_CONTINUE:
             st.session_state.auto_continue_count += 1
             
-            # 准备续写prompt
+            # 准备续写prompt (只改状态，不做UI操作)
             partial_content = st.session_state.messages[target_message_index]["content"][0] if st.session_state.messages[target_message_index]["content"] else ""
             last_chars = (partial_content[-50:] + "...") if len(partial_content) > 50 else partial_content
             continue_prompt = f"请严格地从以下文本的结尾处，无缝、自然地继续写下去。文本片段：\n\"...{last_chars}\""
@@ -2527,14 +2526,16 @@ if st.session_state.is_generating:
             # 最终失败
             st.error(f"自动续写 {MAX_AUTO_CONTINUE} 次后仍然失败。请手动继续。错误: {e}")
             st.session_state.auto_continue_count = 0
-            st.session_state.is_generating = False
+            st.session_state.is_generating = False # <--- 只改变状态
 
-    # --- 5. 统一的清理工作 (仅在不再生成时执行) ---
+    # --- 5. 统一的清理工作 (仅在生成不再进行时执行) ---
     # 无论是成功还是最终失败，is_generating都会变为False，这段代码都会在脚本自然结束前执行
     if not st.session_state.is_generating:
         # 清理临时的续写prompt
-        if st.session_state.messages and st.session_state.messages[-1].get("is_continue_prompt"):
-            st.session_state.messages.pop()
+        if is_continuation_task:
+            # 防御性检查，防止在重试循环中意外删除
+            if st.session_state.messages and st.session_state.messages[-1].get("is_continue_prompt"):
+                st.session_state.messages.pop()
             
         # 移除可能产生的空消息
         if st.session_state.messages and st.session_state.messages[-1]['role'] == 'assistant' and not st.session_state.messages[-1]["content"][0].strip():
@@ -2543,10 +2544,7 @@ if st.session_state.is_generating:
         # 保存历史记录
         with open(log_file, "wb") as f:
             pickle.dump(_prepare_messages_for_save(st.session_state.messages), f)
-        
-        # 【核心】这里不再有任何st.rerun()
-        # 脚本将在这里自然结束，Streamlit会安全地处理刷新
-
+    
 
 
 # --- 底部控件 ---
