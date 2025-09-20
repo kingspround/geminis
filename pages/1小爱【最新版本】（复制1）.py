@@ -98,11 +98,7 @@ if "use_token" not in st.session_state:
     st.session_state.use_token = False
 if "selected_voice" not in st.session_state:
     st.session_state.selected_voice = DEFAULT_VOICE_DISPLAY_NAME # 使用您在常量中定义的有效默认值
-if "generation_error" in st.session_state and st.session_state.generation_error:
-    st.error(st.session_state.generation_error)
-    # 显示后立即清除，这样它只会在本次刷新中出现一次
-    # 如果用户再次手动刷新页面，它就会消失
-    st.session_state.generation_error = None
+
 
 
 # --- 默认角色设定 ---
@@ -2523,7 +2519,7 @@ if not st.session_state.is_generating:
 
 
 # ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
-# ★★★ 核心生成逻辑 (保留Spinner，错误独立显示，UI可交互) ★★★
+# ★★★ 核心生成逻辑 (保留Spinner，错误以Toast弹窗形式显示，UI可交互) ★★★
 # ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
 if st.session_state.is_generating:
     is_continuation_task = st.session_state.messages and st.session_state.messages[-1].get("is_continue_prompt")
@@ -2538,54 +2534,66 @@ if st.session_state.is_generating:
             st.session_state.messages.append({"role": "assistant", "content": [""]})
             target_message_index = -1
         
-        if not (-len(st.session_state.messages) <= target_message_index < len(st.session_state.messages)):
-             # 使用新的错误处理机制
-             st.session_state.generation_error = "生成失败：续写目标消息索引无效。"
-             st.session_state.is_generating = False
-        else:
-            try:
-                # 【核心改动】将 spinner 放在 try 内部
-                with st.spinner("AI 正在思考中..."):
-                    original_content = ""
-                    real_idx = target_message_index if target_message_index != -1 else len(st.session_state.messages) - 1
-                    content_list = st.session_state.messages[real_idx]["content"]
-                    if content_list and isinstance(content_list[0], str):
-                        original_content = content_list[0]
-                    
-                    streamed_part = ""
-                    for chunk in getAnswer():
-                        streamed_part += chunk
-                        updated_full_content = original_content + streamed_part
-                        st.session_state.messages[real_idx]["content"][0] = updated_full_content
-                        placeholder.markdown(updated_full_content + "▌")
+        # 索引检查现在只在内部处理，如果出错会直接进入except
+        
+        try:
+            # Spinner 保证了在生成期间云服务不会认为程序空闲
+            with st.spinner("AI 正在思考中..."):
+                # 再次检查索引，以防万一
+                if not (-len(st.session_state.messages) <= target_message_index < len(st.session_state.messages)):
+                     raise ValueError("生成失败：续写目标消息索引无效。")
 
-                # 生成完成，正式定稿UI并停止
-                final_content = st.session_state.messages[real_idx]["content"][0]
-                placeholder.markdown(final_content)
-                st.session_state.is_generating = False 
-
-            except Exception as e:
-                # 【核心改动】发生错误时，不再修改聊天内容，而是将错误信息存入 session_state
-                st.session_state.generation_error = f"🔴 **生成中断**\n\n错误详情: `{e}`\n\n您可以尝试【♻️重新生成】或【➕继续】上一次的回答，或发起新的对话。"
+                original_content = ""
+                real_idx = target_message_index if target_message_index != -1 else len(st.session_state.messages) - 1
+                content_list = st.session_state.messages[real_idx]["content"]
+                if content_list and isinstance(content_list[0], str):
+                    original_content = content_list[0]
                 
-                # 关键：必须在这里踩下刹车，让UI恢复可操作状态
-                st.session_state.is_generating = False
+                streamed_part = ""
+                for chunk in getAnswer():
+                    streamed_part += chunk
+                    updated_full_content = original_content + streamed_part
+                    st.session_state.messages[real_idx]["content"][0] = updated_full_content
+                    placeholder.markdown(updated_full_content + "▌")
+
+            # 生成完成，正式定稿UI并停止
+            final_content = st.session_state.messages[real_idx]["content"][0]
+            placeholder.markdown(final_content)
+            st.session_state.is_generating = False 
+
+        except Exception as e:
+            # 【核心改动】使用 st.toast() 以弹窗形式显示错误
+            st.toast(
+                f"🔴 生成中断: {e}",
+                icon="⚠️"
+            )
             
-            finally:
-                # 无论成功或失败，都执行清理和保存
-                if is_continuation_task:
-                    if st.session_state.messages and st.session_state.messages[-1].get("is_continue_prompt"):
-                        st.session_state.messages.pop()
+            # 即使出错，也要把已生成的部分内容（如果有）更新到UI
+            # 这样用户可以看到中断发生在哪里
+            real_idx = target_message_index if target_message_index != -1 else len(st.session_state.messages) - 1
+            if -len(st.session_state.messages) <= real_idx < len(st.session_state.messages):
+                 current_content = st.session_state.messages[real_idx]["content"][0]
+                 placeholder.markdown(current_content) # 显示已生成的内容，不带光标
 
-                # 如果助手消息是空的（通常是因错误导致），则移除
-                if st.session_state.messages and st.session_state.messages[-1]['role'] == 'assistant' and not st.session_state.messages[-1]["content"][0].strip():
+            # 关键：踩下刹车，让UI恢复可操作状态
+            st.session_state.is_generating = False
+        
+        finally:
+            # 无论成功或失败，都执行清理和保存
+            if is_continuation_task:
+                if st.session_state.messages and st.session_state.messages[-1].get("is_continue_prompt"):
                     st.session_state.messages.pop()
-                
-                with open(log_file, "wb") as f:
-                    pickle.dump(_prepare_messages_for_save(st.session_state.messages), f)
-                
-                # 必须刷新一次，以便UI能根据最新的状态（is_generating=False, generation_error=True）进行重绘
-                st.experimental_rerun()
+
+            # 如果助手消息是空的（通常是因错误导致），则移除
+            if st.session_state.messages and st.session_state.messages[-1]['role'] == 'assistant' and not st.session_state.messages[-1]["content"][0].strip():
+                st.session_state.messages.pop()
+            
+            with open(log_file, "wb") as f:
+                pickle.dump(_prepare_messages_for_save(st.session_state.messages), f)
+            
+            # 必须刷新一次，以便UI能根据最新的状态（is_generating=False）进行重绘
+            # 这会移除 spinner, 让页面恢复正常交互状态
+            st.experimental_rerun()
 
 
 
