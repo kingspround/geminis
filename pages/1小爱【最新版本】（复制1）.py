@@ -2519,14 +2519,13 @@ if not st.session_state.is_generating:
 
 
 # ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
-# ★★★ 核心生成逻辑 (最终健壮版：保证Spinner在任何情况下都能正确退出) ★★★
+# ★★★ 核心生成逻辑 (最终健壮版 V2：修复Toast报错问题) ★★★
 # ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
 if st.session_state.is_generating:
     with st.chat_message("assistant"):
         placeholder = st.empty()
 
-        # 【核心改动】将 spinner 作为最外层包裹
-        # 这样无论内部发生什么，spinner 最终都会被移除
+        # 将 spinner 作为最外层包裹
         with st.spinner("AI 正在思考中..."):
             try:
                 is_continuation_task = st.session_state.messages and st.session_state.messages[-1].get("is_continue_prompt")
@@ -2554,26 +2553,25 @@ if st.session_state.is_generating:
                     st.session_state.messages[real_idx]["content"][0] = updated_full_content
                     placeholder.markdown(updated_full_content + "▌")
 
-                # 生成成功，显示最终内容
                 final_content = st.session_state.messages[real_idx]["content"][0]
                 placeholder.markdown(final_content)
                 st.session_state.is_generating = False 
 
             except Exception as e:
-                # 弹窗报错
-                st.toast(f"🔴 生成中断: {e}", icon="⚠️")
+                # 【核心修正】使用 type(e).__name__ 来安全地获取错误类型，防止toast自身报错
+                st.toast(f"🔴 生成中断，错误类型: {type(e).__name__}", icon="⚠️")
                 
                 # 在主界面显示已生成的部分内容（如果有）
-                real_idx = target_message_index if "target_message_index" in locals() and target_message_index != -1 else len(st.session_state.messages) - 1
+                real_idx = locals().get("target_message_index", -1)
+                if real_idx == -1: real_idx = len(st.session_state.messages) - 1
+
                 if -len(st.session_state.messages) <= real_idx < len(st.session_state.messages):
                      current_content = st.session_state.messages[real_idx]["content"][0]
                      placeholder.markdown(current_content)
                 
-                # 踩下刹车
                 st.session_state.is_generating = False
             
             finally:
-                # 清理和保存逻辑保持不变
                 is_continuation_task_finally = st.session_state.messages and st.session_state.messages[-1].get("is_continue_prompt")
                 if is_continuation_task_finally:
                     if st.session_state.messages and st.session_state.messages[-1].get("is_continue_prompt"):
@@ -2585,7 +2583,6 @@ if st.session_state.is_generating:
                 with open(log_file, "wb") as f:
                     pickle.dump(_prepare_messages_for_save(st.session_state.messages), f)
         
-        # 【核心改动】rerun() 在 spinner 完全退出后执行
         st.experimental_rerun()
 
 
