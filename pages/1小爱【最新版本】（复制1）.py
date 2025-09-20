@@ -2512,90 +2512,93 @@ if not st.session_state.is_generating:
 
 
 # ==============================================================================
-# ★★★★★★★ 核心生成逻辑 (最终耐心协议版) ★★★★★★★
-# 这个版本解决了快速刷新和对慢API不耐烦的核心问题。
-# 请用这段代码完整替换您原来的 if st.session_state.is_generating: 代码块。
-# ==============================================================================
+# ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
+# ★★★ 核心生成逻辑 (最终融合版：耐心协议 + 计数器容错) ★★★
+# ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
 if st.session_state.is_generating:
-    # --- 1. 初始化或恢复状态 ---
-    # 检查是否已经有一个正在进行的“对话通道”（生成器）
-    if "generator" not in st.session_state:
+    # --- 步骤 1: 初始化或恢复所有需要的状态 ---
+    if 'generator' not in st.session_state:
         st.session_state.generator = None
-    # 存储已经接收到的完整回复
-    if "full_response" not in st.session_state:
+    if 'full_response' not in st.session_state:
         st.session_state.full_response = ""
+    if 'auto_continue_count' not in st.session_state:
+        st.session_state.auto_continue_count = 0
+    if 'is_generating_stopped' not in st.session_state:
+        st.session_state.is_generating_stopped = False
 
-    # 确定续写任务和目标消息
-    is_continuation_task = st.session_state.messages[-1].get("is_continue_prompt", False)
+    # --- 步骤 2: 准备UI和目标消息 ---
+    is_continuation_task = st.session_state.messages and st.session_state.messages[-1].get("is_continue_prompt")
+    target_index = -1
+
     if is_continuation_task:
         target_index = st.session_state.messages[-1].get("target_index", -1)
-        # 续写任务开始时，将已有的内容作为初始内容
-        if not st.session_state.full_response: # 仅在第一次设置
+        # 第一次进入续写时，将原始内容加载到 full_response
+        if st.session_state.auto_continue_count == 0 and not st.session_state.full_response:
              st.session_state.full_response = st.session_state.messages[target_index]["content"][0]
-    else:
-        # 新任务，在消息列表中为AI的回复创建一个占位
-        if len(st.session_state.messages) == 0 or st.session_state.messages[-1].get("role") != "assistant":
-            st.session_state.messages.append({"role": "assistant", "content": [""]})
-        target_index = -1
+    elif not st.session_state.messages or st.session_state.messages[-1]["role"] != "assistant":
+        st.session_state.messages.append({"role": "assistant", "content": [""]})
 
-    # --- 2. 显示UI占位符 ---
     with st.chat_message("assistant"):
         placeholder = st.empty()
-        # 无论刷新多少次，都先显示当前已有的内容
-        placeholder.markdown(st.session_state.full_response + "▌")
+        placeholder.markdown(st.session_state.full_response + "▌") # 每次刷新都显示当前进度
 
-    # --- 3. 核心生成与处理逻辑 ---
-    try:
-        # 如果“对话通道”还未建立，则只建立一次
-        if st.session_state.generator is None:
-            # st.write("DEBUG: Creating new generator...") # 调试信息
-            st.session_state.generator = getAnswer(
-                is_continuation=is_continuation_task, 
-                target_idx=target_index
-            )
+    # --- 步骤 3: 核心循环，带有限重试的容错机制 ---
+    # 只有在生成流程未被手动停止时才执行
+    if not st.session_state.is_generating_stopped:
+        try:
+            # “耐心协议”：如果与AI的通道未建立，则只建立一次
+            if st.session_state.generator is None:
+                st.session_state.generator = getAnswer(is_continuation=is_continuation_task, target_idx=target_index)
 
-        # 持续从“对话通道”中拉取数据，直到它枯竭
-        for chunk in st.session_state.generator:
-            st.session_state.full_response += chunk
-            placeholder.markdown(st.session_state.full_response + "▌")
+            # “韧性”：持续从已建立的通道中拉取数据
+            for chunk in st.session_state.generator:
+                st.session_state.full_response += chunk
+                placeholder.markdown(st.session_state.full_response + "▌")
+                # 成功收到数据，重置重试计数器，表明网络是通的
+                st.session_state.auto_continue_count = 0
+            
+            # 如果for循环正常结束，说明生成完毕
+            st.session_state.is_generating_stopped = True # 标记为正常结束
 
-        # --- 4. 成功完成的清理工作 (当 for 循环正常结束) ---
-        # st.write("DEBUG: Generation successful.") # 调试信息
-        # 将最终的完整回复更新到消息列表中
+        except Exception as e:
+            # 只有在拉取数据时发生真实错误（网络中断等）才会进入这里
+            MAX_AUTO_CONTINUE = 3 # 增加到3次以应对网络抖动
+            st.session_state.auto_continue_count += 1
+
+            if st.session_state.auto_continue_count <= MAX_AUTO_CONTINUE:
+                st.toast(f"连接中断，1秒后尝试恢复... ({st.session_state.auto_continue_count}/{MAX_AUTO_CONTINUE})")
+                time.sleep(1) # 增加一个短暂的冷却，给网络恢复的时间
+                st.experimental_rerun() # 触发重试（会自动再次进入这个try块）
+            else:
+                st.error(f"自动恢复 {MAX_AUTO_CONTINUE} 次失败。请检查网络或手动继续。错误: {e}")
+                st.session_state.is_generating_stopped = True # 达到上限，标记为结束
+
+    # --- 步骤 4: 统一的善后处理 ---
+    # 只有在生成流程被标记为结束后（无论是成功还是失败）才执行
+    if st.session_state.is_generating_stopped:
+        # 更新最终内容到消息列表
         st.session_state.messages[target_index]["content"][0] = st.session_state.full_response
+        placeholder.markdown(st.session_state.full_response) # 去掉光标
 
-        # 如果是续写任务，移除临时的用户提示
-        if is_continuation_task:
-            st.session_state.messages.pop(-2) # 移除倒数第二个，即续写提示
-
-        # 如果AI返回空内容，清理占位消息
-        if not st.session_state.full_response.strip():
+        # 清理临时续写消息
+        if is_continuation_task and st.session_state.messages[-1].get("is_continue_prompt"):
+            st.session_state.messages.pop()
+        
+        # 清理AI返回的空消息
+        if st.session_state.messages and st.session_state.messages[-1]['role'] == 'assistant' and not st.session_state.full_response.strip():
             st.session_state.messages.pop()
 
-        # 保存记录并进行一次干净的刷新
+        # 保存聊天记录
         with open(log_file, "wb") as f:
             pickle.dump(_prepare_messages_for_save(st.session_state.messages), f)
-        
-        # 重置所有生成相关的状态
+
+        # ★★★ 清理并重置所有临时状态，为下一次生成做准备 ★★★
         st.session_state.is_generating = False
         del st.session_state.generator
         del st.session_state.full_response
-        st.experimental_rerun()
-
-    except Exception as e:
-        # --- 5. 真正发生错误时的处理逻辑 ---
-        # st.write(f"DEBUG: Exception caught: {e}") # 调试信息
-        # 在这里可以放置您的重试逻辑，但现在它只会在真实的网络错误或API错误时触发
-        st.error(f"生成过程中发生错误: {e}. 请检查API Key或网络连接后重试。")
-        
-        # 即使出错，也要重置状态，防止卡死
-        st.session_state.is_generating = False
-        if "generator" in st.session_state:
-            del st.session_state.generator
-        if "full_response" in st.session_state:
-            del st.session_state.full_response
-        st.experimental_rerun()
-
+        del st.session_state.auto_continue_count
+        del st.session_state.is_generating_stopped
+        st.experimental_rerun() # 进行最后一次干净的刷新
 
 
 
