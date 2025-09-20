@@ -2589,6 +2589,7 @@ if st.session_state.is_generating:
         with open(log_file, "wb") as f:
             pickle.dump(_prepare_messages_for_save(st.session_state.messages), f)
      
+     
 
 
 
