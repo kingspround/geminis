@@ -2427,14 +2427,15 @@ step3【贝叶斯决策步骤 3】【元素审查】, "紫色皮肤，大屁股�
 
 
 
-# --- 加载和显示聊天记录 (修改后以支持影片) ---
+# --- 加载和显示聊天记录 (最终修正版) ---
 if not st.session_state.messages and not st.session_state.is_generating: load_history(log_file)
 for i, message in enumerate(st.session_state.messages):
     if message.get("temp"): continue
     with st.chat_message(message["role"]):
         for part in message.get("content", []):
             if isinstance(part, str):
-                st.markdown(part, unsafe_allow_html=False)
+                # 【核心修正】允许在历史记录中渲染HTML，以正确显示错误信息
+                st.markdown(part, unsafe_allow_html=True)
             elif isinstance(part, Image.Image):
                 st.image(part, width=400)
             
@@ -2456,6 +2457,7 @@ for i, message in enumerate(st.session_state.messages):
                 mime="audio/wav",
                 key=f"download_audio_{i}" # 使用唯一key防止冲突
             )
+            
 
 				
 # --- 编辑界面显示逻辑 ---
