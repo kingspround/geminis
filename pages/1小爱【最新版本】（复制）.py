@@ -64,12 +64,6 @@ VOICE_OPTIONS = {
 }
 # 将默认声音设置为最可能的萝莉音
 DEFAULT_VOICE_DISPLAY_NAME = "Despina - Smooth"
-
-VOICE_OPTIONS = {
-    "默认语音": "some-voice-id-1",
-    "御姐音": "some-voice-id-2",
-    "萝莉音": "some-voice-id-3",
-    # ...
 }
 
 
