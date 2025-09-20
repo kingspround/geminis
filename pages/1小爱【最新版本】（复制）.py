@@ -2469,17 +2469,23 @@ if not st.session_state.is_generating:
         # 1. 将新消息添加到 session_state
         st.session_state.messages.append({"role": "user", "content": [full_prompt]})
         
-        # 2. 设置标志，告诉 Streamlit 在下一次刷新时开始生成
+        # 2. 【核心修正】在改变状态、触发刷新之前，立刻手动渲染用户的消息
+        with st.chat_message("user"):
+            st.markdown(full_prompt)
+            
+        # 3. 然后再设置状态，这将会自动触发一次安全的刷新
         st.session_state.is_generating = True
-        st.session_state.auto_continue_count = 0
+        st.session_state.auto_continue_count = 0 # 重置续写计数器
 
 
 # ==============================================================================
-# ★★★★★★★ 核心生成逻辑 (最终稳定版 - 彻底移除自动续写) ★★★★★★★
+# ★★★★★★★ 核心生成逻辑 (最终正确版 - 恢复自动续写) ★★★★★★★
 # ==============================================================================
 if st.session_state.is_generating:
 
     # --- 1. 准备工作 (不变) ---
+    if 'auto_continue_count' not in st.session_state:
+        st.session_state.auto_continue_count = 0
     is_continuation_task = st.session_state.messages and st.session_state.messages[-1].get("is_continue_prompt")
     target_message_index = -1
     if is_continuation_task:
@@ -2506,18 +2512,34 @@ if st.session_state.is_generating:
         st.session_state.messages[target_message_index]["content"][0] = full_response
         placeholder.markdown(full_response)
         
+        # 成功后，重置计数器并改变状态
+        st.session_state.auto_continue_count = 0
         st.session_state.is_generating = False
 
     except Exception as e:
         # --- 4. 流式异常时 ---
-        # 【核心】不再尝试自动续写。只显示错误，并干净地结束。
-        with st.chat_message("assistant"):
-            st.error(f"内容生成中断。请手动点击【继续】或【重新生成】。错误: {e}")
-        
-        st.session_state.is_generating = False
+        MAX_AUTO_CONTINUE = 2
+        if st.session_state.auto_continue_count < MAX_AUTO_CONTINUE:
+            st.session_state.auto_continue_count += 1
+            st.toast(f"回答中断，正在尝试自动续写… (第 {st.session_state.auto_continue_count}/{MAX_AUTO_CONTINUE} 次)")
+            
+            # 准备续写prompt
+            partial_content = st.session_state.messages[target_message_index]["content"][0] if st.session_state.messages[target_message_index]["content"] else ""
+            last_chars = (partial_content[-50:] + "...") if len(partial_content) > 50 else partial_content
+            continue_prompt = f"请严格地从以下文本的结尾处，无缝、自然地继续写下去。文本片段：\n\"...{last_chars}\""
+            if is_continuation_task: st.session_state.messages.pop()
+            st.session_state.messages.append({"role": "user", "content": [continue_prompt], "temp": True, "is_continue_prompt": True, "target_index": target_message_index})
+            
+            # 【关键】这是唯一必要的rerun，用于干净地触发重试
+            st.rerun()
+        else:
+            # 最终失败
+            with st.chat_message("assistant"):
+                st.error(f"自动续写 {MAX_AUTO_CONTINUE} 次后仍然失败。请手动继续。错误: {e}")
+            st.session_state.auto_continue_count = 0
+            st.session_state.is_generating = False
 
     # --- 5. 统一的清理工作 (在不再生成时执行) ---
-    # 无论是成功还是失败，is_generating都会变为False
     if not st.session_state.is_generating:
         # 清理临时的续写prompt
         if st.session_state.messages and st.session_state.messages[-1].get("is_continue_prompt"):
@@ -2530,7 +2552,8 @@ if st.session_state.is_generating:
         # 保存历史记录
         with open(log_file, "wb") as f:
             pickle.dump(_prepare_messages_for_save(st.session_state.messages), f)
-      
+
+
 
 
 # --- 底部控件 ---
