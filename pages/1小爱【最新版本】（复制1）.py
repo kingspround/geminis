@@ -2512,7 +2512,7 @@ if not st.session_state.is_generating:
 
 
 
-# ==============================================================================
+==============================================================================
 # ★★★★★★★ 核心生成逻辑 (最终正确版 - 修复您的原始代码) ★★★★★★★
 # ==============================================================================
 if st.session_state.is_generating:
@@ -2561,7 +2561,7 @@ if st.session_state.is_generating:
         MAX_AUTO_CONTINUE = 2
         if st.session_state.auto_continue_count < MAX_AUTO_CONTINUE:
             st.session_state.auto_continue_count += 1
-            st.warning(f"回答中断，正在尝试自动续写… (第 {st.session_state.auto_continue_count}/{MAX_AUTO_CONTINUE} 次)")
+            st.warning(f"回答中断，正在尝试自动续写… (第 {st.session_state.auto_continue_count}/{MAX_AUTO_CONTINUE} 次)") # 使用warning避免崩溃
             
             partial_content = st.session_state.messages[target_message_index]["content"][0] if st.session_state.messages[target_message_index]["content"] else ""
             last_chars = (partial_content[-50:] + "...") if len(partial_content) > 50 else partial_content
