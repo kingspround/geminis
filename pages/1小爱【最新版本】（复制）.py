@@ -99,7 +99,6 @@ if "use_token" not in st.session_state:
 if "selected_voice" not in st.session_state:
     st.session_state.selected_voice = DEFAULT_VOICE_DISPLAY_NAME # 使用您在常量中定义的有效默认值
 
-
 # --- 默认角色设定 ---
 DEFAULT_CHARACTER_SETTINGS = { "理外祝福": """【理外祝福】的核心概念：\n\n""" }
 
