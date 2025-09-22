@@ -6,4 +6,5 @@ aiohttp
 promise
 asyncio
 python-dotenv
-streamlit==1.24
+streamlit==1.49.1
+
