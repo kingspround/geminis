@@ -2552,12 +2552,12 @@ if not st.session_state.is_generating:
 
 
 # ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
-# ★★★ 核心生成逻辑 (已修复) ★★★
-# 1. 剔除了自动续写功能，改为直接报错并停止。
-# 2. 移除了 finally 块中的 st.experimental_rerun()，从根本上解决了生成时的无限刷新问题。
-#    页面会在 is_generating 状态改变后由 Streamlit 自动刷新，无需手动调用。
+# ★★★ 核心生成逻辑 (已加入更高层级的日志进行诊断) ★★★
 # ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
 if st.session_state.is_generating:
+    # --- 【诊断日志 #1】检查生成流程是否被触发 ---
+    print(f"--- [LOG at {datetime.now()}] --- Entered 'is_generating' block. Starting generation process.")
+
     is_continuation_task = st.session_state.messages and st.session_state.messages[-1].get("is_continue_prompt")
     
     with st.chat_message("assistant"):
@@ -2570,67 +2570,63 @@ if st.session_state.is_generating:
             elif not st.session_state.messages or st.session_state.messages[-1]["role"] != "assistant":
                 st.session_state.messages.append({"role": "assistant", "content": [""]})
             
-            # 检查索引有效性
             if not (-len(st.session_state.messages) <= target_message_index < len(st.session_state.messages)):
                  st.error("续写目标消息索引无效，已停止生成。")
                  st.session_state.is_generating = False
-                 # 在这种明确的配置错误下，手动刷新以确保UI停止加载状态
                  st.experimental_rerun()
             else:
                 full_response_content = ""
                 try:
-                    # 获取原始内容（如果是续写）
+                    # (获取原始内容的代码保持不变)
                     original_content = ""
                     content_list = st.session_state.messages[target_message_index]["content"]
                     if content_list and isinstance(content_list[0], str):
                         original_content = content_list[0]
                     
-                    # 流式生成
+                    # --- 【诊断日志 #2】检查 getAnswer 是否即将被调用 ---
+                    print(f"--- [LOG at {datetime.now()}] --- About to call getAnswer().")
+                    
                     streamed_part = ""
-                    for chunk in getAnswer():
+                    # 调用 getAnswer()
+                    for chunk in getAnswer(is_continuation=is_continuation_task, target_idx=target_message_index):
                         streamed_part += chunk
                         full_response_content = original_content + streamed_part
                         st.session_state.messages[target_message_index]["content"][0] = full_response_content
                         placeholder.markdown(full_response_content + "▌")
                     
-                    # 正常结束后，更新最终UI并标记生成结束
+                    # --- 【诊断日志 #3】检查 getAnswer 是否调用完成 ---
+                    print(f"--- [LOG at {datetime.now()}] --- Finished calling getAnswer().")
+                    
                     placeholder.markdown(full_response_content)
                     st.session_state.is_generating = False 
 
                 except Exception as e:
-                    # --- 【修复】剔除自动续写，改为直接报错并停止 ---
+                    # --- 【诊断日志 #4】捕获到异常 ---
+                    print(f"--- [ERROR LOG at {datetime.now()}] --- Exception caught in generation block: {e}")
+                    
                     st.error(f"回答生成时中断。请检查网络或API Key后，手动【继续】或【重新生成】。错误: {e}")
                     if full_response_content:
-                        # 即使出错，也保留已生成的部分内容
                         st.session_state.messages[target_message_index]["content"][0] = full_response_content
                         placeholder.markdown(full_response_content)
-                    # 关键：设置is_generating为False以停止任何循环
                     st.session_state.is_generating = False 
                 
                 finally:
-                    # --- 【修复】移除 st.experimental_rerun()，防止循环 ---
-                    # finally 块现在只负责清理和保存状态，不触发刷新
-
-                    # 如果是续写任务，完成后移除临时的用户提示
+                    # (finally 块的逻辑保持不变)
                     if is_continuation_task:
                         if st.session_state.messages and st.session_state.messages[-1].get("is_continue_prompt"):
                            st.session_state.messages.pop()
 
-                    # 如果最后一条助手消息是空的，也将其移除
                     if st.session_state.messages and st.session_state.messages[-1]['role'] == 'assistant':
                        content = st.session_state.messages[-1].get("content", [""])[0]
                        if not isinstance(content, str) or not content.strip():
                            st.session_state.messages.pop()
 
-                    # 无论成功或失败，都保存一次日志
                     with open(log_file, "wb") as f:
                         pickle.dump(_prepare_messages_for_save(st.session_state.messages), f)
                     
-                    # ★ 关键：在 try/except/finally 流程结束后，
-                    # Streamlit 会检测到 st.session_state.is_generating 的值从 True 变为 False，
-                    # 并在当前脚本运行结束后自动安排一次 rerun。这正是我们想要的行为。
-
-
+                    # --- 【诊断日志 #5】检查 finally 块是否执行完毕，即将 rerun ---
+                    print(f"--- [LOG at {datetime.now()}] --- Finally block finished. Preparing for rerun.")
+                    st.experimental_rerun()
 
 
 
