@@ -64,7 +64,8 @@ VOICE_OPTIONS = {
     "Algenib - Gravelly": "Algenib", "Rasalgethi - Practical": "Rasalgethi", "Achernar - Soft": "Achernar",
     "Alnilam - Firm": "Alnilam", "Schedar - Even": "Schedar", "Gacrux - Mature": "Gacrux",
     "Pulcherrima - Forward": "Pulcherrima", "Achird - Friendly": "Achird", "Zubenelgenubi - Casual": "Zubenelgenubi",
-    "Vindemiatrix - Gentle": "Vindemiatrix", "Sadaltager - Knowledgeable": "Sadaltager", "Sulafat - Warm": "Sulafat"
+    "Vindemiatrix - Gentle": "Vindemiatrix", "Sadaltager - Knowledgeable": "Sadaltager", "Sulafat - Warm": "Sulafat",
+    "默认语音": "Despina"
 }
 # 将默认声音设置为最可能的萝莉音
 DEFAULT_VOICE_DISPLAY_NAME = "Despina - Smooth"
@@ -100,19 +101,11 @@ if "sidebar_caption" not in st.session_state:
     st.session_state.sidebar_caption = ""
 if "use_token" not in st.session_state:
     st.session_state.use_token = False
-
-# --- 【修复】语音相关状态的初始化 ---
 if "selected_voice" not in st.session_state:
-    # 1. 初始化用户看到的【显示名称】
-    # 确保这里的默认值是 VOICE_OPTIONS 字典里的一个有效键
     default_voice_display_name = "默认语音" 
     st.session_state.selected_voice = default_voice_display_name
-
 if "tts_api_voice_name" not in st.session_state:
-    # 2. 【关键修复】根据上面的默认显示名称，初始化程序实际使用的【API名称】
-    # 这确保了即使回调函数从未运行，这个值也一定存在。
     st.session_state.tts_api_voice_name = VOICE_OPTIONS[st.session_state.selected_voice]
-	
 if 'last_error_message' not in st.session_state:
     st.session_state.last_error_message = None
 if 'last_debug_payload' not in st.session_state:
