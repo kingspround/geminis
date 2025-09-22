@@ -2577,7 +2577,6 @@ if prompt := st.chat_input("输入你的消息...", key="main_chat_input"):
 # 让 st.chat_input 来处理下一次的输入。
 # (这部分逻辑需要您确认是否需要，如果按钮也频繁出问题，我们就需要为按钮也创建一个类似的线性流程)
 
-
 # --- 底部控件 ---
 c1, c2 = st.columns(2)
 st.session_state.use_token = c1.checkbox("使用 Token", value=st.session_state.get("use_token", True))
