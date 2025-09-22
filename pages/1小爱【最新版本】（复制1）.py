@@ -2555,7 +2555,7 @@ if st.session_state.get("do_generation"):
                 
                 try:
                     # 【核心修正】将心跳间隔改为20秒
-                    time.sleep(20) 
+                    time.sleep(0.2) 
                     
                     # 真正的API调用发生在这里，next()会阻塞直到第一个chunk返回或出错
                     first_chunk = next(response_iterator)
