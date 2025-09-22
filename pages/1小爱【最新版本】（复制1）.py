@@ -294,24 +294,16 @@ def getAnswer(is_continuation=False, target_idx=-1):
 
 
 def regenerate_message(index):
+    """【停车场】准备重新生成的车辆，然后发出发车信号"""
     if 0 <= index < len(st.session_state.messages) and st.session_state.messages[index]["role"] == "assistant":
+        # 准备工作：截断历史记录
         st.session_state.messages = st.session_state.messages[:index]
-        st.session_state.is_generating = True
-        st.session_state.auto_continue_count = 0 # ★★★ 🔄 重置计数器 ★★★
-        st.experimental_rerun()
-
-        
+        # 发出“发车”信号
+        st.session_state.do_generation = True
 
 def continue_message(index):
-    """
-    【新版】此函数只负责两件事：
-    1. 在session_state中设置一个“续写目标”的标记。
-    2. 添加一条临时的、普通的用户消息来触发API。
-    """
-    # 标记：下一个AI回复的目标是拼接在第 `index` 条消息上
-    st.session_state.continuation_target_index = index
-
-    # 获取需要续写的文本片段，给AI一点上下文
+    """【停车场】准备续写的车辆，然后发出发车信号"""
+    # 准备工作1：获取上下文
     message_to_continue = st.session_state.messages[index]
     original_content = ""
     for part in message_to_continue.get("content", []):
@@ -319,16 +311,21 @@ def continue_message(index):
             original_content = part
             break
     last_chars = (original_content[-100:] + "...") if len(original_content) > 100 else original_content
-
-    # 创建一条临时的、普通的用户消息
+    
+    # 准备工作2：创建一条临时的、普通的用户消息
     continue_prompt = f"请严格地、无缝地从以下文本的结尾处继续写下去。不要重复任何内容，不要添加任何前言或解释，直接输出续写的内容即可。这是需要续写的文本片段：\n\"...{last_chars}\""
     
-    # 【重要】将这条临时消息追加到列表末尾
-    st.session_state.messages.append({"role": "user", "content": [continue_prompt], "is_temp_prompt": True})
+    # 准备工作3：打上标记，告诉“停车场”这是一个续写任务
+    st.session_state.messages.append({
+        "role": "user", 
+        "content": [continue_prompt], 
+        "is_continuation_prompt": True, # 标记这是续写指令
+        "target_index": index            # 标记续写的目标
+    })
 
-    # 触发生成流程
-    st.session_state.is_generating = True
-    # (注意：这里不需要 rerun，主循环会接管)
+    # 发出“发车”信号
+    st.session_state.do_generation = True
+
 
 
 # --- 【最终艺术创作版 V10】---
@@ -2530,70 +2527,71 @@ if not st.session_state.is_generating:
 
 
 # ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
-# ★★★ 核心生成逻辑 (最终修正版：隔离普通与续写，杜绝一切冲突) ★★★
+# ★★★ 核心逻辑 (最终版：完全遵循您的“主干道-停车场”模型) ★★★
 # ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
-if st.session_state.is_generating:
+
+# --- “车辆出发点” 1: 主输入框 ---
+if prompt := st.chat_input("输入你的消息...", key="main_chat_input"):
+    # 准备工作：将用户消息加入列表
+    st.session_state.messages.append({"role": "user", "content": [prompt]})
+    # 发出“发车”信号
+    st.session_state.do_generation = True
+
+
+# --- “主干道” 和 “停车场” ---
+# 检查“发车”信号
+if st.session_state.get("do_generation"):
+    # 信号已收到，立即销毁，保证单次执行
+    del st.session_state.do_generation
+
+    # 预处理：显示用户的最新消息（无论是新prompt还是续写指令）
+    last_user_message = st.session_state.messages[-1]
+    # 我们只显示非临时的用户消息
+    if not last_user_message.get("is_continuation_prompt"):
+        with st.chat_message("user"):
+            st.markdown(last_user_message["content"][0])
+    
+    # 进入主干道
     with st.chat_message("assistant"):
         placeholder = st.empty()
-        
         with st.spinner("AI 正在思考中..."):
             try:
-                # --- 1. 检查是否为续写任务，以此决定进入哪个【隔离】的处理流程 ---
-                is_continuation = "continuation_target_index" in st.session_state and st.session_state.continuation_target_index is not None
+                # 检查车辆类型（在进入主干道前）
+                is_continuation = st.session_state.messages[-1].get("is_continuation_prompt", False)
 
+                # 【API 主干道】
+                # getAnswer() 是纯净的，它只负责通行
+                full_response = ""
+                for chunk in getAnswer():
+                    full_response += chunk
+                    placeholder.markdown(full_response + "▌")
+                placeholder.markdown(full_response)
+
+                # 【专属停车场加工】
+                # 车辆已返回，根据类型进入不同停车位
                 if is_continuation:
-                    # --- 分支A: 【续写任务】的专属处理流程 ---
-                    full_response = ""
-                    target_idx = st.session_state.continuation_target_index
-                    original_text = st.session_state.messages[target_idx]["content"][0]
-
-                    for chunk in getAnswer():
-                        full_response += chunk
-                        # UI预览：只在内存中拼接，不修改session_state
-                        placeholder.markdown(original_text + full_response + "▌")
-
-                    # 【事后拼接】
-                    # a. 移除临时的续写指令
-                    if st.session_state.messages and st.session_state.messages[-1].get("is_temp_prompt"):
-                        st.session_state.messages.pop()
-                    # b. 将结果拼接到目标消息
+                    # 进入“续写”停车位
+                    target_idx = st.session_state.messages[-1].get("target_index")
+                    # 1. 移除临时的续写指令车辆
+                    st.session_state.messages.pop()
+                    # 2. 加工：执行拼接
                     st.session_state.messages[target_idx]["content"][0] += full_response
-                    
-                    # c. 更新最终UI
-                    placeholder.markdown(st.session_state.messages[target_idx]["content"][0])
-                    
                 else:
-                    # --- 分支B: 【普通消息】的专属处理流程 ---
-                    full_response = ""
-                    for chunk in getAnswer():
-                        full_response += chunk
-                        placeholder.markdown(full_response + "▌")
-                    
-                    # 【事后追加】
-                    placeholder.markdown(full_response)
+                    # 进入“新消息”停车位
+                    # 加工：执行追加
                     st.session_state.messages.append({"role": "assistant", "content": [full_response]})
 
-                # --- 成功路径的收尾工作 (对两个分支都适用) ---
-                st.session_state.is_generating = False
-                if "continuation_target_index" in st.session_state:
-                     st.session_state.continuation_target_index = None # 清理标记
+                # 所有车辆加工完毕，保存并刷新道路
                 with open(log_file, "wb") as f:
                     pickle.dump(_prepare_messages_for_save(st.session_state.messages), f)
                 st.experimental_rerun()
 
             except Exception as e:
-                # --- 失败路径 (对两个分支都适用) ---
+                # 【事故处理】
                 error_type_name = type(e).__name__
                 error_details = str(e.args) if e.args else "无更多细节"
-                st.error(f"**[ 🔴 生成中断 ]**\n\n**错误类型:** {error_type_name}\n\n**详情:** {error_details}")
-                
-                # 清理状态，防止卡死
-                st.session_state.is_generating = False
-                if "continuation_target_index" in st.session_state:
-                    st.session_state.continuation_target_index = None
-                if st.session_state.messages and st.session_state.messages[-1].get("is_temp_prompt"):
-                    st.session_state.messages.pop()
-                # 失败时不 rerun
+                st.error(f"**[ 🔴 车辆在主干道发生事故 ]**\n\n**事故类型:** {error_type_name}\n\n**详情:** {error_details}")
+                # 失败时不 rerun，保留事故现场
 
 
 # --- 底部控件 ---
