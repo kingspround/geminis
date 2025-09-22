@@ -285,7 +285,7 @@ def getAnswer(is_continuation=False, target_idx=-1):
     # 【【【【【 在这里添加唯一的黑匣子记录代码 】】】】】
     st.session_state.last_request_for_debug = final_contents
     
-    response = st.session_state.model.generate_content(contents=final_contents, stream=True
+    response = st.session_state.model.generate_content(contents=final_contents, stream=True)
 
 													   
     yielded_something = False
