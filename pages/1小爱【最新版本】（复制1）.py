@@ -77,6 +77,22 @@ SUPPORTED_VIDEO_TYPES = ['mp4', 'mov', 'avi', 'mpeg', 'mpg', 'webm', 'wmv']
 SUPPORTED_DOCUMENT_TYPES = ['pdf', 'txt', 'md', 'html', 'xml', 'py', 'json']
 
 
+# --- 模型核心配置 ---
+GENERATION_CONFIG = {
+  "temperature": 1.0,
+  "top_p": 0.95,
+  "top_k": 40,
+  "max_output_tokens": 8192,
+  "response_mime_type": "text/plain",
+}
+SAFETY_SETTINGS = [
+    {"category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_NONE"},
+    {"category": "HARM_CATEGORY_HATE_SPEECH", "threshold": "BLOCK_NONE"},
+    {"category": "HARM_CATEGORY_SEXUALLY_EXPLICIT", "threshold": "BLOCK_NONE"},
+    {"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_NONE"},
+]
+
+
 # ==============================================================================
 # 2. 所有 Session State 初始化
 # ==============================================================================
@@ -573,11 +589,29 @@ def send_video_interpretation_request():
 
 
 # --- 文件操作与功能函数 ---
+# 恢复动态文件名，因为它在临时文件系统中是合理的
 file = os.path.abspath(__file__)
 filename = os.path.splitext(os.path.basename(file))[0] + ".pkl"
 log_file = os.path.join(os.path.dirname(file), filename)
+
+# (确保文件存在)
 if not os.path.exists(log_file):
-    with open(log_file, "wb") as f: pass
+    with open(log_file, "wb") as f:
+        pass
+
+# 【保留】这个更健aqs的加载函数
+def load_history(log_file):
+    try:
+        with open(log_file, "rb") as f:
+            if os.path.getsize(log_file) > 0:
+                data = pickle.load(f)
+                if isinstance(data, list):
+                    st.session_state.messages = _reconstitute_messages_after_load(data)
+    except Exception as e:
+        st.error(f"读取临时历史记录失败：{e}")
+        st.session_state.messages = []
+
+
 
 
 # (调用这个函数的地方保持不变)
@@ -605,27 +639,16 @@ with st.sidebar:
     )
 
 	
-    # 2. 然后，再用这些刚刚被创建好的 session_state 变量进行配置
+    # --- 模型实例化逻辑 (已简化) ---
     genai.configure(api_key=API_KEYS[st.session_state.selected_api_key])
-
-    generation_config = {
-      "temperature": 1.0, "top_p": 0.95, "top_k": 40, "max_output_tokens": 8192,
-      "response_mime_type": "text/plain",
-    }
-    safety_settings = [
-        {"category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_NONE"},
-        {"category": "HARM_CATEGORY_HATE_SPEECH", "threshold": "BLOCK_NONE"},
-        {"category": "HARM_CATEGORY_SEXUALLY_EXPLICIT", "threshold": "BLOCK_NONE"},
-        {"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_NONE"},
-    ]
-
+    
     model_api_name = MODELS[st.session_state.selected_model_name]
     
-    # 3. 最后，创建模型实例
+    # 直接使用在顶部定义的常量
     st.session_state.model = genai.GenerativeModel(
       model_name=model_api_name,
-      generation_config=generation_config,
-      safety_settings=safety_settings,
+      generation_config=GENERATION_CONFIG, # <-- 使用常量
+      safety_settings=SAFETY_SETTINGS,     # <-- 使用常量
       system_instruction="""
 {
   "__SYSTEM_FRAMEWORK__": "Aesthetic_Concept_Desensitization_and_Refinement_Protocol_v9.0",
