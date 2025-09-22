@@ -213,10 +213,12 @@ def load_history(log_file):
             if isinstance(data, list): st.session_state.messages = _reconstitute_messages_after_load(data)
     except FileNotFoundError: pass
     except Exception as e: st.error(f"读取历史记录失败：{e}")
+
 def clear_history(log_file):
     st.session_state.messages.clear()
     if os.path.exists(log_file): os.remove(log_file)
-    st.success("历史记录已清除！")
+    st.toast("历史记录已清除！", icon="🗑️") # <--- 【修改】使用 st.toast
+
 def ensure_enabled_settings_exists():
     """
     确保 enabled_settings 与 character_settings 同步，并进行防御性检查。
@@ -2589,12 +2591,17 @@ display_last_message_actions()
 
 
 # --- 核心交互逻辑 (主输入框) ---
-if not st.session_state.is_generating:
+if st.session_state.is_generating:
+    # 【修改】当正在生成时，显示一个被禁用的、带有友好提示的输入框
+    st.chat_input("AI正在思考中，请稍候...", disabled=True)
+else:
+    # 当不在生成时，显示正常的输入框
     if prompt := st.chat_input("输入你的消息...", key="main_chat_input", disabled=st.session_state.editing):
         token = generate_token()
         full_prompt = f"{prompt} (token: {token})" if st.session_state.use_token else prompt
-        st.session_state.messages.append({"role": "user", "content": [full_prompt]})
-        st.session_state.is_generating = True
+        
+        # 直接调用我们重构好的通用发送函数
+        _send_user_message([full_prompt]) 
 
 
 # ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
