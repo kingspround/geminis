@@ -286,22 +286,11 @@ def getAnswer(is_continuation=False, target_idx=-1):
 
     final_contents = [msg for msg in history_to_send if msg.get("parts")]
 
-    # ==================== DEBUGGING BLOCK (网页UI部分) ====================
-    # 这部分保持不变，它用于在网页上显示将要发送的数据
-    with st.expander("【🐞 调试信息】发送给 API 的完整消息列表：", expanded=True):
-        st.warning("这部分内容仅用于调试，正常使用时可以删除。")
-        st.json(final_contents)
-
+    # --- 【美化修改】---
+    # 移除了在消息流中展开的 st.expander 调试UI。
+    # 我们只在后台静默地将数据存入“飞行记录仪”，供侧边栏使用。
     st.session_state.last_debug_payload = final_contents
-    # ========================================================================
-
-
-    # ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
-    # ★★★ 【黑匣子日志】这是新增的核心代码 ★★★
-    # ★★★ 在每次网络请求前，在【后台终端】打印一条带时间戳的日志 ★★★
-    # ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
-    print(f"--- [API CALL LOG at {datetime.now()}] --- Attempting to call Google API. Is continuation: {is_continuation_task}")
-
+    # ---------------------
 
     # 这是原始的API调用代码，保持不变
     response = st.session_state.model.generate_content(contents=final_contents, stream=True)
@@ -316,6 +305,7 @@ def getAnswer(is_continuation=False, target_idx=-1):
     
     if not yielded_something:
         yield ""
+
 
 def regenerate_message(index):
     if 0 <= index < len(st.session_state.messages) and st.session_state.messages[index]["role"] == "assistant":
