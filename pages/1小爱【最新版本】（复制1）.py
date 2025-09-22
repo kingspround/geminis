@@ -81,8 +81,6 @@ if "model" not in st.session_state:
     st.session_state.model = None
 if "selected_model_name" not in st.session_state:
     st.session_state.selected_model_name = DEFAULT_MODEL_NAME
-if "continue_task" not in st.session_state:
-    st.session_state.continue_task = None
 if "selected_api_key" not in st.session_state:
     st.session_state.selected_api_key = list(API_KEYS.keys())[0]
 if "messages" not in st.session_state:
@@ -101,11 +99,12 @@ if "sidebar_caption" not in st.session_state:
     st.session_state.sidebar_caption = ""
 if "use_token" not in st.session_state:
     st.session_state.use_token = False
+# --- 语音相关状态的初始化 (已优化) ---
 if "selected_voice" not in st.session_state:
-    default_voice_display_name = "默认语音" 
+    # 如果 selected_voice 不存在，我们就一次性把相关的两个状态都创建好
+    default_voice_display_name = "默认语音"
     st.session_state.selected_voice = default_voice_display_name
-if "tts_api_voice_name" not in st.session_state:
-    st.session_state.tts_api_voice_name = VOICE_OPTIONS[st.session_state.selected_voice]
+    st.session_state.tts_api_voice_name = VOICE_OPTIONS.get(default_voice_display_name, "Leda") # 使用.get()更安全
 if 'last_error_message' not in st.session_state:
     st.session_state.last_error_message = None
 if 'last_debug_payload' not in st.session_state:
@@ -311,7 +310,6 @@ def regenerate_message(index):
     if 0 <= index < len(st.session_state.messages) and st.session_state.messages[index]["role"] == "assistant":
         st.session_state.messages = st.session_state.messages[:index]
         st.session_state.is_generating = True
-        st.session_state.auto_continue_count = 0 # ★★★ 🔄 重置计数器 ★★★
         st.experimental_rerun()
 
         
@@ -331,7 +329,6 @@ def continue_message(index):
         # 标记为手动续写任务
         st.session_state.messages.append({"role": "user", "content": [new_prompt], "temp": True, "is_continue_prompt": True, "target_index": index})
         st.session_state.is_generating = True
-        st.session_state.auto_continue_count = 0 # ★★★ 🔄 重置计数器 ★★★
         st.experimental_rerun()
 
 
@@ -538,15 +535,6 @@ def send_video_interpretation_request():
         st.error(f"处理或上传影片时出错: {e}")
 		
 
-def get_api_history(is_continuation, original_text, target_idx):
-    if is_continuation:
-        history = [{"role": ("model" if m["role"] == "assistant" else "user"), "parts": m["content"]} for m in st.session_state.messages[:target_idx+1]]
-        last_chars = (original_text[-100:] + "...") if len(original_text) > 100 else original_text
-        continue_prompt = f"请严格地从以下文本的结尾处，无缝、自然地继续写下去。不要重复任何内容，不要添加任何前言或解释，直接输出续写的内容即可。文本片段：\n\"...{last_chars}\""
-        history.append({"role": "user", "parts": [continue_prompt]})
-        return history
-    else:
-        return None
 
 # --- 文件操作与功能函数 ---
 file = os.path.abspath(__file__)
@@ -2575,8 +2563,6 @@ if not st.session_state.is_generating:
         full_prompt = f"{prompt} (token: {token})" if st.session_state.use_token else prompt
         st.session_state.messages.append({"role": "user", "content": [full_prompt]})
         st.session_state.is_generating = True
-        st.session_state.auto_continue_count = 0 
-
 
 
 # ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
