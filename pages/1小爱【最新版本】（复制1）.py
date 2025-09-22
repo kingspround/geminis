@@ -2526,59 +2526,50 @@ if not st.session_state.is_generating:
         st.session_state.auto_continue_count = 0 
 
 
+
+
 # ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
-# ★★★ 核心逻辑 (最终版：完全遵循您的“主干道-停车场”模型) ★★★
+# ★★★ 核心生成逻辑 (最终正确版：加入UI节流，解决网页端429) ★★★
 # ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
-
-# --- “车辆出发点” 1: 主输入框 ---
-if prompt := st.chat_input("输入你的消息...", key="main_chat_input"):
-    # 准备工作：将用户消息加入列表
-    st.session_state.messages.append({"role": "user", "content": [prompt]})
-    # 发出“发车”信号
-    st.session_state.do_generation = True
-
-
-# --- “主干道” 和 “停车场” ---
-# 检查“发车”信号
 if st.session_state.get("do_generation"):
     # 信号已收到，立即销毁，保证单次执行
     del st.session_state.do_generation
 
-    # 预处理：显示用户的最新消息（无论是新prompt还是续写指令）
+    # 预处理：显示用户的最新消息
     last_user_message = st.session_state.messages[-1]
-    # 我们只显示非临时的用户消息
     if not last_user_message.get("is_continuation_prompt"):
         with st.chat_message("user"):
             st.markdown(last_user_message["content"][0])
     
-    # 进入主干道
     with st.chat_message("assistant"):
         placeholder = st.empty()
         with st.spinner("AI 正在思考中..."):
             try:
-                # 检查车辆类型（在进入主干道前）
                 is_continuation = st.session_state.messages[-1].get("is_continuation_prompt", False)
 
-                # 【API 主干道】
-                # getAnswer() 是纯净的，它只负责通行
+                # 【核心修正：UI节流】
                 full_response = ""
+                last_update_time = time.time()
+                update_interval = 0.1  # 每0.1秒最多更新一次UI
+
                 for chunk in getAnswer():
                     full_response += chunk
-                    placeholder.markdown(full_response + "▌")
+                    current_time = time.time()
+                    
+                    # 只有当时间间隔超过阈值时，才更新UI
+                    if current_time - last_update_time > update_interval:
+                        placeholder.markdown(full_response + "▌")
+                        last_update_time = current_time
+
+                # 【重要】循环结束后，进行最后一次最终的UI更新，确保所有内容都显示出来
                 placeholder.markdown(full_response)
 
                 # 【专属停车场加工】
-                # 车辆已返回，根据类型进入不同停车位
                 if is_continuation:
-                    # 进入“续写”停车位
                     target_idx = st.session_state.messages[-1].get("target_index")
-                    # 1. 移除临时的续写指令车辆
                     st.session_state.messages.pop()
-                    # 2. 加工：执行拼接
                     st.session_state.messages[target_idx]["content"][0] += full_response
                 else:
-                    # 进入“新消息”停车位
-                    # 加工：执行追加
                     st.session_state.messages.append({"role": "assistant", "content": [full_response]})
 
                 # 所有车辆加工完毕，保存并刷新道路
@@ -2587,10 +2578,9 @@ if st.session_state.get("do_generation"):
                 st.experimental_rerun()
 
             except Exception as e:
-                # 【事故处理】
                 error_type_name = type(e).__name__
                 error_details = str(e.args) if e.args else "无更多细节"
-                st.error(f"**[ 🔴 车辆在主干道发生事故 ]**\n\n**事故类型:** {error_type_name}\n\n**详情:** {error_details}")
+                st.error(f"**[ 🔴 事故处理 ]**\n\n**事故类型:** {error_type_name}\n\n**详情:** {error_details}")
                 # 失败时不 rerun，保留事故现场
 
 
