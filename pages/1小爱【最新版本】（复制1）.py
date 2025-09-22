@@ -2518,70 +2518,85 @@ if len(st.session_state.messages) >= 1 and not st.session_state.editing:
 
 
 # ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
-# ★★★ 核心逻辑 (最终正确版：彻底移除冲突源 st.spinner) ★★★
+# ★★★ 核心逻辑 (最终正确版：心跳间隔修正为20秒) ★★★
 # ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
-
-# 【【【【【 这是唯一需要保留的输入框和生成逻辑 】】】】】
 
 # --- “车辆出发点” 1: 主输入框 ---
 if prompt := st.chat_input("输入你的消息...", key="main_chat_input"):
-    # 准备工作：将用户消息加入列表
     st.session_state.messages.append({"role": "user", "content": [prompt]})
-    # 发出“发车”信号
     st.session_state.do_generation = True
 
 
 # --- “主干道” 和 “停车场” ---
-# 检查“发车”信号
 if st.session_state.get("do_generation"):
-    # 信号已收到，立即销毁，保证单次执行
     del st.session_state.do_generation
 
-    # 预处理：显示用户的最新消息（无论是新prompt还是续写指令）
     last_user_message = st.session_state.messages[-1]
-    # 我们只显示非临时的用户消息
     if not last_user_message.get("is_continuation_prompt"):
         with st.chat_message("user"):
             st.markdown(last_user_message["content"][0])
     
-    # 进入主干道
     with st.chat_message("assistant"):
         placeholder = st.empty()
-        # 【最终修正】使用手动的加载提示，替换掉 st.spinner
-        placeholder.markdown("AI 正在思考中...")
+        
         try:
-            # 检查车辆类型（在进入主干道前）
+            # --- 手动心跳与获取第一个数据块 ---
             is_continuation = st.session_state.messages[-1].get("is_continuation_prompt", False)
-
-            # 【API 主干道】
+            response_iterator = iter(getAnswer())
+            
+            first_chunk_received = False
             full_response = ""
-            for chunk in getAnswer():
+            animation_chars = ["...", ".. .", ". ..", " ..."]
+            animation_index = 0
+            
+            while not first_chunk_received:
+                placeholder.markdown(f"AI 正在思考中{animation_chars[animation_index]}")
+                animation_index = (animation_index + 1) % len(animation_chars)
+                
+                try:
+                    # 【核心修正】将心跳间隔改为20秒
+                    time.sleep(20) 
+                    
+                    # 真正的API调用发生在这里，next()会阻塞直到第一个chunk返回或出错
+                    first_chunk = next(response_iterator)
+                    full_response += first_chunk
+                    first_chunk_received = True
+                except StopIteration:
+                    first_chunk_received = True
+                    break
+
+            # --- 第一个数据块已收到，开始正常的流式显示 ---
+            placeholder.markdown(full_response + "▌")
+            for chunk in response_iterator:
                 full_response += chunk
                 placeholder.markdown(full_response + "▌")
+            
             placeholder.markdown(full_response)
 
-            # 【专属停车场加工】
+            # --- 专属停车场加工 ---
             if is_continuation:
                 target_idx = st.session_state.messages[-1].get("target_index")
-                # 1. 移除临时的续写指令车辆
                 st.session_state.messages.pop()
-                # 2. 加工：执行拼接
                 st.session_state.messages[target_idx]["content"][0] += full_response
             else:
-                # 加工：执行追加
                 st.session_state.messages.append({"role": "assistant", "content": [full_response]})
 
-            # 所有车辆加工完毕，保存并刷新道路
             with open(log_file, "wb") as f:
                 pickle.dump(_prepare_messages_for_save(st.session_state.messages), f)
             st.experimental_rerun()
 
         except Exception as e:
-            # 【事故处理】
             error_type_name = type(e).__name__
             error_details = str(e.args) if e.args else "无更多细节"
-            st.error(f"**[ 🔴 车辆在主干道发生事故 ]**\n\n**事故类型:** {error_type_name}\n\n**详情:** {error_details}")
+            st.error(f"""
+                **[ 🔴 生成中断 ]**\n
+                **错误类型:** {error_type_name}\n
+                **详情:** {error_details}\n
+                您可以尝试【♻️重新生成】或【➕继续】。
+            """)
             # 失败时不 rerun，保留事故现场
+
+
 
 
 # --- 底部控件 ---
