@@ -12,6 +12,7 @@ import wave
 import time
 from datetime import datetime
 import logging
+import traceback
 
 # ==============================================================================
 # 1. 所有常量定义 (Constants)
@@ -99,18 +100,16 @@ if "sidebar_caption" not in st.session_state:
     st.session_state.sidebar_caption = ""
 if "use_token" not in st.session_state:
     st.session_state.use_token = False
-
-# --- 【修复】语音相关状态的初始化 ---
 if "selected_voice" not in st.session_state:
-    # 1. 初始化用户看到的【显示名称】
-    # 确保这里的默认值是 VOICE_OPTIONS 字典里的一个有效键
     default_voice_display_name = "默认语音" 
     st.session_state.selected_voice = default_voice_display_name
-
 if "tts_api_voice_name" not in st.session_state:
-    # 2. 【关键修复】根据上面的默认显示名称，初始化程序实际使用的【API名称】
-    # 这确保了即使回调函数从未运行，这个值也一定存在。
     st.session_state.tts_api_voice_name = VOICE_OPTIONS[st.session_state.selected_voice]
+if 'last_error_message' not in st.session_state:
+    st.session_state.last_error_message = None
+if 'last_debug_payload' not in st.session_state:
+    st.session_state.last_debug_payload = None
+	
 
 # --- 默认角色设定 ---
 DEFAULT_CHARACTER_SETTINGS = { "理外祝福": """【理外祝福】的核心概念：\n\n""" }
@@ -291,6 +290,8 @@ def getAnswer(is_continuation=False, target_idx=-1):
     with st.expander("【🐞 调试信息】发送给 API 的完整消息列表：", expanded=True):
         st.warning("这部分内容仅用于调试，正常使用时可以删除。")
         st.json(final_contents)
+
+    st.session_state.last_debug_payload = final_contents
     # ========================================================================
 
 
@@ -2463,7 +2464,38 @@ step3【贝叶斯决策步骤 3】【元素审查】, "紫色皮肤，大屁股�
         )
 
 
+# --- 【新增】“飞行记录仪”UI ---
+# 检查是否有错误，来决定默认是否展开
+expander_is_open = st.session_state.last_error_message is not None
 
+with st.expander("🐞 上次运行日志 (Last Run Log)", expanded=expander_is_open):
+
+    # 清除日志的回调函数
+    def clear_last_run_logs():
+        st.session_state.last_error_message = None
+        st.session_state.last_debug_payload = None
+
+    st.button("清除日志 🗑️", on_click=clear_last_run_logs, use_container_width=True)
+
+    st.markdown("---") # 分割线
+
+    # 显示最后一次的错误信息
+    if st.session_state.last_error_message:
+        st.error("捕获到错误 (Error Captured):")
+        # 使用 markdown 来更好地格式化显示
+        st.markdown(st.session_state.last_error_message)
+    else:
+        st.success("上次运行成功，无错误记录。")
+
+    st.markdown("---") # 分割线
+
+    # 显示最后一次发送的数据
+    if st.session_state.last_debug_payload:
+        st.info("发送给API的最后一份数据 (Last Payload Sent to API):")
+        st.json(st.session_state.last_debug_payload, expanded=False)
+    else:
+        # 初始状态下没有数据
+        st.info("尚未记录任何发送数据。")
 
 
 
@@ -2562,10 +2594,9 @@ if not st.session_state.is_generating:
 
 
 # ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
-# ★★★ 最终版核心生成逻辑 (使用 logging 模块) ★★★
+# ★★★ 最终版核心生成逻辑 (已集成“飞行记录仪”日志记录) ★★★
 # ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
 if st.session_state.is_generating:
-    # --- 【诊断日志 #1】
     logging.warning(f"--- [DIAGNOSTIC LOG at {datetime.now()}] --- Entered 'is_generating' block.")
 
     is_continuation_task = st.session_state.messages and st.session_state.messages[-1].get("is_continue_prompt")
@@ -2587,12 +2618,15 @@ if st.session_state.is_generating:
             else:
                 full_response_content = ""
                 try:
+                    # --- 在开始生成前，先清除上一次可能存在的旧错误信息 ---
+                    # 这样做可以避免在流式输出过程中，侧边栏还显示着上一次的错误
+                    st.session_state.last_error_message = None
+                    
                     original_content = ""
                     content_list = st.session_state.messages[target_message_index]["content"]
                     if content_list and isinstance(content_list[0], str):
                         original_content = content_list[0]
                     
-                    # --- 【诊断日志 #2】
                     logging.warning(f"--- [DIAGNOSTIC LOG at {datetime.now()}] --- About to call getAnswer().")
                     
                     streamed_part = ""
@@ -2602,24 +2636,50 @@ if st.session_state.is_generating:
                         st.session_state.messages[target_message_index]["content"][0] = full_response_content
                         placeholder.markdown(full_response_content + "▌")
                     
-                    # --- 【诊断日志 #3】
                     logging.warning(f"--- [DIAGNOSTIC LOG at {datetime.now()}] --- Finished calling getAnswer().")
                     
+                    # 成功生成的最后
                     placeholder.markdown(full_response_content)
                     st.session_state.is_generating = False 
+                    
+                    # --- 【步骤 3.B - 成功部分】---
+                    # 成功运行后，再次确认清除旧的错误记录，确保状态正确
+                    st.session_state.last_error_message = None
 
                 except Exception as e:
-                    # --- 【诊断日志 #4】
-                    logging.error(f"--- [ERROR LOG at {datetime.now()}] --- Exception caught: {e}", exc_info=True)
+                    # --- 【步骤 3.B - 失败部分】---
+                    # 捕获并保存详细的错误信息到“飞行记录仪”
+                    error_type = type(e).__name__
+                    error_details = str(e)
+                    full_traceback = traceback.format_exc() # 获取完整的错误堆栈
+
+                    # 格式化成易于阅读的 Markdown 文本
+                    formatted_error = f"""
+**类型 (Type):** `{error_type}`
+
+**详情 (Details):**
+```
+{error_details}
+```
+
+**完整追溯 (Traceback):**
+```
+{full_traceback}
+```
+                    """
+                    # 存入“飞行记录仪”
+                    st.session_state.last_error_message = formatted_error
                     
-                    st.error(f"回答生成时中断。错误: {e}")
+                    # (下面是您原有的错误处理代码)
+                    logging.error(f"--- [ERROR LOG at {datetime.now()}] --- Exception caught: {e}", exc_info=True)
+                    st.error(f"回答生成时中断。错误详情请查看侧边栏日志。")
                     if full_response_content:
                         st.session_state.messages[target_message_index]["content"][0] = full_response_content
                         placeholder.markdown(full_response_content)
                     st.session_state.is_generating = False 
                 
                 finally:
-                    # (清理临时消息的代码保持不变)
+                    # (finally 块的逻辑保持不变)
                     if is_continuation_task and st.session_state.messages and st.session_state.messages[-1].get("is_continue_prompt"):
                        st.session_state.messages.pop()
 
@@ -2631,10 +2691,8 @@ if st.session_state.is_generating:
                     with open(log_file, "wb") as f:
                         pickle.dump(_prepare_messages_for_save(st.session_state.messages), f)
                     
-                    # --- 【诊断日志 #5】
-                    logging.warning(f"--- [DIAGNOSTIC LOG at {datetime.now()}] --- Finally block finished. Preparing for rerun.")
+                    logging.warning(f"--- [DIAGNOGSTIC LOG at {datetime.now()}] --- Finally block finished. Preparing for rerun.")
                     
-                    # 【重要】请务必保留这一行，它是保证应用状态正确的关键
                     st.experimental_rerun()
 
 
