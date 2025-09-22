@@ -2611,7 +2611,7 @@ if st.session_state.is_generating:
                     # ★ 关键：在 try/except/finally 流程结束后，
                     # Streamlit 会检测到 st.session_state.is_generating 的值从 True 变为 False，
                     # 并在当前脚本运行结束后自动安排一次 rerun。这正是我们想要的行为。
-                    st.experimental_rerun()
+
 
 
 
