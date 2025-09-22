@@ -391,20 +391,23 @@ def display_last_message_actions():
         last_msg["content"][0].strip()
     )
 
-    with st.container():
-        cols = st.columns(25)
-        if is_text_only_assistant:
-            # 文本消息有4个按钮
-            if cols[0].button("✏️", key=f"edit_{last_real_msg_idx}", help="编辑"): 
-                st.session_state.editable_index = last_real_msg_idx
-                st.session_state.editing = True
-                st.experimental_rerun()
-            cols[1].button("♻️", key=f"regen_{last_real_msg_idx}", help="重新生成", on_click=regenerate_message, args=(last_real_msg_idx,))
-            cols[2].button("➕", key=f"cont_{last_real_msg_idx}", help="继续", on_click=continue_message, args=(last_real_msg_idx,))
-            cols[3].button("🔊", key=f"tts_{last_real_msg_idx}", help="生成语音", on_click=generate_speech_for_message, args=(last_real_msg_idx,))
-        elif last_msg["role"] == "assistant":
-            # 非文本的助手消息（如图片）只有重生成按钮
-            cols[0].button("♻️", key=f"regen_vision_{last_real_msg_idx}", help="重新生成", on_click=regenerate_message, args=(last_real_msg_idx,))
+    # 使用 st.columns(spec) 来精确定义列宽比例，并使用 gap 控制间距
+    # [1, 1, 1, 1, 15] 表示前4个按钮各占1份宽度，剩下的空间占15份
+    col1, col2, col3, col4, _ = st.columns([1, 1, 1, 1, 15], gap="small")
+
+    if is_text_only_assistant:
+        # 文本消息有4个按钮，分别放在前4列
+        if col1.button("✏️", key=f"edit_{last_real_msg_idx}", help="编辑"): 
+            st.session_state.editable_index = last_real_msg_idx
+            st.session_state.editing = True
+            st.experimental_rerun()
+        col2.button("♻️", key=f"regen_{last_real_msg_idx}", help="重新生成", on_click=regenerate_message, args=(last_real_msg_idx,))
+        col3.button("➕", key=f"cont_{last_real_msg_idx}", help="继续", on_click=continue_message, args=(last_real_msg_idx,))
+        col4.button("🔊", key=f"tts_{last_real_msg_idx}", help="生成语音", on_click=generate_speech_for_message, args=(last_real_msg_idx,))
+    elif last_msg["role"] == "assistant":
+        # 非文本消息只有一个按钮，放在第1列
+        col1.button("♻️", key=f"regen_vision_{last_real_msg_idx}", help="重新生成", on_click=regenerate_message, args=(last_real_msg_idx,))
+
 
 
 # --- 【最终艺术创作版 V10】---
