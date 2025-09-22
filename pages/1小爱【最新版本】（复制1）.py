@@ -272,17 +272,17 @@ def getAnswer(is_continuation=False, target_idx=-1):
 
 
     final_contents = [msg for msg in history_to_send if msg.get("parts")]
-# ==================== DEBUGGING BLOCK START ====================
-# 为了调试，我们在实际发送前，将最终要发送给 API 的内容完整地展示在 Streamlit 界面上
-with st.expander("【🐞 调试信息】发送给 API 的完整消息列表：", expanded=True):
-    st.warning("这部分内容仅用于调试，正常使用时可以删除。")
-    st.json(final_contents) # st.json 会以非常清晰的格式展示整个列表和字典结构
-# ===================== DEBUGGING BLOCK END =====================
 
-# ↓↓↓ 这是原来的代码，保持不变 ↓↓↓
-response = st.session_state.model.generate_content(contents=final_contents, stream=True)
+    # ==================== DEBUGGING BLOCK START ====================
+    # 为了调试，我们在实际发送前，将最终要发送给 API 的内容完整地展示在 Streamlit 界面上
+    with st.expander("【🐞 调试信息】发送给 API 的完整消息列表：", expanded=True):
+        st.warning("这部分内容仅用于调试，正常使用时可以删除。")
+        st.json(final_contents) # st.json 会以非常清晰的格式展示整个列表和字典结构
+    # ===================== DEBUGGING BLOCK END =====================
 
-
+    response = st.session_state.model.generate_content(contents=final_contents, stream=True)
+    
+    # --- 【修复】确保以下代码的缩进是正确的，与上面的 response 在同一级别 ---
     yielded_something = False
     for chunk in response:
         try:
