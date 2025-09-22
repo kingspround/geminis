@@ -339,7 +339,7 @@ def regenerate_message(index):
     if 0 <= index < len(st.session_state.messages) and st.session_state.messages[index]["role"] == "assistant":
         st.session_state.messages = st.session_state.messages[:index]
         st.session_state.is_generating = True
-        st.experimental_rerun()
+        st.rerun()
 
         
 
@@ -358,7 +358,7 @@ def continue_message(index):
         # 标记为手动续写任务
         st.session_state.messages.append({"role": "user", "content": [new_prompt], "temp": True, "is_continue_prompt": True, "target_index": index})
         st.session_state.is_generating = True
-        st.experimental_rerun()
+        st.rerun()
 
 
 def display_last_message_actions():
@@ -395,7 +395,7 @@ def display_last_message_actions():
         if col1.button("✏️", key=f"edit_{last_real_msg_idx}", help="编辑"): 
             st.session_state.editable_index = last_real_msg_idx
             st.session_state.editing = True
-            st.experimental_rerun()
+            st.rerun()
         col2.button("♻️", key=f"regen_{last_real_msg_idx}", help="重新生成", on_click=regenerate_message, args=(last_real_msg_idx,))
         col3.button("➕", key=f"cont_{last_real_msg_idx}", help="继续", on_click=continue_message, args=(last_real_msg_idx,))
         col4.button("🔊", key=f"tts_{last_real_msg_idx}", help="生成语音", on_click=generate_speech_for_message, args=(last_real_msg_idx,))
@@ -494,7 +494,7 @@ def _send_user_message(content_parts, clear_keys=None):
                 else:
                     st.session_state[key] = ""
     
-    st.experimental_rerun()
+    st.rerun()
 
 def send_from_sidebar_callback():
     uploaded_files = st.session_state.get("sidebar_uploader", [])
@@ -891,7 +891,7 @@ AI训练通过使用Danbooru的标签查找，获得一堆图片训练集，将�
 越在前面的词条的权重是越高的
 
 二、环境的宏大叙事（广角与全景）
-你需要先写一个背景（比如森林城镇海洋白色背景），然后用包括panorama  (全景：强调广阔场景，适合营造史诗感)，wide_shot  (广角镜头： 略微收缩的全景，依然能包含较多背景信息，让人物与环境融为一体)，very_wide_shot  (超广角： 略微收缩的广角镜头，更加狭窄)等等词条辅助。之后再添加你的人物
+你需要先写一个背景（比如森林城镇海洋白色背景），然后用包括panorama  (全景：强调广阔场景，适合营造史诗感)，wide_shot  (广角镜头： 略微收缩的全景，依然能包含较多背景信息，让人物与环境融为一体)，very_wide_shot  (超广角： 略微收缩的广角镜头，更加狭窄)等等词条辅助。之后再添加你的人物
 
 三、人物的完整展示与深情的“大头贴”与侧写（全身与中景与肖像与特写）
 最常见的是full body（全身像） , upper body（半身像） , close up（特写）具体可以尝试以下图片。
@@ -912,16 +912,16 @@ foot_focus， 1girl , forest（聚焦在脚上）
 观众互动与情绪
 即画面中的角色正在看向什么地方
 与POV主角的视线接触：
-facing_viewer (面向镜头) / looking_at_viewer (看向阅图者) / eye-contact (眼神接触): 你的角色正在直接“看着”屏幕外的你！这能大大增强作品的代入感和互动性
+facing_viewer (面向镜头) / looking_at_viewer (看向阅图者) / eye-contact (眼神接触): 你的角色正在直接“看着”屏幕外的你！这能大大增强作品的代入感和互动性
 
 直接控制眼神方向：
-looking_down (向下看) / looking_up (抬头看) / looking_back (回眸) / looking_away (看着别处) / looking_to_the_side (看向侧面) / looking_ahead (展望未来): 这些可以表达人物的情绪和她的所思所想，比如羞涩的低头，或自信的仰望。
+looking_down (向下看) / looking_up (抬头看) / looking_back (回眸) / looking_away (看着别处) / looking_to_the_side (看向侧面) / looking_ahead (展望未来): 这些可以表达人物的情绪和她的所思所想，比如羞涩的低头，或自信的仰望。
 looking_up，looking_to_the_side , looking_front ,1girl ，up body , white background, 侧面上面前面的角度
 
 通过控制头的位置控制角色的视线：
-head_tilt (歪头) / head_down (低头): 塑造史莱姆娘的可爱、好奇或内敛的形象。
+head_tilt (歪头) / head_down (低头): 塑造史莱姆娘的可爱、好奇或内敛的形象。
 用画面中的事物控制人物的眼神：
-looking_at_phone (看手机) / looking_at_animal (看着动物) / looking_at_mirror (照镜子) / looking_at_hand/hands (看着手/双手): 描绘角色与周围事物的互动。
+looking_at_phone (看手机) / looking_at_animal (看着动物) / looking_at_mirror (照镜子) / looking_at_hand/hands (看着手/双手): 描绘角色与周围事物的互动。
 
 构图（Composition）
 一、特殊构图
@@ -938,38 +938,38 @@ Pov作为主角：female_pov , pov_breasts , 1girl , skirt , white_background, s
 即借助画面中的内容进行构图，也可以理解为选择涩像机的位置。
 
 二、构图中的小“心机”（强调与偷看）
-例如：between_legs (强调两腿之间), between_breasts (突出胸部), midriff_peek (肚脐偷看), pussy_peek (浦西偷看), panty_peek (内裤偷看), pantyshot (内裤走光), upshirt (从衬衫下方瞥), upshorts (从裙底瞥), caught (被抓现行), upskirt (裙底视角)
+例如：between_legs (强调两腿之间), between_breasts (突出胸部), midriff_peek (肚脐偷看), pussy_peek (浦西偷看), panty_peek (内裤偷看), pantyshot (内裤走光), upshirt (从衬衫下方瞥), upshorts (从裙底瞥), caught (被抓现行), upskirt (裙底视角)
 涩像机在观察胖次：panty_peek , 1girl , close up ,white_background, 
 
 三、动态与变形（特殊构图）
-●dutch angle (倾斜角度): 让画面倾斜，营造出紧张、不稳定或动感的效果，给你的角色增添一丝不安或俏皮感！
-●dynamic_angle (动态角度): 让构图更具活力，适合表现运动中的角色。
-●cinematic_angle (电影角度): 赋予画面电影般的叙事感和史诗感。
-●foreshortening (透视法): 用于夸大近大远小的效果，让某些部分显得更突出或更有张力，超适合表现角色的独特身形哦！
-●vanishing_point (远景透视画法): 创建一个深远、有层次感的画面，引导观众视线。
-●fisheye (鱼眼镜头): 制造出广阔而扭曲的特殊效果，非常适合表现独特的环境或怪诞的角色。
+●dutch angle (倾斜角度): 让画面倾斜，营造出紧张、不稳定或动感的效果，给你的角色增添一丝不安或俏皮感！
+●dynamic_angle (动态角度): 让构图更具活力，适合表现运动中的角色。
+●cinematic_angle (电影角度): 赋予画面电影般的叙事感和史诗感。
+●foreshortening (透视法): 用于夸大近大远小的效果，让某些部分显得更突出或更有张力，超适合表现角色的独特身形哦！
+●vanishing_point (远景透视画法): 创建一个深远、有层次感的画面，引导观众视线。
+●fisheye (鱼眼镜头): 制造出广阔而扭曲的特殊效果，非常适合表现独特的环境或怪诞的角色。
 
 02. 进阶篇1: 光影与色彩 (Lighting & Color)
 即控制画面中光源的位置和光照的效果，明暗，雾气和阴影等等效果。
-光线方向与强度： frontlight (正面光), sidelight (侧面光), backlight (背光), rim_light (边缘光), strong_rim_light (强边缘光), god_rays (自上而下的光线), light_rays (明亮的射线光束), ambient_light (环境光), specular_lighting (镜面高光/高亮), overexposure (过曝).
-自然光与氛围： sunlight (阳光), sunbeam (太阳光束), dappled_sunlight (斑驳的阳光), sunlight_filtering_through_trees (阳光透过树木), moonlight (月光), glowing_light (荧光), atrium (光线照射), sunrise (日出), sunset (日落), twilight (黄昏), golden_hour_lighting (黄金时段照明), against_backlight_at_dusk (傍晚背对阳光), night (晚上), full_moon (满月), cloudy (多云), in_the_rain (雨中), rainy_days (雨天).
-sun_light , shade  , 1girl , solo , Lean forward , backlight  , frontlight , cowboy shot, pov ,dutch angle, motion_blur  , head_tilt , white background ,
-色彩调性： light (亮的), dark (暗的), pale (苍白/薄), shade (阴影/树荫), intense_shadows (强阴影), deep (加深/浓), obscure (模糊), dim (昏暗/朦胧), shady (成荫的), dimly lit (昏暗), monochrome (单色), greyscale (灰度), partially_colored (部分着色), flat_color (色块), spot_color (纯色), halftone (半色调).
-特殊效果： see-through_silhouette (通过透光织物看轮廓), chromatic_aberration (色差/色失焦).
+光线方向与强度： frontlight (正面光), sidelight (侧面光), backlight (背光), rim_light (边缘光), strong_rim_light (强边缘光), god_rays (自上而下的光线), light_rays (明亮的射线光束), ambient_light (环境光), specular_lighting (镜面高光/高亮), overexposure (过曝).
+自然光与氛围： sunlight (阳光), sunbeam (太阳光束), dappled_sunlight (斑驳的阳光), sunlight_filtering_through_trees (阳光透过树木), moonlight (月光), glowing_light (荧光), atrium (光线照射), sunrise (日出), sunset (日落), twilight (黄昏), golden_hour_lighting (黄金时段照明), against_backlight_at_dusk (傍晚背对阳光), night (晚上), full_moon (满月), cloudy (多云), in_the_rain (雨中), rainy_days (雨天).
+sun_light , shade  , 1girl , solo , Lean forward , backlight  , frontlight , cowboy shot, pov ,dutch angle, motion_blur  , head_tilt , white background ,
+色彩调性： light (亮的), dark (暗的), pale (苍白/薄), shade (阴影/树荫), intense_shadows (强阴影), deep (加深/浓), obscure (模糊), dim (昏暗/朦胧), shady (成荫的), dimly lit (昏暗), monochrome (单色), greyscale (灰度), partially_colored (部分着色), flat_color (色块), spot_color (纯色), halftone (半色调).
+特殊效果： see-through_silhouette (通过透光织物看轮廓), chromatic_aberration (色差/色失焦).
 
 03. 进阶篇2: 镜头效果 (Camera Effects)
 这些词条就像是给你的画面加上了一层“魔法滤镜”，让它们更具有电影感和冲击力。
 一、聚焦与景深
-●close-up (特写): 将镜头无限拉近，聚焦人物面部的微小表情、她胸口的纹路，或是任何你想强调的微小细节，放大它的魅力！
-●macro_shot (微距摄像): 比特写更近，用于捕捉极小的细节。
-●depth of field (景深): 让你的人物清晰突出，而背景或前景变得模糊，营造出空间感和艺术美，引导观众看向主体。
-●bokeh (背景虚化 / 散景): 一种特殊的景深效果，让模糊的背景呈现出梦幻般的光斑，超适合营造浪漫或梦幻的氛围哦！
+●close-up (特写): 将镜头无限拉近，聚焦人物面部的微小表情、她胸口的纹路，或是任何你想强调的微小细节，放大它的魅力！
+●macro_shot (微距摄像): 比特写更近，用于捕捉极小的细节。
+●depth of field (景深): 让你的人物清晰突出，而背景或前景变得模糊，营造出空间感和艺术美，引导观众看向主体。
+●bokeh (背景虚化 / 散景): 一种特殊的景深效果，让模糊的背景呈现出梦幻般的光斑，超适合营造浪漫或梦幻的氛围哦！
 
 二、动感与光效
-●motion_blur (运动导致的模糊) / motion_lines (体现运动的线) / speed_lines (速度线): 强有力地表现人物的快速移动或剧烈动作，让画面充满活力！
-●lens_flare (镜头光晕): 模拟镜头前的光线折射，可以增加画面的梦幻感和真实感。
-●caustics (焦散): 模拟光线穿透水或玻璃后形成的复杂光斑，适合在水边的画面中加入哦！
-●chromatic_aberration (色差 / 色失焦): 制造轻微的色彩边缘分离效果，可以增加画面艺术感或某种“复古”或“ glitch”的风格。
+●motion_blur (运动导致的模糊) / motion_lines (体现运动的线) / speed_lines (速度线): 强有力地表现人物的快速移动或剧烈动作，让画面充满活力！
+●lens_flare (镜头光晕): 模拟镜头前的光线折射，可以增加画面的梦幻感和真实感。
+●caustics (焦散): 模拟光线穿透水或玻璃后形成的复杂光斑，适合在水边的画面中加入哦！
+●chromatic_aberration (色差 / 色失焦): 制造轻微的色彩边缘分离效果，可以增加画面艺术感或某种“复古”或“ glitch”的风格。
 
 04. 心得: 如何灵活运用这些魔法？
 
@@ -2396,7 +2396,7 @@ step3【贝叶斯决策步骤 3】【元素审查】, "紫色皮肤，大屁股�
             if c1.button("确认清除", key="clear_confirm"):
                 clear_history(log_file)
                 st.session_state.clear_confirmation = False
-                st.experimental_rerun()
+                st.rerun()
             if c2.button("取消", key="clear_cancel"):
                 st.session_state.clear_confirmation = False
         st.download_button("下载当前聊天记录 ⬇️", data=pickle.dumps(_prepare_messages_for_save(st.session_state.messages)), file_name=os.path.basename(log_file), mime="application/octet-stream")
@@ -2405,7 +2405,7 @@ step3【贝叶斯决策步骤 3】【元素审查】, "紫色皮肤，大屁股�
             try:
                 st.session_state.messages = _reconstitute_messages_after_load(pickle.load(uploaded_pkl))
                 st.success("成功读取本地pkl文件！")
-                st.experimental_rerun()
+                st.rerun()
             except Exception as e:
                 st.error(f"读取本地pkl文件失败：{e}")
 
@@ -2579,9 +2579,9 @@ if st.session_state.get("editing"):
         if c1.button("保存 ✅", key=f"save_{i}"):
             st.session_state.messages[i]["content"][0] = new_text
             with open(log_file, "wb") as f: pickle.dump(_prepare_messages_for_save(st.session_state.messages), f)
-            st.session_state.editing = False; st.experimental_rerun()
+            st.session_state.editing = False; st.rerun()
         if c2.button("取消 ❌", key=f"cancel_{i}"):
-            st.session_state.editing = False; st.experimental_rerun()
+            st.session_state.editing = False; st.rerun()
 
 
 # --- 显示最后一条消息的操作按钮 ---
@@ -2618,7 +2618,7 @@ if st.session_state.is_generating:
             if not (-len(st.session_state.messages) <= target_message_index < len(st.session_state.messages)):
                  st.error("续写目标消息索引无效，已停止生成。")
                  st.session_state.is_generating = False
-                 st.experimental_rerun()
+                 st.rerun()
             else:
                 full_response_content = ""
                 try:
@@ -2697,13 +2697,13 @@ if st.session_state.is_generating:
                     
                     logging.warning(f"--- [DIAGNOGSTIC LOG at {datetime.now()}] --- Finally block finished. Preparing for rerun.")
                     
-                    st.experimental_rerun()
+                    st.rerun()
 
 
 
 # --- 底部控件 ---
 c1, c2 = st.columns(2)
 st.session_state.use_token = c1.checkbox("使用 Token", value=st.session_state.get("use_token", True))
-if c2.button("🔄", key="page_refresh", help="刷新页面"): st.experimental_rerun()
+if c2.button("🔄", key="page_refresh", help="刷新页面"): st.rerun()
 
 	
