@@ -92,6 +92,11 @@ SAFETY_SETTINGS = [
     {"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_NONE"},
 ]
 
+# --- 应用核心配置 ---
+# API请求中包含的最大历史消息数量
+MAX_HISTORY_MESSAGES = 20
+
+
 
 # ==============================================================================
 # 2. 所有 Session State 初始化
@@ -295,7 +300,8 @@ def getAnswer(is_continuation=False, target_idx=-1):
     
     # 2. 构建聊天记录
     current_messages = st.session_state.get("messages", [])
-    history_to_include = current_messages[:target_idx + 1] if is_continuation else current_messages[-20:]
+    # 【修改】使用常量代替魔法数字-20
+    history_to_include = current_messages[:target_idx + 1] if is_continuation else current_messages[-MAX_HISTORY_MESSAGES:]
         
     for msg in history_to_include:
         if msg and msg.get("role") and msg.get("content"):
