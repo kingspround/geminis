@@ -11,7 +11,7 @@ from PIL import Image
 import wave
 import time
 from datetime import datetime
-
+import logging
 
 # ==============================================================================
 # 1. 所有常量定义 (Constants)
@@ -2550,13 +2550,12 @@ if not st.session_state.is_generating:
 
 
 
-
 # ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
-# ★★★ 核心生成逻辑 (已加入更高层级的日志进行诊断) ★★★
+# ★★★ 最终版核心生成逻辑 (使用 logging 模块) ★★★
 # ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
 if st.session_state.is_generating:
-    # --- 【诊断日志 #1】检查生成流程是否被触发 ---
-    print(f"--- [LOG at {datetime.now()}] --- Entered 'is_generating' block. Starting generation process.")
+    # --- 【诊断日志 #1】
+    logging.warning(f"--- [DIAGNOSTIC LOG at {datetime.now()}] --- Entered 'is_generating' block.")
 
     is_continuation_task = st.session_state.messages and st.session_state.messages[-1].get("is_continue_prompt")
     
@@ -2577,44 +2576,41 @@ if st.session_state.is_generating:
             else:
                 full_response_content = ""
                 try:
-                    # (获取原始内容的代码保持不变)
                     original_content = ""
                     content_list = st.session_state.messages[target_message_index]["content"]
                     if content_list and isinstance(content_list[0], str):
                         original_content = content_list[0]
                     
-                    # --- 【诊断日志 #2】检查 getAnswer 是否即将被调用 ---
-                    print(f"--- [LOG at {datetime.now()}] --- About to call getAnswer().")
+                    # --- 【诊断日志 #2】
+                    logging.warning(f"--- [DIAGNOSTIC LOG at {datetime.now()}] --- About to call getAnswer().")
                     
                     streamed_part = ""
-                    # 调用 getAnswer()
                     for chunk in getAnswer(is_continuation=is_continuation_task, target_idx=target_message_index):
                         streamed_part += chunk
                         full_response_content = original_content + streamed_part
                         st.session_state.messages[target_message_index]["content"][0] = full_response_content
                         placeholder.markdown(full_response_content + "▌")
                     
-                    # --- 【诊断日志 #3】检查 getAnswer 是否调用完成 ---
-                    print(f"--- [LOG at {datetime.now()}] --- Finished calling getAnswer().")
+                    # --- 【诊断日志 #3】
+                    logging.warning(f"--- [DIAGNOSTIC LOG at {datetime.now()}] --- Finished calling getAnswer().")
                     
                     placeholder.markdown(full_response_content)
                     st.session_state.is_generating = False 
 
                 except Exception as e:
-                    # --- 【诊断日志 #4】捕获到异常 ---
-                    print(f"--- [ERROR LOG at {datetime.now()}] --- Exception caught in generation block: {e}")
+                    # --- 【诊断日志 #4】
+                    logging.error(f"--- [ERROR LOG at {datetime.now()}] --- Exception caught: {e}", exc_info=True)
                     
-                    st.error(f"回答生成时中断。请检查网络或API Key后，手动【继续】或【重新生成】。错误: {e}")
+                    st.error(f"回答生成时中断。错误: {e}")
                     if full_response_content:
                         st.session_state.messages[target_message_index]["content"][0] = full_response_content
                         placeholder.markdown(full_response_content)
                     st.session_state.is_generating = False 
                 
                 finally:
-                    # (finally 块的逻辑保持不变)
-                    if is_continuation_task:
-                        if st.session_state.messages and st.session_state.messages[-1].get("is_continue_prompt"):
-                           st.session_state.messages.pop()
+                    # (清理临时消息的代码保持不变)
+                    if is_continuation_task and st.session_state.messages and st.session_state.messages[-1].get("is_continue_prompt"):
+                       st.session_state.messages.pop()
 
                     if st.session_state.messages and st.session_state.messages[-1]['role'] == 'assistant':
                        content = st.session_state.messages[-1].get("content", [""])[0]
@@ -2624,9 +2620,11 @@ if st.session_state.is_generating:
                     with open(log_file, "wb") as f:
                         pickle.dump(_prepare_messages_for_save(st.session_state.messages), f)
                     
-                    # --- 【诊断日志 #5】检查 finally 块是否执行完毕，即将 rerun ---
-                    print(f"--- [LOG at {datetime.now()}] --- Finally block finished. Preparing for rerun.")
-
+                    # --- 【诊断日志 #5】
+                    logging.warning(f"--- [DIAGNOSTIC LOG at {datetime.now()}] --- Finally block finished. Preparing for rerun.")
+                    
+                    # 【重要】请务必保留这一行，它是保证应用状态正确的关键
+                    st.experimental_rerun()
 
 
 
