@@ -2483,33 +2483,34 @@ step3【贝叶斯决策步骤 3】【元素审查】, "紫色皮肤，大屁股�
             st.info("尚未记录任何发送数据。")
 
 
-# --- 【新增】滚动到底部按钮 ---
-# 使用 st.components.v1.html 来注入一个带有固定位置的HTML按钮
-# 它的 onclick 事件会执行 JavaScript 来滚动页面
-st.components.v1.html("""
-<style>
-    .scroll-btn {
-        position: fixed;
-        bottom: 5rem; /* 调整按钮距离页面底部的距离 */
-        right: 1.5rem; /* 调整按钮距离页面右侧的距离 */
-        background-color: #007bff;
-        color: white;
-        border: none;
-        border-radius: 50%;
-        width: 50px;
-        height: 50px;
-        font-size: 24px;
-        cursor: pointer;
-        z-index: 1000;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-    }
-    .scroll-btn:hover {
-        background-color: #0056b3;
-    }
-</style>
-<button onclick="window.scrollTo(0, document.body.scrollHeight);" class="scroll-btn" title="滚动到底部">
-    ⬇️
-</button>
+# --- 【最终修复版】滚动到底部按钮 ---
+# 使用括号和单引号字符串，彻底避免多行字符串解析错误
+scroll_to_bottom_html = (
+    '<style>'
+    '.scroll-btn {'
+    '    position: fixed;'
+    '    bottom: 5rem;'
+    '    right: 1.5rem;'
+    '    background-color: #007bff;'
+    '    color: white;'
+    '    border: none;'
+    '    border-radius: 50%;'
+    '    width: 50px;'
+    '    height: 50px;'
+    '    font-size: 24px;'
+    '    cursor: pointer;'
+    '    z-index: 1000;'
+    '    box-shadow: 0 2px 5px rgba(0,0,0,0.2);'
+    '}'
+    '.scroll-btn:hover {'
+    '    background-color: #0056b3;'
+    '}'
+    '</style>'
+    '<button onclick="window.scrollTo(0, document.body.scrollHeight);" class="scroll-btn" title="滚动到底部">'
+    '    ⬇️'
+    '</button>'
+)
+st.components.v1.html(scroll_to_bottom_html, height=0)
 
 
 # --- 加载和显示聊天记录 (修改后以支持影片) ---
@@ -2577,15 +2578,18 @@ if len(st.session_state.messages) >= 1 and not st.session_state.editing:
 
         if is_text_only_assistant:
             with st.container():
-                # 【修改】增加列数以容纳新按钮
                 cols = st.columns(25) 
-                cols[0].button("✏️", key=f"edit_{last_real_msg_idx}", help="编辑") 
+                # 检查编辑按钮是否被点击
+                if cols[0].button("✏️", key=f"edit_{last_real_msg_idx}", help="编辑"): 
+                    st.session_state.editable_index = last_real_msg_idx
+                    st.session_state.editing = True
+                    st.experimental_rerun()
+                
                 cols[1].button("♻️", key=f"regen_{last_real_msg_idx}", help="重新生成", on_click=regenerate_message, args=(last_real_msg_idx,))
                 cols[2].button("➕", key=f"cont_{last_real_msg_idx}", help="继续", on_click=continue_message, args=(last_real_msg_idx,))
                 cols[3].button("🔊", key=f"tts_{last_real_msg_idx}", help="生成语音", on_click=generate_speech_for_message, args=(last_real_msg_idx,))
                 
-                # --- 【新增】滚动到顶部按钮 ---
-                # 使用 st.markdown 注入一个可以执行JS的HTML按钮
+                # 使用括号和单引号字符串，彻底避免多行字符串解析错误
                 scroll_to_top_html = (
                     '<style>'
                     '.stButton>button { '
@@ -2600,9 +2604,12 @@ if len(st.session_state.messages) >= 1 and not st.session_state.editing:
                     '</button>'
                 )
                 cols[4].markdown(scroll_to_top_html, unsafe_allow_html=True)
+
         elif last_msg["role"] == "assistant":
              st.columns(25)[0].button("♻️", key=f"regen_vision_{last_real_msg_idx}", help="重新生成", on_click=regenerate_message, args=(last_real_msg_idx,))
-			 
+
+
+
 
 # --- 核心交互逻辑 (主输入框) ---
 if not st.session_state.is_generating:
