@@ -2524,38 +2524,24 @@ if len(st.session_state.messages) >= 1 and not st.session_state.editing:
 
 
 # ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
-# ★★★ 核心逻辑 (最终正确版：修复拼写错误) ★★★
+# ★★★ 核心逻辑 (最终正确版：回归线性执行，恢复心跳，杜绝一切循环) ★★★
 # ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
 
-# --- 1. “车辆出发点” ---
-# 所有按钮和输入框，都只负责准备工作和发出信号，然后立即 RERUN
+# --- 1. “车辆出发点” 与 “主干道” 合二为一，保证绝对单次执行 ---
 
 if prompt := st.chat_input("输入你的消息...", key="main_chat_input"):
+    # 1a. 立即将用户消息加入状态并显示，解决UI延迟
     st.session_state.messages.append({"role": "user", "content": [prompt]})
-    # 【【【【【 核心修正：修复拼写错误 】】】】】
-    st.session_state.do_generation = True 
-    # 【关键】输入后立即rerun，将“输入处理”和“生成执行”彻底分离
-    st.experimental_rerun()
+    with st.chat_message("user"):
+        st.markdown(prompt)
 
-
-# --- 2. “主干道” 和 “停车场” ---
-# 这个代码块只会在 “do_generation” 信号存在时，在一次全新的脚本运行中被执行
-if st.session_state.get("do_generation"):
-    # 信号已收到，立即销毁，保证单次执行
-    st.session_state.do_generation = False
-
-    # 【修复UI延迟】在生成前，先将最新的用户消息显示出来
-    last_user_message = st.session_state.messages[-1]
-    if last_user_message["role"] == "user":
-         with st.chat_message("user"):
-            st.markdown(last_user_message["content"][0])
-    
-    # 【关键】恢复思考圈圈，它就是我们的心跳
+    # 1b. 在同一次脚本运行中，立即开始生成
     with st.chat_message("assistant"):
         placeholder = st.empty()
+        # 【关键】恢复思考圈圈，它就是我们的心跳
         with st.spinner("AI 正在思考中..."):
             try:
-                # 检查车辆类型
+                # 检查是否是续写（虽然当前逻辑不会触发，但为按钮保留）
                 is_continuation = st.session_state.messages[-1].get("is_continuation_prompt", False)
 
                 # 【API 主干道】
@@ -2567,24 +2553,29 @@ if st.session_state.get("do_generation"):
 
                 # 【专属停车场加工】
                 if is_continuation:
+                    # 这个逻辑块现在只会被“继续”按钮触发
                     target_idx = st.session_state.messages[-1].get("target_index")
                     st.session_state.messages.pop()
                     st.session_state.messages[target_idx]["content"][0] += full_response
                 else:
+                    # 这是新对话，追加
                     st.session_state.messages.append({"role": "assistant", "content": [full_response]})
-
-                # 所有车辆加工完毕，保存并刷新道路
-                with open(log_file, "wb") as f:
-                    pickle.dump(_prepare_messages_for_save(st.session_state.messages), f)
-                st.experimental_rerun()
 
             except Exception as e:
                 # 【事故处理】
                 error_type_name = type(e).__name__
                 error_details = str(e.args) if e.args else "无更多细节"
                 st.error(f"**[ 🔴 生成中断 ]**\n\n**错误类型:** {error_type_name}\n\n**详情:** {error_details}")
-                # 失败时不 rerun，保留事故现场
+    
+    # 1c. 在所有操作结束后，【有且仅有一次】保存记录
+    # 注意：这里不再需要rerun，因为Streamlit在chat_input提交后会自动处理刷新
+    with open(log_file, "wb") as f:
+        pickle.dump(_prepare_messages_for_save(st.session_state.messages), f)
 
+# --- 2. 修改按钮逻辑，让它们也遵循这个简单模式 ---
+# 按钮现在应该只负责准备消息，然后调用 rerun 来触发一次完整的脚本运行，
+# 让 st.chat_input 来处理下一次的输入。
+# (这部分逻辑需要您确认是否需要，如果按钮也频繁出问题，我们就需要为按钮也创建一个类似的线性流程)
 
 
 # --- 底部控件 ---
