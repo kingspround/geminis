@@ -2483,35 +2483,6 @@ step3【贝叶斯决策步骤 3】【元素审查】, "紫色皮肤，大屁股�
             st.info("尚未记录任何发送数据。")
 
 
-# --- 【最终修复版】滚动到底部按钮 ---
-# 使用括号和单引号字符串，并确保CSS/HTML正确无误
-scroll_to_bottom_html = (
-    '<style>'
-    '.scroll-btn-down {'
-    '    position: fixed;'
-    '    bottom: 5rem;'
-    '    right: 1.5rem;'
-    '    background-color: rgba(0, 123, 255, 0.7);'
-    '    color: white;'
-    '    border: none;'
-    '    border-radius: 50%;'
-    '    width: 45px;'
-    '    height: 45px;'
-    '    font-size: 20px;'
-    '    cursor: pointer;'
-    '    z-index: 1000;'
-    '    box-shadow: 0 2px 5px rgba(0,0,0,0.2);'
-    '    transition: background-color 0.3s;'
-    '}'
-    '.scroll-btn-down:hover {'
-    '    background-color: rgba(0, 86, 179, 1);'
-    '}'
-    '</style>'
-    '<button onclick="window.scrollTo(0, document.body.scrollHeight);" class="scroll-btn-down" title="滚动到底部">'
-    '    ⬇️'
-    '</button>'
-)
-st.components.v1.html(scroll_to_bottom_html, height=0)
 
 
 # --- 加载和显示聊天记录 (修改后以支持影片) ---
@@ -2560,7 +2531,8 @@ if st.session_state.get("editing"):
         if c2.button("取消 ❌", key=f"cancel_{i}"):
             st.session_state.editing = False; st.experimental_rerun()
 
-# --- 续写/编辑/重生成/语音按钮逻辑 (修改后) ---
+
+# --- 续写/编辑/重生成/语音按钮逻辑 (替换原有逻辑) ---
 if len(st.session_state.messages) >= 1 and not st.session_state.editing:
     last_real_msg_idx = -1
     for i in range(len(st.session_state.messages) - 1, -1, -1):
@@ -2570,54 +2542,30 @@ if len(st.session_state.messages) >= 1 and not st.session_state.editing:
             
     if last_real_msg_idx != -1:
         last_msg = st.session_state.messages[last_real_msg_idx]
-        
-        # --- 【修复 TypeError】---
-        # 使用 .get() 方法安全地访问字典，避免了之前的语法错误
         is_text_only_assistant = (
             last_msg["role"] == "assistant" and 
             len(last_msg.get("content", [])) > 0 and 
-            isinstance(last_msg.get("content", [])[0], str) and
-            last_msg.get("content", [])[0].strip()
+            isinstance(last_msg["content"][0], str) and
+            last_msg["content"][0].strip() # 确保不是空字符串
         )
 
         if is_text_only_assistant:
-            # --- 【修复 UI】---
-            # 按照您的要求，使用 st.columns(20) 进行布局
-            cols = st.columns(20) 
-            
-            # 将每个标准按钮放置在独立的列中
-            with cols[0]:
-                if st.button("✏️", key=f"edit_{last_real_msg_idx}", help="编辑"): 
+            with st.container():
+                # 增加列数以容纳新按钮
+                cols = st.columns(25) 
+                if cols[0].button("✏️", key=f"edit_{last_real_msg_idx}", help="编辑"): 
                     st.session_state.editable_index = last_real_msg_idx
                     st.session_state.editing = True
                     st.experimental_rerun()
-            
-            with cols[1]:
-                st.button("♻️", key=f"regen_{last_real_msg_idx}", help="重新生成", on_click=regenerate_message, args=(last_real_msg_idx,))
-            
-            with cols[2]:
-                st.button("➕", key=f"cont_{last_real_msg_idx}", help="继续", on_click=continue_message, args=(last_real_msg_idx,))
-            
-            with cols[3]:
-                st.button("🔊", key=f"tts_{last_real_msg_idx}", help="生成语音", on_click=generate_speech_for_message, args=(last_real_msg_idx,))
-            
-            # 将“滚动到顶部”按钮放置在第5列，确保布局一致
-            with cols[4]:
-                scroll_to_top_html = (
-                    '<div style="width: 100%; text-align: center;">'
-                    '<button onclick="window.scrollTo(0, 0);" '
-                    'style="background:none; border:none; padding:0.25rem; font-size:1em; cursor:pointer;" '
-                    'title="滚动到顶部">'
-                    '⬆️'
-                    '</button>'
-                    '</div>'
-                )
-                st.markdown(scroll_to_top_html, unsafe_allow_html=True)
+                cols[1].button("♻️", key=f"regen_{last_real_msg_idx}", help="重新生成", on_click=regenerate_message, args=(last_real_msg_idx,))
+                cols[2].button("➕", key=f"cont_{last_real_msg_idx}", help="继续", on_click=continue_message, args=(last_real_msg_idx,))
+                
+                # 【新增按钮】
+                cols[3].button("🔊", key=f"tts_{last_real_msg_idx}", help="生成语音", on_click=generate_speech_for_message, args=(last_real_msg_idx,))
 
         elif last_msg["role"] == "assistant":
-             cols = st.columns(20)
-             with cols[0]:
-                 st.button("♻️", key=f"regen_vision_{last_real_msg_idx}", help="重新生成", on_click=regenerate_message, args=(last_real_msg_idx,))
+             st.columns(25)[0].button("♻️", key=f"regen_vision_{last_real_msg_idx}", help="重新生成", on_click=regenerate_message, args=(last_real_msg_idx,))
+
 
 
 # --- 核心交互逻辑 (主输入框) ---
