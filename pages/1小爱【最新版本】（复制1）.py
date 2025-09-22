@@ -2513,18 +2513,7 @@ if len(st.session_state.messages) >= 1 and not st.session_state.editing:
                 cols[3].button("🔊", key=f"tts_{last_real_msg_idx}", help="生成语音", on_click=generate_speech_for_message, args=(last_real_msg_idx,))
 
         elif last_msg["role"] == "assistant":
-             st.columns(25)[0].button("♻️", key=f"regen_vision_{last_real_msg_idx}", help="重新生成", on_click=regenerate_message, args=(last_real_msg_idx,))
-
-
-# --- 核心交互逻辑 (主输入框) ---
-if not st.session_state.is_generating:
-    if prompt := st.chat_input("输入你的消息...", key="main_chat_input", disabled=st.session_state.editing):
-        token = generate_token()
-        full_prompt = f"{prompt} (token: {token})" if st.session_state.use_token else prompt
-        st.session_state.messages.append({"role": "user", "content": [full_prompt]})
-        st.session_state.is_generating = True
-        st.session_state.auto_continue_count = 0 
-
+             st.columns(25)[0].button("♻️", key=f"regen_vision_{last_real_msg_idx}", help="重新生成", on_click=regenerate_message, args=(last_real_msg_idx
 
 
 
