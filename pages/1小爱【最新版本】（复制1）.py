@@ -281,19 +281,13 @@ def getAnswer(is_continuation=False, target_idx=-1):
     final_contents = [msg for msg in history_to_send if msg.get("parts")]
     response = st.session_state.model.generate_content(contents=final_contents, stream=True)
 
-def getAnswer(is_continuation=False, target_idx=-1):
-    # ... 您现有的 getAnswer 函数的所有准备逻辑 ...
-    # ... history_to_send 列表被构建完成 ...
-    
-    final_contents = [msg for msg in history_to_send if msg.get("parts")]
 
     # 【【【【【 在这里添加唯一的黑匣子记录代码 】】】】】
     st.session_state.last_request_for_debug = final_contents
     
-    response = st.session_state.model.generate_content(contents=final_contents, stream=True)
-    
-    # ... 函数的其余部分保持不变 ...
-	
+    response = st.session_state.model.generate_content(contents=final_contents, stream=True
+
+													   
     yielded_something = False
     for chunk in response:
         try:
