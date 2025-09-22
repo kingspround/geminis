@@ -99,8 +99,18 @@ if "sidebar_caption" not in st.session_state:
     st.session_state.sidebar_caption = ""
 if "use_token" not in st.session_state:
     st.session_state.use_token = False
+
+# --- 【修复】语音相关状态的初始化 ---
 if "selected_voice" not in st.session_state:
-    st.session_state.selected_voice = DEFAULT_VOICE_DISPLAY_NAME # 使用您在常量中定义的有效默认值
+    # 1. 初始化用户看到的【显示名称】
+    # 确保这里的默认值是 VOICE_OPTIONS 字典里的一个有效键
+    default_voice_display_name = "默认语音" 
+    st.session_state.selected_voice = default_voice_display_name
+
+if "tts_api_voice_name" not in st.session_state:
+    # 2. 【关键修复】根据上面的默认显示名称，初始化程序实际使用的【API名称】
+    # 这确保了即使回调函数从未运行，这个值也一定存在。
+    st.session_state.tts_api_voice_name = VOICE_OPTIONS[st.session_state.selected_voice]
 
 # --- 默认角色设定 ---
 DEFAULT_CHARACTER_SETTINGS = { "理外祝福": """【理外祝福】的核心概念：\n\n""" }
