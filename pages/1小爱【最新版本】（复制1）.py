@@ -2530,7 +2530,7 @@ if not st.session_state.is_generating:
 
 
 # ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
-# ★★★ 核心生成逻辑 (最终版：完全遵循您的“普通交互+事后拼接”模型) ★★★
+# ★★★ 核心生成逻辑 (最终修正版：隔离普通与续写，杜绝一切冲突) ★★★
 # ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
 if st.session_state.is_generating:
     with st.chat_message("assistant"):
@@ -2538,62 +2538,63 @@ if st.session_state.is_generating:
         
         with st.spinner("AI 正在思考中..."):
             try:
-                # --- 1. 预先检查是否为续写任务 ---
+                # --- 1. 检查是否为续写任务，以此决定进入哪个【隔离】的处理流程 ---
                 is_continuation = "continuation_target_index" in st.session_state and st.session_state.continuation_target_index is not None
 
-                # --- 2. 执行【完全普通】的生成与UI更新 ---
-                # getAnswer() 现在是纯净的，它只是读取 session_state 的当前状态
-                full_response = ""
-                for chunk in getAnswer():
-                    full_response += chunk
-                    # 续写任务的UI预览需要拼接，但这只是预览，不修改真实数据
-                    if is_continuation:
-                        target_idx = st.session_state.continuation_target_index
-                        original_text = st.session_state.messages[target_idx]["content"][0]
-                        placeholder.markdown(original_text + full_response + "▌")
-                    else:
-                        placeholder.markdown(full_response + "▌")
-
-                # --- 3. 【成功路径】事后处理 ---
-                # 在生成【完成之后】，才根据标记决定是“拼接”还是“追加”
                 if is_continuation:
+                    # --- 分支A: 【续写任务】的专属处理流程 ---
+                    full_response = ""
                     target_idx = st.session_state.continuation_target_index
-                    
-                    # 首先，移除我们为API添加的那个临时的用户消息
-                    if st.session_state.messages[-1].get("is_temp_prompt"):
+                    original_text = st.session_state.messages[target_idx]["content"][0]
+
+                    for chunk in getAnswer():
+                        full_response += chunk
+                        # UI预览：只在内存中拼接，不修改session_state
+                        placeholder.markdown(original_text + full_response + "▌")
+
+                    # 【事后拼接】
+                    # a. 移除临时的续写指令
+                    if st.session_state.messages and st.session_state.messages[-1].get("is_temp_prompt"):
                         st.session_state.messages.pop()
-                        
-                    # 然后，执行真正的拼接操作
+                    # b. 将结果拼接到目标消息
                     st.session_state.messages[target_idx]["content"][0] += full_response
                     
-                    # 最后，更新UI并清理标记
+                    # c. 更新最终UI
                     placeholder.markdown(st.session_state.messages[target_idx]["content"][0])
-                    st.session_state.continuation_target_index = None
+                    
                 else:
-                    # 这是普通对话，直接追加新消息
+                    # --- 分支B: 【普通消息】的专属处理流程 ---
+                    full_response = ""
+                    for chunk in getAnswer():
+                        full_response += chunk
+                        placeholder.markdown(full_response + "▌")
+                    
+                    # 【事后追加】
                     placeholder.markdown(full_response)
                     st.session_state.messages.append({"role": "assistant", "content": [full_response]})
 
-                # --- 4. 收尾工作 ---
+                # --- 成功路径的收尾工作 (对两个分支都适用) ---
                 st.session_state.is_generating = False
+                if "continuation_target_index" in st.session_state:
+                     st.session_state.continuation_target_index = None # 清理标记
                 with open(log_file, "wb") as f:
                     pickle.dump(_prepare_messages_for_save(st.session_state.messages), f)
                 st.experimental_rerun()
 
             except Exception as e:
-                # --- 5. 失败路径 ---
+                # --- 失败路径 (对两个分支都适用) ---
                 error_type_name = type(e).__name__
                 error_details = str(e.args) if e.args else "无更多细节"
                 st.error(f"**[ 🔴 生成中断 ]**\n\n**错误类型:** {error_type_name}\n\n**详情:** {error_details}")
                 
                 # 清理状态，防止卡死
+                st.session_state.is_generating = False
                 if "continuation_target_index" in st.session_state:
                     st.session_state.continuation_target_index = None
                 if st.session_state.messages and st.session_state.messages[-1].get("is_temp_prompt"):
                     st.session_state.messages.pop()
-                
-                st.session_state.is_generating = False
                 # 失败时不 rerun
+
 
 # --- 底部控件 ---
 c1, c2 = st.columns(2)
