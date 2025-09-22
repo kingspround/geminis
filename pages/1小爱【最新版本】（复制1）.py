@@ -2626,7 +2626,7 @@ if st.session_state.is_generating:
                     
                     # --- 【诊断日志 #5】检查 finally 块是否执行完毕，即将 rerun ---
                     print(f"--- [LOG at {datetime.now()}] --- Finally block finished. Preparing for rerun.")
-                    st.experimental_rerun()
+
 
 
 
