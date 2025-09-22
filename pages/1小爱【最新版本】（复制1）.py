@@ -2521,111 +2521,64 @@ if not st.session_state.is_generating:
 
 
 # ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
-# ★★★ 核心交互逻辑 (最终纯净版：绝对单线程，杜绝一切滥用) ★★★
+# ★★★ 核心生成逻辑 (最终纯净版：彻底分离UI更新与数据存储) ★★★
 # ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
-
-# --- 1. 定义一个统一的生成函数，用于处理所有类型的生成任务 ---
-def handle_generation():
-    """
-    一个统一的生成处理器。
-    它会检查最后一条消息，判断是新对话还是续写，然后执行生成。
-    这个函数是单次执行的，执行完就结束。
-    """
-    # 判断是否是续写任务
-    is_continuation_task = st.session_state.messages and st.session_state.messages[-1].get("is_continue_prompt")
-
+if st.session_state.is_generating:
     with st.chat_message("assistant"):
+        placeholder = st.empty()
+        
         with st.spinner("AI 正在思考中..."):
-            placeholder = st.empty()
-            
-            # 准备原始内容和目标索引
-            original_content = ""
-            target_idx = -1
-            if is_continuation_task:
-                target_idx = st.session_state.messages[-1].get("target_index", -1)
-                # 确保索引有效
-                if not (-len(st.session_state.messages) <= target_idx < len(st.session_state.messages)):
-                    st.error("续写目标消息索引无效。")
-                    return # 直接退出
-                content_list = st.session_state.messages[target_idx]["content"]
-                if content_list and isinstance(content_list[0], str):
-                    original_content = content_list[0]
+            try:
+                # --- 1. 准备工作：判断任务类型 ---
+                is_continuation_task = st.session_state.messages and st.session_state.messages[-1].get("is_continue_prompt")
+                
+                # --- 2. 执行生成与UI更新 ---
+                full_response = ""
+                # 在循环中，我们只操作局部变量，绝不触碰 session_state
+                for chunk in getAnswer():
+                    full_response += chunk
+                    placeholder.markdown(full_response + "▌")
 
-            # 流式生成
-            streamed_part = ""
-            for chunk in getAnswer(): # getAnswer现在总是从session_state的末尾读取上下文
-                streamed_part += chunk
-                full_response = original_content + streamed_part
-                placeholder.markdown(full_response + "▌")
+                # --- 3. 成功路径：一次性地更新数据和状态 ---
+                placeholder.markdown(full_response) # 定稿最终UI
+                
+                # 现在才开始处理 session_state
+                if is_continuation_task:
+                    target_idx = st.session_state.messages[-1].get("target_index", -1)
+                    # 【拼接】将新生成的内容，拼接到目标消息上
+                    st.session_state.messages[target_idx]["content"][0] += full_response
+                    # 移除临时的续写指令
+                    st.session_state.messages.pop()
+                else:
+                    # 这是新对话，追加一个全新的助手消息
+                    st.session_state.messages.append({"role": "assistant", "content": [full_response]})
 
-            # 生成完成，更新或追加消息
-            final_response = original_content + streamed_part
-            if is_continuation_task:
-                # 更新旧消息
-                st.session_state.messages[target_idx]["content"][0] = final_response
-                # 移除临时的续写指令
-                st.session_state.messages.pop()
-            else:
-                # 追加新消息
-                st.session_state.messages.append({"role": "assistant", "content": [final_response]})
-            
-            # 更新UI并保存
-            placeholder.markdown(final_response)
-            with open(log_file, "wb") as f:
-                pickle.dump(_prepare_messages_for_save(st.session_state.messages), f)
+                # 收尾工作
+                st.session_state.is_generating = False
+                with open(log_file, "wb") as f:
+                    pickle.dump(_prepare_messages_for_save(st.session_state.messages), f)
+                st.experimental_rerun()
+
+            except Exception as e:
+                # --- 4. 失败路径 ---
+                error_type_name = type(e).__name__
+                error_details = str(e.args) if e.args else "无更多细节"
+
+                st.error(f"""
+                    **[ 🔴 生成中断 ]**\n
+                    **错误类型:** {error_type_name}\n
+                    **详情:** {error_details}\n
+                    您可以尝试【♻️重新生成】或【➕继续】。
+                """)
+                
+                # 只有在失败时，才需要从 session_state 中移除可能产生的空助手消息
+                if st.session_state.messages and st.session_state.messages[-1]['role'] == 'assistant' and not st.session_state.messages[-1].get("content"):
+                    st.session_state.messages.pop()
+
+                st.session_state.is_generating = False
+                # 失败时不 rerun
 
 
-# --- 2. 主输入框逻辑 ---
-if prompt := st.chat_input("输入你的消息..."):
-    # 清理可能存在的旧错误消息（如果有的话）
-    # (如果需要，可以在这里添加 cleanup_temporary_error_message() 的逻辑)
-
-    # 1. 将用户输入添加到记录中并显示
-    st.session_state.messages.append({"role": "user", "content": [prompt]})
-    with st.chat_message("user"):
-        st.markdown(prompt)
-    
-    # 2. 调用统一的生成函数
-    handle_generation()
-
-# --- 3. 修改所有按钮的回调函数 ---
-# 所有的按钮（重新生成、继续、从侧边栏发送等）现在都应该直接调用 handle_generation()
-# 例如：
-# st.button("♻️", on_click=handle_regeneration)
-#
-# def handle_regeneration():
-#     # 准备重新生成的消息列表 (例如，删除最后一条助手消息)
-#     # ...
-#     handle_generation() # 直接调用
-
-# 【重要】为了让这个结构生效，您需要调整您的按钮回调函数。
-# 这是一个示例，请以此为模板修改您的 `regenerate_message` 和 `continue_message`
-
-def simplified_regenerate_message(index):
-    """准备重新生成，然后调用主生成函数"""
-    if 0 <= index < len(st.session_state.messages) and st.session_state.messages[index]["role"] == "assistant":
-        st.session_state.messages = st.session_state.messages[:index]
-        # 注意：这里不再设置 is_generating，也不再 rerun
-        handle_generation()
-
-def simplified_continue_message(index):
-    """准备续写，然后调用主生成函数"""
-    if 0 <= index < len(st.session_state.messages):
-        message_to_continue = st.session_state.messages[index]
-        original_content = ""
-        for part in message_to_continue.get("content", []):
-            if isinstance(part, str):
-                original_content = part
-                break
-        
-        last_chars = (original_content[-50:] + "...") if len(original_content) > 50 else original_content
-        new_prompt = f"请严格地从以下文本的结尾处，无缝、自然地继续写下去。不要重复任何内容，不要添加任何前言或解释，直接输出续写的内容即可。文本片段：\n\"...{last_chars}\""
-        
-        st.session_state.messages.append({"role": "user", "content": [new_prompt], "temp": True, "is_continue_prompt": True, "target_index": index})
-        handle_generation()
-
-# 请确保在您的UI代码中，按钮的 on_click 指向这些新的 simplified_ 函数
-# 例如： cols[1].button("♻️", ..., on_click=simplified_regenerate_message, args=(last_real_msg_idx,))
 # --- 底部控件 ---
 c1, c2 = st.columns(2)
 st.session_state.use_token = c1.checkbox("使用 Token", value=st.session_state.get("use_token", True))
