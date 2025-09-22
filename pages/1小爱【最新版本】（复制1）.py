@@ -2456,40 +2456,60 @@ step3【贝叶斯决策步骤 3】【元素审查】, "紫色皮肤，大屁股�
 
 
 # --- 【新增】“飞行记录仪”UI ---
-# 检查是否有错误，来决定默认是否展开
-expander_is_open = st.session_state.last_error_message is not None
+    # 检查是否有错误，来决定默认是否展开
+    expander_is_open = st.session_state.last_error_message is not None
 
-with st.expander("🐞 上次运行日志 (Last Run Log)", expanded=expander_is_open):
+    with st.expander("🐞 上次运行日志 (Last Run Log)", expanded=expander_is_open):
 
-    # 清除日志的回调函数
-    def clear_last_run_logs():
-        st.session_state.last_error_message = None
-        st.session_state.last_debug_payload = None
+        def clear_last_run_logs():
+            st.session_state.last_error_message = None
+            st.session_state.last_debug_payload = None
 
-    st.button("清除日志 🗑️", on_click=clear_last_run_logs, use_container_width=True)
+        st.button("清除日志 🗑️", on_click=clear_last_run_logs, use_container_width=True)
+        st.markdown("---") 
 
-    st.markdown("---") # 分割线
+        if st.session_state.last_error_message:
+            st.error("捕获到错误 (Error Captured):")
+            st.markdown(st.session_state.last_error_message)
+        else:
+            st.success("上次运行成功，无错误记录。")
 
-    # 显示最后一次的错误信息
-    if st.session_state.last_error_message:
-        st.error("捕获到错误 (Error Captured):")
-        # 使用 markdown 来更好地格式化显示
-        st.markdown(st.session_state.last_error_message)
-    else:
-        st.success("上次运行成功，无错误记录。")
+        st.markdown("---")
 
-    st.markdown("---") # 分割线
-
-    # 显示最后一次发送的数据
-    if st.session_state.last_debug_payload:
-        st.info("发送给API的最后一份数据 (Last Payload Sent to API):")
-        st.json(st.session_state.last_debug_payload, expanded=False)
-    else:
-        # 初始状态下没有数据
-        st.info("尚未记录任何发送数据。")
+        if st.session_state.last_debug_payload:
+            st.info("发送给API的最后一份数据:")
+            st.json(st.session_state.last_debug_payload, expanded=False)
+        else:
+            st.info("尚未记录任何发送数据。")
 
 
-
+# --- 【新增】滚动到底部按钮 ---
+# 使用 st.components.v1.html 来注入一个带有固定位置的HTML按钮
+# 它的 onclick 事件会执行 JavaScript 来滚动页面
+st.components.v1.html("""
+<style>
+    .scroll-btn {
+        position: fixed;
+        bottom: 5rem; /* 调整按钮距离页面底部的距离 */
+        right: 1.5rem; /* 调整按钮距离页面右侧的距离 */
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 50%;
+        width: 50px;
+        height: 50px;
+        font-size: 24px;
+        cursor: pointer;
+        z-index: 1000;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+    .scroll-btn:hover {
+        background-color: #0056b3;
+    }
+</style>
+<button onclick="window.scrollTo(0, document.body.scrollHeight);" class="scroll-btn" title="滚动到底部">
+    ⬇️
+</button>
 
 
 # --- 加载和显示聊天记录 (修改后以支持影片) ---
@@ -2538,7 +2558,7 @@ if st.session_state.get("editing"):
         if c2.button("取消 ❌", key=f"cancel_{i}"):
             st.session_state.editing = False; st.experimental_rerun()
 
-# --- 续写/编辑/重生成/语音按钮逻辑 (替换原有逻辑) ---
+# --- 续写/编辑/重生成/语音按钮逻辑 (修改后) ---
 if len(st.session_state.messages) >= 1 and not st.session_state.editing:
     last_real_msg_idx = -1
     for i in range(len(st.session_state.messages) - 1, -1, -1):
@@ -2552,26 +2572,34 @@ if len(st.session_state.messages) >= 1 and not st.session_state.editing:
             last_msg["role"] == "assistant" and 
             len(last_msg.get("content", [])) > 0 and 
             isinstance(last_msg["content"][0], str) and
-            last_msg["content"][0].strip() # 确保不是空字符串
+            last_msg["content"][0].strip()
         )
 
         if is_text_only_assistant:
             with st.container():
-                # 增加列数以容纳新按钮
+                # 【修改】增加列数以容纳新按钮
                 cols = st.columns(25) 
-                if cols[0].button("✏️", key=f"edit_{last_real_msg_idx}", help="编辑"): 
-                    st.session_state.editable_index = last_real_msg_idx
-                    st.session_state.editing = True
-                    st.experimental_rerun()
+                cols[0].button("✏️", key=f"edit_{last_real_msg_idx}", help="编辑") 
                 cols[1].button("♻️", key=f"regen_{last_real_msg_idx}", help="重新生成", on_click=regenerate_message, args=(last_real_msg_idx,))
                 cols[2].button("➕", key=f"cont_{last_real_msg_idx}", help="继续", on_click=continue_message, args=(last_real_msg_idx,))
-                
-                # 【新增按钮】
                 cols[3].button("🔊", key=f"tts_{last_real_msg_idx}", help="生成语音", on_click=generate_speech_for_message, args=(last_real_msg_idx,))
+                
+                # --- 【新增】滚动到顶部按钮 ---
+                # 使用 st.markdown 注入一个可以执行JS的HTML按钮
+                scroll_to_top_html = """
+                <style>
+                    .stButton>button {
+                        padding: 0.25rem 0.35rem;
+                        line-height: 1;
+                    }
+                </style>
+                <button onclick="window.scrollTo(0, 0);" style="background:none; border:none; padding:0; font-size:1em; cursor:pointer;" title="滚动到顶部">⬆️</button>
+                """
+                cols[4].markdown(scroll_to_top_html, unsafe_allow_html=True)
 
         elif last_msg["role"] == "assistant":
              st.columns(25)[0].button("♻️", key=f"regen_vision_{last_real_msg_idx}", help="重新生成", on_click=regenerate_message, args=(last_real_msg_idx,))
-
+			 
 
 # --- 核心交互逻辑 (主输入框) ---
 if not st.session_state.is_generating:
