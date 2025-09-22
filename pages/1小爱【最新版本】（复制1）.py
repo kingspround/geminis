@@ -2385,27 +2385,33 @@ step3【贝叶斯决策步骤 3】【元素审查】, "紫色皮肤，大屁股�
 
 
     with st.expander("语音生成设置", expanded=False):
+        # --- 【修复】: 创建回调函数以避免在脚本主体中修改状态，防止不必要的刷新循环 ---
+        def update_voice_settings():
+            # 回调函数从 st.session_state 中读取触发它的控件的当前值
+            selected_display_name = st.session_state.voice_selector_widget
+            # 然后，根据这个值更新其他相关的会话状态
+            st.session_state.selected_voice = selected_display_name
+            st.session_state.tts_api_voice_name = VOICE_OPTIONS[selected_display_name]
+
         # 1. 让用户通过 selectbox 选择声音的“显示名称”
-        selected_display_name = st.selectbox(
+        st.selectbox(
             "选择声音:",
             options=list(VOICE_OPTIONS.keys()),
-            # 使用已初始化的 st.session_state.selected_voice 作为默认值
-            index=list(VOICE_OPTIONS.keys()).index(st.session_state.selected_voice), 
-            key="voice_selector_widget"
+            # 使用 key 来唯一标识此控件，回调函数会通过它来获取当前值
+            key="voice_selector_widget",
+            # 使用 on_change 参数将回调函数与控件绑定。当用户做出选择时，函数会被调用
+            on_change=update_voice_settings,
+            # 使用已正确初始化的 st.session_state.selected_voice 来设置默认显示项
+            index=list(VOICE_OPTIONS.keys()).index(st.session_state.get("selected_voice", "默认语音"))
         )
-        
-        # 2. 【核心修正】: 不再使用 if 判断，而是每次渲染都直接更新状态
-        # 这保证了状态的绝对同步，彻底杜绝了逻辑漏洞
-        st.session_state.selected_voice = selected_display_name
-        st.session_state.tts_api_voice_name = VOICE_OPTIONS[selected_display_name]
-        
-        # 3. 添加表演指导的文本区域 (保持不变)
+
+        # 2. 添加表演指导的文本区域 (保持不变)
         st.text_area(
             "声音表演指导 (Prompt Prefix):",
             key="tts_prompt_prefix",
             help="在这里用自然语言描述您希望AI用什么样的语气、情感和风格来说话。"
         )
-
+		
 	
     with st.expander("大文件解读", expanded=False):
         st.file_uploader(
@@ -2527,86 +2533,86 @@ if not st.session_state.is_generating:
 
 
 
-# ==============================================================================
-# ★★★★★★★ 核心生成逻辑 (最终修复版) ★★★★★★★
-# ==============================================================================
+# ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
+# ★★★ 核心生成逻辑 (已修复) ★★★
+# 1. 剔除了自动续写功能，改为直接报错并停止。
+# 2. 移除了 finally 块中的 st.experimental_rerun()，从根本上解决了生成时的无限刷新问题。
+#    页面会在 is_generating 状态改变后由 Streamlit 自动刷新，无需手动调用。
+# ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
 if st.session_state.is_generating:
-    # --- 0. 初始化和安全检查 ---
-    # 判断当前是否是续写任务 (由“继续”按钮触发)
     is_continuation_task = st.session_state.messages and st.session_state.messages[-1].get("is_continue_prompt")
-
-    # 获取要操作的目标消息索引
-    target_message_index = -1
-    if is_continuation_task:
-        # 如果是续写任务，目标是之前消息的索引
-        target_message_index = st.session_state.messages[-1].get("target_index", -1)
-    elif not st.session_state.messages or st.session_state.messages[-1]["role"] != "assistant":
-        # 如果是新消息，为助手创建一个新的空消息容器
-        st.session_state.messages.append({"role": "assistant", "content": [""]})
-        target_message_index = -1 # 指向最后一个
-    else:
-        # 如果因意外情况已存在助手消息，就直接用最后一个
-        target_message_index = -1
-
-    # 将相对索引(-1)转换为绝对索引，使代码更健壮
-    absolute_target_index = target_message_index if target_message_index != -1 else len(st.session_state.messages) - 1
-
-    # --- 1. 执行生成或续写 ---
-    try:
-        with st.chat_message("assistant"):
+    
+    with st.chat_message("assistant"):
+        with st.spinner("AI 正在思考中..."):
             placeholder = st.empty()
+            
+            target_message_index = -1
+            if is_continuation_task:
+                target_message_index = st.session_state.messages[-1].get("target_index", -1)
+            elif not st.session_state.messages or st.session_state.messages[-1]["role"] != "assistant":
+                st.session_state.messages.append({"role": "assistant", "content": [""]})
+            
+            # 检查索引有效性
+            if not (-len(st.session_state.messages) <= target_message_index < len(st.session_state.messages)):
+                 st.error("续写目标消息索引无效，已停止生成。")
+                 st.session_state.is_generating = False
+                 # 在这种明确的配置错误下，手动刷新以确保UI停止加载状态
+                 st.experimental_rerun()
+            else:
+                full_response_content = ""
+                try:
+                    # 获取原始内容（如果是续写）
+                    original_content = ""
+                    content_list = st.session_state.messages[target_message_index]["content"]
+                    if content_list and isinstance(content_list[0], str):
+                        original_content = content_list[0]
+                    
+                    # 流式生成
+                    streamed_part = ""
+                    for chunk in getAnswer():
+                        streamed_part += chunk
+                        full_response_content = original_content + streamed_part
+                        st.session_state.messages[target_message_index]["content"][0] = full_response_content
+                        placeholder.markdown(full_response_content + "▌")
+                    
+                    # 正常结束后，更新最终UI并标记生成结束
+                    placeholder.markdown(full_response_content)
+                    st.session_state.is_generating = False 
 
-            # 如果是续写任务，获取原始文本内容
-            original_content = ""
-            content_list = st.session_state.messages[absolute_target_index]["content"]
-            if content_list and isinstance(content_list[0], str):
-                original_content = content_list[0]
+                except Exception as e:
+                    # --- 【修复】剔除自动续写，改为直接报错并停止 ---
+                    st.error(f"回答生成时中断。请检查网络或API Key后，手动【继续】或【重新生成】。错误: {e}")
+                    if full_response_content:
+                        # 即使出错，也保留已生成的部分内容
+                        st.session_state.messages[target_message_index]["content"][0] = full_response_content
+                        placeholder.markdown(full_response_content)
+                    # 关键：设置is_generating为False以停止任何循环
+                    st.session_state.is_generating = False 
+                
+                finally:
+                    # --- 【修复】移除 st.experimental_rerun()，防止循环 ---
+                    # finally 块现在只负责清理和保存状态，不触发刷新
 
-            # 流式接收API响应并实时更新UI
-            streamed_part = ""
-            for chunk in getAnswer(is_continuation=is_continuation_task, target_idx=absolute_target_index):
-                streamed_part += chunk
-                updated_full_content = original_content + streamed_part
-                # 直接更新目标消息的内容
-                st.session_state.messages[absolute_target_index]["content"][0] = updated_full_content
-                placeholder.markdown(updated_full_content + "▌") # 添加光标效果
+                    # 如果是续写任务，完成后移除临时的用户提示
+                    if is_continuation_task:
+                        if st.session_state.messages and st.session_state.messages[-1].get("is_continue_prompt"):
+                           st.session_state.messages.pop()
 
-        # --- 2. 成功完成的路径 ---
-        final_content = st.session_state.messages[absolute_target_index]["content"][0]
-        placeholder.markdown(final_content) # 显示最终完整内容
+                    # 如果最后一条助手消息是空的，也将其移除
+                    if st.session_state.messages and st.session_state.messages[-1]['role'] == 'assistant':
+                       content = st.session_state.messages[-1].get("content", [""])[0]
+                       if not isinstance(content, str) or not content.strip():
+                           st.session_state.messages.pop()
 
-        st.session_state.is_generating = False # 结束生成状态
+                    # 无论成功或失败，都保存一次日志
+                    with open(log_file, "wb") as f:
+                        pickle.dump(_prepare_messages_for_save(st.session_state.messages), f)
+                    
+                    # ★ 关键：在 try/except/finally 流程结束后，
+                    # Streamlit 会检测到 st.session_state.is_generating 的值从 True 变为 False，
+                    # 并在当前脚本运行结束后自动安排一次 rerun。这正是我们想要的行为。
+                    st.experimental_rerun()
 
-        # 清理临时的续写提示
-        if is_continuation_task and st.session_state.messages and st.session_state.messages[-1].get("is_continue_prompt"):
-            st.session_state.messages.pop()
-
-        # 如果最后一条助手消息是空的，也移除它
-        if st.session_state.messages and st.session_state.messages[-1]['role'] == 'assistant' and not st.session_state.messages[-1]["content"][0].strip():
-            st.session_state.messages.pop()
-
-        # 保存聊天记录
-        with open(log_file, "wb") as f:
-            pickle.dump(_prepare_messages_for_save(st.session_state.messages), f)
-
-        st.experimental_rerun() # 刷新页面以固化UI
-
-    except Exception as e:
-        # --- 3. 【核心修复】发生异常的路径 (已剔除自动续写) ---
-        st.error(f"生成过程中发生错误，操作已中断。请检查API Key或网络后重试。\n\n错误详情: {e}")
-
-        # 清理因本次失败操作而产生的临时消息或空消息
-        if is_continuation_task and st.session_state.messages and st.session_state.messages[-1].get("is_continue_prompt"):
-            st.session_state.messages.pop()
-        # 检查最后一个消息是否是本次生成的空助手消息
-        if st.session_state.messages and st.session_state.messages[-1]['role'] == 'assistant' and not st.session_state.messages[-1]["content"][0].strip():
-            st.session_state.messages.pop()
-
-        # 关键步骤：无论如何都要停止生成状态，以中断刷新循环
-        st.session_state.is_generating = False
-
-        # 刷新页面，显示错误信息并解锁输入框
-        st.experimental_rerun()
 
 
 
