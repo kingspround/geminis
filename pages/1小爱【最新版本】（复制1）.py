@@ -2484,29 +2484,30 @@ step3【贝叶斯决策步骤 3】【元素审查】, "紫色皮肤，大屁股�
 
 
 # --- 【最终修复版】滚动到底部按钮 ---
-# 使用括号和单引号字符串，彻底避免多行字符串解析错误
+# 使用括号和单引号字符串，并确保CSS/HTML正确无误
 scroll_to_bottom_html = (
     '<style>'
-    '.scroll-btn {'
+    '.scroll-btn-down {'
     '    position: fixed;'
     '    bottom: 5rem;'
     '    right: 1.5rem;'
-    '    background-color: #007bff;'
+    '    background-color: rgba(0, 123, 255, 0.7);'
     '    color: white;'
     '    border: none;'
     '    border-radius: 50%;'
-    '    width: 50px;'
-    '    height: 50px;'
-    '    font-size: 24px;'
+    '    width: 45px;'
+    '    height: 45px;'
+    '    font-size: 20px;'
     '    cursor: pointer;'
     '    z-index: 1000;'
     '    box-shadow: 0 2px 5px rgba(0,0,0,0.2);'
+    '    transition: background-color 0.3s;'
     '}'
-    '.scroll-btn:hover {'
-    '    background-color: #0056b3;'
+    '.scroll-btn-down:hover {'
+    '    background-color: rgba(0, 86, 179, 1);'
     '}'
     '</style>'
-    '<button onclick="window.scrollTo(0, document.body.scrollHeight);" class="scroll-btn" title="滚动到底部">'
+    '<button onclick="window.scrollTo(0, document.body.scrollHeight);" class="scroll-btn-down" title="滚动到底部">'
     '    ⬇️'
     '</button>'
 )
@@ -2572,42 +2573,44 @@ if len(st.session_state.messages) >= 1 and not st.session_state.editing:
         is_text_only_assistant = (
             last_msg["role"] == "assistant" and 
             len(last_msg.get("content", [])) > 0 and 
-            isinstance(last_msg["content"][0], str) and
+            isinstance(last_msg["content", []][0], str) and
             last_msg["content"][0].strip()
         )
 
         if is_text_only_assistant:
-            with st.container():
-                cols = st.columns(25) 
-                # 检查编辑按钮是否被点击
-                if cols[0].button("✏️", key=f"edit_{last_real_msg_idx}", help="编辑"): 
+            # 使用 st.columns 提供稳定、独立的布局槽位
+            cols = st.columns([1, 1, 1, 1, 1, 15]) # 5个小槽给按钮, 剩下的大空间留白
+            
+            with cols[0]:
+                if st.button("✏️", key=f"edit_{last_real_msg_idx}", help="编辑"): 
                     st.session_state.editable_index = last_real_msg_idx
                     st.session_state.editing = True
                     st.experimental_rerun()
-                
-                cols[1].button("♻️", key=f"regen_{last_real_msg_idx}", help="重新生成", on_click=regenerate_message, args=(last_real_msg_idx,))
-                cols[2].button("➕", key=f"cont_{last_real_msg_idx}", help="继续", on_click=continue_message, args=(last_real_msg_idx,))
-                cols[3].button("🔊", key=f"tts_{last_real_msg_idx}", help="生成语音", on_click=generate_speech_for_message, args=(last_real_msg_idx,))
-                
-                # 使用括号和单引号字符串，彻底避免多行字符串解析错误
+            
+            with cols[1]:
+                st.button("♻️", key=f"regen_{last_real_msg_idx}", help="重新生成", on_click=regenerate_message, args=(last_real_msg_idx,))
+            
+            with cols[2]:
+                st.button("➕", key=f"cont_{last_real_msg_idx}", help="继续", on_click=continue_message, args=(last_real_msg_idx,))
+            
+            with cols[3]:
+                st.button("🔊", key=f"tts_{last_real_msg_idx}", help="生成语音", on_click=generate_speech_for_message, args=(last_real_msg_idx,))
+            
+            with cols[4]:
+                # 为“滚动到顶部”按钮注入一个干净、无样式的HTML，避免布局冲突
                 scroll_to_top_html = (
-                    '<style>'
-                    '.stButton>button { '
-                    '    padding: 0.25rem 0.35rem; '
-                    '    line-height: 1; '
-                    '}'
-                    '</style>'
                     '<button onclick="window.scrollTo(0, 0);" '
-                    'style="background:none; border:none; padding:0; font-size:1em; cursor:pointer;" '
+                    'style="background:none; border:none; padding:0; font-size:1.1em; cursor:pointer; width:100%; height:100%;" '
                     'title="滚动到顶部">'
                     '⬆️'
                     '</button>'
                 )
-                cols[4].markdown(scroll_to_top_html, unsafe_allow_html=True)
+                st.markdown(scroll_to_top_html, unsafe_allow_html=True)
 
         elif last_msg["role"] == "assistant":
-             st.columns(25)[0].button("♻️", key=f"regen_vision_{last_real_msg_idx}", help="重新生成", on_click=regenerate_message, args=(last_real_msg_idx,))
-
+             cols = st.columns([1, 24])
+             with cols[0]:
+                 st.button("♻️", key=f"regen_vision_{last_real_msg_idx}", help="重新生成", on_click=regenerate_message, args=(last_real_msg_idx,))
 
 
 
