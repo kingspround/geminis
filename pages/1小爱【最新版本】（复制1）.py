@@ -2586,12 +2586,12 @@ if len(st.session_state.messages) >= 1 and not st.session_state.editing:
                 
                 # --- 【新增】滚动到顶部按钮 ---
                 # 使用 st.markdown 注入一个可以执行JS的HTML按钮
-                scroll_to_top_html = f"""
+                scroll_to_top_html = """
                 <style>
-                    .stButton>button {{
+                    .stButton>button {
                         padding: 0.25rem 0.35rem;
                         line-height: 1;
-                    }}
+                    }
                 </style>
                 <button onclick="window.scrollTo(0, 0);" style="background:none; border:none; padding:0; font-size:1em; cursor:pointer;" title="滚动到顶部">⬆️</button>
                 """
