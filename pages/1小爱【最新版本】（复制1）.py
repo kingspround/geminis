@@ -280,7 +280,20 @@ def getAnswer(is_continuation=False, target_idx=-1):
 
     final_contents = [msg for msg in history_to_send if msg.get("parts")]
     response = st.session_state.model.generate_content(contents=final_contents, stream=True)
+
+def getAnswer(is_continuation=False, target_idx=-1):
+    # ... 您现有的 getAnswer 函数的所有准备逻辑 ...
+    # ... history_to_send 列表被构建完成 ...
     
+    final_contents = [msg for msg in history_to_send if msg.get("parts")]
+
+    # 【【【【【 在这里添加唯一的黑匣子记录代码 】】】】】
+    st.session_state.last_request_for_debug = final_contents
+    
+    response = st.session_state.model.generate_content(contents=final_contents, stream=True)
+    
+    # ... 函数的其余部分保持不变 ...
+	
     yielded_something = False
     for chunk in response:
         try:
@@ -2518,7 +2531,7 @@ if len(st.session_state.messages) >= 1 and not st.session_state.editing:
 
 
 # ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
-# ★★★ 核心逻辑 (最终正确版：心跳间隔修正为20秒) ★★★
+# ★★★ 核心逻辑 (最终诊断版：在错误时打印所有内部状态) ★★★
 # ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
 
 # --- “车辆出发点” 1: 主输入框 ---
@@ -2529,7 +2542,7 @@ if prompt := st.chat_input("输入你的消息...", key="main_chat_input"):
 
 # --- “主干道” 和 “停车场” ---
 if st.session_state.get("do_generation"):
-    del st.session_state.do_generation
+    st.session_state.do_generation = False
 
     last_user_message = st.session_state.messages[-1]
     if not last_user_message.get("is_continuation_prompt"):
@@ -2540,40 +2553,15 @@ if st.session_state.get("do_generation"):
         placeholder = st.empty()
         
         try:
-            # --- 手动心跳与获取第一个数据块 ---
+            placeholder.markdown("AI 正在思考中...")
             is_continuation = st.session_state.messages[-1].get("is_continuation_prompt", False)
-            response_iterator = iter(getAnswer())
             
-            first_chunk_received = False
             full_response = ""
-            animation_chars = ["...", ".. .", ". ..", " ..."]
-            animation_index = 0
-            
-            while not first_chunk_received:
-                placeholder.markdown(f"AI 正在思考中{animation_chars[animation_index]}")
-                animation_index = (animation_index + 1) % len(animation_chars)
-                
-                try:
-                    # 【核心修正】将心跳间隔改为20秒
-                    time.sleep(0.2) 
-                    
-                    # 真正的API调用发生在这里，next()会阻塞直到第一个chunk返回或出错
-                    first_chunk = next(response_iterator)
-                    full_response += first_chunk
-                    first_chunk_received = True
-                except StopIteration:
-                    first_chunk_received = True
-                    break
-
-            # --- 第一个数据块已收到，开始正常的流式显示 ---
-            placeholder.markdown(full_response + "▌")
-            for chunk in response_iterator:
+            for chunk in getAnswer():
                 full_response += chunk
                 placeholder.markdown(full_response + "▌")
-            
             placeholder.markdown(full_response)
 
-            # --- 专属停车场加工 ---
             if is_continuation:
                 target_idx = st.session_state.messages[-1].get("target_index")
                 st.session_state.messages.pop()
@@ -2586,16 +2574,33 @@ if st.session_state.get("do_generation"):
             st.experimental_rerun()
 
         except Exception as e:
+            # --- 【【【【【 强大的错误诊断模块 】】】】】 ---
             error_type_name = type(e).__name__
             error_details = str(e.args) if e.args else "无更多细节"
+
+            # 1. 显示一个简洁的错误摘要
             st.error(f"""
                 **[ 🔴 生成中断 ]**\n
                 **错误类型:** {error_type_name}\n
                 **详情:** {error_details}\n
-                您可以尝试【♻️重新生成】或【➕继续】。
+                请展开下方的“错误诊断信息”查看详情。
             """)
-            # 失败时不 rerun，保留事故现场
+            
+            # 2. 创建一个可展开的区域，用于显示所有详细的诊断信息
+            with st.expander("🔍 **错误诊断信息 (点击展开)**", expanded=True):
+                st.subheader("错误的完整追溯信息 (Traceback):")
+                st.exception(e)
 
+                st.subheader("getAnswer 函数实际发送给 API 的内容:")
+                if "last_request_for_debug" in st.session_state:
+                    st.json(st.session_state.last_request_for_debug)
+                else:
+                    st.warning("未能捕获到API请求内容。错误可能发生在 getAnswer 函数被调用之前。")
+
+                st.subheader("错误发生时，完整的聊天记录 (`st.session_state.messages`):")
+                st.json(st.session_state.messages)
+
+            # 失败时不 rerun，保留事故现场和诊断信息
 
 
 
