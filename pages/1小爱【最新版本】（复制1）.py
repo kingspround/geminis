@@ -2525,31 +2525,39 @@ if len(st.session_state.messages) >= 1 and not st.session_state.editing:
 
 
 # ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
-# ★★★ 核心逻辑 (最终诊断版：在错误时打印所有内部状态) ★★★
+# ★★★ 核心逻辑 (最终正确版：彻底隔离输入与执行，杜绝重复发送) ★★★
 # ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
 
-# --- “车辆出发点” 1: 主输入框 ---
+# --- 1. “车辆出发点”：所有按钮和输入框 ---
+# 所有的触发点，都只负责“准备车辆”和“发出信号”，然后立即停止本次脚本运行。
+
 if prompt := st.chat_input("输入你的消息...", key="main_chat_input"):
     st.session_state.messages.append({"role": "user", "content": [prompt]})
     st.session_state.do_generation = True
+    # 【关键】输入后立即rerun，将“输入处理”和“生成执行”彻底分离到两个独立的脚本运行中
+    st.experimental_rerun()
 
 
-# --- “主干道” 和 “停车场” ---
+# --- 2. “主干道” 和 “停车场”：唯一的生成逻辑 ---
+# 这个代码块只会在 “do_generation” 信号存在时，在一次全新的脚本运行中被执行。
 if st.session_state.get("do_generation"):
+    # 信号已收到，立即销毁，保证单次执行
     st.session_state.do_generation = False
 
+    # 预处理：显示用户的最新消息
     last_user_message = st.session_state.messages[-1]
+    # 我们只显示非临时的用户消息
     if not last_user_message.get("is_continuation_prompt"):
         with st.chat_message("user"):
             st.markdown(last_user_message["content"][0])
     
+    # 进入主干道
     with st.chat_message("assistant"):
         placeholder = st.empty()
-        
         try:
             placeholder.markdown("AI 正在思考中...")
             is_continuation = st.session_state.messages[-1].get("is_continuation_prompt", False)
-            
+
             full_response = ""
             for chunk in getAnswer():
                 full_response += chunk
@@ -2565,37 +2573,14 @@ if st.session_state.get("do_generation"):
 
             with open(log_file, "wb") as f:
                 pickle.dump(_prepare_messages_for_save(st.session_state.messages), f)
+            # 成功后，再次rerun以清理UI状态（例如移除临时的续写指令显示）
             st.experimental_rerun()
 
         except Exception as e:
-            # --- 【【【【【 强大的错误诊断模块 】】】】】 ---
             error_type_name = type(e).__name__
             error_details = str(e.args) if e.args else "无更多细节"
-
-            # 1. 显示一个简洁的错误摘要
-            st.error(f"""
-                **[ 🔴 生成中断 ]**\n
-                **错误类型:** {error_type_name}\n
-                **详情:** {error_details}\n
-                请展开下方的“错误诊断信息”查看详情。
-            """)
-            
-            # 2. 创建一个可展开的区域，用于显示所有详细的诊断信息
-            with st.expander("🔍 **错误诊断信息 (点击展开)**", expanded=True):
-                st.subheader("错误的完整追溯信息 (Traceback):")
-                st.exception(e)
-
-                st.subheader("getAnswer 函数实际发送给 API 的内容:")
-                if "last_request_for_debug" in st.session_state:
-                    st.json(st.session_state.last_request_for_debug)
-                else:
-                    st.warning("未能捕获到API请求内容。错误可能发生在 getAnswer 函数被调用之前。")
-
-                st.subheader("错误发生时，完整的聊天记录 (`st.session_state.messages`):")
-                st.json(st.session_state.messages)
-
-            # 失败时不 rerun，保留事故现场和诊断信息
-
+            st.error(f"**[ 🔴 生成中断 ]**\n\n**错误类型:** {error_type_name}\n\n**详情:** {error_details}")
+            # 失败时不 rerun，保留事故现场
 
 
 # --- 底部控件 ---
