@@ -2525,72 +2525,66 @@ if len(st.session_state.messages) >= 1 and not st.session_state.editing:
 
 
 # ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
-# ★★★ 核心逻辑 (最终正确版：即时UI响应 + 优雅处理真实API错误) ★★★
+# ★★★ 核心逻辑 (最终正确版：修复执行穿透 + 恢复心跳 + 解决UI延迟) ★★★
 # ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
 
-# --- 1. “车辆出发点”：所有按钮 ---
-# 按钮（重新生成、继续）的逻辑是：准备消息列表，然后发出“发车”信号，最后rerun
-# 例如：
-# def regenerate_message(index):
-#     st.session_state.messages = st.session_state.messages[:index]
-#     st.session_state.do_generation = True
-#     st.experimental_rerun()
+# --- 1. “车辆出发点” ---
+# 所有按钮和输入框，都只负责准备工作和发出信号，然后立即 RERUN，这是防止重复发送的唯一正确方法。
 
-
-# --- 2. 交互与生成的主流程 ---
-
-# 2a. “车辆出发点” 2: 主输入框
 if prompt := st.chat_input("输入你的消息...", key="main_chat_input"):
-    # 【修复延迟】立即将用户消息加入状态并显示
     st.session_state.messages.append({"role": "user", "content": [prompt]})
-    with st.chat_message("user"):
-        st.markdown(prompt)
-    
-    # 【重要】直接在同一次脚本运行中，发出“发车”信号
-    st.session_state.do_generation = True
+    st.session_tate.do_generation = True
+    # 【关键】输入后立即rerun，将“输入处理”和“生成执行”彻底分离
+    st.experimental_rerun()
 
-# 2b. “主干道” 和 “停车场”
+
+# --- 2. “主干道” 和 “停车场” ---
+# 这个代码块只会在 “do_generation” 信号存在时，在一次全新的脚本运行中被执行
 if st.session_state.get("do_generation"):
-    st.session_state.do_generation = False # 信号已收到，立即销毁
+    # 信号已收到，立即销毁，保证单次执行
+    st.session_state.do_generation = False
 
+    # 【修复UI延迟】在生成前，先将最新的用户消息显示出来
+    # 注意：因为rerun的存在，这个显示动作和生成是在同一次脚本运行中，所以是即时的
+    last_user_message = st.session_state.messages[-1]
+    if last_user_message["role"] == "user":
+         with st.chat_message("user"):
+            st.markdown(last_user_message["content"][0])
+    
+    # 【关键】恢复思考圈圈，它就是我们的心跳
     with st.chat_message("assistant"):
         placeholder = st.empty()
-        try:
-            placeholder.markdown("AI 正在思考中...")
-            is_continuation = st.session_state.messages[-1].get("is_continuation_prompt", False)
+        with st.spinner("AI 正在思考中..."):
+            try:
+                # 检查车辆类型
+                is_continuation = st.session_state.messages[-1].get("is_continuation_prompt", False)
 
-            full_response = ""
-            for chunk in getAnswer():
-                full_response += chunk
-                placeholder.markdown(full_response + "▌")
-            placeholder.markdown(full_response)
+                # 【API 主干道】
+                full_response = ""
+                for chunk in getAnswer():
+                    full_response += chunk
+                    placeholder.markdown(full_response + "▌")
+                placeholder.markdown(full_response)
 
-            if is_continuation:
-                target_idx = st.session_state.messages[-1].get("target_index")
-                st.session_state.messages.pop() # 移除临时续写指令
-                st.session_state.messages[target_idx]["content"][0] += full_response
-            else:
-                # 检查最后一条消息是否是助手消息，如果是，则更新它；否则，追加
-                if st.session_state.messages and st.session_state.messages[-1]["role"] == "assistant":
-                     st.session_state.messages[-1]["content"] = [full_response]
+                # 【专属停车场加工】
+                if is_continuation:
+                    target_idx = st.session_state.messages[-1].get("target_index")
+                    st.session_state.messages.pop()
+                    st.session_state.messages[target_idx]["content"][0] += full_response
                 else:
-                     st.session_state.messages.append({"role": "assistant", "content": [full_response]})
+                    st.session_state.messages.append({"role": "assistant", "content": [full_response]})
 
-            with open(log_file, "wb") as f:
-                pickle.dump(_prepare_messages_for_save(st.session_state.messages), f)
-            st.experimental_rerun()
+                # 所有车辆加工完毕，保存并刷新道路
+                with open(log_file, "wb") as f:
+                    pickle.dump(_prepare_messages_for_save(st.session_state.messages), f)
+                st.experimental_rerun()
 
-        except Exception as e:
-            error_type_name = type(e).__name__
-            error_details = str(e.args) if e.args else "无更多细节"
-            st.error(f"""
-                **[ 🔴 生成中断 ]**\n
-                **错误类型:** {error_type_name}\n
-                **详情:** {error_details}\n
-                您可以尝试【♻️重新生成】或【➕继续】。
-            """)
-            # 失败时不 rerun，保留事故现场
-
+            except Exception as e:
+                # 【事故处理】
+                error_type_name = type(e).__name__
+                error_details = str(e.args) if e.args else "无更多细节"
+                st.error(f"**[ 🔴 生成中断 ]**\n\n**错误类型:** {error_type_name}\n\n**详情:** {error_details}")
+                # 失败时不 rerun，保留事故现场
 
 
 # --- 底部控件 ---
