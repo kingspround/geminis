@@ -2524,62 +2524,134 @@ if len(st.session_state.messages) >= 1 and not st.session_state.editing:
 
 
 # ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
-# ★★★ 核心逻辑 (最终正确版：回归线性执行，恢复心跳，杜绝一切循环) ★★★
+# ★★★ 全新的核心逻辑 (从零重写，绝对稳定) ★★★
 # ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
 
-# --- 1. “车辆出发点” 与 “主干道” 合二为一，保证绝对单次执行 ---
+# --- 1. 定义一个“发车”函数，用于所有生成任务 ---
+# 这是一个辅助函数，用于设置信号并触发刷新，确保执行流程被正确分离
+def trigger_generation():
+    st.session_state.do_generation = True
+    st.experimental_rerun()
 
+# --- 2. 修改按钮回调函数，让它们只负责准备工作 ---
+# 这是您之前的 regenerate_message 和 continue_message 函数的【新版本】
+def prepare_for_regenerate(index):
+    """只准备重新生成的消息列表，不执行任何操作"""
+    if 0 <= index < len(st.session_state.messages) and st.session_state.messages[index]["role"] == "assistant":
+        st.session_state.messages = st.session_state.messages[:index]
+
+def prepare_for_continue(index):
+    """只准备续写的消息列表，不执行任何操作"""
+    message_to_continue = st.session_state.messages[index]
+    original_content = ""
+    for part in message_to_continue.get("content", []):
+        if isinstance(part, str):
+            original_content = part
+            break
+    last_chars = (original_content[-100:] + "...") if len(original_content) > 100 else original_content
+    continue_prompt = f"请严格地、无缝地从以下文本的结尾处继续写下去。不要重复任何内容，不要添加任何前言或解释，直接输出续写的内容即可。这是需要续写的文本片段：\n\"...{last_chars}\""
+    st.session_state.messages.append({
+        "role": "user", 
+        "content": [continue_prompt], 
+        "is_continuation_prompt": True,
+        "target_index": index
+    })
+
+# --- 3. UI 渲染与交互入口 ---
+
+# 3a. 重新生成/继续按钮的UI
+# (请将您之前的按钮UI代码块替换为此，确保 on_click 正确)
+if len(st.session_state.messages) >= 1 and not st.session_state.get("editing"):
+    last_real_msg_idx = -1
+    # ... (寻找 last_real_msg_idx 的逻辑保持不变) ...
+    for i in range(len(st.session_state.messages) - 1, -1, -1):
+        if not st.session_state.messages[i].get("temp"):
+            last_real_msg_idx = i
+            break
+            
+    if last_real_msg_idx != -1:
+        last_msg = st.session_state.messages[last_real_msg_idx]
+        is_text_only_assistant = (
+            last_msg["role"] == "assistant" and 
+            len(last_msg.get("content", [])) > 0 and 
+            isinstance(last_msg["content"][0], str) and
+            last_msg["content"][0].strip()
+        )
+        if is_text_only_assistant:
+            with st.container():
+                cols = st.columns(25) 
+                if cols[0].button("✏️", key=f"edit_{last_real_msg_idx}", help="编辑"): 
+                    st.session_state.editable_index = last_real_msg_idx
+                    st.session_state.editing = True
+                    st.experimental_rerun()
+                
+                # 【重要】按钮现在只调用准备函数，然后调用发车函数
+                if cols[1].button("♻️", key=f"regen_{last_real_msg_idx}", help="重新生成"):
+                    prepare_for_regenerate(last_real_msg_idx)
+                    trigger_generation()
+
+                if cols[2].button("➕", key=f"cont_{last_real_msg_idx}", help="继续"):
+                    prepare_for_continue(last_real_msg_idx)
+                    trigger_generation()
+                
+                cols[3].button("🔊", key=f"tts_{last_real_msg_idx}", help="生成语音", on_click=generate_speech_for_message, args=(last_real_msg_idx,))
+        elif last_msg["role"] == "assistant":
+             if st.columns(25)[0].button("♻️", key=f"regen_vision_{last_real_msg_idx}", help="重新生成"):
+                prepare_for_regenerate(last_real_msg_idx)
+                trigger_generation()
+
+
+# 3b. 主输入框
 if prompt := st.chat_input("输入你的消息...", key="main_chat_input"):
-    # 1a. 立即将用户消息加入状态并显示，解决UI延迟
     st.session_state.messages.append({"role": "user", "content": [prompt]})
-    with st.chat_message("user"):
-        st.markdown(prompt)
+    trigger_generation()
 
-    # 1b. 在同一次脚本运行中，立即开始生成
+
+# --- 4. “主干道”：唯一的、绝对单线程的生成逻辑 ---
+# 这个代码块只会在 “do_generation” 信号存在时，在一次全新的脚本运行中被执行。
+if st.session_state.get("do_generation"):
+    st.session_state.do_generation = False # 信号已收到，立即销毁，保证单次执行
+
+    # 预处理：显示用户的最新消息
+    last_user_message = st.session_state.messages[-1]
+    if not last_user_message.get("is_continuation_prompt"):
+        with st.chat_message("user"):
+            st.markdown(last_user_message["content"][0])
+    
     with st.chat_message("assistant"):
         placeholder = st.empty()
-        # 【关键】恢复思考圈圈，它就是我们的心跳
+        # 【关键】恢复思考圈圈作为心跳
         with st.spinner("AI 正在思考中..."):
             try:
-                # 检查是否是续写（虽然当前逻辑不会触发，但为按钮保留）
                 is_continuation = st.session_state.messages[-1].get("is_continuation_prompt", False)
 
-                # 【API 主干道】
                 full_response = ""
                 for chunk in getAnswer():
                     full_response += chunk
                     placeholder.markdown(full_response + "▌")
                 placeholder.markdown(full_response)
 
-                # 【专属停车场加工】
+                # “停车场加工”
                 if is_continuation:
-                    # 这个逻辑块现在只会被“继续”按钮触发
                     target_idx = st.session_state.messages[-1].get("target_index")
-                    st.session_state.messages.pop()
+                    st.session_state.messages.pop() # 移除临时续写指令
                     st.session_state.messages[target_idx]["content"][0] += full_response
                 else:
-                    # 这是新对话，追加
                     st.session_state.messages.append({"role": "assistant", "content": [full_response]})
 
+                # 保存并触发最终的UI刷新
+                with open(log_file, "wb") as f:
+                    pickle.dump(_prepare_messages_for_save(st.session_state.messages), f)
+                st.experimental_rerun()
+
             except Exception as e:
-                # 【事故处理】
                 error_type_name = type(e).__name__
                 error_details = str(e.args) if e.args else "无更多细节"
                 st.error(f"**[ 🔴 生成中断 ]**\n\n**错误类型:** {error_type_name}\n\n**详情:** {error_details}")
-    
-    # 1c. 在所有操作结束后，【有且仅有一次】保存记录
-    # 注意：这里不再需要rerun，因为Streamlit在chat_input提交后会自动处理刷新
-    with open(log_file, "wb") as f:
-        pickle.dump(_prepare_messages_for_save(st.session_state.messages), f)
+                # 失败时不 rerun，保留事故现场
 
-# --- 2. 修改按钮逻辑，让它们也遵循这个简单模式 ---
-# 按钮现在应该只负责准备消息，然后调用 rerun 来触发一次完整的脚本运行，
-# 让 st.chat_input 来处理下一次的输入。
-# (这部分逻辑需要您确认是否需要，如果按钮也频繁出问题，我们就需要为按钮也创建一个类似的线性流程)
-
-# --- 底部控件 ---
+# --- 5. 底部控件 ---
 c1, c2 = st.columns(2)
 st.session_state.use_token = c1.checkbox("使用 Token", value=st.session_state.get("use_token", True))
-if c2.button("🔄", key="page_refresh", help="刷新页面"): st.experimental_rerun()
-
-	
+if c2.button("🔄", key="page_refresh", help="刷新页面"):
+    st.experimental_rerun()
