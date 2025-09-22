@@ -2525,33 +2525,34 @@ if len(st.session_state.messages) >= 1 and not st.session_state.editing:
 
 
 # ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
-# ★★★ 核心逻辑 (最终正确版：彻底隔离输入与执行，杜绝重复发送) ★★★
+# ★★★ 核心逻辑 (最终正确版：即时UI响应 + 优雅处理真实API错误) ★★★
 # ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
 
-# --- 1. “车辆出发点”：所有按钮和输入框 ---
-# 所有的触发点，都只负责“准备车辆”和“发出信号”，然后立即停止本次脚本运行。
+# --- 1. “车辆出发点”：所有按钮 ---
+# 按钮（重新生成、继续）的逻辑是：准备消息列表，然后发出“发车”信号，最后rerun
+# 例如：
+# def regenerate_message(index):
+#     st.session_state.messages = st.session_state.messages[:index]
+#     st.session_state.do_generation = True
+#     st.experimental_rerun()
 
+
+# --- 2. 交互与生成的主流程 ---
+
+# 2a. “车辆出发点” 2: 主输入框
 if prompt := st.chat_input("输入你的消息...", key="main_chat_input"):
+    # 【修复延迟】立即将用户消息加入状态并显示
     st.session_state.messages.append({"role": "user", "content": [prompt]})
-    st.session_state.do_generation = True
-    # 【关键】输入后立即rerun，将“输入处理”和“生成执行”彻底分离到两个独立的脚本运行中
-    st.experimental_rerun()
-
-
-# --- 2. “主干道” 和 “停车场”：唯一的生成逻辑 ---
-# 这个代码块只会在 “do_generation” 信号存在时，在一次全新的脚本运行中被执行。
-if st.session_state.get("do_generation"):
-    # 信号已收到，立即销毁，保证单次执行
-    st.session_state.do_generation = False
-
-    # 预处理：显示用户的最新消息
-    last_user_message = st.session_state.messages[-1]
-    # 我们只显示非临时的用户消息
-    if not last_user_message.get("is_continuation_prompt"):
-        with st.chat_message("user"):
-            st.markdown(last_user_message["content"][0])
+    with st.chat_message("user"):
+        st.markdown(prompt)
     
-    # 进入主干道
+    # 【重要】直接在同一次脚本运行中，发出“发车”信号
+    st.session_state.do_generation = True
+
+# 2b. “主干道” 和 “停车场”
+if st.session_state.get("do_generation"):
+    st.session_state.do_generation = False # 信号已收到，立即销毁
+
     with st.chat_message("assistant"):
         placeholder = st.empty()
         try:
@@ -2566,21 +2567,30 @@ if st.session_state.get("do_generation"):
 
             if is_continuation:
                 target_idx = st.session_state.messages[-1].get("target_index")
-                st.session_state.messages.pop()
+                st.session_state.messages.pop() # 移除临时续写指令
                 st.session_state.messages[target_idx]["content"][0] += full_response
             else:
-                st.session_state.messages.append({"role": "assistant", "content": [full_response]})
+                # 检查最后一条消息是否是助手消息，如果是，则更新它；否则，追加
+                if st.session_state.messages and st.session_state.messages[-1]["role"] == "assistant":
+                     st.session_state.messages[-1]["content"] = [full_response]
+                else:
+                     st.session_state.messages.append({"role": "assistant", "content": [full_response]})
 
             with open(log_file, "wb") as f:
                 pickle.dump(_prepare_messages_for_save(st.session_state.messages), f)
-            # 成功后，再次rerun以清理UI状态（例如移除临时的续写指令显示）
             st.experimental_rerun()
 
         except Exception as e:
             error_type_name = type(e).__name__
             error_details = str(e.args) if e.args else "无更多细节"
-            st.error(f"**[ 🔴 生成中断 ]**\n\n**错误类型:** {error_type_name}\n\n**详情:** {error_details}")
+            st.error(f"""
+                **[ 🔴 生成中断 ]**\n
+                **错误类型:** {error_type_name}\n
+                **详情:** {error_details}\n
+                您可以尝试【♻️重新生成】或【➕继续】。
+            """)
             # 失败时不 rerun，保留事故现场
+
 
 
 # --- 底部控件 ---
