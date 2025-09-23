@@ -937,16 +937,24 @@ if st.session_state.is_generating:
             else:
                 full_response_content = ""
                 try:
-                    # --- 【关键修复】修改调用流程 ---
-
-                    # 1. 首先，调用新函数，安全地构建出将要发送的消息包
+                    # 1. 安全地构建将要发送的消息包
                     api_payload = _build_api_payload(is_continuation_task, target_message_index)
 
-                    # 2. 然后，立刻、无条件地将这份“飞行计划”存入“黑匣子”
-                    # 无论后续API调用成功还是失败，这份记录都将确保被保留
+                    # 2. 立刻将“飞行计划”存入“黑匣子”
                     st.session_state.last_debug_payload = api_payload
 
-                    # 3. 最后，才拿着这份消息包去调用API并进行流式处理
+                    # --- 【关键修复】---
+                    # 在开始流式处理之前，必须在这里定义 original_content
+                    # 默认情况下，它是一个空字符串（用于新消息或重新生成）
+                    original_content = ""
+                    # 如果是“继续”任务，则获取已有的文本内容
+                    if is_continuation_task:
+                        content_list = st.session_state.messages[target_message_index]["content"]
+                        if content_list and isinstance(content_list[0], str):
+                            original_content = content_list[0]
+                    # --- 【修复结束】---
+
+                    # 3. 最后，才拿着消息包去调用API
                     streamed_part = ""
                     for chunk in getAnswer(payload_to_send=api_payload):
                         streamed_part += chunk
@@ -956,39 +964,27 @@ if st.session_state.is_generating:
                     
                     logging.warning(f"--- [DIAGNOSTIC LOG at {datetime.now()}] --- Finished calling getAnswer().")
                     
-                    # 成功生成的最后
                     placeholder.markdown(full_response_content)
                     st.session_state.is_generating = False 
-                    
-                    # --- 【步骤 3.B - 成功部分】---
-                    # 成功运行后，再次确认清除旧的错误记录，确保状态正确
                     st.session_state.last_error_message = None
 
                 except Exception as e:
-                    # --- 【步骤 3.B - 失败部分】---
-                    # 捕获并保存详细的错误信息到“飞行记录仪”
+                    # (这里的错误捕获和记录逻辑完全不变)
                     error_type = type(e).__name__
                     error_details = str(e)
-                    full_traceback = traceback.format_exc() # 获取完整的错误堆栈
-
-                    # 格式化成易于阅读的 Markdown 文本
+                    full_traceback = traceback.format_exc()
                     formatted_error = f"""
 **类型 (Type):** `{error_type}`
-
 **详情 (Details):**
 ```
 {error_details}
 ```
-
 **完整追溯 (Traceback):**
 ```
 {full_traceback}
 ```
                     """
-                    # 存入“飞行记录仪”
                     st.session_state.last_error_message = formatted_error
-                    
-                    # (下面是您原有的错误处理代码)
                     logging.error(f"--- [ERROR LOG at {datetime.now()}] --- Exception caught: {e}", exc_info=True)
                     st.error(f"回答生成时中断。错误详情请查看侧边栏日志。")
                     if full_response_content:
@@ -997,20 +993,16 @@ if st.session_state.is_generating:
                     st.session_state.is_generating = False 
                 
                 finally:
-                    # (finally 块的逻辑保持不变)
+                    # (finally 块逻辑完全不变)
                     if is_continuation_task and st.session_state.messages and st.session_state.messages[-1].get("is_continue_prompt"):
                        st.session_state.messages.pop()
-
                     if st.session_state.messages and st.session_state.messages[-1]['role'] == 'assistant':
                        content = st.session_state.messages[-1].get("content", [""])[0]
                        if not isinstance(content, str) or not content.strip():
                            st.session_state.messages.pop()
-
                     with open(log_file, "wb") as f:
                         pickle.dump(_prepare_messages_for_save(st.session_state.messages), f)
-                    
-                    logging.warning(f"--- [DIAGNOGSTIC LOG at {datetime.now()}] --- Finally block finished. Preparing for rerun.")
-                    
+                    logging.warning(f"--- [DIAGNOSTIC LOG at {datetime.now()}] --- Finally block finished. Preparing for rerun.")
                     st.rerun()
 
 
