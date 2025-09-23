@@ -12,8 +12,27 @@ from PIL import Image
 # --- API 密钥设置 ---
 # 【请在这里填入您的API Keys】
 API_KEYS = {
-    "默认API Key": "AIza...",
-    "4号API (正常)": "AIza...", 
+    "04 1号20270168962": "AIzaSyDGjLL0nJWkqDYj2KDWJdAh3zPwLPmIA_E",
+    "04 2号371111309083": "AIzaSyAQIz1pb84NzSzDwbtM2vB04zhLw8zVqdA",
+    "04 3号622662315859":"AIzaSyD9JGoGhibXPWdNmpcfmrqZ-zxpEyg67EQ",
+	"04 5号375090949096":"AIzaSyCLuGSiCE-3lxciVRiD28aBBFROMPoFU3M",
+	"04 6号340384272853":"AIzaSyDp6qJunrZ37Nc9ucbItUJB-L8lYXDdGgs",
+	"04 7号371111309083":"AIzaSyAQIz1pb84NzSzDwbtM2vB04zhLw8zVqdA",
+	
+    "1 1号799638464939":"AIzaSyA5fPQo1F4qlywciLyZQknpCq0ScuOTpv4",
+	
+    "2 1号866575601521":"AIzaSyD9_DVaXprbjlM6pqhbcpznrOPYib_OLcc",
+	"2 3号961280537667":"AIzaSyClCCaPvJ8uqM23fQ_ZxpbA_EqA4g1i2V8",
+
+	"01 1号227514221200":"AIzaSyBTyNjfDMw5tX5kOMi9i3g9OOnwDovMtQI",
+	
+	"02 1号163679758614":"AIzaSyCEoSXnALUnxMSvWpK4AWYre99mxNydKZY",
+
+	"03 1号702122391294":"AIzaSyBQodu9EWd8VlLteNTiL0pXfSDPI_WobHI",
+
+	"05 1号668014237032":"AIzaSyDGJtgFfVPWOwVJ4YIR59UHNTBt8gsoKRM",
+	"05 2号851244762061":"AIzaSyAV6awcQC4NUQaX241EM72zxsGdwSEFMm0",
+	
 }
 
 # --- 模型配置 ---
