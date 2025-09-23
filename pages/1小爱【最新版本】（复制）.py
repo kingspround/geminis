@@ -294,11 +294,39 @@ def _build_setup_messages():
     return setup_messages
 
 
-def getAnswer(contents_to_send):
+def _build_api_payload(is_continuation, target_idx):
     """
-    【简化版】只负责调用API并返回流。
+    【新函数】专门负责构建发送给API的完整消息负载(payload)。
+    它不执行任何网络请求，只准备数据并返回。
     """
-    response = st.session_state.model.generate_content(contents=contents_to_send, stream=True)
+    # 1. 构建前置指令 (此逻辑从旧getAnswer中移出)
+    history_to_send = _build_setup_messages()
+    
+    # 2. 构建聊天记录 (此逻辑从旧getAnswer中移出)
+    current_messages = st.session_state.get("messages", [])
+    history_to_include = current_messages[:target_idx + 1] if is_continuation else current_messages[-MAX_HISTORY_MESSAGES:]
+        
+    for msg in history_to_include:
+        if msg and msg.get("role") and msg.get("content"):
+            api_role = "model" if msg["role"] == "assistant" else "user"
+            history_to_send.append({"role": api_role, "parts": msg["content"]})
+    
+    # 3. (仅续写时) 注入最后的提醒 (此逻辑从旧getAnswer中移出)
+    if is_continuation:
+        LAST_MINUTE_REMINDER_PROMPT = """
+请严格地从以下文本的结尾处，无缝、自然地继续写下去。不要重复任何内容，不要添加任何前言或解释，直接输出续写的内容即可。
+"""
+        history_to_send.append({"role": "user", "parts": [{"text": LAST_MINUTE_REMINDER_PROMPT}]})
+
+    final_contents = [msg for msg in history_to_send if msg.get("parts")]
+    return final_contents
+	
+
+def getAnswer(payload_to_send):
+    """
+    【已简化】接收准备好的消息负载(payload)，执行API调用并返回流式结果。
+    """
+    response = st.session_state.model.generate_content(contents=payload_to_send, stream=True)
     
     yielded_something = False
     for chunk in response:
@@ -310,7 +338,6 @@ def getAnswer(contents_to_send):
     
     if not yielded_something:
         yield ""
-
 
 
 def regenerate_message(index):
@@ -2622,60 +2649,58 @@ if st.session_state.is_generating:
             else:
                 full_response_content = ""
                 try:
-                    # --- 【核心修复】在这里提前构建并保存 Debug Payload ---
-                    # 1. 立即构建完整的前置指令和历史消息
-                    history_to_send = _build_setup_messages()
-                    current_messages = st.session_state.get("messages", [])
-                    history_to_include = current_messages[:target_message_index + 1] if is_continuation_task else current_messages[-MAX_HISTORY_MESSAGES:]
-                    for msg in history_to_include:
-                        if msg and msg.get("role") and msg.get("content"):
-                            api_role = "model" if msg["role"] == "assistant" else "user"
-                            history_to_send.append({"role": api_role, "parts": msg["content"]})
-                    if is_continuation_task:
-                        # (续写指令的注入逻辑不变)
-                        LAST_MINUTE_REMINDER_PROMPT = "..." # (您的续写指令)
-                        history_to_send.append({"role": "user", "parts": [{"text": LAST_MINUTE_REMINDER_PROMPT}]})
-                    
-                    final_contents_for_api = [msg for msg in history_to_send if msg.get("parts")]
+                    # --- 【关键修复】修改调用流程 ---
 
-                    # 2. 【关键】在调用API之前，就将这份“遗言”存入飞行记录仪
-                    st.session_state.last_debug_payload = final_contents_for_api
-                    # ----------------------------------------------------
+                    # 1. 首先，调用新函数，安全地构建出将要发送的消息包
+                    api_payload = _build_api_payload(is_continuation_task, target_message_index)
 
-                    # 3. 清除上一次可能存在的旧错误信息
-                    st.session_state.last_error_message = None
+                    # 2. 然后，立刻、无条件地将这份“飞行计划”存入“黑匣子”
+                    # 无论后续API调用成功还是失败，这份记录都将确保被保留
+                    st.session_state.last_debug_payload = api_payload
 
-                    logging.warning(f"--- [DIAGNOSTIC LOG at {datetime.now()}] --- About to call API.")
-                    
-                    # 4. 现在才真正调用API，并将已经构建好的数据传给它
-                    response = st.session_state.model.generate_content(contents=final_contents_for_api, stream=True)
-
-                    original_content = ""
-                    content_list = st.session_state.messages[target_message_index]["content"]
-                    if content_list and isinstance(content_list[0], str):
-                        original_content = content_list[0]
-
+                    # 3. 最后，才拿着这份消息包去调用API并进行流式处理
                     streamed_part = ""
-                    for chunk in response:
+                    for chunk in getAnswer(payload_to_send=api_payload):
                         streamed_part += chunk
                         full_response_content = original_content + streamed_part
                         st.session_state.messages[target_message_index]["content"][0] = full_response_content
                         placeholder.markdown(full_response_content + "▌")
                     
-                    logging.warning(f"--- [DIAGNOSTIC LOG at {datetime.now()}] --- Finished API call successfully.")
+                    logging.warning(f"--- [DIAGNOSTIC LOG at {datetime.now()}] --- Finished calling getAnswer().")
                     
+                    # 成功生成的最后
                     placeholder.markdown(full_response_content)
                     st.session_state.is_generating = False 
+                    
+                    # --- 【步骤 3.B - 成功部分】---
+                    # 成功运行后，再次确认清除旧的错误记录，确保状态正确
                     st.session_state.last_error_message = None
 
                 except Exception as e:
-                    # (这里的错误捕获和记录逻辑保持不变)
+                    # --- 【步骤 3.B - 失败部分】---
+                    # 捕获并保存详细的错误信息到“飞行记录仪”
                     error_type = type(e).__name__
                     error_details = str(e)
-                    full_traceback = traceback.format_exc()
-                    formatted_error = f"..." # (格式化错误信息的代码不变)
+                    full_traceback = traceback.format_exc() # 获取完整的错误堆栈
+
+                    # 格式化成易于阅读的 Markdown 文本
+                    formatted_error = f"""
+**类型 (Type):** `{error_type}`
+
+**详情 (Details):**
+```
+{error_details}
+```
+
+**完整追溯 (Traceback):**
+```
+{full_traceback}
+```
+                    """
+                    # 存入“飞行记录仪”
                     st.session_state.last_error_message = formatted_error
                     
+                    # (下面是您原有的错误处理代码)
                     logging.error(f"--- [ERROR LOG at {datetime.now()}] --- Exception caught: {e}", exc_info=True)
                     st.error(f"回答生成时中断。错误详情请查看侧边栏日志。")
                     if full_response_content:
