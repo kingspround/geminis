@@ -38,20 +38,21 @@ API_KEYS = {
 
 	"03 1号702122391294":"AIzaSyBQodu9EWd8VlLteNTiL0pXfSDPI_WobHI",
 
-	"05 1号668014237032":"AIzaSyBmkXf1tx9qrqnrPlzoDeVi6vQ5xLY-AB0",
+	"05 1号668014237032":"AIzaSyDGJtgFfVPWOwVJ4YIR59UHNTBt8gsoKRM",
 	"05 2号851244762061":"AIzaSyAV6awcQC4NUQaX241EM72zxsGdwSEFMm0",
 	
 }
 
 # --- 模型配置 ---
 MODELS = {
-    "gemini-2.5-flash (默认)": "gemini-2.5-flash",
+    "gemini-2.5-flash-preview-05-20 (默认)": "gemini-2.5-flash-preview-05-20",
     "gemini-2.5-pro": "gemini-2.5-pro",
     "gemini-2.0-flash-exp": "gemini-2.0-flash-exp",
     "gemini-exp-1206": "gemini-exp-1206",
     "gemini-embedding-001 (嵌入模型，会报错)": "gemini-embedding-001",
 }
-DEFAULT_MODEL_NAME = "gemini-2.5-flash (默认)"
+DEFAULT_MODEL_NAME = "gemini-2.5-flash-preview-05-20 (默认)"
+
 
 # --- 语音生成 (TTS) 配置 ---
 VOICE_OPTIONS = {
