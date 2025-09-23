@@ -294,15 +294,16 @@ def _build_setup_messages():
     return setup_messages
 
 
+# --- 【关键修复】在这里添加被遗漏的 _build_api_payload 函数定义 ---
 def _build_api_payload(is_continuation, target_idx):
     """
     【新函数】专门负责构建发送给API的完整消息负载(payload)。
     它不执行任何网络请求，只准备数据并返回。
     """
-    # 1. 构建前置指令 (此逻辑从旧getAnswer中移出)
+    # 1. 构建前置指令
     history_to_send = _build_setup_messages()
     
-    # 2. 构建聊天记录 (此逻辑从旧getAnswer中移出)
+    # 2. 构建聊天记录
     current_messages = st.session_state.get("messages", [])
     history_to_include = current_messages[:target_idx + 1] if is_continuation else current_messages[-MAX_HISTORY_MESSAGES:]
         
@@ -311,7 +312,7 @@ def _build_api_payload(is_continuation, target_idx):
             api_role = "model" if msg["role"] == "assistant" else "user"
             history_to_send.append({"role": api_role, "parts": msg["content"]})
     
-    # 3. (仅续写时) 注入最后的提醒 (此逻辑从旧getAnswer中移出)
+    # 3. (仅续写时) 注入最后的提醒
     if is_continuation:
         LAST_MINUTE_REMINDER_PROMPT = """
 请严格地从以下文本的结尾处，无缝、自然地继续写下去。不要重复任何内容，不要添加任何前言或解释，直接输出续写的内容即可。
