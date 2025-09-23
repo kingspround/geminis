@@ -509,7 +509,8 @@ def send_from_sidebar_callback():
             except Exception as e: st.error(f"处理图片 {uploaded_file.name} 失败: {e}")
     if caption: content_parts.append(caption)
     
-    _send_user_message(content_parts, clear_keys=["sidebar_caption", "sidebar_uploader"])
+    # ✅ 正确：只清空自己负责的文本框，不再去动文件上传器的状态
+    _send_user_message(content_parts, clear_keys=["sidebar_caption"])
 
 
 def send_file_interpretation_request():
@@ -523,7 +524,8 @@ def send_file_interpretation_request():
         try:
             content_parts = [genai.upload_file(path=f) for f in uploaded_files]
             content_parts.append(prompt)
-            _send_user_message(content_parts, clear_keys=["file_interpreter_prompt", "file_interpreter_uploader"])
+            # ✅ 正确：只清空自己负责的文本框
+            _send_user_message(content_parts, clear_keys=["file_interpreter_prompt"])
         except Exception as e:
             st.error(f"处理或上传文件时出错: {e}")
 
@@ -581,7 +583,8 @@ def send_video_interpretation_request():
 
         # --- 步骤 3: 发送提问请求 ---
         content_parts.append(prompt)
-        _send_user_message(content_parts, clear_keys=["video_prompt", "youtube_url_input", "video_uploader"])
+        # ✅ 正确：只清空自己负责的文本框，不再碰 video_uploader
+        _send_user_message(content_parts, clear_keys=["video_prompt", "youtube_url_input"])
         
     except Exception as e:
         st.error(f"处理或上传影片时出错: {e}")
