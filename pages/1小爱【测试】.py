@@ -45,7 +45,7 @@ API_KEYS = {
 
 # --- 模型配置 ---
 MODELS = {
-    "gemini-2.5-flash-preview (默认)": "gemini-2.5-flash",
+    "gemini-2.5-flash (默认)": "gemini-2.5-flash",
     "gemini-2.5-pro": "gemini-2.5-pro",
     "gemini-2.0-flash-exp": "gemini-2.0-flash-exp",
     "gemini-exp-1206": "gemini-exp-1206",
