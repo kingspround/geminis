@@ -17,18 +17,28 @@ if "enabled_settings" not in st.session_state:
     st.session_state.enabled_settings = {}
 
 # --- API 密钥设置 ---
-api_keys = {
-    "主密钥": "AIzaSyCBjZbA78bPusYmUNvfsmHpt6rPx6Ur0QE",  # 替换成你的主 API 密钥
-    "备用1号": "AIzaSyAWfFf6zqy1DizINOwPfxPD8EF2ACdwCaQ",  # 替换成你的备用 API 密钥
-    "备用2号":"AIzaSyD4UdMp5wndOAKxtO1CWpzuZEGEf78YKUQ",
-    "备用3号":"AIzaSyBVbA7tEyyy_ASp7l9P60qSh1xOM2CSMNw",
-    "备用4号":"AIzaSyDezEpxvtY1AKN6JACMU9XHte5sxATNcUs",
-    "备用5号":"AIzaSyBgyyy2kTTAdsLB53OCR2omEbj7zlx1mjw",
-    "备用6号":"AIzaSyDPFZ7gRba9mhKTqbXA_Y7fhAxS8IEu0bY",
-    "备用7号":"AIzaSyDdyhqcowl0ftcbK9pMObXzM7cIOQMtlmA",
-    "备用8号":"AIzaSyAA7Qs9Lzy4UxxIqCIQ4RknchiWQt_1hgI",
-    "备用9号":"AIzaSyCj_CCwQua1mfq3EjzqV6Up6NHsxtb9dy8",
-    "备用10号":"AIzaSyDOI2e-I1RdXBnk99jY2H00A3aymXREETA"
+API_KEYS = {
+    "04 1号20270168962": "AIzaSyDGjLL0nJWkqDYj2KDWJdAh3zPwLPmIA_E",
+    "04 2号371111309083": "AIzaSyAQIz1pb84NzSzDwbtM2vB04zhLw8zVqdA",
+    "04 3号622662315859":"AIzaSyD9JGoGhibXPWdNmpcfmrqZ-zxpEyg67EQ",
+	"04 5号375090949096":"AIzaSyCLuGSiCE-3lxciVRiD28aBBFROMPoFU3M",
+	"04 6号340384272853":"AIzaSyDp6qJunrZ37Nc9ucbItUJB-L8lYXDdGgs",
+	"04 7号371111309083":"AIzaSyAQIz1pb84NzSzDwbtM2vB04zhLw8zVqdA",
+	
+    "1 1号799638464939":"AIzaSyA5fPQo1F4qlywciLyZQknpCq0ScuOTpv4",
+	
+    "2 1号866575601521":"AIzaSyD9_DVaXprbjlM6pqhbcpznrOPYib_OLcc",
+	"2 3号961280537667":"AIzaSyClCCaPvJ8uqM23fQ_ZxpbA_EqA4g1i2V8",
+
+	"01 1号227514221200":"AIzaSyBTyNjfDMw5tX5kOMi9i3g9OOnwDovMtQI",
+	
+	"02 1号163679758614":"AIzaSyCEoSXnALUnxMSvWpK4AWYre99mxNydKZY",
+
+	"03 1号702122391294":"AIzaSyBQodu9EWd8VlLteNTiL0pXfSDPI_WobHI",
+
+	"05 1号668014237032":"AIzaSyDGJtgFfVPWOwVJ4YIR59UHNTBt8gsoKRM",
+	"05 2号851244762061":"AIzaSyAV6awcQC4NUQaX241EM72zxsGdwSEFMm0",
+	
 }
 
 selected_key = st.sidebar.selectbox("选择 API 密钥", list(api_keys.keys()), index=0) # 默认选择主密钥
