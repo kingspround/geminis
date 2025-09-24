@@ -11,9 +11,6 @@ from PIL import Image
 import wave
 import time
 from datetime import datetime
-import logging
-import traceback
-import google.api_core.exceptions
 
 
 
@@ -325,34 +322,13 @@ def _build_api_payload(is_continuation, target_idx):
     return final_contents
 	
 
-@retry(
-    # 【关键修复】将错误的 retry_on_exception 参数换成正确的 retry 参数，
-    # 并使用 tenacity 官方推荐的 retry_if_exception_type 工具。
-    retry=retry_if_exception_type((
-        google.api_core.exceptions.ResourceExhausted,
-        google.api_core.exceptions.InternalServerError
-    )),
-    
-    # 下面的等待策略、停止条件和日志记录都保持不变，它们是正确的
-    wait=wait_exponential(multiplier=2, min=2, max=60),
-    stop=stop_after_attempt(3),
-    before_sleep=lambda retry_state: logging.warning(
-        f"API响应繁忙 ({type(retry_state.outcome.exception()).__name__})，正在礼貌地等待 "
-        f"{retry_state.next_action.sleep:.2f} 秒后重试 (第 {retry_state.attempt_number} 次尝试)..."
-    )
-)
+
 def getAnswer(payload_to_send):
     """
-    【已升级】接收准备好的消息负载，执行API调用并返回流式结果。
-    此版本已正确配置 tenacity 装饰器，能够自动处理 429 和 500 错误。
+    【已简化】接收准备好的消息负载(payload)，执行API调用并返回流式结果。
     """
-    response = st.session_state.model.generate_content(
-        contents=payload_to_send, 
-        stream=True,
-        request_options={'timeout': 120} 
-    )
+    response = st.session_state.model.generate_content(contents=payload_to_send, stream=True)
     
-    # 流式处理的逻辑保持不变
     yielded_something = False
     for chunk in response:
         try:
@@ -363,6 +339,7 @@ def getAnswer(payload_to_send):
     
     if not yielded_something:
         yield ""
+
 
 def regenerate_message(index):
     if 0 <= index < len(st.session_state.messages) and st.session_state.messages[index]["role"] == "assistant":
