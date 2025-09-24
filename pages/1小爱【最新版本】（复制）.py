@@ -13,6 +13,10 @@ import time
 from datetime import datetime
 import logging
 import traceback
+import logging
+import google.api_core.exceptions
+from tenacity import retry, stop_after_attempt, wait_exponential
+
 
 # ==============================================================================
 # 1. 所有常量定义 (Constants)
@@ -322,12 +326,40 @@ def _build_api_payload(is_continuation, target_idx):
     return final_contents
 	
 
+@retry(
+    # 当餐厅服务员说“后厨忙”(ResourceExhausted, 429)或“我打翻了菜”(InternalServerError, 500)时，才触发等待
+    retry_on_exception=lambda e: isinstance(e, (
+        google.api_core.exceptions.ResourceExhausted,
+        google.api_core.exceptions.InternalServerError
+    )),
+    
+    # 等待的策略：有风度的指数退避。
+    # 第一次等2秒，如果还不行就等4秒，再不行就等8秒... 最长不超过60秒。
+    wait=wait_exponential(multiplier=2, min=2, max=60),
+    
+    # 绅士的耐心是有限的：在放弃前，最多重试3次。
+    stop=stop_after_attempt(3),
+    
+    # 在每次等待前，都礼貌地在后台日志里说一声，方便我们调试
+    before_sleep=lambda retry_state: logging.warning(
+        f"API响应繁忙 ({type(retry_state.outcome.exception()).__name__})，正在礼貌地等待 "
+        f"{retry_state.next_action.sleep:.2f} 秒后重试 (第 {retry_state.attempt_number} 次尝试)..."
+    )
+)
 def getAnswer(payload_to_send):
     """
-    【已简化】接收准备好的消息负载(payload)，执行API调用并返回流式结果。
+    【已升级】接收准备好的消息负载，执行API调用并返回流式结果。
+    此版本已加入 tenacity 装饰器，能够自动处理 429 和 500 错误，
+    像一位有耐心的绅士一样等待服务员上菜。
     """
-    response = st.session_state.model.generate_content(contents=payload_to_send, stream=True)
+    # 向餐厅下单，并设定一个最长等待时间（比如120秒），如果超时就直接不等了
+    response = st.session_state.model.generate_content(
+        contents=payload_to_send, 
+        stream=True,
+        request_options={'timeout': 120} 
+    )
     
+    # 开始享用上来的菜（处理数据流）
     yielded_something = False
     for chunk in response:
         try:
