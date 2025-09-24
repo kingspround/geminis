@@ -52,7 +52,7 @@ MODELS = {
     "gemini-exp-1206": "gemini-exp-1206",
     "gemini-embedding-001 (嵌入模型，会报错)": "gemini-embedding-001",
 }
-DEFAULT_MODEL_NAME = "gemini-2.5-flash-preview-05-20 (默认)"
+DEFAULT_MODEL_NAME = "gemini-2.5-pro"
 
 # --- 语音生成 (TTS) 配置 ---
 VOICE_OPTIONS = {
