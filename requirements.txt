@@ -7,4 +7,6 @@ promise
 asyncio
 python-dotenv
 streamlit==1.49.1
+tenacity 
+pillow            
 
