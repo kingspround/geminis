@@ -13,9 +13,7 @@ import time
 from datetime import datetime
 import logging
 import traceback
-import logging
 import google.api_core.exceptions
-from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
 
 
 
