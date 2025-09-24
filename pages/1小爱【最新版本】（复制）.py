@@ -11,7 +11,8 @@ from PIL import Image
 import wave
 import time
 from datetime import datetime
-
+import logging
+import traceback
 
 
 # ==============================================================================
