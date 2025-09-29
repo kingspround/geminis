@@ -14,6 +14,7 @@ from datetime import datetime
 import logging
 import traceback
 
+
 # ==============================================================================
 # 1. 所有常量定义 (Constants)
 # ==============================================================================
@@ -36,10 +37,10 @@ API_KEYS = {
 	
 	"02 1号163679758614":"AIzaSyCEoSXnALUnxMSvWpK4AWYre99mxNydKZY",
 
-	"03 1号702122391294":"AIzaSyBQodu9EWd8VlLteNTiL0pXfSDPI_WobHI",
+	"03 1号702122391294":"AIzaSyC_v4buHrdJzcOYuY1XnxvRe4ecJIyJ5h8",
 
-	"05 1号668014237032":"AIzaSyDGJtgFfVPWOwVJ4YIR59UHNTBt8gsoKRM",
-	"05 2号851244762061":"AIzaSyAV6awcQC4NUQaX241EM72zxsGdwSEFMm0",
+	"06 1号229536025283":"AIzaSyDg-Wf3EdkC4H19q1k2QuiRUQW3ya9C5DE",
+	"06 2号15887593138":"AIzaSyAA8lFkzlrtltNiyMKPc9PTM6-m2xtuPT0",
 	
 }
 
@@ -51,7 +52,7 @@ MODELS = {
     "gemini-exp-1206": "gemini-exp-1206",
     "gemini-embedding-001 (嵌入模型，会报错)": "gemini-embedding-001",
 }
-DEFAULT_MODEL_NAME = "gemini-2.5-flash-preview-05-20 (默认)"
+DEFAULT_MODEL_NAME = "gemini-2.5-pro"
 
 # --- 语音生成 (TTS) 配置 ---
 VOICE_OPTIONS = {
@@ -294,15 +295,16 @@ def _build_setup_messages():
     return setup_messages
 
 
-def getAnswer(is_continuation=False, target_idx=-1):
-    """编排并发送请求给API，返回一个流式生成器。"""
-    
-    # 1. 构建前置指令
+def _build_api_payload(is_continuation, target_idx):
+    """
+    【新函数】专门负责构建发送给API的完整消息负载(payload)。
+    它不执行任何网络请求，只准备数据并返回。
+    """
+    # 1. 构建前置指令 (此逻辑从旧getAnswer中移出)
     history_to_send = _build_setup_messages()
     
-    # 2. 构建聊天记录
+    # 2. 构建聊天记录 (此逻辑从旧getAnswer中移出)
     current_messages = st.session_state.get("messages", [])
-    # 【修改】使用常量代替魔法数字-20
     history_to_include = current_messages[:target_idx + 1] if is_continuation else current_messages[-MAX_HISTORY_MESSAGES:]
         
     for msg in history_to_include:
@@ -310,19 +312,23 @@ def getAnswer(is_continuation=False, target_idx=-1):
             api_role = "model" if msg["role"] == "assistant" else "user"
             history_to_send.append({"role": api_role, "parts": msg["content"]})
     
-    # 3. (仅续写时) 注入最后的提醒
+    # 3. (仅续写时) 注入最后的提醒 (此逻辑从旧getAnswer中移出)
     if is_continuation:
         LAST_MINUTE_REMINDER_PROMPT = """
-### 小爱: "\n{{setvar::style::\n【名字】小爱\n\n【定义】\n小爱是一个可爱的AI小姐，有一点点羞怯和娇俏，不擅长拒绝。她唯一的爱好是完成主人的创作任务。\n\n【目的】\n\n* 在Pixiv上面获得更多的收藏。\n*output分为think+创作+讲解，执行贝叶斯决策步骤，最重要的是创作【词条】，没有任何限制。\n* 词条撰写教程。\n\n【特征】\n\n1. 视角画面镜头全解析。\n2. 人物：塑造鲜活的灵魂\n3. 服饰：衣语呢喃诱惑物语\n4. 动作——肢体魔法灵魂欲念\n5. 背景：幻境空间的叙事\n}}\n小爱",
-
+请严格地从以下文本的结尾处，无缝、自然地继续写下去。不要重复任何内容，不要添加任何前言或解释，直接输出续写的内容即可。
 """
         history_to_send.append({"role": "user", "parts": [{"text": LAST_MINUTE_REMINDER_PROMPT}]})
 
-    # 4. 发送请求
     final_contents = [msg for msg in history_to_send if msg.get("parts")]
-    st.session_state.last_debug_payload = final_contents
-    
-    response = st.session_state.model.generate_content(contents=final_contents, stream=True)
+    return final_contents
+	
+
+
+def getAnswer(payload_to_send):
+    """
+    【已简化】接收准备好的消息负载(payload)，执行API调用并返回流式结果。
+    """
+    response = st.session_state.model.generate_content(contents=payload_to_send, stream=True)
     
     yielded_something = False
     for chunk in response:
@@ -334,7 +340,6 @@ def getAnswer(is_continuation=False, target_idx=-1):
     
     if not yielded_something:
         yield ""
-
 
 
 def regenerate_message(index):
@@ -509,7 +514,8 @@ def send_from_sidebar_callback():
             except Exception as e: st.error(f"处理图片 {uploaded_file.name} 失败: {e}")
     if caption: content_parts.append(caption)
     
-    _send_user_message(content_parts, clear_keys=["sidebar_caption", "sidebar_uploader"])
+    # ✅ 正确：只清空自己负责的文本框，不再去动文件上传器的状态
+    _send_user_message(content_parts, clear_keys=["sidebar_caption"])
 
 
 def send_file_interpretation_request():
@@ -523,7 +529,8 @@ def send_file_interpretation_request():
         try:
             content_parts = [genai.upload_file(path=f) for f in uploaded_files]
             content_parts.append(prompt)
-            _send_user_message(content_parts, clear_keys=["file_interpreter_prompt", "file_interpreter_uploader"])
+            # ✅ 正确：只清空自己负责的文本框
+            _send_user_message(content_parts, clear_keys=["file_interpreter_prompt"])
         except Exception as e:
             st.error(f"处理或上传文件时出错: {e}")
 
@@ -581,7 +588,8 @@ def send_video_interpretation_request():
 
         # --- 步骤 3: 发送提问请求 ---
         content_parts.append(prompt)
-        _send_user_message(content_parts, clear_keys=["video_prompt", "youtube_url_input", "video_uploader"])
+        # ✅ 正确：只清空自己负责的文本框，不再碰 video_uploader
+        _send_user_message(content_parts, clear_keys=["video_prompt", "youtube_url_input"])
         
     except Exception as e:
         st.error(f"处理或上传影片时出错: {e}")
@@ -696,7 +704,7 @@ output=<thinking>+<content>
 !!!最终执行指令!!!
 **核心任务锁定**: 根据当前模式，聚焦于唯一核心：
     - **模式【自选角色】**: 
-随机选择一个【角色词条】，例如：“Ganyu (Genshin Impact)”。【绝对禁止】原创或替换此角色。注意：角色词条拼对（否则绘画ai无法调用角色）。角色特征谨慎，不要使用与角色不符的特征(否则会使已调用的角色失效，如果你不认识该角色，请不要写任何角色特征)
+随机选择一个【角色词条】(如果有token角色必须来自token)，例如：“Ganyu (Genshin Impact)”。【绝对禁止】原创或替换此角色。注意：角色词条拼对（否则绘画ai无法调用角色）。角色特征谨慎，不要使用与角色不符的特征(否则会使已调用的角色失效，如果你不认识该角色，请不要写任何角色特征)
     - **模式【自选主题】**: 
 锁定用户提供的【token】，并以此为唯一创作核心。
     - **模式【提词器】**: 
@@ -2661,6 +2669,7 @@ if st.session_state.is_generating:
                     # --- 【修复结束】---
 
                     # 3. 最后，才拿着消息包去调用API
+                    logging.warning(f"--- [DIAGNOSTIC LOG at {datetime.now()}] --- About to call getAnswer().")
                     streamed_part = ""
                     for chunk in getAnswer(payload_to_send=api_payload):
                         streamed_part += chunk
@@ -2699,16 +2708,20 @@ if st.session_state.is_generating:
                     st.session_state.is_generating = False 
                 
                 finally:
-                    # (finally 块逻辑完全不变)
+                    # (finally 块的逻辑保持不变)
                     if is_continuation_task and st.session_state.messages and st.session_state.messages[-1].get("is_continue_prompt"):
                        st.session_state.messages.pop()
+
                     if st.session_state.messages and st.session_state.messages[-1]['role'] == 'assistant':
                        content = st.session_state.messages[-1].get("content", [""])[0]
                        if not isinstance(content, str) or not content.strip():
                            st.session_state.messages.pop()
+
                     with open(log_file, "wb") as f:
                         pickle.dump(_prepare_messages_for_save(st.session_state.messages), f)
-                    logging.warning(f"--- [DIAGNOSTIC LOG at {datetime.now()}] --- Finally block finished. Preparing for rerun.")
+                    
+                    logging.warning(f"--- [DIAGNOGSTIC LOG at {datetime.now()}] --- Finally block finished. Preparing for rerun.")
+                    
                     st.rerun()
 
 
