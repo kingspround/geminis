@@ -284,7 +284,7 @@ def _build_setup_messages():
 
 
 
-一、Deep Think（在PIXIV获得更多的收藏的策略）
+一、Deep Think（执行PIXIV获得更多的收藏的策略，follow【创作执行协议】，stady【词条撰写教程】and【色色进阶教程】）
 step1：指令解析
 主问题
 
