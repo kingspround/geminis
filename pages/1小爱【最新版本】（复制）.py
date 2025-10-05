@@ -3016,7 +3016,7 @@ else:
 
 
 # ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
-# ★★★ 最终版核心生成逻辑 (已集成“飞行记录仪”日志记录) ★★★
+# ★★★ 最终版核心生成逻辑 (已集成“飞行记录仪”日志记录 和 续写错误修复) ★★★
 # ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
 if st.session_state.is_generating:
     logging.warning(f"--- [DIAGNOSTIC LOG at {datetime.now()}] --- Entered 'is_generating' block.")
@@ -3030,17 +3030,24 @@ if st.session_state.is_generating:
             target_message_index = -1
             if is_continuation_task:
                 target_message_index = st.session_state.messages[-1].get("target_index", -1)
-            elif not st.session_state.messages or st.session_state.messages[-1]["role"] != "assistant":
-                st.session_state.messages.append({"role": "assistant", "content": [""]})
+            # 兼容普通消息和重新生成
+            else: 
+                # 如果是新消息，在末尾追加
+                if not st.session_state.messages or st.session_state.messages[-1]["role"] != "assistant":
+                    st.session_state.messages.append({"role": "assistant", "content": [""]})
+                # 确定目标索引为最后一条消息
+                target_message_index = len(st.session_state.messages) - 1
+
             
             if not (-len(st.session_state.messages) <= target_message_index < len(st.session_state.messages)):
-                 st.error("续写目标消息索引无效，已停止生成。")
+                 st.error("续写或生成的目标消息索引无效，已停止生成。")
                  st.session_state.is_generating = False
                  st.rerun()
             else:
                 full_response_content = ""
                 try:
                     # 1. 安全地构建将要发送的消息包
+                    # 注意：对于重新生成，is_continuation_task为False，但目标索引是正确的
                     api_payload = _build_api_payload(is_continuation_task, target_message_index)
 
                     # 2. 立刻将“飞行计划”存入“黑匣子”
@@ -3102,8 +3109,8 @@ if st.session_state.is_generating:
                        st.session_state.messages.pop()
 
                     if st.session_state.messages and st.session_state.messages[-1]['role'] == 'assistant':
-                       content = st.session_state.messages[-1].get("content", [""])[0]
-                       if not isinstance(content, str) or not content.strip():
+                       content_list = st.session_state.messages[-1].get("content", [])
+                       if not content_list or (isinstance(content_list[0], str) and not content_list[0].strip()):
                            st.session_state.messages.pop()
 
                     with open(log_file, "wb") as f:
