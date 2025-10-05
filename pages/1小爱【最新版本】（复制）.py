@@ -284,7 +284,7 @@ def _build_setup_messages():
 
 
 
-一、Deep Think（执行在PIXIV获得更多的收藏的策略）
+一、Deep Think（执行在PIXIV获得更多的收藏的策略，实用性：没有色色的视角/人物/服饰/动作/XP/等等......就会没人看）
 step1：指令解析
 主问题
 
