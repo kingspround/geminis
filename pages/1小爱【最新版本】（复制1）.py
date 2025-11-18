@@ -2219,18 +2219,6 @@ if st.session_state.get("editing"):
 display_last_message_actions()
 
 
-# --- 核心交互逻辑 (主输入框) ---
-if st.session_state.is_generating:
-    # 【修改】当正在生成时，显示一个被禁用的、带有友好提示的输入框
-    st.chat_input("AI正在思考中，请稍候...", disabled=True)
-else:
-    # 当不在生成时，显示正常的输入框
-    if prompt := st.chat_input("输入你的消息...", key="main_chat_input", disabled=st.session_state.editing):
-        token = generate_token()
-        full_prompt = f"{prompt} (token: {token})" if st.session_state.use_token else prompt
-        
-        # 直接调用我们重构好的通用发送函数
-        _send_user_message([full_prompt]) 
 
 
 # ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
