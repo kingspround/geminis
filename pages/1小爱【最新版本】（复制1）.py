@@ -2234,115 +2234,74 @@ else:
 
 
 # ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
-# ★★★ 最终版核心生成逻辑 (已集成“飞行记录仪”日志记录 和 续写错误修复) ★★★
+# ★★★ 核心逻辑 (最终正确版：修复执行穿透 + 恢复心跳 + 解决UI延迟) ★★★
 # ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
-if st.session_state.is_generating:
-    logging.warning(f"--- [DIAGNOSTIC LOG at {datetime.now()}] --- Entered 'is_generating' block.")
 
-    is_continuation_task = st.session_state.messages and st.session_state.messages[-1].get("is_continue_prompt")
+# --- 1. “车辆出发点” ---
+# 所有按钮和输入框，都只负责准备工作和发出信号，然后立即 RERUN
+
+if prompt := st.chat_input("输入你的消息...", key="main_chat_input"):
+    st.session_state.messages.append({"role": "user", "content": [prompt]})
+    st.session_state.do_generation = True
+    # 【关键】输入后立即rerun，将“输入处理”和“生成执行”彻底分离
+    st.experimental_rerun()
+
+
+# --- 2. “主干道” 和 “停车场” ---
+# 这个代码块只会在 “do_generation” 信号存在时，在一次全新的脚本运行中被执行
+if st.session_state.get("do_generation"):
+    # 信号已收到，立即销毁，保证单次执行
+    st.session_state.do_generation = False
+
+    # 【修复UI延迟】在生成前，先将最新的用户消息显示出来
+    # 注意：因为rerun的存在，这个显示动作和生成是在同一次脚本运行中，所以是即时的
+    last_user_message = st.session_state.messages[-1]
+    if last_user_message["role"] == "user":
+         with st.chat_message("user"):
+            # 净化内容，只显示字符串
+            user_text_parts = [part for part in last_user_message.get("content", []) if isinstance(part, str)]
+            if user_text_parts:
+                st.markdown(" ".join(user_text_parts))
     
+    # 【关键】恢复思考圈圈，它就是我们的心跳
     with st.chat_message("assistant"):
+        placeholder = st.empty()
         with st.spinner("AI 正在思考中..."):
-            placeholder = st.empty()
-            
-            target_message_index = -1
-            if is_continuation_task:
-                target_message_index = st.session_state.messages[-1].get("target_index", -1)
-            # 兼容普通消息和重新生成
-            else: 
-                # 如果是新消息，在末尾追加
-                if not st.session_state.messages or st.session_state.messages[-1]["role"] != "assistant":
-                    st.session_state.messages.append({"role": "assistant", "content": [""]})
-                # 确定目标索引为最后一条消息
-                target_message_index = len(st.session_state.messages) - 1
+            try:
+                # 检查车辆类型
+                is_continuation = st.session_state.messages[-1].get("is_continuation_prompt", False)
 
-            
-            if not (-len(st.session_state.messages) <= target_message_index < len(st.session_state.messages)):
-                 st.error("续写或生成的目标消息索引无效，已停止生成。")
-                 st.session_state.is_generating = False
-                 st.rerun()
-            else:
-                full_response_content = ""
-                try:
-                    # 1. 安全地构建将要发送的消息包
-                    # 注意：对于重新生成，is_continuation_task为False，但目标索引是正确的
-                    api_payload = _build_api_payload(is_continuation_task, target_message_index)
+                # 【API 主干道】
+                full_response = ""
+                for chunk in getAnswer():
+                    full_response += chunk
+                    placeholder.markdown(full_response + "▌")
+                placeholder.markdown(full_response)
 
-                    # 2. 立刻将“飞行计划”存入“黑匣子”
-                    st.session_state.last_debug_payload = api_payload
+                # 【专属停车场加工】
+                if is_continuation:
+                    target_idx = st.session_state.messages[-1].get("target_index")
+                    st.session_state.messages.pop()
+                    st.session_state.messages[target_idx]["content"][0] += full_response
+                else:
+                    st.session_state.messages.append({"role": "assistant", "content": [full_response]})
 
-                    # --- 【关键修复】---
-                    # 在开始流式处理之前，必须在这里定义 original_content
-                    # 默认情况下，它是一个空字符串（用于新消息或重新生成）
-                    original_content = ""
-                    # 如果是“继续”任务，则获取已有的文本内容
-                    if is_continuation_task:
-                        content_list = st.session_state.messages[target_message_index]["content"]
-                        if content_list and isinstance(content_list[0], str):
-                            original_content = content_list[0]
-                    # --- 【修复结束】---
+                # 所有车辆加工完毕，保存并刷新道路
+                with open(log_file, "wb") as f:
+                    pickle.dump(_prepare_messages_for_save(st.session_state.messages), f)
+                st.experimental_rerun()
 
-                    # 3. 最后，才拿着消息包去调用API
-                    logging.warning(f"--- [DIAGNOSTIC LOG at {datetime.now()}] --- About to call getAnswer().")
-                    streamed_part = ""
-                    for chunk in getAnswer(payload_to_send=api_payload):
-                        streamed_part += chunk
-                        full_response_content = original_content + streamed_part
-                        st.session_state.messages[target_message_index]["content"][0] = full_response_content
-                        placeholder.markdown(full_response_content + "▌")
-                    
-                    logging.warning(f"--- [DIAGNOSTIC LOG at {datetime.now()}] --- Finished calling getAnswer().")
-                    
-                    placeholder.markdown(full_response_content)
-                    st.session_state.is_generating = False 
-                    st.session_state.last_error_message = None
+            except Exception as e:
+                # 【事故处理】
+                error_type_name = type(e).__name__
+                error_details = str(e.args) if e.args else "无更多细节"
+                st.error(f"**[ 🔴 生成中断 ]**\n\n**错误类型:** {error_type_name}\n\n**详情:** {error_details}")
+                # 失败时不 rerun，保留事故现场
 
-                except Exception as e:
-                    # (这里的错误捕获和记录逻辑完全不变)
-                    error_type = type(e).__name__
-                    error_details = str(e)
-                    full_traceback = traceback.format_exc()
-                    formatted_error = f"""
-**类型 (Type):** `{error_type}`
-**详情 (Details):**
-```
-{error_details}
-```
-**完整追溯 (Traceback):**
-```
-{full_traceback}
-```
-                    """
-                    st.session_state.last_error_message = formatted_error
-                    logging.error(f"--- [ERROR LOG at {datetime.now()}] --- Exception caught: {e}", exc_info=True)
-                    st.error(f"回答生成时中断。错误详情请查看侧边栏日志。")
-                    if full_response_content:
-                        st.session_state.messages[target_message_index]["content"][0] = full_response_content
-                        placeholder.markdown(full_response_content)
-                    st.session_state.is_generating = False 
-                
-                finally:
-                    # (finally 块的逻辑保持不变)
-                    if is_continuation_task and st.session_state.messages and st.session_state.messages[-1].get("is_continue_prompt"):
-                       st.session_state.messages.pop()
-
-                    if st.session_state.messages and st.session_state.messages[-1]['role'] == 'assistant':
-                       content_list = st.session_state.messages[-1].get("content", [])
-                       if not content_list or (isinstance(content_list[0], str) and not content_list[0].strip()):
-                           st.session_state.messages.pop()
-
-                    with open(log_file, "wb") as f:
-                        pickle.dump(_prepare_messages_for_save(st.session_state.messages), f)
-                    
-                    logging.warning(f"--- [DIAGNOGSTIC LOG at {datetime.now()}] --- Finally block finished. Preparing for rerun.")
-                    
-                    st.rerun()
-
-
-
-# --- 底部控件 ---
+# --- 3. 底部控件 ---
+# (这部分代码保持不变)
 c1, c2 = st.columns(2)
 st.session_state.use_token = c1.checkbox("使用 Token", value=st.session_state.get("use_token", True))
-if c2.button("🔄", key="page_refresh", help="刷新页面"): st.rerun()
+if c2.button("🔄", key="page_refresh", help="刷新页面"):
+    st.experimental_rerun()
 
-	
