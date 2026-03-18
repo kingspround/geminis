@@ -55,7 +55,7 @@ API_KEYS = {
 MODELS = {
     "gemini-2.5-flash-preview-05-20 (默认)": "gemini-2.5-flash-preview-05-20",
     "gemini-2.5-pro": "gemini-2.5-pro",
-    "gemini-2.0-flash-exp": "gemini-2.0-flash-exp",
+    "gemini-2.0-flash": "gemini-2.0-flash",
     "gemini-exp-1206": "gemini-exp-1206",
     "gemini-embedding-001 (嵌入模型，会报错)": "gemini-embedding-001",
 }
