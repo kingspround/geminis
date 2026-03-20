@@ -12,7 +12,7 @@ from io import StringIO
 import streamlit as st
 
 if "key" not in st.session_state:
-    st.session_state.key = "AIzaSyDp6qJunrZ37Nc9ucbItUJB-L8lYXDdGgs"  # 请替换为你的实际密钥
+    st.session_state.key = "AIzaSyCGakEmPpSGcWdjYNhTSt6dxqba1gTbjEA"  # 请替换为你的实际密钥
 
     
 if not st.session_state.key:
