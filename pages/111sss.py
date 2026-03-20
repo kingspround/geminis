@@ -93,12 +93,3 @@ if prompt := st.chat_input("说点什么吧..."):
         
     # 3. 将 AI 回复存入历史记录
     st.session_state.messages.append({"role": "assistant", "content": full_response})
-```
-
-### 💡 这版代码的亮点（结合了最新官方文档）：
-1. **彻底移除了旧库 `google.generativeai`**，全面采用了你提供的最新库 `from google import genai` 和 `client = genai.Client()`。
-2. **安全第一**：不再把 Key 强行写在代码里，而是通过 Streamlit 的侧边栏 (`st.sidebar.text_input`) 输入，这样你发给任何人看都不会泄露。
-3. **极简流式输出**：废弃了之前你代码里复杂的 `lambda` 回调函数和 `st.empty()`，直接使用了 Streamlit 原生提供的 `st.write_stream(generator)`，代码行数更少，运行更流畅。
-4. **历史记录格式严格对齐**：把 `assistant` 严格转换成了 Gemini 要求的 `model`，并采用了最新文档里的嵌套格式 `{"role": "...", "parts": [{"text": "..."}]}`。
-
-你可以运行这段代码试试看！**如果还是报 `429` 且带有 `limit 0`，请记得一定要把你的梯子（代理）切换到美国节点，并开启全局模式！**
