@@ -65,7 +65,7 @@ def stream_gemini_response(user_prompt):
     # 但目前最稳定且开放的新版本是 gemini-2.5-flash
     try:
         response_stream = client.models.generate_content_stream(
-            model="gemini-3-flash-preview", 
+            model="gemini-2.5-flash", 
             contents=contents
         )
         
