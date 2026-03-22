@@ -24,7 +24,7 @@ API_KEYS = {
 	"3 1号539310778764":"AIzaSyBVbA7tEyyy_ASp7l9P60qSh1xOM2CSMNw",
 	"3 1号342196464449":"AIzaSyDQrUXv_JhfU0nGV47r6Maqb9StmaTI5rM",
 
-	"hj1":"AIzaSyC5B2z49h54qQlRo6Gt2tAstGn1YA0SWA0",
+	"hj1":"AIzaSyDvyE0XC_Tn9QWEMMM7RVRB_m-2cUH4LUU",
 	"hj2":"AIzaSyChxFl-GUcBD19Fz7MF_sZwW79T0xRKRFM",
 	"hj3":"AQ.Ab8RN6K3CYN2LP6hJabLqck6zCKUfl38XibN23-V-GDGP1DPNA",
 	"hj4":"AIzaSyAHX8TELMSOnyM-nwCcegYp-zlLGv9e7y4",
@@ -58,7 +58,7 @@ API_KEYS = {
 MODELS = {
     "gemini-2.5-flash-preview-05-20 (默认)": "gemini-2.5-flash-preview-05-20",
     "gemini-2.5-pro": "gemini-2.5-pro",
-    "gemini-2.0-flash-exp": "gemini-2.0-flash-exp",
+    "gemini-2.0-flash-exp": "gemini-1.5-flash",
     "gemini-exp-1206": "gemini-exp-1206",
     "gemini-embedding-001 (嵌入模型，会报错)": "gemini-embedding-001",
 }
